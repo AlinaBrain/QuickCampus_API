@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace QuickCampus_Core.Services
 {
-    public class CountryServices : BaseRepository<QuikCampusContext, Country>, ICountry
-    {
-    }
+    //public class CountryServices : BaseRepository<QuikCampusContext, Country>, ICountry
+    //{
+    //}
 }

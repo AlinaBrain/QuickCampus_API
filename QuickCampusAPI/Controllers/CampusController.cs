@@ -21,14 +21,14 @@ namespace QuickCampusAPI.Controllers
     public class CampusController : ControllerBase
     {
         private readonly ICampusRepo _campusrepo;
-        private readonly ICountry _country;
+        //private readonly ICountry _country;
         private readonly IStateRepo _staterepo;
 
-        public CampusController(IConfiguration configuration, ICampusRepo campusrepo, ICountry country, IStateRepo stateRepo)
+        public CampusController(IConfiguration configuration, ICampusRepo campusrepo)
         {
             _campusrepo = campusrepo;
-            _country = country;
-            _staterepo = stateRepo;
+            //_country = country;
+            //_staterepo = stateRepo;
         }
 
         [HttpGet]
@@ -81,26 +81,26 @@ namespace QuickCampusAPI.Controllers
         //    return Ok(model);
 
         //}
-        [HttpGet]
-        [Route("Edit")]
-        public async Task<ActionResult> Edit(int Id)
-        {
-            var campus = _campusrepo.GetCampusByID(Id);
-            CampusGridViewModel model = new CampusGridViewModel()
-            {
-                WalkInID = campus.Id,
-                JobDescription = campus.JobDescription,
-                WalkInDate = campus.WalkInDate,
-                Address1 = campus.Address1,
-                Address2 = campus.Address2,
-                City = campus.City,
-                StateID = campus.StateID,
-                CountryID = campus.CountryID,
-                Colleges = campus.Colleges,
-                Title = campus.Title
-            };
-            return Ok(model);
-        }
+        //[HttpGet]
+        //[Route("Edit")]
+        //public async Task<ActionResult> Edit(int Id)
+        //{
+        //    var campus = _campusrepo.GetCampusByID(Id);
+        //    CampusGridViewModel model = new CampusGridViewModel()
+        //    {
+        //        WalkInID = campus.Id,
+        //        JobDescription = campus.JobDescription,
+        //        WalkInDate = campus.WalkInDate,
+        //        Address1 = campus.Address1,
+        //        Address2 = campus.Address2,
+        //        City = campus.City,
+        //        StateID = campus.StateID,
+        //        CountryID = campus.CountryID,
+        //        Colleges = campus.Colleges,
+        //        Title = campus.Title
+        //    };
+        //    return Ok(model);
+        //}
 
         [HttpGet]
         [Route("AddCampus")]
@@ -116,85 +116,85 @@ namespace QuickCampusAPI.Controllers
         }
 
 
-        [HttpPost]
-        [Route("AddCampus")]
-        public async Task<IActionResult> AddCampus(CampusGridViewModel campusGridViewModel)
-        {
-            IGeneralResult<CampusGridViewModel> result = new GeneralResult<CampusGridViewModel>();
-            try
-            {
-                if (ModelState.IsValid)
-                {
-                    var FindCountry = _country.GetAll().Result.Where(x => x.CountryId == campusGridViewModel.CountryID).ToList();
-                    var FindStates = _staterepo.GetAll().Result.Where(x => x.StateId == campusGridViewModel.StateID);
-                    if (FindCountry == null)
-                    {
-                        result.Message = "This Country is not listed for Country Table!";
-                        return Ok(result);
-                    }
-                    else if (FindStates == null)
-                    {
-                        result.Message = "State not found!";
-                        return Ok(result);
-                    }
-                    else
-                    {
-                        var campusDetails = _campusrepo.GetAll().Result.Where(x => x.CountryId == campusGridViewModel.CountryID && x.StateId == campusGridViewModel.StateID).FirstOrDefault();
-                        if (campusDetails == null)
-                        {
-                            var ad = new CampusGridViewModel()
-                            {
-                                Title = campusGridViewModel.Title,
-                                StateID = campusGridViewModel.StateID,
-                                CountryID = campusGridViewModel.CountryID,
-                                City = campusGridViewModel.City,
-                                JobDescription = campusGridViewModel.JobDescription,
-                                WalkInDate = campusGridViewModel.WalkInDate,
-                                Address1 = campusGridViewModel.Address1,
-                                Address2 = campusGridViewModel.Address2,
-                               
+        //    [HttpPost]
+        //    [Route("AddCampus")]
+        //    public async Task<IActionResult> AddCampus(CampusGridViewModel campusGridViewModel)
+        //    {
+        //        IGeneralResult<CampusGridViewModel> result = new GeneralResult<CampusGridViewModel>();
+        //        try
+        //        {
+        //            if (ModelState.IsValid)
+        //            {
+        //                var FindCountry = _country.GetAll().Result.Where(x => x.CountryId == campusGridViewModel.CountryID).ToList();
+        //                var FindStates = _staterepo.GetAll().Result.Where(x => x.StateId == campusGridViewModel.StateID);
+        //                if (FindCountry == null)
+        //                {
+        //                    result.Message = "This Country is not listed for Country Table!";
+        //                    return Ok(result);
+        //                }
+        //                else if (FindStates == null)
+        //                {
+        //                    result.Message = "State not found!";
+        //                    return Ok(result);
+        //                }
+        //                else
+        //                {
+        //                    var campusDetails = _campusrepo.GetAll().Result.Where(x => x.CountryId == campusGridViewModel.CountryID && x.StateId == campusGridViewModel.StateID).FirstOrDefault();
+        //                    if (campusDetails == null)
+        //                    {
+        //                        var ad = new CampusGridViewModel()
+        //                        {
+        //                            Title = campusGridViewModel.Title,
+        //                            StateID = campusGridViewModel.StateID,
+        //                            CountryID = campusGridViewModel.CountryID,
+        //                            City = campusGridViewModel.City,
+        //                            JobDescription = campusGridViewModel.JobDescription,
+        //                            WalkInDate = campusGridViewModel.WalkInDate,
+        //                            Address1 = campusGridViewModel.Address1,
+        //                            Address2 = campusGridViewModel.Address2,
 
 
-                            };
-                           
-                            var campus = await _campusrepo.Add(campusDetails);
-                            if (campus != null)
-                            {
-                                result.IsSuccess = true;
-                                result.Message = "College Added Successfully.";
-                                result.Data = campusGridViewModel;
-                            }
-                            else
-                            {
-                                result.Message = " Something Went wrong!";
-                            }
-                        }
-                        else
-                        {
-                            result.Message = "College Already Exist!";
-                        }
-                    }
-                }
 
-            }
-            catch (Exception ex)
-            {
-                result.Message = "Server Error!";
-            }
-            return Ok(result);
-        }
+        //                        };
+
+        //                        var campus = await _campusrepo.Add(campusDetails);
+        //                        if (campus != null)
+        //                        {
+        //                            result.IsSuccess = true;
+        //                            result.Message = "College Added Successfully.";
+        //                            result.Data = campusGridViewModel;
+        //                        }
+        //                        else
+        //                        {
+        //                            result.Message = " Something Went wrong!";
+        //                        }
+        //                    }
+        //                    else
+        //                    {
+        //                        result.Message = "College Already Exist!";
+        //                    }
+        //                }
+        //            }
+
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            result.Message = "Server Error!";
+        //        }
+        //        return Ok(result);
+        //    }
+
+        //}
 
     }
-
-
 }
 
 
 
 
 
-       
 
 
-    
+
+
 

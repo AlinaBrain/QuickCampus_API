@@ -163,8 +163,7 @@ namespace QuickCampus_Core.Services
         {
             throw new NotImplementedException();
         }
-       
-        
+
+
     }
 }
-        
