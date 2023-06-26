@@ -65,7 +65,8 @@ namespace QuickCampus_Core.ViewModel
                 WalkInId = WalkInId,
                 Address1 = Address1,
                 Address2 = Address2,
-                City = City,             
+                City = City,
+                
                 CreatedDate = CreatedDate,
                 JobDescription = JobDescription,
                 WalkInDate = WalkInDate,
