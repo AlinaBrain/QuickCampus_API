@@ -203,6 +203,11 @@ namespace QuickCampus_Core.Services
 
         }
 
+        public IEnumerable<object> GetAllApplicant()
+        {
+            throw new NotImplementedException();
+        }
+
 
 
         //public ApplicantViewModel Add(ApplicantViewModel applicantViewModel)
