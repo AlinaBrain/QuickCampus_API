@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace QuickCampus_Core.Interfaces
 {
-    //public interface ICountry : IGenericRepository<Country>
-    //{
-    //}
+    public interface ICountryRepo 
+    {
+    }
 }

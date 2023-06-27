@@ -60,7 +60,7 @@ namespace QuickCampusAPI.Controllers
             return Ok();
         }
 
-     [HttpPut]
+     [HttpPost]
      [Route("EditApplicant")]
        public async Task<IActionResult> EditApplicant(ApplicantRegisterViewModel applicantViewModel, int ApplicantId)
        {

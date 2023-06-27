@@ -22,14 +22,14 @@ namespace QuickCampusAPI.Controllers
     public class CampusController : ControllerBase
     {
         private readonly ICampusRepo _campusrepo;
-        // private readonly ICountry _country;
+        private readonly ICountryRepo _country;
         private readonly IStateRepo _staterepo;
 
-        public CampusController(IConfiguration configuration, ICampusRepo campusrepo)
+        public CampusController(IConfiguration configuration, ICampusRepo campusrepo, ICountryRepo countryRepo, IStateRepo stateRepo)
         {
             _campusrepo = campusrepo;
-            // _country = country;
-            //_staterepo = stateRepo;
+             _country = countryRepo;
+            _staterepo = stateRepo;
         }
 
         [HttpGet]
@@ -76,46 +76,15 @@ namespace QuickCampusAPI.Controllers
         //        Title = campus.Title
         //    };
 
-        //    var StateList = Common.GetStateByCountryID(campus.CountryID ?? 0);
+        //    var StateList = _staterepo.GetStateByCountryID(campus.CountryID ?? 0);
         //    model.States = StateList.Successful ? (StateList.Value as IEnumerable).OfType<StateModel>().Select(x => new SelectListItem() { Text = x.StateName, Value = x.StateID.ToString() }) : new List<SelectListItem>();
-        //    model.Countries = (Common.GetAllCountries().Value as IEnumerable).OfType<CountryModel>().Select(x => new SelectListItem() { Text = x.CountryName, Value = x.CountryID.ToString() });
+        //    model.Countries = _counteryrepo.GetAllCountries().Value as IEnumerable).OfType<CountryModel>().Select(x => new SelectListItem() { Text = x.CountryName, Value = x.CountryID.ToString() });
         //    return Ok(model);
         //}
 
 
 
-        //[HttpPut]
-        //[Route("EditCampus")]
-        //public async Task<IActionResult> EditCampus(CampusViewModel campusViewModel, int WalkInId)
-        //{
-        //    try
-        //    {
-        //        IGeneralResult<CampusViewModel> result = new GeneralResult<CampusViewModel>();
-        //        var campusdetails = _campusrepo.GetCampusByID(WalkInId);
-        //        if (campusdetails != null)
-        //        {
-        //            campusdetails.WalkInID = campusViewModel.WalkInID;
-        //            campusdetails.JobDescription = campusViewModel.JobDescription;
-        //            campusdetails.WalkInDate = campusViewModel.WalkInDate;
-        //            campusdetails.Address1 = campusViewModel.Address1;
-        //            campusdetails.Address2 = campusViewModel.Address2;
-        //            campusdetails.City = campusViewModel.City;
-        //            campusdetails.Colleges = campusViewModel.Colleges;
-        //            campusdetails.Title = campusViewModel.Title;
-                   
-        //        }
-        //        else
-        //        {
-        //            result.Message = "Campus details does not found";
-        //        }
-        //        return Ok(result);
-        //    }
-        //    catch (Exception ex)
-        //    {
 
-        //    }
-        //    return Ok();
-        //}
 
         [HttpPost]
         [Route("AddCampus")]

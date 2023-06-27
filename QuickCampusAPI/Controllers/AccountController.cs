@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using QuickCampus_Core.Common;
@@ -12,8 +14,8 @@ using System.Text;
 
 namespace QuickCampusAPI.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class AccountController : ControllerBase
     {
         private readonly IApplicationUserRepo _applicationUserRepo;
@@ -69,6 +71,9 @@ namespace QuickCampusAPI.Controllers
             return null;
         }
 
+
+
+      
 
     }
 }

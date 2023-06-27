@@ -26,5 +26,7 @@ namespace QuickCampus_Core.Common
             HR = 3
         }
 
+
+
     }
 }

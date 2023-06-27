@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 
 namespace QuickCampus_Core.Interfaces
 {
-    public interface IStateRepo : IGenericRepository<State>
-    {
+    public interface IStateRepo
+    { 
+
     }
 }
