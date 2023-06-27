@@ -174,11 +174,6 @@ namespace QuickCampusAPI.Controllers
         //}
 
 
-
-
-
-
-
         //[HttpPost]
         //[Route("AddApplicant")]
         //public async Task<IActionResult> AddApplicant([FromBody] ApplicantViewModel applicantViewModel)
