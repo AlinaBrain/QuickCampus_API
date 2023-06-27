@@ -24,8 +24,8 @@ namespace QuickCampus_Core.Services
         }
         public async  Task<List<QuestionViewModelAdmin>> GetAllQuestion()
         {
-            
-               var rec =  _context.Questions.Where(x => x.IsDeleted == false && x.IsActive == true).Select(x => new QuestionViewModelAdmin()
+            List<QuestionViewModelAdmin> record = new List<QuestionViewModelAdmin>();
+               record =  _context.Questions.Where(x => x.IsDeleted == false && x.IsActive == true).Select(x => new QuestionViewModelAdmin()
                 {
                     QuestionId = x.QuestionId,
                     QuestionTypeName = x.QuestionType.QuestionType1,
@@ -34,15 +34,8 @@ namespace QuickCampus_Core.Services
                     Question = x.Text,
                     IsActive = x.IsActive ?? false
                 }).ToList();
+            return record;
 
-            if (rec.Any())
-            {
-                return rec;
-            }
-            else
-            {
-                return new List<GroupViewModelAdmin>();
-            }
         }
         public async Task<QuestionViewModelAdmin> GetQuestionById(int QuestionId)
         {
