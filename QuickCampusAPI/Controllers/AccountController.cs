@@ -27,55 +27,55 @@ namespace QuickCampusAPI.Controllers
             _config = config;
             _applicationUserRepo = applicationUserRepo;
         }
-        //[HttpPost]
-        //[Route("AdminLogin")]
-        //public IActionResult AdminLogin([FromBody] AdminLogin adminlogin)
-        //{
-        //    var user = Authenticate(adminlogin);
-        //    if (user != null)
-        //    {
-        //        var token = Generate(adminlogin);
-        //        return Ok(token);
+        [HttpPost]
+        [Route("AdminLogin")]
+        public IActionResult AdminLogin([FromBody] AdminLogin adminlogin)
+        {
+            var user = Authenticate(adminlogin);
+            if (user != null)
+            {
+                var token = Generate(adminlogin);
+                return Ok(token);
 
-        //    }
-        //    return NotFound("User Not Found");
+            }
+            return NotFound("User Not Found");
 
-        //}
+        }
 
-        //private string Generate(AdminLogin adminlogin)
-        //{
-        //    var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
-        //    var credentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
+        private string Generate(AdminLogin adminlogin)
+        {
+            var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var credentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
 
-        //    var Claims = new[]
-        //   {
-        //        new Claim(ClaimTypes.NameIdentifier,CommonMethods.ConvertToEncrypt(adminlogin.UserName)),
+            var Claims = new[]
+           {
+                new Claim(ClaimTypes.NameIdentifier,CommonMethods.ConvertToEncrypt(adminlogin.UserName)),
 
-        //        new Claim(ClaimTypes.Name,CommonMethods.ConvertToEncrypt(adminlogin.Password))
+                new Claim(ClaimTypes.Name,CommonMethods.ConvertToEncrypt(adminlogin.Password))
 
-        //    };
-        //    var token = new JwtSecurityToken(_config["Jwt:Issuer"],
-        //       _config["Jwt:Audience"],
-        //       Claims,
-        //       expires: DateTime.Now.AddHours(24),
-        //       signingCredentials: credentials);
-        //    return new JwtSecurityTokenHandler().WriteToken(token);
-        //}
-
-
-        //private ApplicationUserVM Authenticate(AdminLogin adminLogin)
-        //{
-        //    var currentUser = _applicationUserRepo.FirstOrDefault(o => o.UserName.ToLower() == adminLogin.UserName.ToLower() && o.Password == adminLogin.Password);
-        //    if (currentUser != null)
-        //    {
-        //        return (ApplicationUserVM)currentUser;
-        //    }
-        //    return null;
-        //}
+            };
+            var token = new JwtSecurityToken(_config["Jwt:Issuer"],
+               _config["Jwt:Audience"],
+               Claims,
+               expires: DateTime.Now.AddHours(24),
+               signingCredentials: credentials);
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
 
 
+        private ApplicationUserVM Authenticate(AdminLogin adminLogin)
+        {
+            var currentUser = _applicationUserRepo.FirstOrDefault(o => o.UserName.ToLower() == adminLogin.UserName.ToLower() && o.Password == adminLogin.Password);
+            if (currentUser != null)
+            {
+                return (ApplicationUserVM)currentUser;
+            }
+            return null;
+        }
 
-      
+
+
+
 
     }
 }

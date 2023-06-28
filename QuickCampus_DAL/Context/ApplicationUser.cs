@@ -12,6 +12,8 @@ public partial class ApplicationUser
     public string Password { get; set; } = null!;
 
     public string? Token { get; set; }
+    public string EmailId { get; set; }
+    public string Name { get; set; }
 
     public virtual ICollection<ApplicationUserRole> ApplicationUserRoles { get; set; } = new List<ApplicationUserRole>();
 }
