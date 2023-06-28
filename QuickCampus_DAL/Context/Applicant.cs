@@ -28,7 +28,7 @@ public partial class Applicant
     public string? Skills { get; set; }
 
     public int? StatusId { get; set; }
- 
+
     public string? Comment { get; set; }
 
     public DateTime? RegisteredDate { get; set; }
@@ -46,7 +46,4 @@ public partial class Applicant
     public virtual Company? AssignedToCompanyNavigation { get; set; }
 
     public virtual Status? Status { get; set; }
-    //public DateTime? CreatedDate { get; set; }
-   // public bool IsActive { get; set; }
-    //public bool IsDeleted { get; set; }
 }

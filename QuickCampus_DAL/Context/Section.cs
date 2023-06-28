@@ -13,4 +13,3 @@ public partial class Section
 
     public virtual ICollection<Question> Questions { get; set; } = new List<Question>();
 }
-                            

@@ -6,7 +6,7 @@ namespace QuickCampus_DAL.Context;
 public partial class WalkIn
 {
     public int WalkInId { get; set; }
-  
+
     public string? Title { get; set; }
 
     public string? Address1 { get; set; }
@@ -16,9 +16,9 @@ public partial class WalkIn
     public string? City { get; set; }
 
     public int? StateId { get; set; }
-    
+
     public int? CountryId { get; set; }
-  
+
     public DateTime? WalkInDate { get; set; }
 
     public string? JobDescription { get; set; }
@@ -38,5 +38,4 @@ public partial class WalkIn
     public virtual Country? Country { get; set; }
 
     public virtual State? State { get; set; }
-
 }

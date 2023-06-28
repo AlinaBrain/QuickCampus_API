@@ -11,11 +11,11 @@ namespace QuickCampusAPI.Controllers
     {
         private readonly ICountryRepo countryRepo;
         private readonly ICollegeRepo collegeRepo;
-        public CollegeController(ICountryRepo countryRepo,ICollegeRepo collegeRepo)
+        public CollegeController(ICountryRepo countryRepo, ICollegeRepo collegeRepo)
         {
             this.countryRepo = countryRepo;
             this.collegeRepo = collegeRepo;
-            
+
         }
         public IActionResult Index()
         {
@@ -23,7 +23,7 @@ namespace QuickCampusAPI.Controllers
         }
         [HttpGet]
         [Route("getCollegeManage")]
-        public async Task <IActionResult> Manage()
+        public async Task<IActionResult> Manage()
         {
             var model = new CollegeViewModel()
             {
@@ -44,9 +44,7 @@ namespace QuickCampusAPI.Controllers
                 }),
                 filter = new CollegeFilter() { },
             };
-                return Ok(model);
+            return Ok(model);
         }
-
-s
     }
 }
