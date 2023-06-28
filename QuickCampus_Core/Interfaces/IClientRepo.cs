@@ -1,4 +1,6 @@
-﻿using System;
+﻿using QuickCampus_Core.ViewModel;
+using QuickCampus_DAL.Context;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,8 +8,12 @@ using System.Threading.Tasks;
 
 namespace QuickCampus_Core.Interfaces
 {
-    public interface IClientRepo
+    
+    public interface IClientRepo : IGenericRepository<TblClient>
     {
+        Task<List<ClientVM>> GetAllClient();
+        //Task<List<ClientVM>> Add(ClientVM clientVM);
+        Task<ClientVM> Add(ClientVM clientVM);
 
     }
 }
