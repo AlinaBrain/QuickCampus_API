@@ -22,24 +22,21 @@ namespace QuickCampusAPI.Controllers
     {
         private readonly IApplicationUserRepo _applicationUserRepo;
         private IConfiguration _config;
-        public AccountController(IApplicationUserRepo applicationUserRepo, IConfiguration config)
+        private readonly IAccount _account;
+        public AccountController(IApplicationUserRepo applicationUserRepo, IConfiguration config, IAccount account)
         {
             _config = config;
             _applicationUserRepo = applicationUserRepo;
+            _account = account;
         }
+        [AllowAnonymous]
         [HttpPost]
         [Route("AdminLogin")]
-        public IActionResult AdminLogin([FromBody] AdminLogin adminlogin)
+        public IActionResult AdminLogin(AdminLogin adminlogin)
         {
-            var user = Authenticate(adminlogin);
-            if (user != null)
-            {
-                var token = Generate(adminlogin);
-                return Ok(token);
 
-            }
-            return NotFound("User Not Found");
-
+            var res = _account.Login(adminlogin);
+            return Ok(res);
         }
 
         private string Generate(AdminLogin adminlogin)
@@ -62,7 +59,6 @@ namespace QuickCampusAPI.Controllers
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-
         private ApplicationUserVM Authenticate(AdminLogin adminLogin)
         {
             var currentUser = _applicationUserRepo.FirstOrDefault(o => o.UserName.ToLower() == adminLogin.UserName.ToLower() && o.Password == adminLogin.Password);
@@ -72,10 +68,5 @@ namespace QuickCampusAPI.Controllers
             }
             return null;
         }
-
-
-
-
-
     }
 }

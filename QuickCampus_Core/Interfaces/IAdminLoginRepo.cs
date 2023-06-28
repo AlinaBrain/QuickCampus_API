@@ -9,5 +9,7 @@ namespace QuickCampus_Core.Interfaces
 {
     public interface IApplicationUserRepo : IGenericRepository<ApplicationUser>
     {
+
+
     }
 }
