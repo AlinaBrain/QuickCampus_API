@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using QuickCampus_Core.Common;
@@ -9,11 +11,13 @@ using System.CodeDom.Compiler;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 namespace QuickCampusAPI.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
+    [Authorize]
     public class AccountController : ControllerBase
     {
         private readonly IApplicationUserRepo _applicationUserRepo;
@@ -25,12 +29,12 @@ namespace QuickCampusAPI.Controllers
         }
         [HttpPost]
         [Route("AdminLogin")]
-        public IActionResult AdminLogin([FromBody] AdminLogin adminlogin)
+        public IActionResult AdminLogin([FromBody] LoginVM loginVM)
         {
-            var user = Authenticate(adminlogin);
+            var user = Authenticate(loginVM);
             if (user != null)
             {
-                var token = Generate(adminlogin);
+                var token = Generate(loginVM);
                 return Ok(token);
 
             }
@@ -38,16 +42,16 @@ namespace QuickCampusAPI.Controllers
 
         }
 
-        private string Generate(AdminLogin adminlogin)
+        private string Generate(LoginVM loginVM)
         {
             var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
 
             var Claims = new[]
            {
-                new Claim(ClaimTypes.NameIdentifier,CommonMethods.ConvertToEncrypt(adminlogin.UserName)),
+                new Claim(ClaimTypes.NameIdentifier,CommonMethods.ConvertToEncrypt(loginVM.UserName)),
 
-                new Claim(ClaimTypes.Name,CommonMethods.ConvertToEncrypt(adminlogin.Password))
+                new Claim(ClaimTypes.Name,CommonMethods.ConvertToEncrypt(loginVM.Password))
 
             };
             var token = new JwtSecurityToken(_config["Jwt:Issuer"],
@@ -59,9 +63,9 @@ namespace QuickCampusAPI.Controllers
         }
 
 
-        private ApplicationUserVM Authenticate(AdminLogin adminLogin)
+        private ApplicationUserVM Authenticate(LoginVM loginVM)
         {
-            var currentUser = _applicationUserRepo.FirstOrDefault(o => o.UserName.ToLower() == adminLogin.UserName.ToLower() && o.Password == adminLogin.Password);
+            var currentUser = _applicationUserRepo.FirstOrDefault(o => o.UserName.ToLower() == loginVM.UserName.ToLower() && o.Password == loginVM.Password);
             if (currentUser != null)
             {
                 return (ApplicationUserVM)currentUser;
@@ -69,6 +73,9 @@ namespace QuickCampusAPI.Controllers
             return null;
         }
 
+
+
+      
 
     }
 }
