@@ -11,8 +11,8 @@ namespace QuickCampus_Core.Services
 {
     public class StateServices :  IStateRepo
     {
-        private readonly QuikCampusContext _context;
-        public StateServices(QuikCampusContext context)
+        private readonly QuikCampusDevContext _context;
+        public StateServices(QuikCampusDevContext context)
         {
             _context = context;
         }

@@ -14,7 +14,7 @@ using static QuickCampus_Core.ViewModel.ApplicantViewModel;
 
 namespace QuickCampus_Core.Services
 {
-    public class ApplicantRepoServices : BaseRepository<QuikCampusContext, Applicant>, IApplicantRepo
+    public class ApplicantRepoServices : BaseRepository<QuikCampusDevContext, Applicant>, IApplicantRepo
     {
        
         public async Task<IEnumerable<Applicant>> GetApplicant()

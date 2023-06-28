@@ -19,7 +19,7 @@ builder.Services.AddCors(options =>
 });
 
 //Add services to the container.
-builder.Services.AddDbContext<QuikCampusContext>(
+builder.Services.AddDbContext<QuikCampusDevContext>(
     x => x.UseSqlServer(
         builder.Configuration.GetConnectionString("ConnectionString"))
     );
@@ -51,6 +51,7 @@ builder.Services.AddTransient<IApplicantRepo, ApplicantRepoServices>();
 builder.Services.AddScoped<ICampusRepo, CampusService>();
 builder.Services.AddScoped<ICountryRepo, CountryService>();
 builder.Services.AddScoped<ICollegeRepo, CollegeRepo>();
+builder.Services.AddScoped<IUserRepo, UserRepo>();
 
 
 

@@ -15,10 +15,10 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace QuickCampus_Core.Services
 {
-    public class CampusService : BaseRepository<QuikCampusContext, WalkIn>, ICampusRepo
+    public class CampusService : BaseRepository<QuikCampusDevContext, WalkIn>, ICampusRepo
     {
-        private readonly QuikCampusContext _context;
-        public CampusService(QuikCampusContext context)
+        private readonly QuikCampusDevContext _context;
+        public CampusService(QuikCampusDevContext context)
         {
             _context = context;
         }

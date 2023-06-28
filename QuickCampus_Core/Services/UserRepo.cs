@@ -8,8 +8,7 @@ using System.Threading.Tasks;
 
 namespace QuickCampus_Core.Services
 {
-    public class ApplicationUserService : BaseRepository<QuikCampusDevContext, ApplicationUser>, IApplicationUserRepo
+    public class UserRepo : BaseRepository<QuikCampusDevContext, TblUser>, IUserRepo
     {
-
     }
 }
