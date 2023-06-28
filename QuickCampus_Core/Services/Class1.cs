@@ -10,9 +10,9 @@ namespace QuickCampus_Core.Services
 {
     public class ApplicantRepository : IApplicantRepository
     {
-        private readonly QuikCampusContext _context;
+        private readonly QuikCampusDevContext _context;
 
-        public ApplicantRepository(QuikCampusContext context)
+        public ApplicantRepository(QuikCampusDevContext context)
         {
             this._context = context;
         }

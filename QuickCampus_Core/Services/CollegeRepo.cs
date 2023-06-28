@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace QuickCampus_Core.Services
 {
-    public class CollegeRepo : BaseRepository<QuikCampusContext, College>, ICollegeRepo
+    public class CollegeRepo : BaseRepository<QuikCampusDevContext, College>, ICollegeRepo
     {
         public  CollegeGridViewModel GetCollegeByID(int id)
         {
-            using (var context = new QuikCampusContext())
+            using (var context = new QuikCampusDevContext())
             {
                 var college = context.Colleges.Where(x => x.CollegeId == id && x.IsActive == true && x.IsDeleted == false).FirstOrDefault();
                 return college != null ? new CollegeGridViewModel()
@@ -85,7 +85,7 @@ namespace QuickCampus_Core.Services
 
         public async Task <IEnumerable<CollegeGridViewModel>> GetAllCollege()
         {
-            using (var context = new QuikCampusContext())
+            using (var context = new QuikCampusDevContext())
             {
                 var colleges = await dbContext.Colleges.Where(x => x.IsDeleted == false).OrderBy(x => x.CollegeName).Select(x => new CollegeGridViewModel()
                 {

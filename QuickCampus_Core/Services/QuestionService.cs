@@ -17,8 +17,8 @@ namespace QuickCampus_Core.Services
 {
     public class QuestionService : IQuestion
     {
-        private readonly QuikCampusContext _context;
-        public QuestionService(QuikCampusContext context)
+        private readonly QuikCampusDevContext _context;
+        public QuestionService(QuikCampusDevContext context)
         {
             _context = context;
         }

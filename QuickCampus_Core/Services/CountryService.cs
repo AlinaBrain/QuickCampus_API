@@ -12,10 +12,10 @@ using System.Threading.Tasks;
 
 namespace QuickCampus_Core.Services
 {
-   public class CountryService : BaseRepository<QuikCampusContext, Country>, ICountryRepo
+   public class CountryService : BaseRepository<QuikCampusDevContext, Country>, ICountryRepo
     {
-        private readonly QuikCampusContext _context;
-        public CountryService(QuikCampusContext context)
+        private readonly QuikCampusDevContext _context;
+        public CountryService(QuikCampusDevContext context)
         {
             _context = context;
         }
