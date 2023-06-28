@@ -11,13 +11,11 @@ using System.CodeDom.Compiler;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.AspNetCore.Authorization;
 
 namespace QuickCampusAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class AccountController : ControllerBase
     {
         private readonly IApplicationUserRepo _applicationUserRepo;
@@ -29,12 +27,12 @@ namespace QuickCampusAPI.Controllers
         }
         [HttpPost]
         [Route("AdminLogin")]
-        public IActionResult AdminLogin([FromBody] LoginVM loginVM)
+        public IActionResult AdminLogin([FromBody] AdminLogin adminlogin)
         {
-            var user = Authenticate(loginVM);
+            var user = Authenticate(adminlogin);
             if (user != null)
             {
-                var token = Generate(loginVM);
+                var token = Generate(adminlogin);
                 return Ok(token);
 
             }
@@ -42,16 +40,16 @@ namespace QuickCampusAPI.Controllers
 
         }
 
-        private string Generate(LoginVM loginVM)
+        private string Generate(AdminLogin adminlogin)
         {
             var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
 
             var Claims = new[]
            {
-                new Claim(ClaimTypes.NameIdentifier,CommonMethods.ConvertToEncrypt(loginVM.UserName)),
+                new Claim(ClaimTypes.NameIdentifier,CommonMethods.ConvertToEncrypt(adminlogin.UserName)),
 
-                new Claim(ClaimTypes.Name,CommonMethods.ConvertToEncrypt(loginVM.Password))
+                new Claim(ClaimTypes.Name,CommonMethods.ConvertToEncrypt(adminlogin.Password))
 
             };
             var token = new JwtSecurityToken(_config["Jwt:Issuer"],
@@ -63,9 +61,9 @@ namespace QuickCampusAPI.Controllers
         }
 
 
-        private ApplicationUserVM Authenticate(LoginVM loginVM)
+        private ApplicationUserVM Authenticate(AdminLogin adminLogin)
         {
-            var currentUser = _applicationUserRepo.FirstOrDefault(o => o.UserName.ToLower() == loginVM.UserName.ToLower() && o.Password == loginVM.Password);
+            var currentUser = _applicationUserRepo.FirstOrDefault(o => o.UserName.ToLower() == adminLogin.UserName.ToLower() && o.Password == adminLogin.Password);
             if (currentUser != null)
             {
                 return (ApplicationUserVM)currentUser;
