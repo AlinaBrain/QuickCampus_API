@@ -2,7 +2,7 @@
 
 namespace QuickCampus_Core.Services
 {
-    internal class GeneralResult : ApplicantViewModel.ApplicantGridViewModel
+    public class GeneralResult : ApplicantViewModel.ApplicantGridViewModel
     {
         public bool Successful { get; set; }
         public string Message { get; set; }

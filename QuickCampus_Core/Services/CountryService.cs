@@ -45,9 +45,5 @@ namespace QuickCampus_Core.Services
             
 
         }
-
-
-
-
     }
 }
