@@ -41,38 +41,7 @@ namespace QuickCampus_Core.ViewModel
         public int WalkInId { get; set; }
         public int CountryId { get; set; }
 
-        public WalkIn ToCampusDbModel()
-        {
-            return new WalkIn
-            {
-               // WalkInId = WalkInId,
-                Address1 = Address1,
-                Address2 = Address2,
-                City = City,
-                IsActive = IsActive,
-                CreatedDate = CreatedDate,
-                WalkInDate = WalkInDate,
-                JobDescription = JobDescription,
-                Title = Title,
-               // Colleges = CampusWalkInColleges
-                
-            };
-        }
-        public WalkIn ToUpdateDbModel()
-        {
-            return new WalkIn
-            {
-                WalkInId = WalkInId,
-                Address1 = Address1,
-                Address2 = Address2,
-                City = City,             
-                CreatedDate = CreatedDate,
-                JobDescription = JobDescription,
-                WalkInDate = WalkInDate,
-                IsActive = IsActive ?? false,
-                Title = Title,
-            };
-        }
+       
 
     }
     public class CampusGridViewModel

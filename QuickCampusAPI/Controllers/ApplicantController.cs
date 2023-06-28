@@ -60,7 +60,7 @@ namespace QuickCampusAPI.Controllers
             return Ok();
         }
 
-     [HttpPut]
+     [HttpPost]
      [Route("EditApplicant")]
        public async Task<IActionResult> EditApplicant(ApplicantRegisterViewModel applicantViewModel, int ApplicantId)
        {
@@ -78,13 +78,13 @@ namespace QuickCampusAPI.Controllers
                     applicantDetail.PhoneNumber = applicantViewModel.PhoneNumber;
                     applicantDetail.Skills = applicantViewModel.Skills;
                     _applicantRepo.UpdateApplicant(applicantDetail);
-                    result.Message = "Category Details updated Succesfully";
+                    result.Message = "Applicant Details updated Succesfully";
                     result.IsSuccess = true;
                    
                 }
                 else
                 {
-                    result.Message = "Category details does not found";
+                    result.Message = "Applicant details does not found";
                 }
                 return Ok(result);
             }
@@ -118,53 +118,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(model);
         }
 
-        //[HttpPatch]
-        //[Route("EditApplicant")]
-        //public ActionResult EditApplicant(ApplicantViewModel applicantViewModel)
-        //{
-        //    IGeneralResult<List<ApplicantViewModel>> result = new GeneralResult<List<ApplicantViewModel>>();
-
-        //    var applicantdetail = _applicantRepo.GetApplicantByID(applicantViewModel.ApplicantID);
-        //    if (applicantdetail != null)
-        //    {
-        //        applicantdetail.FirstName = applicantViewModel.FirstName;
-        //        applicantdetail.EmailAddress = applicantViewModel.EmailAddress;
-        //        applicantdetail.HigestQualification = applicantViewModel.HigestQualification;
-        //        applicantdetail.HigestQualificationPercentage = applicantViewModel.HigestQualificationPercentage;
-        //        applicantdetail.MatricPercentage = applicantViewModel.MatricPercentage;
-        //        applicantdetail.PhoneNumber = applicantViewModel.PhoneNumber;
-        //        applicantdetail.Skills = applicantViewModel.Skills;
-        //        applicantdetail.LastName = applicantViewModel.LastName;
-        //        _applicantRepo.Update(applicantdetail);
-        //        result.Message = "Applicant Details updated Succesfully";
-        //        result.IsSuccess = true;
-        //    }
-        //    else
-        //    {
-        //        result.Message = "Applicant details  does not found";
-        //    }
-        //    return Ok(result);
-        //}
-
-
-        //[HttpPut]
-        //[Route("Put")]
-        //public async Task<IActionResult> Put(ApplicantViewModel applicantViewModel)
-        //{
-        //    if (applicantViewModel == null || applicantViewModel.ApplicantID == 0)
-        //        return BadRequest();
-
-        //    var applicantdetail = _applicantRepo.GetApplicantByID(applicantViewModel.ApplicantID);
-        //    if (applicantdetail == null)
-        //        return NotFound();
-        //    applicantdetail.FirstName = applicantViewModel.FirstName;
-        //    applicantdetail.EmailAddress = applicantViewModel.EmailAddress;
-        //    applicantdetail.LastName = applicantViewModel.LastName;
-        //    await _applicantRepo.SaveChangesAsync();
-        //    return Ok();
-        //}
-
-
+       
         [HttpDelete]
         [Route("DeleteApplicant")]
         public async Task<IActionResult> DeleteApplicant(int ApplicantId)
@@ -188,13 +142,13 @@ namespace QuickCampusAPI.Controllers
         //{
         //    foreach (int Id in Ids)
         //    {
-        //        ApplicantGridViewModel applicant = ApplicantManager.GetApplicantByID(Id);
-        //        applicant.StatusID = (int)Common.ApplicantStatus.Deleted;
-        //        var result = ApplicantManager.UpdateApplicant(applicant);
+        //        ApplicantGridViewModel applicant = _applicantRepo.GetApplicantByID(Id);
+        //        applicant.StatusID = QuickCampus_Core.Common.(int)common.ApplicantStatus.Deleted;
+        //        var result = _applicantRepo.UpdateApplicant(applicant);
         //    }
         //    var model = new ApplicantViewModel()
         //    {
-        //        ApplicantList = ApplicantManager.GetAllApplicant().Select(x => new ApplicantGridViewModel()
+        //        ApplicantList = _applicantRepo.GetAllApplicant().Select(x => new ApplicantGridViewModel()
         //        {
         //            ApplicantID = x.ApplicantID,
         //            ApplicantToken = x.ApplicantToken,
@@ -216,8 +170,10 @@ namespace QuickCampusAPI.Controllers
         //        }),
         //        filter = new ApplicantFilter() { },
         //    };
-        //    return Json(new { data = RenderRazorViewToString("_ApplicantGrid", model) });
+        //    return Ok(new { data = RenderRazorViewToString("_ApplicantGrid", model) });
         //}
+
+
 
 
 
@@ -241,6 +197,8 @@ namespace QuickCampusAPI.Controllers
         //    return Ok(result);
         //}
 
+
+        
     }
 }
 

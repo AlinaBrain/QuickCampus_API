@@ -9,18 +9,12 @@ using QuickCampus_DAL.Context;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-//builder.Services.AddCors(c =>
-//{
-//    c.AddPolicy("AllowOrigin", options => options.WithOrigins("http://localhost:4200", "http://abc1234.etrueconcept.com:4200").AllowAnyHeader().AllowAnyMethod());
-//});
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: "MyAllowSpecificOrigins",
                       policy =>
                       {
-                          policy.WithOrigins("http://localhost:4200",
-                                              "http://localhost:4200");
+                          policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
                       });
 });
 
@@ -30,19 +24,7 @@ builder.Services.AddDbContext<QuikCampusContext>(
         builder.Configuration.GetConnectionString("ConnectionString"))
     );
 
-
-//builder.Services.AddCors(options => {
-//options.AddPolicy("Policy1", builder => {
-//    builder.WithOrigins("http://localhost:4200");
-//});
-
-//    options.AddPolicy("Policy2", builder => {
-//        builder.WithOrigins("http://localhost:4200").AllowAnyHeader().AllowAnyMethod();
-//    });
-//});
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen();
@@ -66,6 +48,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 builder.Services.AddTransient<IApplicationUserRepo, ApplicationUserService>();
 builder.Services.AddTransient<IApplicantRepo, ApplicantRepoServices>();
 builder.Services.AddScoped<ICampusRepo, CampusService>();
+builder.Services.AddScoped<ICountryRepo, CountryService>();
+builder.Services.AddScoped<ICollegeRepo, CollegeRepo>();
 
 
 
