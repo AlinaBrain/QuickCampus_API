@@ -171,12 +171,12 @@ public partial class QuikCampusContext : DbContext
             entity.HasIndex(e => e.UserName, "UK_UserName_User").IsUnique();
 
             entity.Property(e => e.ApplicationUserId).ValueGeneratedNever();
-            entity.Property(e => e.EmailId)
-                .HasMaxLength(40)
-                .IsUnicode(false);
-            entity.Property(e => e.Name)
-                .HasMaxLength(50)
-                .IsUnicode(false);
+            //entity.Property(e => e.EmailId)
+            //    .HasMaxLength(40)
+            //    .IsUnicode(false);
+            //entity.Property(e => e.Name)
+            //    .HasMaxLength(50)
+                //.IsUnicode(false);
             entity.Property(e => e.Password).HasMaxLength(50);
             entity.Property(e => e.UserName).HasMaxLength(50);
         });

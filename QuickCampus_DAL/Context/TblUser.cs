@@ -17,6 +17,10 @@ public partial class TblUser
 
     public bool? IsActive { get; set; }
 
+    public string? Email { get; set; }
+
+    public string? Mobile { get; set; }
+
     public virtual ICollection<TblClient> TblClientCraetedByNavigations { get; set; } = new List<TblClient>();
 
     public virtual ICollection<TblClient> TblClientModifiedByNavigations { get; set; } = new List<TblClient>();
