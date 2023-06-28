@@ -11,11 +11,13 @@ using System.CodeDom.Compiler;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 namespace QuickCampusAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class AccountController : ControllerBase
     {
         private readonly IApplicationUserRepo _applicationUserRepo;
