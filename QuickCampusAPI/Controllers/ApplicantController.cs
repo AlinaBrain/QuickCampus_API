@@ -28,6 +28,8 @@ namespace QuickCampusAPI.Controllers
         {
             _applicantRepo = applicantRepo;
         }
+
+
         [HttpGet]
         [Route("Manage")]
         public async Task<ActionResult> Manage(int statusId)

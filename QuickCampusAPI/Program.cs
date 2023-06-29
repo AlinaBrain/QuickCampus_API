@@ -64,12 +64,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseAuthentication();
 
 app.UseCors("MyAllowSpecificOrigins");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-app.UseAuthentication();
 
 app.UseAuthorization();
 
