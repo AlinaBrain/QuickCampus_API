@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace QuickCampusAPI.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
 
