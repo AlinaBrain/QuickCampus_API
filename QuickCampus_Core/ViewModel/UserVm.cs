@@ -24,7 +24,7 @@ namespace QuickCampus_Core.ViewModel
         public int Id { get; set; }
         [Required]
         public string? UserName { get; set; }
-        [Required]
+        [Required, MaxLength(50)]
         public string? Name { get; set; }
         [Required(ErrorMessage = "Password is required")]
         [StringLength(100, ErrorMessage = "Must be between 6 and 50 characters", MinimumLength = 8)]
@@ -36,9 +36,10 @@ namespace QuickCampus_Core.ViewModel
 
         public bool? IsActive { get; set; }
         [Required, MaxLength(100)]
+        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage = "Invalid email address.")]
         [EmailAddress(ErrorMessage = "Invalid email address")]
         public string? Email { get; set; }
-        [Required]
+        [Required,MaxLength(10)]
         [Phone(ErrorMessage = "Please enter a valid mobile number")]
         public string? Mobile { get; set; }
 

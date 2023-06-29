@@ -10,7 +10,7 @@ namespace QuickCampus_Core.Common
     public class GeneralResult<T> : IGeneralResult<T>
     {
         public bool IsSuccess { get; set; }
-        public bool IsActive { get; set; }
+        //public bool IsActive { get; set; }
 
         public string Message { get; set; }
         public T Data { get; set; }
