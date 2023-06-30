@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
@@ -7,6 +8,7 @@ using System.Collections;
 
 namespace QuickCampusAPI.Controllers
 {
+    [Authorize]
     public class CollegeController : Controller
     {
         private readonly ICountryRepo countryRepo;

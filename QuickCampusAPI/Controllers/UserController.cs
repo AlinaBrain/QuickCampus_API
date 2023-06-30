@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
@@ -7,6 +8,7 @@ using System.Reflection.Metadata.Ecma335;
 
 namespace QuickCampusAPI.Controllers
 {
+    [Authorize]
     public class UserController : Controller
     {
         private readonly IUserRepo userRepo;

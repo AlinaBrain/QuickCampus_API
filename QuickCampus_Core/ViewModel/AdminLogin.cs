@@ -1,5 +1,7 @@
-﻿using System;
+﻿using FluentValidation;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,5 +12,25 @@ namespace QuickCampus_Core.ViewModel
     {
         public string UserName { get; set; }
         public String Password { get; set; }
+    }
+
+
+    public class AdminLoginValidator : AbstractValidator<AdminLogin>
+    {
+        public AdminLoginValidator()
+        {
+            RuleFor(x => x.UserName)
+               .Cascade(CascadeMode.StopOnFirstFailure)
+               .NotNull().WithMessage("UserName could not be null")
+               .NotEmpty().WithMessage("UserName could not be empty")
+               .Length(0, 100).WithMessage("UserName lengh could not be greater than 100");
+
+            RuleFor(x => x.Password)
+              .Cascade(CascadeMode.StopOnFirstFailure)
+              .NotNull().WithMessage("Password could not be null")
+              .NotEmpty().WithMessage("Password could not be empty")
+              .Length(0, 500).WithMessage("Password lengh could not be greater than 500");
+            
+        }
     }
 }

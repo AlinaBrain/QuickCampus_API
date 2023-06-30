@@ -2,6 +2,7 @@
 using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ using static QuickCampus_Core.ViewModel.ApplicantViewModel;
 
 namespace QuickCampusAPI.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
 

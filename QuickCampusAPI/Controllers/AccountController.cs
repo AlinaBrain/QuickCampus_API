@@ -12,6 +12,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace QuickCampusAPI.Controllers
 {
@@ -34,7 +35,6 @@ namespace QuickCampusAPI.Controllers
         [Route("AdminLogin")]
         public IActionResult AdminLogin(AdminLogin adminlogin)
         {
-
             var res = _account.Login(adminlogin);
             return Ok(res);
         }
