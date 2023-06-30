@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
@@ -6,7 +6,8 @@ using QuickCampus_Core.ViewModel;
 
 namespace QuickCampusAPI.Controllers
 {
-    [Authorize]
+    [Route("api/[controller]")]
+    [ApiController]
     public class RoleController : Controller
     {
         private readonly IRoleRepo roleRepo;
@@ -15,10 +16,6 @@ namespace QuickCampusAPI.Controllers
         {
             this.roleRepo = roleRepo;
             this.userRepo = userRepo;
-        }
-        public IActionResult Index()
-        {
-            return View();
         }
         [HttpPost]
         [Route("roleAdd")]

@@ -9,9 +9,6 @@ namespace QuickCampus_Core.ViewModel
 {
     public class UserModel
     {
-        //[Required(ErrorMessage = "UserName is required"), MaxLength(20)]
-        //[RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "Only characters allowed.")]
-        //public string? UserName { get; set; }
         [Required, MaxLength(20)]
         [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "In name only characters allowed.")]
         public string? Name { get; set; }
@@ -23,6 +20,7 @@ namespace QuickCampus_Core.ViewModel
         [Required, MaxLength(100)]
         [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage = "Invalid email address.")]
         [EmailAddress(ErrorMessage = "Invalid email address")]
+        public string? ConfirmPassword { get; set; }
         public string? Email { get; set; }
         [Required, MaxLength(10)]
         [Phone(ErrorMessage ="Please enter a valid mobile number")]

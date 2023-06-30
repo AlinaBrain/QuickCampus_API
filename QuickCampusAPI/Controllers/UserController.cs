@@ -1,43 +1,41 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
-using System.Reflection.Metadata.Ecma335;
 
 namespace QuickCampusAPI.Controllers
 {
-    [Authorize]
-    public class UserController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class UserController : ControllerBase
     {
         private readonly IUserRepo userRepo;
         public UserController(IUserRepo userRepo)
         {
-            this.userRepo = userRepo; 
-            
-        }
-        public IActionResult Index()
-        {
-            return View();
+            this.userRepo = userRepo;
+
         }
         [HttpPost]
         [Route("userAdd")]
-        public async Task<IActionResult> addUser([FromBody]UserModel vm)
+        public async Task<IActionResult> addUser([FromBody] UserModel vm)
         {
             IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
             if (ModelState.IsValid)
             {
+                if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.IsDelete == null))
+                {
+                    result.Message = "Email Already Registerd!";
+                }
                 UserVm userVm = new UserVm
-            {
-                UserName = vm.Email,
-                Name = vm.Name,
-                Email = vm.Email,
-                Mobile = vm.Mobile,
-                Password = vm.Password,
-                IsActive =true,
-                IsDelete = false,
-            };
+                {
+                    UserName = vm.Email,
+                    Name = vm.Name,
+                    Email = vm.Email,
+                    Mobile = vm.Mobile,
+                    Password = vm.Password,
+                    IsActive = true,
+                    IsDelete = false,
+                };
                 await userRepo.Add(userVm.toUserDBModel());
                 result.IsSuccess = true;
                 result.Message = "User added successfully.";
@@ -84,16 +82,20 @@ namespace QuickCampusAPI.Controllers
         }
         [HttpPost]
         [Route("userEdit")]
-        public async Task<IActionResult>Edit(int userId, UserModel vm)
+        public async Task<IActionResult> Edit(int userId, UserModel vm)
         {
             IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
             var res = await userRepo.GetById(userId);
             if (res != null)
             {
+                if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.IsDelete == null))
+                {
+                    result.Message = "Email Already Registerd!";
+                }
                 res.Id = userId;
                 res.UserName = vm.Email;
                 res.Name = vm.Name;
-                res. Email = vm.Email;
+                res.Email = vm.Email;
                 res.Mobile = vm.Mobile;
                 res.Password = vm.Password;
                 res.IsActive = true;
@@ -112,13 +114,13 @@ namespace QuickCampusAPI.Controllers
         }
         [HttpGet]
         [Route("activeAndInactive")]
-        public async Task<IActionResult> activeAndInactive(bool IsActive,int id)
+        public async Task<IActionResult> activeAndInactive(bool IsActive, int id)
         {
             IGeneralResult<dynamic> result = new GeneralResult<dynamic>();
             if (id > 0)
             {
                 var res = await userRepo.GetById(id);
-                if (res != null) 
+                if (res != null)
                 {
                     res.IsActive = IsActive;
                     await userRepo.Update(res);
