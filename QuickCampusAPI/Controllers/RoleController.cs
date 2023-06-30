@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
-using QuickCampus_Core.Services;
 using QuickCampus_Core.ViewModel;
 
 namespace QuickCampusAPI.Controllers
@@ -10,7 +9,7 @@ namespace QuickCampusAPI.Controllers
     {
         private readonly IRoleRepo roleRepo;
         private readonly IUserRepo userRepo;
-        public RoleController(IRoleRepo roleRepo,IUserRepo userRepo)
+        public RoleController(IRoleRepo roleRepo, IUserRepo userRepo)
         {
             this.roleRepo = roleRepo;
             this.userRepo = userRepo;
@@ -21,16 +20,18 @@ namespace QuickCampusAPI.Controllers
         }
         [HttpPost]
         [Route("roleAdd")]
-        public async Task<IActionResult> roleAdd(RoleModel vm)
+        public async Task<IActionResult> roleAdd([FromBody] RoleModel vm)
         {
             IGeneralResult<RoleVm> result = new GeneralResult<RoleVm>();
             if (ModelState.IsValid)
             {
+
                 var user = await userRepo.GetById(vm.userId);
                 RoleVm roleVm = new RoleVm
                 {
                     Name = vm.RoleName,
-                    CreatedBy =user.Id,
+                    CreatedBy = user.Id,
+                    ModifiedBy = user.Id,
                     CreatedDate = DateTime.Now,
 
                 };
@@ -42,8 +43,7 @@ namespace QuickCampusAPI.Controllers
             }
             else
             {
-                result.Message ="Something went wrong";
-                result.IsSuccess = false;
+                result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
             }
             return Ok(result);
         }
@@ -70,6 +70,7 @@ namespace QuickCampusAPI.Controllers
                 res.Id = roleId;
                 res.Name = vm.RoleName;
                 res.ModifiedBy = vm.userId;
+                res.ModofiedDate = DateTime.Now;
                 await roleRepo.Update(res);
                 result.Message = "Role data is updated successfully";
                 result.IsSuccess = true;
@@ -78,7 +79,7 @@ namespace QuickCampusAPI.Controllers
             }
             else
             {
-                result.Message = "Role data is not updated";
+                result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
             }
             return Ok(result);
         }

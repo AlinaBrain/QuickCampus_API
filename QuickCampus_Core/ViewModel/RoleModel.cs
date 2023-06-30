@@ -10,8 +10,8 @@ namespace QuickCampus_Core.ViewModel
     public class RoleModel
     {
         public int userId { get; set;}
-        [Required(ErrorMessage = "RoleName is required"), MaxLength(20)]
-        [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "Only characters allowed.")]
+        [Required, MaxLength(20)]
+        [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "In name only characters allowed.")]
         public string? RoleName { get; set; }
     }
 }

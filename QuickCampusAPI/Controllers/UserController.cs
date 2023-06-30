@@ -21,14 +21,14 @@ namespace QuickCampusAPI.Controllers
         }
         [HttpPost]
         [Route("userAdd")]
-        public async Task<IActionResult> addUser(UserModel vm)
+        public async Task<IActionResult> addUser([FromBody]UserModel vm)
         {
             IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
             if (ModelState.IsValid)
             {
                 UserVm userVm = new UserVm
             {
-                UserName = vm.UserName,
+                UserName = vm.Email,
                 Name = vm.Name,
                 Email = vm.Email,
                 Mobile = vm.Mobile,
@@ -44,8 +44,7 @@ namespace QuickCampusAPI.Controllers
             }
             else
             {
-                result.IsSuccess = false;
-                result.Message = "something went wrong.";
+                result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
             }
             return Ok(result);
         }
@@ -90,7 +89,7 @@ namespace QuickCampusAPI.Controllers
             if (res != null)
             {
                 res.Id = userId;
-                res.UserName = vm.UserName;
+                res.UserName = vm.Email;
                 res.Name = vm.Name;
                 res. Email = vm.Email;
                 res.Mobile = vm.Mobile;
@@ -105,8 +104,7 @@ namespace QuickCampusAPI.Controllers
             }
             else
             {
-                result.IsSuccess = false;
-                result.Message = "User data is not updated";
+                result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
             }
             return Ok(result);
         }
@@ -129,8 +127,7 @@ namespace QuickCampusAPI.Controllers
                 }
                 else
                 {
-                    result.IsSuccess = false;
-                    result.Message = "something went wrong.";
+                    result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
                 }
             }
             return Ok(result);
