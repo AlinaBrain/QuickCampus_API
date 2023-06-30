@@ -39,26 +39,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(res);
         }
 
-        private string Generate(AdminLogin adminlogin)
-        {
-            var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
-            var credentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
-
-            var Claims = new[]
-           {
-                new Claim(ClaimTypes.NameIdentifier,CommonMethods.ConvertToEncrypt(adminlogin.UserName)),
-
-                new Claim(ClaimTypes.Name,CommonMethods.ConvertToEncrypt(adminlogin.Password))
-
-            };
-            var token = new JwtSecurityToken(_config["Jwt:Issuer"],
-               _config["Jwt:Audience"],
-               Claims,
-               expires: DateTime.Now.AddHours(24),
-               signingCredentials: credentials);
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
+       
         private ApplicationUserVM Authenticate(AdminLogin adminLogin)
         {
             var currentUser = _applicationUserRepo.FirstOrDefault(o => o.UserName.ToLower() == adminLogin.UserName.ToLower() && o.Password == adminLogin.Password);

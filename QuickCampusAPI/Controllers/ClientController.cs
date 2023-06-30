@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace QuickCampusAPI.Controllers
 {
-    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
 
     public class ClientController : ControllerBase
     {

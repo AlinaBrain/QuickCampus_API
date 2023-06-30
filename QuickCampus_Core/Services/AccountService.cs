@@ -99,37 +99,20 @@ namespace QuickCampus_Core.Services
         private string GenerateToken(AdminLogin adminlogin, string userRole, List<string> obj)
         {
 
-
-
-            // Create claims for each role
-            List<Claim> roleClaims = obj.Select(role => new Claim(ClaimTypes.Role, role)).ToList();
-
-            // Create other claims as needed
-            List<Claim> otherClaims = new List<Claim>
-                {
-                    // Add additional claims if necessary
-                    new Claim("UserName", adminlogin.UserName),
-                    new Claim("Password", adminlogin.Password)
-                };
-
-            // Combine all claims
-            List<Claim> allClaims = new List<Claim>();
-            allClaims.AddRange(roleClaims);
-            allClaims.AddRange(otherClaims);
-
-            // Create a JWT token
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_config["Jwt:Key"]); // Replace with your secret key
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(allClaims),
-                Expires = DateTime.UtcNow.AddDays(7), // Set token expiration as per your requirements
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var credentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
+            var Claims = new[]
+         {
+                new Claim(ClaimTypes.Name,adminlogin.UserName),
+                new Claim(ClaimTypes.Role,"Admin")
             };
-            var token1 = tokenHandler.CreateToken(tokenDescriptor);
-            var jwtToken = tokenHandler.WriteToken(token1);
+            var token = new JwtSecurityToken(_config["Jwt:Issuer"],
+               _config["Jwt:Audience"],
+               Claims,
+               expires: DateTime.Now.AddHours(24),
+               signingCredentials: credentials);
+            return new JwtSecurityTokenHandler().WriteToken(token);
 
-            return jwtToken;
         }
     }
 }
