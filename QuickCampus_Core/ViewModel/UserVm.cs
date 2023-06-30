@@ -1,56 +1,62 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using QuickCampus_DAL.Context;
-using System;
-using System.Collections.Generic;
+﻿using QuickCampus_DAL.Context;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace QuickCampus_Core.ViewModel
 {
     public class UserVm
     {
 
-        //public static explicit operator UserVm(TblUser item)
-        //{
-        //    return new UserVm
-        //    {
-        //        Id = item.Id,
-        //        TemplateName = item.TemplateName,
-        //        SubjectName = item.SubjectName,
-        //        Description = item.Body,
-        //    };
+        public static explicit operator UserVm(TblUser item)
+        {
+            return new UserVm
+            {
+                Id = item.Id,
+                UserName = item.UserName,
+                Name = item.Name,
+                Password = item.Password,
+                IsDelete = item.IsDelete,
+                IsActive = item.IsActive,
+                Email = item.Email,
+                Mobile = item.Mobile,
+            };
 
-        //}
-        //public int Id { get; set; }
-        //[Required(ErrorMessage = "Template name is required."), MaxLength(30)]
-        //[Remote("PageExist", "Templates", AdditionalFields = "Id", ErrorMessage = ("Page already exist!"))]
-        //[RegularExpression(@"^([a-zA-Z]).+", ErrorMessage = "Starting with Alphabates only. Atleast two characters required.")]
-        //public string TemplateName { get; set; }
-        //[Required(ErrorMessage = "Subject Name is Required."), MaxLength(50)]
-        //[RegularExpression(@"^([a-zA-Z]).+", ErrorMessage = "Starting with Alphabates only. Atleast two characters required.")]
-        //public string SubjectName { get; set; }
+        }
+        public int Id { get; set; }
+        [Required]
+        public string? UserName { get; set; }
+        [Required, MaxLength(50)]
+        public string? Name { get; set; }
+        [Required(ErrorMessage = "Password is required")]
+        [StringLength(100, ErrorMessage = "Must be between 6 and 50 characters", MinimumLength = 8)]
+        [RegularExpression(@"(?!.* )(?=.*\d)(?=.*[A-Z]).{8,15}$",
+        ErrorMessage = "Please enter a password That contains 1 small alphabet, 1 capital alphabet, 1 special character.")]
+        public string? Password { get; set; }
 
-        //[Required(ErrorMessage = "Description Name is required."), MinLength(10)]
-        //public string Description { get; set; }
-        //public DateTime? UpdatedAt { get; set; }
-        //public bool? Active { get; set; }
-        //public DateTime? DeletedAt { get; set; }
+        public bool? IsDelete { get; set; }
 
-        //public TblUser ToTemplateDBModel()
-        //{
-        //    return new TblUser
-        //    {
-        //        Id = Id,
-        //        TemplateName = TemplateName,
-        //        SubjectName = SubjectName,
-        //        Body = Description,
-        //        Active = true,
-        //        CreatedAt = DateTime.UtcNow,
-        //        UpdatedAt = Id > 0 ? DateTime.UtcNow : null,
-        //        DeletedAt = DeletedAt,
-        //    };
-        //}
+        public bool? IsActive { get; set; }
+        [Required, MaxLength(100)]
+        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage = "Invalid email address.")]
+        [EmailAddress(ErrorMessage = "Invalid email address")]
+        public string? Email { get; set; }
+        [Required,MaxLength(10)]
+        [Phone(ErrorMessage = "Please enter a valid mobile number")]
+        public string? Mobile { get; set; }
+
+
+        public TblUser toUserDBModel()
+        {
+            return new TblUser
+            {
+                Id = Id,
+                UserName = UserName,
+                Name = Name,
+                Password = Password,
+                Email = Email,
+                Mobile = Mobile,
+                IsDelete = false,
+                IsActive = true,
+            };
+        }
     }
 }

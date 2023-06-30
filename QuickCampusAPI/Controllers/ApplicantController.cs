@@ -82,7 +82,6 @@ namespace QuickCampusAPI.Controllers
                     _applicantRepo.UpdateApplicant(applicantDetail);
                     result.Message = "Applicant Details updated Succesfully";
                     result.IsSuccess = true;
-                   
                 }
                 else
                 {
