@@ -11,6 +11,7 @@ namespace QuickCampus_Core.ViewModel
             return new UserVm
             {
                 Id = item.Id,
+                ClientId = item.ClientId,
                 UserName = item.UserName,
                 Name = item.Name,
                 Password = item.Password,
@@ -22,6 +23,7 @@ namespace QuickCampus_Core.ViewModel
 
         }
         public int Id { get; set; }
+        public int?ClientId { get; set; }
         [Required]
         public string? UserName { get; set; }
         [Required, MaxLength(50)]
@@ -49,6 +51,7 @@ namespace QuickCampus_Core.ViewModel
             return new TblUser
             {
                 Id = Id,
+                ClientId= ClientId,
                 UserName = UserName,
                 Name = Name,
                 Password = Password,

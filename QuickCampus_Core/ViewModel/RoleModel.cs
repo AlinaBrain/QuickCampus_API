@@ -9,6 +9,8 @@ namespace QuickCampus_Core.ViewModel
 {
     public class RoleModel
     {
+        [Required]
+        public int ClientId { get; set; }
         public int userId { get; set;}
         [Required, MaxLength(20)]
         [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "In name only characters allowed.")]

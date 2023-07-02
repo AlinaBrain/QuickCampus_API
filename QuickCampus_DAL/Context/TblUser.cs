@@ -21,6 +21,10 @@ public partial class TblUser
 
     public string? Mobile { get; set; }
 
+    public int? ClientId { get; set; }
+
+    public virtual TblClient? Client { get; set; }
+
     public virtual ICollection<TblClient> TblClientCraetedByNavigations { get; set; } = new List<TblClient>();
 
     public virtual ICollection<TblClient> TblClientModifiedByNavigations { get; set; } = new List<TblClient>();

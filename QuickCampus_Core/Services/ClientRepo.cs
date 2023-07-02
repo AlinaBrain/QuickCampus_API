@@ -1,4 +1,5 @@
 ﻿using QuickCampus_Core.Interfaces;
+using QuickCampus_DAL.Context;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace QuickCampus_Core.Services
 {
-    public class ClientServices : IClientRepo
+    public class ClientRepo : BaseRepository<QuikCampusDevContext, TblClient>, IClientRepo
     {
 
     }

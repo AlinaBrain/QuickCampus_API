@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
+using QuickCampus_Core.Services;
 using QuickCampus_Core.ViewModel;
 
 namespace QuickCampusAPI.Controllers
@@ -12,10 +13,12 @@ namespace QuickCampusAPI.Controllers
     {
         private readonly IRoleRepo roleRepo;
         private readonly IUserRepo userRepo;
-        public RoleController(IRoleRepo roleRepo, IUserRepo userRepo)
+        private readonly IClientRepo clientRepo;
+        public RoleController(IRoleRepo roleRepo, IUserRepo userRepo, IClientRepo clientRepo)
         {
             this.roleRepo = roleRepo;
             this.userRepo = userRepo;
+            this.clientRepo = clientRepo;
         }
         [HttpPost]
         [Route("roleAdd")]
@@ -24,11 +27,16 @@ namespace QuickCampusAPI.Controllers
             IGeneralResult<RoleVm> result = new GeneralResult<RoleVm>();
             if (ModelState.IsValid)
             {
-
                 var user = await userRepo.GetById(vm.userId);
+                if(user != null)
+                {
+                    var clientId = await clientRepo.GetById(vm.ClientId);
+                if(clientId!= null) 
+                { 
                 RoleVm roleVm = new RoleVm
                 {
                     Name = vm.RoleName,
+                    ClientId = vm.ClientId,
                     CreatedBy = user.Id,
                     ModifiedBy = user.Id,
                     CreatedDate = DateTime.Now,
@@ -39,6 +47,16 @@ namespace QuickCampusAPI.Controllers
                 result.IsSuccess = true;
                 result.Data = roleVm;
                 return Ok(result);
+                }
+                else
+                {
+                    result.Message = "Client Id is not valid.";
+                }
+                }
+                else
+                {
+                    result.Message = "User Id is not valid.";
+                }
             }
             else
             {
@@ -64,9 +82,13 @@ namespace QuickCampusAPI.Controllers
             IGeneralResult<RoleVm> result = new GeneralResult<RoleVm>();
             var uId = await userRepo.GetById(vm.userId);
             var res = await roleRepo.GetById(roleId);
-            if (res != null)
+            var clientId = await clientRepo.GetById(vm.ClientId);
+            if(clientId != null && uId !=null)
+            {
+                if (res != null)
             {
                 res.Id = roleId;
+                res.ClientId = vm.ClientId;
                 res.Name = vm.RoleName;
                 res.ModifiedBy = vm.userId;
                 res.ModofiedDate = DateTime.Now;
@@ -79,6 +101,11 @@ namespace QuickCampusAPI.Controllers
             else
             {
                 result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
+            }
+            }
+            else
+            {
+                result.Message = "Client ID not found or user not found. ";
             }
             return Ok(result);
         }

@@ -15,6 +15,7 @@ namespace QuickCampus_Core.ViewModel
             return new RoleVm
             {
                 Id = item.Id,
+                ClientId = item.ClientId,
                 Name = item.Name,
                 CreatedBy = item.CreatedBy,
                 ModifiedBy = item.ModifiedBy,
@@ -24,6 +25,7 @@ namespace QuickCampus_Core.ViewModel
             };
 
         }
+        public int? ClientId { get; set; }
         public int Id { get; set; }
         [Required(ErrorMessage = "RoleName is required"), MaxLength(20)]
         [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "Only characters allowed.")]
@@ -43,6 +45,7 @@ namespace QuickCampus_Core.ViewModel
             return new TblRole
             {
                 Id = Id,
+                ClientId= ClientId,
                 Name = Name,
                 CreatedBy = CreatedBy,
                 ModifiedBy = ModifiedBy,
