@@ -12,7 +12,7 @@ namespace QuickCampusAPI.Controllers
     {
         private readonly IUserRepo userRepo;
         private readonly IClientRepo clientRepo;
-        public UserController(IUserRepo userRepo,IClientRepo clientRepo)
+        public UserController(IUserRepo userRepo, IClientRepo clientRepo)
         {
             this.userRepo = userRepo;
             this.clientRepo = clientRepo;
@@ -28,7 +28,7 @@ namespace QuickCampusAPI.Controllers
                 result.Message = "Email Already Registerd!";
             }
 
-            else 
+            else
             {
                 if (ModelState.IsValid)
                 {
@@ -36,23 +36,23 @@ namespace QuickCampusAPI.Controllers
 
                     //if (clientId != null) // Check if client is found
                     //{
-                        UserVm userVm = new UserVm
-                        {
-                            UserName = vm.Email,
-                            Name = vm.Name,
-                            Email = vm.Email,
-                            Mobile = vm.Mobile,
-                            Password = vm.Password,
-                            ClientId = vm.ClientId,
-                            IsActive = true,
-                            IsDelete = false,
-                        };
+                    UserVm userVm = new UserVm
+                    {
+                        UserName = vm.Email,
+                        Name = vm.Name,
+                        Email = vm.Email,
+                        Mobile = vm.Mobile,
+                        Password = vm.Password,
+                        ClientId = vm.ClientId,
+                        IsActive = true,
+                        IsDelete = false,
+                    };
 
-                        await userRepo.Add(userVm.toUserDBModel());
-                        result.IsSuccess = true;
-                        result.Message = "User added successfully.";
-                        result.Data = userVm;
-                        return Ok(result);
+                    await userRepo.Add(userVm.toUserDBModel());
+                    result.IsSuccess = true;
+                    result.Message = "User added successfully.";
+                    result.Data = userVm;
+                    return Ok(result);
                     //}
                     //else
                     //{
@@ -108,42 +108,38 @@ namespace QuickCampusAPI.Controllers
         public async Task<IActionResult> Edit(int userId, UserModel vm)
         {
             IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
-            if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.IsDelete == false))
+            if (userRepo.Any(x => x.Email == vm.Email && x.Id!= userId &&  x.IsActive == true && x.IsDelete == false))
             {
                 result.Message = "Email Already Registerd!";
             }
             else
             {
-            var res = await userRepo.GetById(userId);
-            var clientId = await clientRepo.GetById((int)vm.ClientId);
+                var res = await userRepo.GetById(userId);
+                var clientId = await clientRepo.GetById((int)vm.ClientId);
                 //if (clientId != null)
                 //{
-                    if (res != null )
-                    {
-                        res.Id = userId;
-                        res.ClientId = vm.ClientId;
-                        res.UserName = vm.Email;
-                        res.Name = vm.Name;
-                        res.Email = vm.Email;
-                        res.Mobile = vm.Mobile;
-                        res.Password = vm.Password;
-                        res.IsActive = true;
-                        res.IsDelete = false;
-                        await userRepo.Update(res);
-                        result.Message = "User data is updated successfully";
-                        result.IsSuccess = true;
-                        result.Data = (UserVm)res;
-                        return Ok(result);
-                    }
-                    else
-                    {
-                        result.Message = "User ID not found.";
-                    }
-                //}
-                //else
-                //{
-                //    result.Message = "Client ID not found.";
-                //}
+                if (res != null)
+                {
+                    res.Id = userId;
+                    res.ClientId = vm.ClientId;
+                    res.UserName = vm.Email;
+                    res.Name = vm.Name;
+                    res.Email = vm.Email;
+                    res.Mobile = vm.Mobile;
+                    res.Password = vm.Password;
+                    res.IsActive = true;
+                    res.IsDelete = false;
+                    await userRepo.Update(res);
+                    result.Message = "User data is updated successfully";
+                    result.IsSuccess = true;
+                    result.Data = (UserVm)res;
+                    return Ok(result);
+                }
+                else
+                {
+                    result.Message = "User ID not found.";
+
+                }
             }
 
             return Ok(result);
