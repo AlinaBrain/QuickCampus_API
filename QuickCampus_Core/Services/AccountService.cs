@@ -34,6 +34,8 @@ namespace QuickCampus_Core.Services
             LoginResponseVM data = new LoginResponseVM();
             response.Data = data;
             List<RoleMaster> rm = new List<RoleMaster>();
+
+            adminLogin.Password = EncodePasswordToBase64(adminLogin.Password);
             response.Data.RoleMasters = rm;
             var user = _context.TblUserRoles.
                      Include(i => i.User)
@@ -173,6 +175,20 @@ namespace QuickCampus_Core.Services
             //var rec= _context.TblRolePermissions.Where(w=> a.Contains(w.RoleId)).
 
             return response;
+        }
+        private string EncodePasswordToBase64(string password)
+        {
+            try
+            {
+                byte[] encData_byte = new byte[password.Length];
+                encData_byte = System.Text.Encoding.UTF8.GetBytes(password);
+                string encodedData = Convert.ToBase64String(encData_byte);
+                return encodedData;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error in base64Encode" + ex.Message);
+            }
         }
     }
 }
