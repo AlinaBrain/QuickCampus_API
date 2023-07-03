@@ -20,4 +20,8 @@ public partial class TblClient
     public virtual TblUser? CraetedByNavigation { get; set; }
 
     public virtual TblUser? ModifiedByNavigation { get; set; }
+
+    public virtual ICollection<TblRole> TblRoles { get; set; } = new List<TblRole>();
+
+    public virtual ICollection<TblUser> TblUsers { get; set; } = new List<TblUser>();
 }

@@ -31,7 +31,7 @@ namespace QuickCampusAPI.Controllers
             _account = account;
         }
         [AllowAnonymous]
-        [HttpPost]
+        [HttpPost]  
         [Route("AdminLogin")]
         public IActionResult AdminLogin(AdminLogin adminlogin)
         {
@@ -39,7 +39,21 @@ namespace QuickCampusAPI.Controllers
             return Ok(res);
         }
 
-       
+        [HttpGet]
+        [Route("getallpermission")]
+        public async  Task<IActionResult> GetAllPermission()
+        {
+            var res = await _account.ListPermission();
+            return Ok(res);
+        }
+
+        [HttpGet]
+        [Route("getallroles")]
+        public async Task<IActionResult> GetAllRoles()
+        {
+            var res = await _account.ListRoles();
+            return Ok(res);
+        }
         private ApplicationUserVM Authenticate(AdminLogin adminLogin)
         {
             var currentUser = _applicationUserRepo.FirstOrDefault(o => o.UserName.ToLower() == adminLogin.UserName.ToLower() && o.Password == adminLogin.Password);

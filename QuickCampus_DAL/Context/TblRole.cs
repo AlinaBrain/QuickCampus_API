@@ -17,6 +17,10 @@ public partial class TblRole
 
     public DateTime ModofiedDate { get; set; }
 
+    public int? ClientId { get; set; }
+
+    public virtual TblClient? Client { get; set; }
+
     public virtual TblUser? CreatedByNavigation { get; set; }
 
     public virtual TblUser? ModifiedByNavigation { get; set; }

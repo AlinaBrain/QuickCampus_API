@@ -57,6 +57,8 @@ public partial class QuikCampusDevContext : DbContext
 
     public virtual DbSet<TblClient> TblClients { get; set; }
 
+    public virtual DbSet<TblPermission> TblPermissions { get; set; }
+
     public virtual DbSet<TblRole> TblRoles { get; set; }
 
     public virtual DbSet<TblRolePermission> TblRolePermissions { get; set; }
@@ -374,6 +376,16 @@ public partial class QuikCampusDevContext : DbContext
                 .HasConstraintName("FK__tbl_Clien__Modif__1AD3FDA4");
         });
 
+        modelBuilder.Entity<TblPermission>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Tbl_perm__3214EC07E8B524C3");
+
+            entity.ToTable("Tbl_permission");
+
+            entity.Property(e => e.PermissionDisplay).HasMaxLength(100);
+            entity.Property(e => e.PermissionName).HasMaxLength(100);
+        });
+
         modelBuilder.Entity<TblRole>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__tbl_Role__3214EC07D7A69E98");
@@ -384,6 +396,10 @@ public partial class QuikCampusDevContext : DbContext
             entity.Property(e => e.ModifiedBy).HasColumnName("modifiedBy");
             entity.Property(e => e.ModofiedDate).HasColumnType("datetime");
             entity.Property(e => e.Name).HasMaxLength(50);
+
+            entity.HasOne(d => d.Client).WithMany(p => p.TblRoles)
+                .HasForeignKey(d => d.ClientId)
+                .HasConstraintName("FK__tbl_Role__Client__3B40CD36");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.TblRoleCreatedByNavigations)
                 .HasForeignKey(d => d.CreatedBy)
@@ -403,6 +419,10 @@ public partial class QuikCampusDevContext : DbContext
             entity.Property(e => e.DisplayName).HasMaxLength(500);
             entity.Property(e => e.PermissionName).HasMaxLength(500);
 
+            entity.HasOne(d => d.Permission).WithMany(p => p.TblRolePermissions)
+                .HasForeignKey(d => d.PermissionId)
+                .HasConstraintName("FK__tbl_RoleP__Permi__3C34F16F");
+
             entity.HasOne(d => d.Role).WithMany(p => p.TblRolePermissions)
                 .HasForeignKey(d => d.RoleId)
                 .HasConstraintName("FK__RolePermi__RoleI__08B54D69");
@@ -421,6 +441,10 @@ public partial class QuikCampusDevContext : DbContext
             entity.Property(e => e.Name).HasMaxLength(100);
             entity.Property(e => e.Password).HasMaxLength(500);
             entity.Property(e => e.UserName).HasMaxLength(100);
+
+            entity.HasOne(d => d.Client).WithMany(p => p.TblUsers)
+                .HasForeignKey(d => d.ClientId)
+                .HasConstraintName("FK__tbl_User__Client__3A4CA8FD");
         });
 
         modelBuilder.Entity<TblUserRole>(entity =>

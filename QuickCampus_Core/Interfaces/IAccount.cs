@@ -12,5 +12,9 @@ namespace QuickCampus_Core.Interfaces
     public interface IAccount
     {
         Task<IGeneralResult<LoginResponseVM>> Login(AdminLogin adminLogin);
+        Task<IGeneralResult<List<PermissionVM>>> ListPermission();
+        Task<IGeneralResult<List<RoleMappingVM>>> ListRoles();
+
+        //Task<IGeneralResult<RoleMappingVM>> GetRolePermissionById(int [] roleIds);
     }
 }
