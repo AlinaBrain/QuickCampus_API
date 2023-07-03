@@ -8,12 +8,8 @@ using System.Threading.Tasks;
 
 namespace QuickCampus_Core.Interfaces
 {
-    
+
     public interface IClientRepo : IGenericRepository<TblClient>
     {
-        Task<List<ClientVM>> GetAllClient();
-        //Task<List<ClientVM>> Add(ClientVM clientVM);
-        Task<ClientVM> Add(ClientVM clientVM);
-
     }
 }

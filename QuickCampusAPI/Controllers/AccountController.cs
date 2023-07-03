@@ -27,6 +27,7 @@ namespace QuickCampusAPI.Controllers
             _config = config;
             _applicationUserRepo = applicationUserRepo;
         }
+        [AllowAnonymous]
         [HttpPost]
         [Route("AdminLogin")]
         public IActionResult AdminLogin([FromBody] AdminLogin adminlogin)

@@ -52,7 +52,7 @@ builder.Services.AddScoped<ICampusRepo, CampusService>();
 builder.Services.AddScoped<ICountryRepo, CountryService>();
 builder.Services.AddScoped<ICollegeRepo, CollegeRepo>();
 builder.Services.AddScoped<IUserRepo, UserRepo>();
-builder.Services.AddScoped<IClientRepo, ClientServices>();
+builder.Services.AddScoped<IClientRepo, ClientService>();
 
 
 
