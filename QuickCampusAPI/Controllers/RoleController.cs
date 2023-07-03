@@ -40,10 +40,11 @@ namespace QuickCampusAPI.Controllers
                     var res = (user != null && user.IsDelete == true) ? user : null;
                     if (user != null)
                     {
-                        var clientId = await clientRepo.GetById((int)vm.ClientId);
-                        //if(clientId!= null) 
-                        //{ 
-                        RoleVm roleVm = new RoleVm
+                        var clientId = vm.ClientId.HasValue ? await clientRepo.GetById((int)vm.ClientId) : null;
+
+                        if (clientId != null || vm.ClientId == null)
+                        {
+                            RoleVm roleVm = new RoleVm
                         {
                             Name = vm.RoleName,
                             ClientId = (int)vm.ClientId,
@@ -57,11 +58,11 @@ namespace QuickCampusAPI.Controllers
                         result.IsSuccess = true;
                         result.Data = roleVm;
                         return Ok(result);
-                        //}
-                        //else
-                        //{
-                        //    result.Message = "Client Id is not valid.";
-                        //}
+                        }
+                        else
+                        {
+                            result.Message = "Client Id is not valid.";
+                        }
                     }
                     else
                     {
@@ -103,8 +104,9 @@ namespace QuickCampusAPI.Controllers
                 if (uId != null)
                 {
                     var res = await roleRepo.GetById(roleId);
-                    var clientId = await clientRepo.GetById((int)vm.ClientId);
-                    if (/*clientId != null && */uId != null)
+                    var clientId = vm.ClientId.HasValue ? await clientRepo.GetById((int)vm.ClientId) : null;
+
+                    if (clientId != null || vm.ClientId == null)
                     {
                         if (res != null)
                         {
@@ -126,7 +128,7 @@ namespace QuickCampusAPI.Controllers
                     }
                     else
                     {
-                        result.Message = "user not found. ";
+                        result.Message = "ClientId not found. ";
                     }
                 }
                 else

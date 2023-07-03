@@ -20,44 +20,43 @@ namespace QuickCampusAPI.Controllers
         }
         [HttpPost]
         [Route("userAdd")]
-        public async Task<IActionResult> addUser([FromBody] UserModel vm)
+        public async Task<IActionResult> AddUser([FromBody] UserModel vm)
         {
             IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
             if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.IsDelete == false))
             {
                 result.Message = "Email Already Registerd!";
             }
-
             else
             {
                 if (ModelState.IsValid)
                 {
-                    var clientId = await clientRepo.GetById((int)vm.ClientId);
+                    var clientId = vm.ClientId.HasValue ? await clientRepo.GetById((int)vm.ClientId) : null;
 
-                    //if (clientId != null) // Check if client is found
-                    //{
-                    UserVm userVm = new UserVm
+                    if (clientId != null || vm.ClientId == null)
                     {
-                        UserName = vm.Email,
-                        Name = vm.Name,
-                        Email = vm.Email,
-                        Mobile = vm.Mobile,
-                        Password = vm.Password,
-                        ClientId = vm.ClientId,
-                        IsActive = true,
-                        IsDelete = false,
-                    };
+                        UserVm userVm = new UserVm
+                        {
+                            UserName = vm.Email,
+                            Name = vm.Name,
+                            Email = vm.Email,
+                            Mobile = vm.Mobile,
+                            Password = vm.Password,
+                            ClientId = vm.ClientId,
+                            IsActive = true,
+                            IsDelete = false,
+                        };
 
-                    await userRepo.Add(userVm.toUserDBModel());
-                    result.IsSuccess = true;
-                    result.Message = "User added successfully.";
-                    result.Data = userVm;
-                    return Ok(result);
-                    //}
-                    //else
-                    //{
-                    //    result.Message = "Client ID not found.";
-                    //}
+                        await userRepo.Add(userVm.toUserDBModel());
+                        result.IsSuccess = true;
+                        result.Message = "User added successfully.";
+                        result.Data = userVm;
+                        return Ok(result);
+                    }
+                    else
+                    {
+                        result.Message = "Client ID not found.";
+                    }
                 }
                 else
                 {
@@ -65,10 +64,10 @@ namespace QuickCampusAPI.Controllers
                 }
 
                 return Ok(result);
-
             }
             return Ok(result);
         }
+
         [HttpGet]
         [Route("userList")]
         public async Task<IActionResult> userList()
@@ -108,43 +107,48 @@ namespace QuickCampusAPI.Controllers
         public async Task<IActionResult> Edit(int userId, UserModel vm)
         {
             IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
-            if (userRepo.Any(x => x.Email == vm.Email && x.Id!= userId &&  x.IsActive == true && x.IsDelete == false))
+            if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.IsDelete == false))
             {
-                result.Message = "Email Already Registerd!";
+                result.Message = "Email Already Registered!";
             }
             else
             {
                 var res = await userRepo.GetById(userId);
-                var clientId = await clientRepo.GetById((int)vm.ClientId);
-                //if (clientId != null)
-                //{
                 if (res != null)
                 {
-                    res.Id = userId;
-                    res.ClientId = vm.ClientId;
-                    res.UserName = vm.Email;
-                    res.Name = vm.Name;
-                    res.Email = vm.Email;
-                    res.Mobile = vm.Mobile;
-                    res.Password = vm.Password;
-                    res.IsActive = true;
-                    res.IsDelete = false;
-                    await userRepo.Update(res);
-                    result.Message = "User data is updated successfully";
-                    result.IsSuccess = true;
-                    result.Data = (UserVm)res;
-                    return Ok(result);
+                    var clientId = vm.ClientId.HasValue ? await clientRepo.GetById((int)vm.ClientId) : null;
+
+                    if (clientId != null || vm.ClientId == null)
+                    {
+                        res.Id = userId;
+                        res.ClientId = vm.ClientId;
+                        res.UserName = vm.Email;
+                        res.Name = vm.Name;
+                        res.Email = vm.Email;
+                        res.Mobile = vm.Mobile;
+                        res.Password = vm.Password;
+                        res.IsActive = true;
+                        res.IsDelete = false;
+                        await userRepo.Update(res);
+                        result.Message = "User data is updated successfully";
+                        result.IsSuccess = true;
+                        result.Data = (UserVm)res;
+                        return Ok(result);
+                    }
+                    else
+                    {
+                        result.Message = "Client ID not found.";
+                    }
                 }
                 else
                 {
                     result.Message = "User ID not found.";
-
                 }
             }
 
             return Ok(result);
-
         }
+
         [HttpGet]
         [Route("activeAndInactive")]
         public async Task<IActionResult> activeAndInactive(bool IsActive, int id)

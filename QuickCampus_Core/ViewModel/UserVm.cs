@@ -30,9 +30,7 @@ namespace QuickCampus_Core.ViewModel
         [Required, MaxLength(50)]
         public string? Name { get; set; }
         [Required(ErrorMessage = "Password is required")]
-        [StringLength(100, ErrorMessage = "Must be between 6 and 50 characters", MinimumLength = 8)]
-        [RegularExpression(@"(?!.* )(?=.*\d)(?=.*[A-Z]).{8,15}$",
-        ErrorMessage = "Please enter a password That contains 1 small alphabet, 1 capital alphabet, 1 special character.")]
+        [StringLength(8, MinimumLength = 6, ErrorMessage = "Password must be between 6 and 8 characters.")]
         public string? Password { get; set; }
 
         public bool? IsDelete { get; set; }
@@ -44,7 +42,7 @@ namespace QuickCampus_Core.ViewModel
         [EmailAddress(ErrorMessage = "Invalid email address")]
         public string? Email { get; set; }
         [Required,MaxLength(10)]
-        [Phone(ErrorMessage = "Please enter a valid mobile number")]
+        [RegularExpression(@"^\d{10}$", ErrorMessage = "Mobile number must be a 10-digit number.")]
         public string? Mobile { get; set; }
 
 
