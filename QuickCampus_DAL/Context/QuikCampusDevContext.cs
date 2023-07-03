@@ -419,6 +419,10 @@ public partial class QuikCampusDevContext : DbContext
             entity.Property(e => e.DisplayName).HasMaxLength(500);
             entity.Property(e => e.PermissionName).HasMaxLength(500);
 
+            entity.HasOne(d => d.Permission).WithMany(p => p.TblRolePermissions)
+                .HasForeignKey(d => d.PermissionId)
+                .HasConstraintName("FK__tbl_RoleP__Permi__3C34F16F");
+
             entity.HasOne(d => d.Role).WithMany(p => p.TblRolePermissions)
                 .HasForeignKey(d => d.RoleId)
                 .HasConstraintName("FK__RolePermi__RoleI__08B54D69");

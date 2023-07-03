@@ -33,11 +33,8 @@ namespace QuickCampus_Core.Services
             IGeneralResult<LoginResponseVM> response = new GeneralResult<LoginResponseVM>();
             LoginResponseVM data = new LoginResponseVM();
             response.Data = data;
-
             List<RoleMaster> rm = new List<RoleMaster>();
-
             response.Data.RoleMasters = rm;
-
             var user = _context.TblUserRoles.
                      Include(i => i.User)
                      .Include(i => i.Role)
@@ -47,13 +44,13 @@ namespace QuickCampus_Core.Services
 
             if (user != null)
             {
-
-
-                var uRoles = _context.TblUserRoles.Where(w => w.User.UserName == adminLogin.UserName && w.User.Password == adminLogin.Password && w.User.IsDelete == false && w.User.IsActive == true).Select(s => new RoleMaster()
-                {
-                    Id = s.Role.Id,
-                    RoleName = s.Role.Name
-                }).ToList();
+                var uRoles = _context.TblUserRoles
+                    .Where(w => w.User.UserName == adminLogin.UserName && w.User.Password == adminLogin.Password && w.User.IsDelete == false && w.User.IsActive == true)
+                    .Select(s => new RoleMaster()
+                    {
+                        Id = s.Role.Id,
+                        RoleName = s.Role.Name
+                    }).ToList();
 
                 foreach (var rec in uRoles)
                 {
@@ -86,11 +83,11 @@ namespace QuickCampus_Core.Services
         {
             List<RolePermissions> rolePermissions = new List<RolePermissions>();
 
-            rolePermissions = tblRole.TblRolePermissions.Where(w => w.RoleId == roleId).Select(s => new RolePermissions()
+            rolePermissions = _context.TblRolePermissions.Include(i => i.Permission).Where(w => w.RoleId == roleId).Select(s => new RolePermissions()
             {
                 Id = s.Id,
-                PermissionName = s.PermissionName,
-                DisplayName = s.DisplayName
+                PermissionName = s.Permission.PermissionName,
+                DisplayName = s.Permission.PermissionDisplay
             }).ToList();
 
             return rolePermissions;
@@ -98,7 +95,6 @@ namespace QuickCampus_Core.Services
 
         private string GenerateToken(AdminLogin adminlogin, string userRole, List<string> obj)
         {
-
             var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
             var Claims = new[]
@@ -112,7 +108,71 @@ namespace QuickCampus_Core.Services
                expires: DateTime.Now.AddHours(24),
                signingCredentials: credentials);
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
 
+        public async Task<IGeneralResult<List<PermissionVM>>> ListPermission()
+        {
+            IGeneralResult<List<PermissionVM>> lst = new GeneralResult<List<PermissionVM>>();
+            lst.Data = new List<PermissionVM>();
+
+            var record = await _context.TblPermissions.Select(s => new PermissionVM()
+            {
+                Id = s.Id,
+                PermissionDisplay = s.PermissionDisplay,
+                PermissionName = s.PermissionName
+            }).ToListAsync();
+
+            if (record.Count != 0)
+            {
+                lst.Message = "Permissions";
+                lst.IsSuccess = true;
+                lst.Data = record;
+            }
+            else
+            {
+                lst.Message = "No Record Found";
+                lst.IsSuccess = false;
+            }
+            return lst;
+        }
+
+        public async Task<IGeneralResult<List<RoleMappingVM>>> ListRoles()
+        {
+            IGeneralResult<List<RoleMappingVM>> lst = new GeneralResult<List<RoleMappingVM>>();
+            lst.Data = new List<RoleMappingVM>();
+            var record = await _context.TblRoles.Select(s => new RoleMappingVM()
+            {
+                Id = s.Id,
+                RoleName = s.Name
+            }).ToListAsync();
+
+            if (record.Count > 0)
+            {
+                lst.Message = "Role List";
+                lst.IsSuccess = true;
+                lst.Data = record;
+            }
+            else
+            {
+                lst.Message = "No Record Found";
+                lst.IsSuccess = true;
+            }
+            return lst;
+        }
+
+        public async Task<IGeneralResult<RoleMappingVM>> GetRolePermissionByRoleIds(int[] roleIds)
+        {
+            var a = new List<int>();
+            foreach (int id in roleIds)
+            {
+                a.Add(id);
+            }
+
+            GeneralResult<RoleMappingVM> response = new GeneralResult<RoleMappingVM>();
+
+            //var rec= _context.TblRolePermissions.Where(w=> a.Contains(w.RoleId)).
+
+            return response;
         }
     }
 }

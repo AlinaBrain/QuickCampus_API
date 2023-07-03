@@ -9,6 +9,5 @@ namespace QuickCampus_Core.Interfaces
 {
     public interface IClientRepo : IGenericRepository<TblClient>
     {
-
     }
 }

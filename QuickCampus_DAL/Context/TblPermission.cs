@@ -12,4 +12,6 @@ public partial class TblPermission
     public string PermissionDisplay { get; set; } = null!;
 
     public int ParentPermissionId { get; set; }
+
+    public virtual ICollection<TblRolePermission> TblRolePermissions { get; set; } = new List<TblRolePermission>();
 }

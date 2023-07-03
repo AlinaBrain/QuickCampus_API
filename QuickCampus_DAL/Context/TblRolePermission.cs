@@ -13,5 +13,9 @@ public partial class TblRolePermission
 
     public string? DisplayName { get; set; }
 
+    public int? PermissionId { get; set; }
+
+    public virtual TblPermission? Permission { get; set; }
+
     public virtual TblRole? Role { get; set; }
 }
