@@ -9,10 +9,10 @@ using QuickCampus_Core.ViewModel;
 
 namespace QuickCampusAPI.Controllers
 {
-[Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    
 
     public class ClientController : ControllerBase
     {
@@ -85,7 +85,7 @@ namespace QuickCampusAPI.Controllers
             }
             else
             {
-                result.Message = "Client details  does not found";
+                result.Message = "Client details does not found";
             }
             return Ok(result);
         }
