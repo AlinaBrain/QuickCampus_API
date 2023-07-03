@@ -10,7 +10,7 @@ namespace QuickCampus_Core.ViewModel
     public class UserModel
     {
 
-        public int ClientId { get; set; }
+        public int? ClientId { get; set; }
         [Required, MaxLength(20)]
         [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "In name only characters allowed.")]
         public string? Name { get; set; }

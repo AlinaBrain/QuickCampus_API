@@ -30,9 +30,9 @@ namespace QuickCampusAPI.Controllers
                 var user = await userRepo.GetById(vm.userId);
                 if(user != null)
                 {
-                    var clientId = await clientRepo.GetById(vm.ClientId);
-                if(clientId!= null) 
-                { 
+                    var clientId = await clientRepo.GetById((int)vm.ClientId);
+                //if(clientId!= null) 
+                //{ 
                 RoleVm roleVm = new RoleVm
                 {
                     Name = vm.RoleName,
@@ -47,11 +47,11 @@ namespace QuickCampusAPI.Controllers
                 result.IsSuccess = true;
                 result.Data = roleVm;
                 return Ok(result);
-                }
-                else
-                {
-                    result.Message = "Client Id is not valid.";
-                }
+                //}
+                //else
+                //{
+                //    result.Message = "Client Id is not valid.";
+                //}
                 }
                 else
                 {
@@ -82,8 +82,8 @@ namespace QuickCampusAPI.Controllers
             IGeneralResult<RoleVm> result = new GeneralResult<RoleVm>();
             var uId = await userRepo.GetById(vm.userId);
             var res = await roleRepo.GetById(roleId);
-            var clientId = await clientRepo.GetById(vm.ClientId);
-            if(clientId != null && uId !=null)
+            var clientId = await clientRepo.GetById((int)vm.ClientId);
+            if(/*clientId != null && */uId !=null)
             {
                 if (res != null)
             {
@@ -105,7 +105,7 @@ namespace QuickCampusAPI.Controllers
             }
             else
             {
-                result.Message = "Client ID not found or user not found. ";
+                result.Message = "user not found. ";
             }
             return Ok(result);
         }

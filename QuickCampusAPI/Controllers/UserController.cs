@@ -32,10 +32,10 @@ namespace QuickCampusAPI.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var clientId = await clientRepo.GetById(vm.ClientId);
+                    var clientId = await clientRepo.GetById((int)vm.ClientId);
 
-                    if (clientId != null) // Check if client is found
-                    {
+                    //if (clientId != null) // Check if client is found
+                    //{
                         UserVm userVm = new UserVm
                         {
                             UserName = vm.Email,
@@ -53,11 +53,11 @@ namespace QuickCampusAPI.Controllers
                         result.Message = "User added successfully.";
                         result.Data = userVm;
                         return Ok(result);
-                    }
-                    else
-                    {
-                        result.Message = "Client ID not found.";
-                    }
+                    //}
+                    //else
+                    //{
+                    //    result.Message = "Client ID not found.";
+                    //}
                 }
                 else
                 {
@@ -115,9 +115,9 @@ namespace QuickCampusAPI.Controllers
             else
             {
             var res = await userRepo.GetById(userId);
-            var clientId = await clientRepo.GetById(vm.ClientId);
-                if (clientId != null)
-                {
+            var clientId = await clientRepo.GetById((int)vm.ClientId);
+                //if (clientId != null)
+                //{
                     if (res != null )
                     {
                         res.Id = userId;
@@ -139,11 +139,11 @@ namespace QuickCampusAPI.Controllers
                     {
                         result.Message = "User ID not found.";
                     }
-                }
-                else
-                {
-                    result.Message = "Client ID not found.";
-                }
+                //}
+                //else
+                //{
+                //    result.Message = "Client ID not found.";
+                //}
             }
 
             return Ok(result);
