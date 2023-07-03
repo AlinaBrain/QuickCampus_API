@@ -21,9 +21,8 @@ namespace QuickCampus_Core.ViewModel
         [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage = "Invalid email address.")]
         [EmailAddress(ErrorMessage = "Invalid email address")]
         public string? Email { get; set; }
-        [Required, MaxLength(10)]
-        [RegularExpression(@"^\d{10}$", ErrorMessage = "Please enter a valid mobile numbers.")]
-        [Phone(ErrorMessage ="Please enter a valid mobile number")]
-        public string? Mobile { get; set; }
+        [Required]
+        [RegularExpression(@"^[1-9][0-9]{9}$", ErrorMessage = "Please enter a valid 10-digit mobile number that does not start with 0.")]
+        public string Mobile { get; set; }
     }
 }

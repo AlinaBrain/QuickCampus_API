@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
+﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Mvc;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
@@ -23,7 +24,7 @@ namespace QuickCampusAPI.Controllers
         public async Task<IActionResult> AddUser([FromBody] UserModel vm)
         {
             IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
-            if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.IsDelete == false))
+            if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true  && x.IsDelete == false))
             {
                 result.Message = "Email Already Registerd!";
             }
@@ -107,7 +108,7 @@ namespace QuickCampusAPI.Controllers
         public async Task<IActionResult> Edit(int userId, UserModel vm)
         {
             IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
-            if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.IsDelete == false))
+            if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.Id != userId && x.IsDelete == false))
             {
                 result.Message = "Email Already Registered!";
             }
