@@ -39,13 +39,13 @@ namespace QuickCampus_Core.Services
                      Include(i => i.User)
                      .Include(i => i.Role)
                      .Include(i => i.Role.TblRolePermissions)
-                     .Where(w => w.User.UserName == adminLogin.UserName && w.User.Password == adminLogin.Password && w.User.IsDelete == false && w.User.IsActive == true)
+                     .Where(w => w.User.Email == adminLogin.UserName && w.User.Password == adminLogin.Password && w.User.IsDelete == false && w.User.IsActive == true)
                      .FirstOrDefault();
 
             if (user != null)
             {
                 var uRoles = _context.TblUserRoles
-                    .Where(w => w.User.UserName == adminLogin.UserName && w.User.Password == adminLogin.Password && w.User.IsDelete == false && w.User.IsActive == true)
+                    .Where(w => w.User.Email == adminLogin.UserName && w.User.Password == adminLogin.Password && w.User.IsDelete == false && w.User.IsActive == true)
                     .Select(s => new RoleMaster()
                     {
                         Id = s.Role.Id,
