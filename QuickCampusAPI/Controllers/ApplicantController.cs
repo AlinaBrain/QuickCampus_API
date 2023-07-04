@@ -31,7 +31,7 @@ namespace QuickCampusAPI.Controllers
             _applicantRepo = applicantRepo;
         }
 
-
+        //[AllowAnonymous]
         [HttpGet]
         [Route("Manage")]
         public async Task<ActionResult> Manage(int statusId)
@@ -66,6 +66,7 @@ namespace QuickCampusAPI.Controllers
 
      [HttpPost]
      [Route("EditApplicant")]
+     
        public async Task<IActionResult> EditApplicant(ApplicantRegisterViewModel applicantViewModel, int ApplicantId)
        {
             try
