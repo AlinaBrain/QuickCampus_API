@@ -17,6 +17,20 @@ public partial class TblClient
 
     public DateTime ModofiedDate { get; set; }
 
+    public string? Address { get; set; }
+
+    public string? Phone { get; set; }
+
+    public string? Email { get; set; }
+
+    public string? Geolocation { get; set; }
+
+    public string? SubscriptionPlan { get; set; }
+
+    public bool? IsActive { get; set; }
+
+    public bool? IsDeleted { get; set; }
+
     public virtual TblUser? CraetedByNavigation { get; set; }
 
     public virtual TblUser? ModifiedByNavigation { get; set; }

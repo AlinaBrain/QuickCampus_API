@@ -9,7 +9,7 @@ using QuickCampus_Core.ViewModel;
 
 namespace QuickCampusAPI.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     
@@ -75,10 +75,10 @@ namespace QuickCampusAPI.Controllers
             if (clientDetail != null)
             {
                 clientDetail.Name = clientVM.Name;
-                clientDetail.CraetedBy = clientVM.CraetedBy;
-                clientDetail.CreatedDate = clientVM.CreatedDate;
-                clientDetail.ModifiedBy = clientVM.ModifiedBy;
-                clientDetail.ModofiedDate = clientVM.ModofiedDate;
+                clientDetail.Phone = clientVM.Phone;
+                clientDetail.Email = clientVM.Email;
+                clientDetail.SubscriptionPlan = clientVM.SubscriptionPlan;
+                clientDetail.Geolocation = clientVM.Geolocation;
                 await _clientRepo.Update(clientDetail);
                 result.Message = "Client Details updated Succesfully";
                 result.IsSuccess = true;

@@ -71,7 +71,7 @@ public partial class QuikCampusDevContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=103.133.215.42,1434;Database=QuikCampusDev; user id=bt;password=bT@nEw#1234%^;Integrated Security=false;TrustServerCertificate=True;");
+        => optionsBuilder.UseSqlServer("Server=103.133.215.42,1434;Database=QuikCampusDev;TrustServerCertificate=true;user id=bt;password=bT@nEw#1234%^;Integrated Security=false;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -363,9 +363,20 @@ public partial class QuikCampusDevContext : DbContext
 
             entity.ToTable("tbl_Client");
 
+            entity.Property(e => e.Address).HasMaxLength(1);
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+            entity.Property(e => e.Email)
+                .HasMaxLength(1)
+                .HasColumnName("email");
+            entity.Property(e => e.Geolocation)
+                .HasMaxLength(1)
+                .HasColumnName("geolocation");
             entity.Property(e => e.ModofiedDate).HasColumnType("datetime");
             entity.Property(e => e.Name).HasMaxLength(100);
+            entity.Property(e => e.Phone)
+                .HasMaxLength(1)
+                .HasColumnName("phone");
+            entity.Property(e => e.SubscriptionPlan).HasMaxLength(1);
 
             entity.HasOne(d => d.CraetedByNavigation).WithMany(p => p.TblClientCraetedByNavigations)
                 .HasForeignKey(d => d.CraetedBy)

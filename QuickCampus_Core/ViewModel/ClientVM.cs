@@ -22,10 +22,17 @@ namespace QuickCampus_Core.ViewModel
                 CreatedDate = items.CreatedDate,
                 ModifiedBy = items.ModifiedBy,
                 ModofiedDate = items.ModofiedDate,
+                Address = items.Address,
+                Phone= items.Phone,
+                Email = items.Email,
+                SubscriptionPlan = items.SubscriptionPlan,
+                Geolocation = items.Geolocation,
+                IsActive = items.IsActive,
+                IsDeleted = items.IsDeleted,
             };
         }
         public int Id { get; set; }
-        [Required(ErrorMessage = "Name is required"), MaxLength(20)]
+        [Required(ErrorMessage = "Name is required")]
         [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "Only characters allowed.")]
 
         public string? Name { get; set; }
@@ -39,20 +46,41 @@ namespace QuickCampus_Core.ViewModel
 
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
         public DateTime ModofiedDate { get; set; }
+        public string? Address { get; set; }
 
-       
-       //ublic IEnumerable<SelectListItem> rec { get; set; }
+        public string? Phone { get; set; }
+
+        public string? Email { get; set; }
+
+        public string? Geolocation { get; set; }
+
+        public string? SubscriptionPlan { get; set; }
+
+        public bool? IsActive { get; set; }
+
+        public bool? IsDeleted { get; set; }
+
+
+        //ublic IEnumerable<SelectListItem> rec { get; set; }
 
         public TblClient ToClientDbModel()
         {
             return new TblClient
             {
                 Name = Name,
-
+                Phone = Phone,
+                Email = Email,
+                Geolocation = Geolocation,
+                SubscriptionPlan = SubscriptionPlan,
                 CraetedBy = CraetedBy,
-                CreatedDate = DateTime.UtcNow,
+                CreatedDate = CreatedDate,
                 ModifiedBy = ModifiedBy,
-                ModofiedDate = DateTime.UtcNow,
+                ModofiedDate = ModofiedDate,
+                IsActive = true,
+                IsDeleted = false,
+
+
+               
             };
         }
 
@@ -62,10 +90,14 @@ namespace QuickCampus_Core.ViewModel
             {
                 Id = Id,
                 Name = Name,
-                CraetedBy = CraetedBy,
-                CreatedDate = DateTime.UtcNow,
+                Phone= Phone,
+                Email = Email,
+                SubscriptionPlan = SubscriptionPlan,
+                Geolocation = Geolocation,
                 ModifiedBy = ModifiedBy,
-                ModofiedDate = DateTime.UtcNow,
+                ModofiedDate = ModofiedDate,
+                CraetedBy = CraetedBy,
+                CreatedDate = CreatedDate,
             };
         }
     }
