@@ -35,7 +35,7 @@ namespace QuickCampus_Core.Services
             response.Data = data;
             List<RoleMaster> rm = new List<RoleMaster>();
 
-            adminLogin.Password = EncodePasswordToBase64(adminLogin.Password);
+            //adminLogin.Password = EncodePasswordToBase64(adminLogin.Password);
             response.Data.RoleMasters = rm;
             var user = _context.TblUserRoles.
                      Include(i => i.User)

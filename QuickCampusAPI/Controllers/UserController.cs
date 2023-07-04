@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
@@ -7,8 +8,9 @@ using QuickCampus_Core.ViewModel;
 
 namespace QuickCampusAPI.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly IUserRepo userRepo;
@@ -19,11 +21,12 @@ namespace QuickCampusAPI.Controllers
             this.clientRepo = clientRepo;
 
         }
-        [HttpPost]
+       
         [Route("userAdd")]
-        public async Task<IActionResult> AddUser([FromBody] UserModel vm)
+        [HttpPost]
+        public async Task<IActionResult> AddUser(UserModel vm)
         {
-            vm.Password = EncodePasswordToBase64(vm.Password);
+            //vm.Password = EncodePasswordToBase64(vm.Password);
 
             IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
             if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true  && x.IsDelete == false))
@@ -87,7 +90,7 @@ namespace QuickCampusAPI.Controllers
             IGeneralResult<dynamic> result = new GeneralResult<dynamic>();
             var user = await userRepo.GetById(id);
 
-            var res = (user != null && user.IsActive == true) ? user : null;
+            var res = (user != null&& user.IsDelete == false) ? user : null;
             if (res != null)
             {
                 res.IsActive = false;
