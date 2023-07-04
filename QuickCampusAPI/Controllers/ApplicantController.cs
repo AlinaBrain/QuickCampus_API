@@ -17,7 +17,7 @@ using static QuickCampus_Core.ViewModel.ApplicantViewModel;
 
 namespace QuickCampusAPI.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [ApiController]
     [Route("api/[controller]")]
 
@@ -66,6 +66,7 @@ namespace QuickCampusAPI.Controllers
 
      [HttpPost]
      [Route("EditApplicant")]
+     
        public async Task<IActionResult> EditApplicant(ApplicantRegisterViewModel applicantViewModel, int ApplicantId)
        {
             try
