@@ -47,7 +47,7 @@ namespace QuickCampusAPI.Controllers
                             RoleVm roleVm = new RoleVm
                         {
                             Name = vm.RoleName,
-                            ClientId = (int)vm.ClientId,
+                            ClientId = vm.ClientId,
                             CreatedBy = user.Id,
                             ModifiedBy = user.Id,
                             CreatedDate = DateTime.Now,
