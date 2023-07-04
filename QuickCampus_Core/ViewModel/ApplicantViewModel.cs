@@ -41,9 +41,23 @@ namespace QuickCampus_Core.ViewModel
         
         public int ApplicantID { get; private set; }
         public string? ApplicantToken { get; private set; }
+
+        [Required(ErrorMessage = "Name is required"), MaxLength(20)]
+        [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "Only characters allowed.")]
         public string? FirstName { get; private set; }
+        [Required(ErrorMessage = "Name is required"), MaxLength(20)]
+        [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "Only characters allowed.")]
         public string? LastName { get; private set; }
+
+        [Display(Name = "Email Address")]
+        [Required(ErrorMessage = "You must provide an email address.")]
+        [MaxLength(100, ErrorMessage = "can't exceed more than 100 characters.")]
+        [EmailAddress(ErrorMessage = "Not a valid email address.")]
         public string? EmailAddress { get; private set; }
+        [MaxLength(25, ErrorMessage = "can't exceed more than 25 characters.")]
+        [Required(ErrorMessage = "You must provide a Contact Number")]
+        [Display(Name = "Contact Number")]
+        [RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Not a valid Contact number.")]
         public string? PhoneNumber { get; private set; }
         public string? HigestQualification { get; private set; }
         public decimal? HigestQualificationPercentage { get; private set; }
@@ -105,13 +119,12 @@ namespace QuickCampus_Core.ViewModel
         {
             public int ApplicantID { get; set; }
             public string ApplicantToken { get; set; }
-            [Required(ErrorMessage = "Your must provide First Name.")]
-            [Display(Name = "First Name")]
-            [MaxLength(100, ErrorMessage = "can't exceed more than 100 characters.")]
+            [Required(ErrorMessage = "Name is required"), MaxLength(20)]
+            [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "Only characters allowed.")]
             public string FirstName { get; set; }
 
-            [Display(Name = "Last Name")]
-            [MaxLength(100, ErrorMessage = "can't exceed more than 100 characters.")]
+            [Required(ErrorMessage = "Name is required"), MaxLength(20)]
+            [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "Only characters allowed.")]
             public string LastName { get; set; }
 
             [Display(Name = "College Name")]
@@ -125,10 +138,10 @@ namespace QuickCampus_Core.ViewModel
             [EmailAddress(ErrorMessage = "Not a valid email address.")]
             public string EmailAddress { get; set; }
 
-            //[MaxLength(25, ErrorMessage = "can't exceed more than 25 characters.")]
-            //[Required(ErrorMessage = "You must provide a Contact Number")]
-            //[Display(Name = "Contact Number")]
-            //[RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Not a valid Contact number.")]
+            [MaxLength(25, ErrorMessage = "can't exceed more than 25 characters.")]
+            [Required(ErrorMessage = "You must provide a Contact Number")]
+            [Display(Name = "Contact Number")]
+            [RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Not a valid Contact number.")]
             public string PhoneNumber { get; set; }
 
 

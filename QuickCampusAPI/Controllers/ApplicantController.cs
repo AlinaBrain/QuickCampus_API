@@ -17,7 +17,7 @@ using static QuickCampus_Core.ViewModel.ApplicantViewModel;
 
 namespace QuickCampusAPI.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
 
@@ -31,7 +31,7 @@ namespace QuickCampusAPI.Controllers
             _applicantRepo = applicantRepo;
         }
 
-
+        //[AllowAnonymous]
         [HttpGet]
         [Route("Manage")]
         public async Task<ActionResult> Manage(int statusId)

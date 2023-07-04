@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -12,56 +13,53 @@ namespace QuickCampus_Core.ViewModel
     {
         public int ApplicantId { get; set; }
 
-        //[Required(ErrorMessage = "Your must provide First Name.")]
-        //[Display(Name = "First Name")]
-        //[MaxLength(100, ErrorMessage = "can't exceed more than 100 characters.")]
+        [Required(ErrorMessage = "First Name is required"), MaxLength(20)]
+        [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "Only characters allowed.")]
         public string FirstName { get; set; }
 
-        //[Display(Name = "Last Name")]
-        //[MaxLength(100, ErrorMessage = "can't exceed more than 100 characters.")]
+        [Required(ErrorMessage = "Last Name is required"), MaxLength(20)]
+        [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "Only characters allowed.")]
         public string LastName { get; set; }
 
-        //[Display(Name = "College Name")]
-        //[Required(ErrorMessage = "You must select one college.")]
+        
         public int? CollegeId { get; set; }
         public List<SelectListItem> Colleges { get; set; }
 
-        //[Display(Name = "Email Address")]
-        //[Required(ErrorMessage = "You must provide an email address.")]
-        //[MaxLength(100, ErrorMessage = "can't exceed more than 100 characters.")]
-        //[EmailAddress(ErrorMessage = "Not a valid email address.")]
+        [Required, MaxLength(100)]
+        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage = "Invalid email address.")]
+      
+        [EmailAddress(ErrorMessage = "Invalid email address")]
         public string EmailAddress { get; set; }
 
-        //[MaxLength(25, ErrorMessage = "can't exceed more than 25 characters.")]
-        //[Required(ErrorMessage = "You must provide a mobile Number")]
-        //[Display(Name = "Mobile Number")]
-        //[RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Not a valid mobile number.")]
+        [Required(ErrorMessage = "Mobile is required")]
+        [RegularExpression(@"^(0|91)?[1-9][0-9]{9}$", ErrorMessage = "Invalid Mobile Number.")]
+
         public string PhoneNumber { get; set; }
 
 
 
-        //[Display(Name = "Highest Qualification")]
-        //[Required(ErrorMessage = "You must provide your highest qualification.")]
-        //[MaxLength(100, ErrorMessage = "can't exceed more than 100 characters.")]
+        [Display(Name = "Highest Qualification")]
+        [Required(ErrorMessage = "You must provide your highest qualification.")]
+        [MaxLength(100, ErrorMessage = "can't exceed more than 100 characters.")]
         public string HigestQualification { get; set; }
 
-        //[Display(Name = "Best 3 Skills")]
-        //[MaxLength(100, ErrorMessage = "can't exceed more than 100 characters.")]
+        [Display(Name = "Best 3 Skills")]
+        [MaxLength(100, ErrorMessage = "can't exceed more than 100 characters.")]
         public string Skills { get; set; }
 
-        //[Display(Name = "Highest Qualification %")]
-        //[Required(ErrorMessage = "You must provide %.")]
-        //[Range(1, 100, ErrorMessage = "% should be in 1 - 100 range.")]
+        [Display(Name = "Highest Qualification %")]
+        [Required(ErrorMessage = "You must provide %.")]
+        [Range(1, 100, ErrorMessage = "% should be in 1 - 100 range.")]
         public decimal? HigestQualificationPercentage { get; set; }
 
-        //[Display(Name = "10th Class %")]
-        //[Required(ErrorMessage = "You must provide %.")]
-        //[Range(1, 100, ErrorMessage = "% should be in 1 - 100 range.")]
+        [Display(Name = "10th Class %")]
+        [Required(ErrorMessage = "You must provide %.")]
+        [Range(1, 100, ErrorMessage = "% should be in 1 - 100 range.")]
         public decimal? MatricPercentage { get; set; }
 
-        //[Display(Name = "12th Class %")]
-        //[Required(ErrorMessage = "You must provide %.")]
-        //[Range(1, 100, ErrorMessage = "% should be in 1 - 100 range.")]
+        [Display(Name = "12th Class %")]
+        [Required(ErrorMessage = "You must provide %.")]
+        [Range(1, 100, ErrorMessage = "% should be in 1 - 100 range.")]
         public decimal? IntermediatePercentage { get; set; }
 
         public string ApplicantCollegeLogo { get; set; }
