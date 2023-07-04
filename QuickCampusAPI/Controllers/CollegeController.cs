@@ -8,9 +8,9 @@ using QuickCampus_Core.ViewModel;
 
 namespace QuickCampusAPI.Controllers
 {
-    [Authorize]
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
+    [Authorize]
     public class CollegeController : ControllerBase
     {
         private readonly ICollegeRepo collegeRepo;
