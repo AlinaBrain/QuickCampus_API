@@ -2,9 +2,11 @@
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
+using System.Text;
 
 namespace QuickCampusAPI.Controllers
 {
@@ -15,23 +17,25 @@ namespace QuickCampusAPI.Controllers
     {
         private readonly IUserRepo userRepo;
         private readonly IClientRepo clientRepo;
-        public UserController(IUserRepo userRepo, IClientRepo clientRepo)
+        private IConfiguration config;
+        private readonly string _jwtSecretKey = "your_secret_key_here";
+        public UserController(IUserRepo userRepo, IClientRepo clientRepo, IConfiguration config)
         {
             this.userRepo = userRepo;
             this.clientRepo = clientRepo;
-
+            this.config = config;
         }
-       
+
         [Route("userAdd")]
         [HttpPost]
         public async Task<IActionResult> AddUser(UserModel vm)
         {
             //vm.Password = EncodePasswordToBase64(vm.Password);
-
             IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
-            if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true  && x.IsDelete == false))
+            var _jwtSecretKey = config["Jwt:Key"];
+            if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.IsDelete == false))
             {
-                result.Message = "Email Already Registerd!";
+                result.Message = "Email Already Registered!";
             }
             else
             {
@@ -41,6 +45,9 @@ namespace QuickCampusAPI.Controllers
 
                     if (clientId != null || vm.ClientId == null)
                     {
+                        // Decode the JWT token and retrieve the "id" claim
+                        string ClientId = JwtHelper.GetUserIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+
                         UserVm userVm = new UserVm
                         {
                             UserName = vm.Email,
@@ -68,11 +75,11 @@ namespace QuickCampusAPI.Controllers
                 {
                     result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
                 }
-
-                return Ok(result);
             }
+
             return Ok(result);
-        }
+        
+    }
 
         [HttpGet]
         [Route("userList")]
