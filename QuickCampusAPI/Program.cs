@@ -13,6 +13,7 @@ using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
 using System.Reflection;
 using System.Text;
+using static QuickCampus_Core.ViewModel.ClientVM;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
@@ -32,6 +33,9 @@ builder.Services.AddDbContext<QuikCampusDevContext>(
 
 builder.Services.AddControllers();
 builder.Services.AddScoped<IValidator<AdminLogin>, AdminLoginValidator>();
+builder.Services.AddScoped<IValidator<ClientVM>, ClientValidator>();
+
+
 
 builder.Services.AddControllers()
                 .AddFluentValidation(options =>

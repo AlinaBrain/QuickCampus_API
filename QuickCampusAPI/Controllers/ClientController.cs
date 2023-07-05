@@ -50,22 +50,34 @@ namespace QuickCampusAPI.Controllers
         }
         [HttpPost]
         [Route("AddClient")]
-        public async Task<IActionResult> AddClient([FromBody] ClientVM clientVM)
+        public async Task<IActionResult> AddClient(ClientVM clientVM)
         {
             IGeneralResult<ClientVM> result = new GeneralResult<ClientVM>();
-            var client = await _clientRepo.Add(clientVM.ToClientDbModel());
-            if (client.Id != 0)
-            {
-                result.IsSuccess = true;
-                result.Message = "Client Added Successfully";
-            }
-            else
-            {
-                result.Message = "something Went Wrong";
-            }
-            return Ok(result);
-        }
 
+            if (ModelState.IsValid)
+            {
+                if (!_clientRepo.Any(o => o.Name == clientVM.Name))
+                {
+                    var client = await _clientRepo.Add(clientVM.ToClientDbModel());
+                    if (client.Id != 0)
+                    {
+                        result.IsSuccess = true;
+                        result.Message = "Client Added Successfully";
+                    }
+                    else
+                    {
+                        result.Message = "already record with this name exist";
+                        result.Message = "something Went Wrong";
+                    }
+
+                }
+            }
+
+            return Ok(result);
+                
+                
+            
+        }
         [HttpPatch]
         [Route("EditClient")]
         public async Task<IActionResult> EditClient(ClientVM clientVM)
@@ -79,7 +91,14 @@ namespace QuickCampusAPI.Controllers
                 clientDetail.Email = clientVM.Email;
                 clientDetail.SubscriptionPlan = clientVM.SubscriptionPlan;
                 clientDetail.Geolocation = clientVM.Geolocation;
+                //clientDetail.ModifiedBy = clientVM.ModifiedBy;
+                clientDetail.ModofiedDate = clientVM.ModofiedDate;
+                //clientDetail.CraetedBy = clientVM.CraetedBy;
+                clientDetail.CreatedDate = clientVM.CreatedDate;
+                clientDetail.Address = clientVM.Address;
+
                 await _clientRepo.Update(clientDetail);
+               
                 result.Message = "Client Details updated Succesfully";
                 result.IsSuccess = true;
             }

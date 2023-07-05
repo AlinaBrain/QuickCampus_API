@@ -13,6 +13,10 @@ namespace QuickCampus_Core.Services
 {
     public class ClientRepo : BaseRepository<QuikCampusDevContext, TblClient>, IClientRepo
     {
+        //public static Task<bool> UsernameExistsAsync(string name)
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
 
 

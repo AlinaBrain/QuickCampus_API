@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using QuickCampus_Core.Services;
 using QuickCampus_DAL.Context;
 using System;
 using System.Collections.Generic;
@@ -32,9 +35,9 @@ namespace QuickCampus_Core.ViewModel
             };
         }
         public int Id { get; set; }
-        [Required(ErrorMessage = "Name is required")]
-        [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "Only characters allowed.")]
-
+        //[Required(ErrorMessage = "Name is required")]
+        //[RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "Only characters allowed.")]
+        [Remote("IsAlreadyExist", "Client", HttpMethod = "POST", ErrorMessage = "Name already exists in database.")]
         public string? Name { get; set; }
 
         public int? CraetedBy { get; set; }
@@ -72,12 +75,14 @@ namespace QuickCampus_Core.ViewModel
                 Email = Email,
                 Geolocation = Geolocation,
                 SubscriptionPlan = SubscriptionPlan,
-                CraetedBy = CraetedBy,
-                CreatedDate = CreatedDate,
                 ModifiedBy = ModifiedBy,
                 ModofiedDate = ModofiedDate,
+                CraetedBy = CraetedBy,
+                Address = Address,
+                CreatedDate = CreatedDate,
                 IsActive = true,
                 IsDeleted = false,
+
 
 
                
@@ -94,11 +99,63 @@ namespace QuickCampus_Core.ViewModel
                 Email = Email,
                 SubscriptionPlan = SubscriptionPlan,
                 Geolocation = Geolocation,
-                ModifiedBy = ModifiedBy,
-                ModofiedDate = ModofiedDate,
-                CraetedBy = CraetedBy,
-                CreatedDate = CreatedDate,
+               // ModifiedBy = ModifiedBy,
+                //ModofiedDate = ModofiedDate,
+                //CraetedBy = CraetedBy,
+               // CreatedDate = CreatedDate,
+                IsActive = true,
+               IsDeleted = false,
             };
         }
+
+        public class ClientValidator : AbstractValidator<ClientVM>
+        {
+            public ClientValidator()
+            {
+                RuleFor(x => x.Name)
+                   .Cascade(CascadeMode.StopOnFirstFailure)
+                   .NotNull().WithMessage("Name could not be null")
+                   
+                   .NotEmpty().WithMessage("Name could not be empty")
+                   .Length(0, 10).WithMessage("Name lengh could not be greater than 10");
+
+                RuleFor(x => x.Address)
+                  .Cascade(CascadeMode.StopOnFirstFailure)
+                  .NotNull().WithMessage("Address could not be null")
+                  .NotEmpty().WithMessage("Address could not be empty")
+                  .Length(0, 100).WithMessage("Address lengh could not be greater than 100");
+
+                RuleFor(x => x.Phone)
+                  .Cascade(CascadeMode.StopOnFirstFailure)
+                  .NotNull().WithMessage("Phone could not be null")
+                  .NotEmpty().WithMessage("Phone could not be empty")
+                  .Length(0, 15).WithMessage("Phone lengh could not be greater than 15");
+
+                RuleFor(x => x.Email).EmailAddress()
+                  //.Cascade(CascadeMode.StopOnFirstFailure)
+                  .NotNull().WithMessage("Email could not be null")
+                  .NotEmpty().WithMessage("Email could not be empty");
+                  
+
+                RuleFor(x => x.SubscriptionPlan)
+                  .Cascade(CascadeMode.StopOnFirstFailure)
+                  .NotNull().WithMessage("SubscriptionPlan could not be null")
+                  .NotEmpty().WithMessage("SubscriptionPlan could not be empty")
+                  .Length(0, 20).WithMessage("SubscriptionPlan lengh could not be greater than 20");
+
+                RuleFor(x => x.Geolocation)
+                 .Cascade(CascadeMode.StopOnFirstFailure)
+                 .NotNull().WithMessage("Geolocation could not be null")
+                 .NotEmpty().WithMessage("Geolocation could not be empty")
+                 .Length(0, 20).WithMessage("Geolocation lengh could not be greater than 20");
+            }
+            //private async Task<bool> IsUniquename(string Name, CancellationToken token)
+            //{
+            //    bool isExistingname = await ClientRepo.UsernameExistsAsync(Name);
+            //    return isExistingname;
+            //}
+        }
+
+
     }
 }
