@@ -1,12 +1,8 @@
-﻿using DocumentFormat.OpenXml.Office2010.Excel;
-using DocumentFormat.OpenXml.Spreadsheet;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
-using System.Text;
 
 namespace QuickCampusAPI.Controllers
 {
@@ -46,7 +42,7 @@ namespace QuickCampusAPI.Controllers
                     if (clientId != null || vm.ClientId == null)
                     {
                         // Decode the JWT token and retrieve the "id" claim
-                        string ClientId = JwtHelper.GetUserIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                        var ClientId = JwtHelper.GetUserIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
 
                         UserVm userVm = new UserVm
                         {
