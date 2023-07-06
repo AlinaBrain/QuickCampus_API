@@ -51,7 +51,8 @@ namespace QuickCampus_Core.ViewModel
       //  [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
        // public DateTime ModofiedDate { get; set; }
         public string? Address { get; set; }
-
+        [Required]
+        [RegularExpression(@"^[1-9][0-9]{9}$", ErrorMessage = "Please enter a valid 10-digit mobile number that does not start with 0.")]
         public string? Phone { get; set; }
 
         public string? Email { get; set; }

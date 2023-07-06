@@ -11,7 +11,7 @@ using QuickCampus_DAL.Context;
 
 namespace QuickCampusAPI.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
 
