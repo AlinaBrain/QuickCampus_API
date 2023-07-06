@@ -71,7 +71,7 @@ namespace QuickCampus_Core.Services
                 response.Message = "Login Successuflly";
                 List<string> record = new List<string>();
                 record = uRoles.Select(s => s.RoleName).ToList();
-                response.Data.Token = GenerateToken(adminLogin, record, re.ClientId == null ? 0 : 0);
+                response.Data.Token = GenerateToken(adminLogin, record, re.ClientId == null ? 0 : re.ClientId, re.Id);
                 response.Data.UserName = re.UserName;
                 response.Data.UserId = re.Id;
                 response.Data.CilentId = re.ClientId;
@@ -99,15 +99,15 @@ namespace QuickCampus_Core.Services
             return rolePermissions;
         }
 
-        private string GenerateToken(AdminLogin adminlogin, List<string> obj, int? clientId = 0)
+        private string GenerateToken(AdminLogin adminlogin, List<string> obj, int? clientId ,int userId)
         {
             var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
             var Claims = new[]
          {
                 new Claim(ClaimTypes.Name,clientId==0?string.Empty:clientId.ToString()),
-                new Claim(ClaimTypes.Role,"Admin"),
-                //new Claim("ClientId",clientId.ToString())
+                new Claim(ClaimTypes.Role,userId.ToString()),
+                new Claim("Role","Admin")
             };
             var token = new JwtSecurityToken(_config["Jwt:Issuer"],
                _config["Jwt:Audience"],
