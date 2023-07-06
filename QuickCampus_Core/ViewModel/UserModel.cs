@@ -6,10 +6,11 @@ namespace QuickCampus_Core.ViewModel
     public class UserModel
     {
 
-        public int? ClientId { get; set; }
-        [Required, MaxLength(20)]
-        [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "In name only characters allowed.")]
-        public string? Name { get; set; }
+        //public int? ClientId { get; set; }
+        [Required(ErrorMessage = "Name is required.")]
+        [MaxLength(20, ErrorMessage = "Name must be at most 20 characters long.")]
+        [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]*$", ErrorMessage = "Only alphabetic characters are allowed in the name.")]
+        public string Name { get; set; }
 
         [Required(ErrorMessage = "Password is required")]
         [StringLength(8, MinimumLength = 6, ErrorMessage = "Password must be between 6 and 8 characters.")]

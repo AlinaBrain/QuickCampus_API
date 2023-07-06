@@ -14,7 +14,6 @@ namespace QuickCampusAPI.Controllers
         private readonly IUserRepo userRepo;
         private readonly IClientRepo clientRepo;
         private IConfiguration config;
-        private readonly string _jwtSecretKey = "your_secret_key_here";
         public UserController(IUserRepo userRepo, IClientRepo clientRepo, IConfiguration config)
         {
             this.userRepo = userRepo;
@@ -37,13 +36,42 @@ namespace QuickCampusAPI.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var clientId = vm.ClientId.HasValue ? await clientRepo.GetById((int)vm.ClientId) : null;
+                    // Decode the JWT token and retrieve the "id" claim
 
-                    if (clientId != null || vm.ClientId == null)
+                    var clientId = JwtHelper.GetUserIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+
+                    //var clientId = vm.ClientId.HasValue ? await clientRepo.GetById((int)vm.ClientId) : null;
+
+                    if (!string.IsNullOrEmpty(clientId))
                     {
-                        // Decode the JWT token and retrieve the "id" claim
-                        var ClientId = JwtHelper.GetUserIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                        int parsedClientId;
+                        if (int.TryParse(clientId, out parsedClientId))
+                        {
+                            UserVm userVm = new UserVm
+                            {
+                                UserName = vm.Email,
+                                Name = vm.Name,
+                                Email = vm.Email,
+                                Mobile = vm.Mobile,
+                                Password = vm.Password,
+                                ClientId = parsedClientId,
+                                IsActive = true,
+                                IsDelete = false
+                            };
 
+                            await userRepo.Add(userVm.toUserDBModel());
+                            result.IsSuccess = true;
+                            result.Message = "User added successfully.";
+                            result.Data = userVm;
+                            return Ok(result);
+                        }
+                        else
+                        {
+                            result.Message = "Invalid Client ID format.";
+                        }
+                    }
+                    else
+                    {
                         UserVm userVm = new UserVm
                         {
                             UserName = vm.Email,
@@ -51,9 +79,9 @@ namespace QuickCampusAPI.Controllers
                             Email = vm.Email,
                             Mobile = vm.Mobile,
                             Password = vm.Password,
-                            ClientId = vm.ClientId,
+                            ClientId = null, // Assign null to ClientId property
                             IsActive = true,
-                            IsDelete = false,
+                            IsDelete = false
                         };
 
                         await userRepo.Add(userVm.toUserDBModel());
@@ -62,10 +90,7 @@ namespace QuickCampusAPI.Controllers
                         result.Data = userVm;
                         return Ok(result);
                     }
-                    else
-                    {
-                        result.Message = "Client ID not found.";
-                    }
+
                 }
                 else
                 {
@@ -116,6 +141,7 @@ namespace QuickCampusAPI.Controllers
         public async Task<IActionResult> Edit(int userId, UserModel vm)
         {
             IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
+            var _jwtSecretKey = config["Jwt:Key"];
             if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.Id != userId && x.IsDelete == false))
             {
                 result.Message = "Email Already Registered!";
@@ -125,12 +151,20 @@ namespace QuickCampusAPI.Controllers
                 var res = await userRepo.GetById(userId);
                 if (res != null)
                 {
-                    var clientId = vm.ClientId.HasValue ? await clientRepo.GetById((int)vm.ClientId) : null;
+                    var clientId = JwtHelper.GetUserIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                    //var clientId = vm.ClientId.HasValue ? await clientRepo.GetById((int)vm.ClientId) : null;
 
-                    if (clientId != null || vm.ClientId == null)
+                    if (clientId != null || clientId == "")
                     {
                         res.Id = userId;
-                        res.ClientId = vm.ClientId;
+                        if (clientId == "")
+                        {
+                            res.ClientId = null; // Assign null to ClientId property
+                        }
+                        else
+                        {
+                            res.ClientId = Convert.ToInt32(clientId);
+                        }
                         res.UserName = vm.Email;
                         res.Name = vm.Name;
                         res.Email = vm.Email;
