@@ -1,9 +1,11 @@
 ﻿using DocumentFormat.OpenXml.InkML;
+using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.Claims;
 using System.Text;
 
@@ -60,13 +62,14 @@ public class JwtHelper
 
         try
         {
-            // Validate and decode the JWT token
+
+
             var claimsPrincipal = tokenHandler.ValidateToken(jwt, tokenValidationParameters, out var validatedToken);
             var jwtToken = (JwtSecurityToken)validatedToken;
 
             // Retrieve the "id" claim value
-            var nameClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/Role")?.Value;
-            // var idClaim = jwtToken.Claims.SingleOrDefault(c => c.Type == "name")?.Value;
+            var nameClaim = jwtToken.Claims.First(c => c.Type == "UserId").Value;
+
 
             return nameClaim;
         }

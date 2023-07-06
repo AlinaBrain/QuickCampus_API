@@ -46,11 +46,11 @@ namespace QuickCampus_Core.Services
                     Include(i => i.User)
                     .Include(i => i.Role)
                     .Include(i => i.Role.TblRolePermissions)
-                    .Where(w => w.User.Email == adminLogin.UserName && w.User.Password == adminLogin.Password && w.User.IsDelete == false && w.User.IsActive == true)
+                    .Where(w => w.User.Email.ToLower() == adminLogin.UserName.ToLower() && w.User.Password == adminLogin.Password && w.User.IsDelete == false && w.User.IsActive == true)
                     .FirstOrDefault();
 
                 var uRoles = _context.TblUserRoles
-                    .Where(w => w.User.Email == adminLogin.UserName && w.User.Password == adminLogin.Password && w.User.IsDelete == false && w.User.IsActive == true)
+                    .Where(w => w.User.Email.ToLower() == adminLogin.UserName.ToLower() && w.User.Password == adminLogin.Password && w.User.IsDelete == false && w.User.IsActive == true)
                     .Select(s => new RoleMaster()
                     {
                         Id = s.Role.Id,
@@ -106,8 +106,8 @@ namespace QuickCampus_Core.Services
             var Claims = new[]
          {
                 new Claim(ClaimTypes.Name,clientId==0?string.Empty:clientId.ToString()),
-                new Claim(ClaimTypes.Role,userId.ToString()),
-                new Claim("Role","Admin")
+                new Claim(ClaimTypes.Role,"Admin"),
+                new Claim("UserId",userId.ToString())
             };
             var token = new JwtSecurityToken(_config["Jwt:Issuer"],
                _config["Jwt:Audience"],
