@@ -18,9 +18,11 @@ namespace QuickCampusAPI.Controllers
     public class ClientController : ControllerBase
     {
      private readonly IClientRepo _clientRepo;
-        public ClientController(IClientRepo clientRepo)
+        private IConfiguration config;
+        public ClientController(IClientRepo clientRepo, IConfiguration config)
         {
             _clientRepo = clientRepo;
+            this.config = config;
         }
 
         [HttpGet]
@@ -49,37 +51,39 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-        //[HttpPost]
-        //[Route("AddClient")]
-        //public async Task<IActionResult> AddClient(ClientVM vm)
-        //{
-        //    IGeneralResult<ClientVM> result = new GeneralResult<ClientVM>();
+        [HttpPost]
+        [Route("AddClient")]
+        public async Task<IActionResult> AddClient(ClientVM vm)
+        {
+            IGeneralResult<ClientVM> result = new GeneralResult<ClientVM>();
+            var _jwtSecretKey = config["Jwt:Key"];
+            var clientId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
 
-        //    if (_clientRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.Name == vm.Name))
-        //    {
-        //        result.Message = "Email Already Registered!";
-        //        result.Message = "Name Already Registered!";
-        //    }
-        //    else
-        //    {
-        //        var client = await _clientRepo.Add(vm.ToClientDbModel());
-        //               if (client.Id != 0)
-        //               {
-        //                    result.IsSuccess = true;
-        //                    result.Message = "Client Added Successfully";
-        //               }
-        //                else
-        //                {
-        //                    result.Message = "already record with this name exist";
-        //                    result.Message = "something Went Wrong";
-        //                }
+            if (_clientRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.Name == vm.Name))
+            {
+                result.Message = "Email Already Registered!";
+                result.Message = "Name Already Registered!";
+            }
+            else
+            {
+                var client = await _clientRepo.Add(vm.ToClientDbModel());
+                if (client.Id != 0)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Client Added Successfully";
+                }
+                else
+                {
+                    result.Message = "already record with this name exist";
+                    result.Message = "something Went Wrong";
+                }
 
-                    
-        //    }
 
-        //        return Ok(result);
+            }
 
-        //}
+            return Ok(result);
+
+        }
 
 
         [HttpPost]

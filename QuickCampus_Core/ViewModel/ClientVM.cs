@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace QuickCampus_Core.ViewModel
@@ -40,15 +41,15 @@ namespace QuickCampus_Core.ViewModel
         [Remote("IsAlreadyExist", "Client", HttpMethod = "POST", ErrorMessage = "Name already exists in database.")]
         public string? Name { get; set; }
 
-        public int? CraetedBy { get; set; }
+       // public int? CraetedBy { get; set; }
 
-        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
-        public DateTime CreatedDate { get; set; }
+        //[DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
+       // public DateTime CreatedDate { get; set; }
 
-        public int? ModifiedBy { get; set; }
+      //  public int? ModifiedBy { get; set; }
 
-        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
-        public DateTime ModofiedDate { get; set; }
+      //  [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
+       // public DateTime ModofiedDate { get; set; }
         public string? Address { get; set; }
 
         public string? Phone { get; set; }
@@ -59,9 +60,9 @@ namespace QuickCampus_Core.ViewModel
 
         public string? SubscriptionPlan { get; set; }
 
-        public bool? IsActive { get; set; }
+        //public bool? IsActive { get; set; }
 
-        public bool? IsDeleted { get; set; }
+        //public bool? IsDeleted { get; set; }
 
 
         //ublic IEnumerable<SelectListItem> rec { get; set; }
@@ -128,8 +129,11 @@ namespace QuickCampus_Core.ViewModel
                 RuleFor(x => x.Phone)
                   .Cascade(CascadeMode.StopOnFirstFailure)
                   .NotNull().WithMessage("Phone could not be null")
-                  .NotEmpty().WithMessage("Phone could not be empty")
-                  .Length(0, 15).WithMessage("Phone lengh could not be greater than 15");
+                  .NotEmpty().WithMessage("Phone could not be empty");
+                  
+       //           .MinimumLength(10).WithMessage("PhoneNumber must not be less than 10 characters.")
+       //.MaximumLength(20).WithMessage("PhoneNumber must not exceed 50 characters.")
+       //.Matches(new Regex(@"((\(\d{3}\) ?)|(\d{3}-))?\d{3}-\d{4}")).WithMessage("PhoneNumber not valid");
 
                 RuleFor(x => x.Email)
                   .Cascade(CascadeMode.StopOnFirstFailure).EmailAddress()
