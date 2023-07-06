@@ -11,7 +11,7 @@ using QuickCampus_DAL.Context;
 
 namespace QuickCampusAPI.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
 
@@ -61,10 +61,9 @@ namespace QuickCampusAPI.Controllers
             var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
 
 
-            if (_clientRepo.Any(x => x.Email == vm.Email && x.IsDeleted == false && x.Name == vm.Name))
+            if (_clientRepo.Any(x => x.Email == vm.Email && x.IsActive == true))
             {
                 result.Message = "Email Already Registered!";
-                result.Message = "Name Already Registered!";
             }
             else
             {
@@ -109,10 +108,9 @@ namespace QuickCampusAPI.Controllers
     public async Task<IActionResult> Edit(int Id, ClientVM vm)
     {
         IGeneralResult<ClientVM> result = new GeneralResult<ClientVM>();
-        if (_clientRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.Name == vm.Name))
+        if (_clientRepo.Any(x => x.Email == vm.Email && x.IsActive == true  && x.Id!=vm.Id))
         {
-            result.Message = "Email Already Registered!";
-            result.Message = "Name Already Registered!";
+            //result.Message = "Email Already Registered!";
         }
         else
         {
