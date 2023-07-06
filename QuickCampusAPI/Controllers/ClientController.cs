@@ -49,37 +49,39 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-        [HttpPost]
-        [Route("AddClient")]
-        public async Task<IActionResult> AddClient(ClientVM vm)
-        {
-            IGeneralResult<ClientVM> result = new GeneralResult<ClientVM>();
+        //[HttpPost]
+        //[Route("AddClient")]
+        //public async Task<IActionResult> AddClient(ClientVM vm)
+        //{
+        //    IGeneralResult<ClientVM> result = new GeneralResult<ClientVM>();
 
-            if (_clientRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.Name == vm.Name))
-            {
-                result.Message = "Email Already Registered!";
-                result.Message = "Name Already Registered!";
-            }
-            else
-            {
-                var client = await _clientRepo.Add(vm.ToClientDbModel());
-                       if (client.Id != 0)
-                       {
-                            result.IsSuccess = true;
-                            result.Message = "Client Added Successfully";
-                       }
-                        else
-                        {
-                            result.Message = "already record with this name exist";
-                            result.Message = "something Went Wrong";
-                        }
+        //    if (_clientRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.Name == vm.Name))
+        //    {
+        //        result.Message = "Email Already Registered!";
+        //        result.Message = "Name Already Registered!";
+        //    }
+        //    else
+        //    {
+        //        var client = await _clientRepo.Add(vm.ToClientDbModel());
+        //               if (client.Id != 0)
+        //               {
+        //                    result.IsSuccess = true;
+        //                    result.Message = "Client Added Successfully";
+        //               }
+        //                else
+        //                {
+        //                    result.Message = "already record with this name exist";
+        //                    result.Message = "something Went Wrong";
+        //                }
 
                     
-            }
+        //    }
 
-                return Ok(result);
+        //        return Ok(result);
 
-        }
+        //}
+
+
         [HttpPost]
         [Route("Edit")]
         public async Task<IActionResult> Edit(int Id, ClientVM vm)
@@ -125,36 +127,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
-        //[HttpPatch]
-        //[Route("EditClient")]
-        //public async Task<IActionResult> EditClient(ClientVM clientVM)
-        //{
-        //    IGeneralResult<ClientVM> result = new GeneralResult<ClientVM>();
-        //    var clientDetail = await _clientRepo.GetById(clientVM.Id);
-        //    if (clientDetail != null)
-        //    {
-        //        clientDetail.Name = clientVM.Name;
-        //        clientDetail.Phone = clientVM.Phone;
-        //        clientDetail.Email = clientVM.Email;
-        //        clientDetail.SubscriptionPlan = clientVM.SubscriptionPlan;
-        //        clientDetail.Geolocation = clientVM.Geolocation;
-        //        //clientDetail.ModifiedBy = clientVM.ModifiedBy;
-        //        clientDetail.ModofiedDate = clientVM.ModofiedDate;
-        //        //clientDetail.CraetedBy = clientVM.CraetedBy;
-        //        clientDetail.CreatedDate = clientVM.CreatedDate;
-        //        clientDetail.Address = clientVM.Address;
-
-        //        await _clientRepo.Update(clientDetail);
-               
-        //        result.Message = "Client Details updated Succesfully";
-        //        result.IsSuccess = true;
-        //    }
-        //    else
-        //    {
-        //        result.Message = "Client details does not found";
-        //    }
-        //    return Ok(result);
-        //}
+        
     }
 }
 

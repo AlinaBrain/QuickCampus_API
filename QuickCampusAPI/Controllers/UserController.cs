@@ -63,6 +63,9 @@ namespace QuickCampusAPI.Controllers
                     result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
                 }
 
+            return Ok(result);
+        
+         }
                 return Ok(result);
             }
             return Ok(result);
