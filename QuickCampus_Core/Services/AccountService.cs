@@ -105,9 +105,9 @@ namespace QuickCampus_Core.Services
             var credentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
             var Claims = new[]
          {
-                new Claim(ClaimTypes.Name,adminlogin.UserName),
+                new Claim(ClaimTypes.Name,clientId==0?string.Empty:clientId.ToString()),
                 new Claim(ClaimTypes.Role,"Admin"),
-                new Claim("ClientId",clientId.ToString())
+                //new Claim("ClientId",clientId.ToString())
             };
             var token = new JwtSecurityToken(_config["Jwt:Issuer"],
                _config["Jwt:Audience"],
