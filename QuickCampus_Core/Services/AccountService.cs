@@ -35,17 +35,20 @@ namespace QuickCampus_Core.Services
             response.Data = data;
             List<RoleMaster> rm = new List<RoleMaster>();
 
-            //adminLogin.Password = EncodePasswordToBase64(adminLogin.Password);
+            adminLogin.Password = EncodePasswordToBase64(adminLogin.Password);
             response.Data.RoleMasters = rm;
-            var user = _context.TblUserRoles.
-                     Include(i => i.User)
-                     .Include(i => i.Role)
-                     .Include(i => i.Role.TblRolePermissions)
-                     .Where(w => w.User.Email == adminLogin.UserName && w.User.Password == adminLogin.Password && w.User.IsDelete == false && w.User.IsActive == true)
-                     .FirstOrDefault();
+           
+            var re = _context.TblUsers.Include(i=>i.TblUserRoles).Where(w => w.Email == adminLogin.UserName && w.Password == adminLogin.Password && w.IsDelete == false && w.IsActive == true).FirstOrDefault();
 
-            if (user != null)
+            if (re != null)
             {
+                var user = _context.TblUserRoles.
+                    Include(i => i.User)
+                    .Include(i => i.Role)
+                    .Include(i => i.Role.TblRolePermissions)
+                    .Where(w => w.User.Email == adminLogin.UserName && w.User.Password == adminLogin.Password && w.User.IsDelete == false && w.User.IsActive == true)
+                    .FirstOrDefault();
+
                 var uRoles = _context.TblUserRoles
                     .Where(w => w.User.Email == adminLogin.UserName && w.User.Password == adminLogin.Password && w.User.IsDelete == false && w.User.IsActive == true)
                     .Select(s => new RoleMaster()
@@ -68,10 +71,10 @@ namespace QuickCampus_Core.Services
                 response.Message = "Login Successuflly";
                 List<string> record = new List<string>();
                 record = uRoles.Select(s => s.RoleName).ToList();
-                response.Data.Token = GenerateToken(adminLogin, user.Role.Name, record,user.User.ClientId);
-                response.Data.UserName = user.User.UserName;
-                response.Data.UserId = user.Id;
-                response.Data.CilentId = user.User.ClientId;
+                response.Data.Token = GenerateToken(adminLogin, record,re.ClientId==null? 0:0);
+                response.Data.UserName = re.UserName;
+                response.Data.UserId = re.Id;
+                response.Data.CilentId = re.ClientId;
             }
             else
             {
@@ -96,7 +99,7 @@ namespace QuickCampus_Core.Services
             return rolePermissions;
         }
 
-        private string GenerateToken(AdminLogin adminlogin, string userRole, List<string> obj,int? clientId)
+        private string GenerateToken(AdminLogin adminlogin,  List<string> obj,int? clientId=0)
         {
             var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);

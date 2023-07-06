@@ -26,7 +26,7 @@ namespace QuickCampusAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> AddUser(UserModel vm)
         {
-            //vm.Password = EncodePasswordToBase64(vm.Password);
+            vm.Password = EncodePasswordToBase64(vm.Password);
             IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
             var _jwtSecretKey = config["Jwt:Key"];
             if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.IsDelete == false))
