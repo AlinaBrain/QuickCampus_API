@@ -21,17 +21,17 @@ namespace QuickCampus_Core.ViewModel
             {
                 Id = items.Id,
                 Name = items.Name,
-                CraetedBy = items.CraetedBy,
-                CreatedDate = items.CreatedDate,
-                ModifiedBy = items.ModifiedBy,
-                ModofiedDate = items.ModofiedDate,
+                //CraetedBy = items.CraetedBy,
+                //CreatedDate = items.CreatedDate,
+                // ModifiedBy = items.ModifiedBy,
+                //ModofiedDate = items.ModofiedDate,
                 Address = items.Address,
                 Phone= items.Phone,
                 Email = items.Email,
                 SubscriptionPlan = items.SubscriptionPlan,
                 Geolocation = items.Geolocation,
-                IsActive = items.IsActive,
-                IsDeleted = items.IsDeleted,
+                //IsActive = items.IsActive,
+                //IsDeleted = items.IsDeleted,
             };
         }
         public int Id { get; set; }
@@ -75,11 +75,11 @@ namespace QuickCampus_Core.ViewModel
                 Email = Email,
                 Geolocation = Geolocation,
                 SubscriptionPlan = SubscriptionPlan,
-                ModifiedBy = ModifiedBy,
-                ModofiedDate = ModofiedDate,
-                CraetedBy = CraetedBy,
+                //ModifiedBy = ModifiedBy,
+                //ModofiedDate = ModofiedDate,
+                //CraetedBy = CraetedBy,
                 Address = Address,
-                CreatedDate = CreatedDate,
+               // CreatedDate = CreatedDate,
                 IsActive = true,
                 IsDeleted = false,
 
@@ -100,11 +100,11 @@ namespace QuickCampus_Core.ViewModel
                 SubscriptionPlan = SubscriptionPlan,
                 Geolocation = Geolocation,
                // ModifiedBy = ModifiedBy,
-                //ModofiedDate = ModofiedDate,
-                //CraetedBy = CraetedBy,
+               //ModofiedDate = ModofiedDate,
+               //CraetedBy = CraetedBy,
                // CreatedDate = CreatedDate,
                 IsActive = true,
-               IsDeleted = false,
+                IsDeleted = false,
             };
         }
 
@@ -117,7 +117,7 @@ namespace QuickCampus_Core.ViewModel
                    .NotNull().WithMessage("Name could not be null")
                    
                    .NotEmpty().WithMessage("Name could not be empty")
-                   .Length(0, 10).WithMessage("Name lengh could not be greater than 10");
+                   .Length(0, 20).WithMessage("Name lengh could not be greater than 20");
 
                 RuleFor(x => x.Address)
                   .Cascade(CascadeMode.StopOnFirstFailure)
@@ -131,8 +131,8 @@ namespace QuickCampus_Core.ViewModel
                   .NotEmpty().WithMessage("Phone could not be empty")
                   .Length(0, 15).WithMessage("Phone lengh could not be greater than 15");
 
-                RuleFor(x => x.Email).EmailAddress()
-                  //.Cascade(CascadeMode.StopOnFirstFailure)
+                RuleFor(x => x.Email)
+                  .Cascade(CascadeMode.StopOnFirstFailure).EmailAddress()
                   .NotNull().WithMessage("Email could not be null")
                   .NotEmpty().WithMessage("Email could not be empty");
                   
