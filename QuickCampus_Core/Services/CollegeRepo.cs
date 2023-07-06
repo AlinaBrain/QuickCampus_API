@@ -39,11 +39,60 @@ namespace QuickCampus_Core.Services
             }
         }
 
-
-        //public CollegeGridViewModel UpdateCollege(CollegeGridViewModel model)
+        //public static IGeneralResult AddCollege(CollegeGridViewModel model)
         //{
-        
-        //        College college = dbContext.Colleges.Where(x => x.CollegeId == model.CollegeID).FirstOrDefault();
+        //    using (var context = new QuikCampusDevContext())
+        //    {
+        //        College college = new College()
+        //        {
+        //            CollegeName = model.CollegeName,
+        //            Address1 = model.Address1,
+        //            Address2 = model.Address2,
+        //            City = model.City,
+        //            StateId = model.StateID,
+        //            CountryId = model.CountryID,
+        //            Logo = model.LogoImage,
+        //            IsActive = true,
+        //            IsDeleted = false,
+        //            CreatedBy = 1,
+        //            CreatedDate = DateTime.Now,
+        //            ContectEmail = model.ContectEmail,
+        //            ContectPerson = model.ContectPerson,
+        //            ContectPhone = model.ContectPhone
+        //        };
+        //        var res = context.Colleges.Add(college);
+        //        context.SaveChanges();
+        //        if (res.CollegeId > 0)
+        //        {
+        //            return new GeneralResult()
+        //            {
+        //                Successful = true,
+        //                Message = "College has been created successfully.",
+        //                Value = res.CollegeId
+        //            };
+        //        }
+        //        else
+        //        {
+        //            return new GeneralResult()
+        //            {
+        //                Successful = false,
+        //                Message = "College has not been created.",
+        //                Value = null
+        //            };
+        //        }
+        //    }
+        //}
+
+        /// <summary>
+        /// This method is to update college entity
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns>object of General Result</returns>
+        //public static IGeneralResult UpdateCollege(CollegeGridViewModel model)
+        //{
+        //    using (var context = new QuikCampusEntities())
+        //    {
+        //        College college = context.Colleges.Where(x => x.CollegeId == model.CollegeID).FirstOrDefault();
         //        if (college != null)
         //        {
         //            college.CollegeName = model.CollegeName;
@@ -58,30 +107,28 @@ namespace QuickCampus_Core.Services
         //            college.ContectPerson = model.ContectPerson;
         //            college.ContectEmail = model.ContectEmail;
         //        }
-        //        var result = dbContext.Entry(college).State = EntityState.Modified;
-        //        int status = dbContext.SaveChanges();
-   
-        //    //if (status > 0)
-        //    //{
-        //    //    return new GeneralResult()
-        //    //    {
-        //    //        Successful = true,
-        //    //        Message = "College has been updated successfully.",
-
-        //    //        Value = college.CollegeId
-        //    //    };
-
-
-        //    //}
-        //    //else
-        //    //{
-        //    //    return new GeneralResult()
-        //    //    {
-        //    //        Successful = false,
-        //    //        Message = "College has not been updated."
-        //    //    };
-        //    //}
+        //        var result = context.Entry(college).State = System.Data.Entity.EntityState.Modified;
+        //        int status = context.SaveChanges();
+        //        if (status > 0)
+        //        {
+        //            return new GeneralResult()
+        //            {
+        //                Successful = true,
+        //                Message = "College has been updated successfully.",
+        //                Value = college.CollegeId
+        //            };
+        //        }
+        //        else
+        //        {
+        //            return new GeneralResult()
+        //            {
+        //                Successful = false,
+        //                Message = "College has not been updated.",
+        //                Value = null
+        //            };
+        //        }
         //    }
+        //}
 
         public async Task <IEnumerable<CollegeGridViewModel>> GetAllCollege()
         {

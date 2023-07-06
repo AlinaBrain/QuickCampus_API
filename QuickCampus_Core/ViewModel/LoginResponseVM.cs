@@ -9,6 +9,7 @@ namespace QuickCampus_Core.ViewModel
     public class LoginResponseVM
     {
         public string? Token { get; set; }
+        public int? CilentId { get; set; }
         public int UserId { get; set; }
         public string UserName { get; set; }
         public List<RoleMaster> RoleMasters { get; set; }

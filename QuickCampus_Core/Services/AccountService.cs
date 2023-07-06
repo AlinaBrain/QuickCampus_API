@@ -34,18 +34,20 @@ namespace QuickCampus_Core.Services
             LoginResponseVM data = new LoginResponseVM();
             response.Data = data;
             List<RoleMaster> rm = new List<RoleMaster>();
+
+            //adminLogin.Password = EncodePasswordToBase64(adminLogin.Password);
             response.Data.RoleMasters = rm;
             var user = _context.TblUserRoles.
                      Include(i => i.User)
                      .Include(i => i.Role)
                      .Include(i => i.Role.TblRolePermissions)
-                     .Where(w => w.User.UserName == adminLogin.UserName && w.User.Password == adminLogin.Password && w.User.IsDelete == false && w.User.IsActive == true)
+                     .Where(w => w.User.Email == adminLogin.UserName && w.User.Password == adminLogin.Password && w.User.IsDelete == false && w.User.IsActive == true)
                      .FirstOrDefault();
 
             if (user != null)
             {
                 var uRoles = _context.TblUserRoles
-                    .Where(w => w.User.UserName == adminLogin.UserName && w.User.Password == adminLogin.Password && w.User.IsDelete == false && w.User.IsActive == true)
+                    .Where(w => w.User.Email == adminLogin.UserName && w.User.Password == adminLogin.Password && w.User.IsDelete == false && w.User.IsActive == true)
                     .Select(s => new RoleMaster()
                     {
                         Id = s.Role.Id,
@@ -66,9 +68,10 @@ namespace QuickCampus_Core.Services
                 response.Message = "Login Successuflly";
                 List<string> record = new List<string>();
                 record = uRoles.Select(s => s.RoleName).ToList();
-                response.Data.Token = GenerateToken(adminLogin, user.Role.Name, record);
+                response.Data.Token = GenerateToken(adminLogin, user.Role.Name, record,user.User.ClientId);
                 response.Data.UserName = user.User.UserName;
                 response.Data.UserId = user.Id;
+                response.Data.CilentId = user.User.ClientId;
             }
             else
             {
@@ -93,14 +96,15 @@ namespace QuickCampus_Core.Services
             return rolePermissions;
         }
 
-        private string GenerateToken(AdminLogin adminlogin, string userRole, List<string> obj)
+        private string GenerateToken(AdminLogin adminlogin, string userRole, List<string> obj,int? clientId)
         {
             var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
             var Claims = new[]
          {
                 new Claim(ClaimTypes.Name,adminlogin.UserName),
-                new Claim(ClaimTypes.Role,"Admin")
+                new Claim(ClaimTypes.Role,"Admin"),
+                new Claim("ClientId",clientId.ToString())
             };
             var token = new JwtSecurityToken(_config["Jwt:Issuer"],
                _config["Jwt:Audience"],
@@ -173,6 +177,20 @@ namespace QuickCampus_Core.Services
             //var rec= _context.TblRolePermissions.Where(w=> a.Contains(w.RoleId)).
 
             return response;
+        }
+        private string EncodePasswordToBase64(string password)
+        {
+            try
+            {
+                byte[] encData_byte = new byte[password.Length];
+                encData_byte = System.Text.Encoding.UTF8.GetBytes(password);
+                string encodedData = Convert.ToBase64String(encData_byte);
+                return encodedData;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error in base64Encode" + ex.Message);
+            }
         }
     }
 }

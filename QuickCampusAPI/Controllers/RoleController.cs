@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QuickCampus_Core.Common;
@@ -9,8 +10,9 @@ using QuickCampus_Core.ViewModel;
 
 namespace QuickCampusAPI.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
+    [Authorize]
     public class RoleController : Controller
     {
         private readonly IRoleRepo roleRepo;
@@ -47,7 +49,7 @@ namespace QuickCampusAPI.Controllers
                             RoleVm roleVm = new RoleVm
                         {
                             Name = vm.RoleName,
-                            ClientId = (int)vm.ClientId,
+                            ClientId = vm.ClientId,
                             CreatedBy = user.Id,
                             ModifiedBy = user.Id,
                             CreatedDate = DateTime.Now,

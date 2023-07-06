@@ -1,4 +1,4 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
@@ -6,26 +6,32 @@ using QuickCampus_Core.ViewModel;
 
 namespace QuickCampusAPI.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly IUserRepo userRepo;
         private readonly IClientRepo clientRepo;
-        public UserController(IUserRepo userRepo, IClientRepo clientRepo)
+        private IConfiguration config;
+        private readonly string _jwtSecretKey = "your_secret_key_here";
+        public UserController(IUserRepo userRepo, IClientRepo clientRepo, IConfiguration config)
         {
             this.userRepo = userRepo;
             this.clientRepo = clientRepo;
-
+            this.config = config;
         }
-        [HttpPost]
+
         [Route("userAdd")]
-        public async Task<IActionResult> AddUser([FromBody] UserModel vm)
+        [HttpPost]
+        public async Task<IActionResult> AddUser(UserModel vm)
         {
+            //vm.Password = EncodePasswordToBase64(vm.Password);
             IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
+            var _jwtSecretKey = config["Jwt:Key"];
             if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.IsDelete == false))
             {
-                result.Message = "Email Already Registerd!";
+                result.Message = "Email Already Registered!";
             }
             else
             {
@@ -35,6 +41,9 @@ namespace QuickCampusAPI.Controllers
 
                     if (clientId != null || vm.ClientId == null)
                     {
+                        // Decode the JWT token and retrieve the "id" claim
+                        var ClientId = JwtHelper.GetUserIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+
                         UserVm userVm = new UserVm
                         {
                             UserName = vm.Email,
@@ -62,14 +71,11 @@ namespace QuickCampusAPI.Controllers
                 {
                     result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
                 }
+            }
 
             return Ok(result);
         
-         }
-                return Ok(result);
-            }
-            return Ok(result);
-        }
+    }
 
         [HttpGet]
         [Route("userList")]
@@ -87,7 +93,7 @@ namespace QuickCampusAPI.Controllers
             IGeneralResult<dynamic> result = new GeneralResult<dynamic>();
             var user = await userRepo.GetById(id);
 
-            var res = (user != null && user.IsActive == true) ? user : null;
+            var res = (user != null&& user.IsDelete == false) ? user : null;
             if (res != null)
             {
                 res.IsActive = false;
@@ -110,7 +116,7 @@ namespace QuickCampusAPI.Controllers
         public async Task<IActionResult> Edit(int userId, UserModel vm)
         {
             IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
-            if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.IsDelete == false))
+            if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.Id != userId && x.IsDelete == false))
             {
                 result.Message = "Email Already Registered!";
             }
@@ -176,6 +182,19 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-
+        private string EncodePasswordToBase64(string password)
+        {
+            try
+            {
+                byte[] encData_byte = new byte[password.Length];
+                encData_byte = System.Text.Encoding.UTF8.GetBytes(password);
+                string encodedData = Convert.ToBase64String(encData_byte);
+                return encodedData;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error in base64Encode" + ex.Message);
+            }
+        }
     }
 }
