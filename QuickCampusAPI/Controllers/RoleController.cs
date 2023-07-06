@@ -18,17 +18,20 @@ namespace QuickCampusAPI.Controllers
         private readonly IRoleRepo roleRepo;
         private readonly IUserRepo userRepo;
         private readonly IClientRepo clientRepo;
-        public RoleController(IRoleRepo roleRepo, IUserRepo userRepo, IClientRepo clientRepo)
+        private IConfiguration config;
+        public RoleController(IRoleRepo roleRepo, IUserRepo userRepo, IClientRepo clientRepo, IConfiguration config)
         {
             this.roleRepo = roleRepo;
             this.userRepo = userRepo;
             this.clientRepo = clientRepo;
+            this.config = config;
         }
         [HttpPost]
         [Route("roleAdd")]
         public async Task<IActionResult> roleAdd([FromBody] RoleModel vm)
         {
             IGeneralResult<RoleVm> result = new GeneralResult<RoleVm>();
+            var _jwtSecretKey = config["Jwt:Key"];
             if (roleRepo.Any(x => x.Name == vm.RoleName))
             {
                 result.Message = "RoleName Already Registerd!";
@@ -42,28 +45,50 @@ namespace QuickCampusAPI.Controllers
                     var res = (user != null && user.IsDelete == true) ? user : null;
                     if (user != null)
                     {
-                        var clientId = vm.ClientId.HasValue ? await clientRepo.GetById((int)vm.ClientId) : null;
+                        var clientId = JwtHelper.GetUserIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
 
-                        if (clientId != null || vm.ClientId == null)
+                        if (!string.IsNullOrEmpty(clientId))
                         {
-                            RoleVm roleVm = new RoleVm
-                        {
-                            Name = vm.RoleName,
-                            ClientId = vm.ClientId,
-                            CreatedBy = user.Id,
-                            ModifiedBy = user.Id,
-                            CreatedDate = DateTime.Now,
+                            int parsedClientId;
+                            if (int.TryParse(clientId, out parsedClientId))
+                            {
+                                RoleVm roleVm = new RoleVm
+                                {
+                                    Name = vm.RoleName,
+                                    ClientId = parsedClientId,
+                                    CreatedBy = user.Id,
+                                    ModifiedBy = user.Id,
+                                    CreatedDate = DateTime.Now,
 
-                        };
-                        await roleRepo.Add(roleVm.toRoleDBModel());
-                        result.Message = "Role added successfully";
-                        result.IsSuccess = true;
-                        result.Data = roleVm;
-                        return Ok(result);
+                                };
+                                await roleRepo.Add(roleVm.toRoleDBModel());
+                                result.Message = "Role added successfully";
+                                result.IsSuccess = true;
+                                result.Data = roleVm;
+                                return Ok(result);
+                            }
+                            else
+                            {
+                                result.Message = "Invalid Client ID format.";
+                            }
+
                         }
                         else
                         {
-                            result.Message = "Client Id is not valid.";
+                            RoleVm roleVm = new RoleVm
+                            {
+                                Name = vm.RoleName,
+                                ClientId = null,
+                                CreatedBy = user.Id,
+                                ModifiedBy = user.Id,
+                                CreatedDate = DateTime.Now,
+
+                            };
+                            await roleRepo.Add(roleVm.toRoleDBModel());
+                            result.Message = "Role added successfully";
+                            result.IsSuccess = true;
+                            result.Data = roleVm;
+                            return Ok(result);
                         }
                     }
                     else
@@ -95,6 +120,7 @@ namespace QuickCampusAPI.Controllers
         public async Task<IActionResult> Edit(int roleId, RoleModel vm)
         {
             IGeneralResult<RoleVm> result = new GeneralResult<RoleVm>();
+            var _jwtSecretKey = config["Jwt:Key"];
             if (roleRepo.Any(x => x.Name == vm.RoleName && x.Id != roleId))
             {
                 result.Message = "RoleName Already Registerd!";
@@ -106,14 +132,22 @@ namespace QuickCampusAPI.Controllers
                 if (uId != null)
                 {
                     var res = await roleRepo.GetById(roleId);
-                    var clientId = vm.ClientId.HasValue ? await clientRepo.GetById((int)vm.ClientId) : null;
+                    var clientId = JwtHelper.GetUserIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                    //var clientId = vm.ClientId.HasValue ? await clientRepo.GetById((int)vm.ClientId) : null;
 
-                    if (clientId != null || vm.ClientId == null)
+                    if (clientId != null || clientId == "")
                     {
+                        res.Id = roleId;
+                        if (clientId == "")
+                        {
+                            res.ClientId = null; // Assign null to ClientId property
+                        }
+                        else
+                        {
+                            res.ClientId = Convert.ToInt32(clientId);
+                        }
                         if (res != null)
                         {
-                            res.Id = roleId;
-                            res.ClientId = vm.ClientId;
                             res.Name = vm.RoleName;
                             res.ModifiedBy = vm.userId;
                             res.ModofiedDate = DateTime.Now;
