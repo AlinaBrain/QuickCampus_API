@@ -1,14 +1,18 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Azure;
+using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Vml.Office;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
+using QuickCampus_DAL.Context;
 
 namespace QuickCampusAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Roles = "Test, Admin")]
     public class UserController : ControllerBase
     {
         private readonly IUserRepo userRepo;
@@ -106,11 +110,43 @@ namespace QuickCampusAPI.Controllers
         [Route("userList")]
         public async Task<IActionResult> userList()
         {
-            List<UserVm> vm = new List<UserVm>();
-            var list = (await userRepo.GetAll()).Where(x => x.IsDelete == false).ToList();
-            vm = list.Select(x => ((UserVm)x)).ToList();
+            var _jwtSecretKey = config["Jwt:Key"];
+            var clientId = JwtHelper.GetUserIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            List<UserRoleMapping> vm = new List<UserRoleMapping>();
+            UserRoleMapping data = new UserRoleMapping();
+            if (!string.IsNullOrEmpty(clientId))
+            {
+                var list = (await userRepo.GetAll()).Where(x => x.IsDelete == false && x.ClientId == Convert.ToInt32(clientId)).ToList();
+                vm = list.Select(x => new UserRoleMapping()
+                {
+                    Email=x.Email,
+                    Name=x.Name,
+                    Mobile=x.Mobile,
+                    ClientId =x.ClientId,
+                    userId =x.Id
+                }).ToList();
+                List<int>? ids = new List<int>();
+                ids = list.Select(s => s.Id).ToList();
+                foreach (var rec in vm)
+                {
+                    //data.userRoleVms.Add(new UserRoleVm()
+                    //{
+                    //    Id = rec.Id,
+                    //    RoleName = rec.RoleName,
+                    //    rolePermissions = userRepo.getPermission(rec.Id, user.Role)
+                    //});
+                }
+
+            }
+            else
+            {
+                //var list = (await userRepo.GetAll()).Where(x => x.IsDelete == false).ToList();
+                //vm = list.Select(x => ((UserVm)x)).ToList();
+            }
             return Ok(vm);
         }
+       
+
         [HttpGet]
         [Route("userDelete")]
         public async Task<IActionResult> Delete(int id)
