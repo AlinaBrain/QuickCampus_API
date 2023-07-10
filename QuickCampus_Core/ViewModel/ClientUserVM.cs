@@ -17,9 +17,11 @@ namespace QuickCampus_Core.ViewModel
                 {
                     Id = item.Id,
                     UserName = item.UserName,
-                    Name = item.Name,
-                    CategoryId = item.CategoryId,
-                    ProcessIcon = item.ProcessIcon
+                    Name = item.Name
+                    
+                    //,
+                    //CategoryId = item.CategoryId,
+                    //ProcessIcon = item.ProcessIcon
                 };
             }
             public int ProcessId { get; set; }

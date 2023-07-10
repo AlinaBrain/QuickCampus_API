@@ -10,9 +10,9 @@ using QuickCampus_Core.ViewModel;
 
 namespace QuickCampusAPI.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class RoleController : Controller
     {
         private readonly IRoleRepo roleRepo;
@@ -109,6 +109,8 @@ namespace QuickCampusAPI.Controllers
         [Route("roleList")]
         public async Task<IActionResult> roleList()
         {
+            var _jwtSecretKey = config["Jwt:Key"];
+            var clientId = JwtHelper.GetUserIdFromToken(Request.Headers["Authorization"], _jwtSecretKey); 
             List<RoleVm> roleVm = new List<RoleVm>();
             var rolelist = (await roleRepo.GetAll()).ToList();
             roleVm = rolelist.Select(x => ((RoleVm)x)).ToList();

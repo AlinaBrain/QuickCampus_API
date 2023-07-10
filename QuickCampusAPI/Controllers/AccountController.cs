@@ -46,7 +46,7 @@ namespace QuickCampusAPI.Controllers
             var res = await _account.ListPermission();
             return Ok(res);
         }
-
+        1
         [HttpGet]
         [Route("getallroles")]
         public async Task<IActionResult> GetAllRoles()
