@@ -10,9 +10,9 @@ using QuickCampus_Core.ViewModel;
 
 namespace QuickCampusAPI.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class RoleController : Controller
     {
         private readonly IRoleRepo roleRepo;
@@ -109,9 +109,19 @@ namespace QuickCampusAPI.Controllers
         [Route("roleList")]
         public async Task<IActionResult> roleList()
         {
+            var _jwtSecretKey = config["Jwt:Key"];
+            var  clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey); 
             List<RoleVm> roleVm = new List<RoleVm>();
             var rolelist = (await roleRepo.GetAll()).ToList();
-            roleVm = rolelist.Select(x => ((RoleVm)x)).ToList();
+
+            if (string.IsNullOrEmpty(clientId))
+            {
+                roleVm = rolelist.Select(x => ((RoleVm)x)).Where(w=>w.ClientId==null).ToList();
+            }
+            else
+            {
+                roleVm = rolelist.Select(x => ((RoleVm)x)).Where(w => w.ClientId == Convert.ToInt32(clientId)).ToList();
+            }
             return Ok(roleVm);
         }
 
@@ -132,7 +142,7 @@ namespace QuickCampusAPI.Controllers
                 if (uId != null)
                 {
                     var res = await roleRepo.GetById(roleId);
-                    var clientId = JwtHelper.GetUserIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                    var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                     //var clientId = vm.ClientId.HasValue ? await clientRepo.GetById((int)vm.ClientId) : null;
 
                     if (clientId != null || clientId == "")
@@ -175,6 +185,46 @@ namespace QuickCampusAPI.Controllers
 
             }
             return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("GetRoleByRoleId")]
+        public async Task<IActionResult> GetRoleByRoleId(int roleId)
+        {
+            int cId = 0;
+            var _jwtSecretKey = config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            IGeneralResult<GetRoleId> roleRecord = new GeneralResult<GetRoleId>();
+
+            if (string.IsNullOrEmpty(clientId))
+            {
+                 roleRecord.Data = (await roleRepo.GetAll()).Where(w => w.Id == roleId && w.ClientId==null).Select(s => new GetRoleId()
+                {
+                    Id = roleId,
+                    RoleName = s.Name
+                }).FirstOrDefault();
+            }
+            else
+            {
+                cId= Convert.ToInt32(clientId);
+                 roleRecord.Data = (await roleRepo.GetAll()).Where(w => w.Id == roleId && w.ClientId==cId).Select(s => new GetRoleId()
+                {
+                    Id = roleId,
+                    RoleName = s.Name
+                }).FirstOrDefault();
+            }
+
+            if (roleRecord.Data == null)
+            {
+                roleRecord.IsSuccess = false;
+                roleRecord.Message = "No Record Found";
+            }
+            else
+            {
+                roleRecord.IsSuccess = true;
+                roleRecord.Message = "Role Record of Id "+roleId;
+            }
+            return Ok(roleRecord);
         }
 
 
