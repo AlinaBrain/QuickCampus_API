@@ -11,7 +11,7 @@ using QuickCampus_DAL.Context;
 
 namespace QuickCampusAPI.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
 
@@ -68,7 +68,6 @@ namespace QuickCampusAPI.Controllers
             if (userRepo.Any(x => x.Email == vm.Email && x.Name == vm.Name))
             {
                 result.Message = "Email Already Registered!";
-                result.Message = "Name Already Registered!";
             }
             else
             {
@@ -113,10 +112,9 @@ namespace QuickCampusAPI.Controllers
     public async Task<IActionResult> Edit(int Id, ClientVM vm)
     {
         IGeneralResult<ClientVM> result = new GeneralResult<ClientVM>();
-        if (_clientRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.Name == vm.Name))
+        if (_clientRepo.Any(x => x.Email == vm.Email && x.IsActive == true  && x.Id!=vm.Id))
         {
-            result.Message = "Email Already Registered!";
-            result.Message = "Name Already Registered!";
+            //result.Message = "Email Already Registered!";
         }
         else
         {
