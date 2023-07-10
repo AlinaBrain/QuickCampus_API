@@ -19,75 +19,76 @@ namespace QuickCampusAPI.Controllers
     public class ClientController : ControllerBase
     {
         private readonly IClientRepo _clientRepo;
+        private readonly IUserRepo userRepo;
         private IConfiguration config;
-        public ClientController(IClientRepo clientRepo, IConfiguration config)
+        public ClientController(IClientRepo clientRepo, IConfiguration config, IUserRepo userRepo)
         {
             _clientRepo = clientRepo;
             this.config = config;
+            this.userRepo = userRepo;
         }
 
         [HttpGet]
         [Route("ClientList")]
         public async Task<IActionResult> ClientList()
         {
-            IGeneralResult<List<ClientVM>> result = new GeneralResult<List<ClientVM>>();
-            try
+
+
+            IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
+            List<UserVm> vm = new List<UserVm>();
+            var _jwtSecretKey = config["Jwt:Key"];
+
+            var cilentId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            
+            
+            if (cilentId == null)
             {
-                var clientList = (await _clientRepo.GetAll()).ToList();
-                var res = clientList.Select(x => ((ClientVM)x)).ToList();
-                if (res != null)
-                {
-                    result.IsSuccess = true;
-                    result.Message = "ClientList";
-                    result.Data = res;
-                }
-                else
-                {
-                    result.Message = "Client List Not Found";
-                }
+
+               
+                var list = (await userRepo.GetAll()).ToList();
+                vm = list.Select(x => ((UserVm)x)).ToList();
+                
             }
-            catch (Exception ex)
+            else 
             {
-                result.Message = "Server Error";
+                int cId = Convert.ToInt32(cilentId);
+                var list = (await userRepo.GetAll()).ToList();
+                vm = list.Select(x => ((UserVm)x)).Where(w=>w.ClientId== cId).ToList();
+               
             }
-            return Ok(result);
+            return Ok(vm);
         }
         [HttpPost]
         [Route("AddClient")]
-        public async Task<IActionResult> AddClient(ClientVM vm)
+        public async Task<IActionResult> AddClient(UserVm vm)
         {
-            IGeneralResult<ClientVM> result = new GeneralResult<ClientVM>();
+            IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
             var _jwtSecretKey = config["Jwt:Key"];
             var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
 
 
-            if (_clientRepo.Any(x => x.Email == vm.Email && x.IsActive == true))
+            if (userRepo.Any(x => x.Email == vm.Email && x.Name == vm.Name))
             {
                 result.Message = "Email Already Registered!";
             }
             else
             {
-                TblClient abc = new TblClient
+                TblUser abc = new TblUser
                 {
                     Name = vm.Name,
-                    Address = vm.Address,
-                    Phone = vm.Phone,
+                    UserName = vm.UserName,
+                    Password = vm.Password,
                     Email = vm.Email,
-                    Geolocation = vm.Geolocation,
-                    SubscriptionPlan = vm.SubscriptionPlan,
-                    CraetedBy = userId == null ? null : Convert.ToInt16(userId),
-                    ModifiedBy = userId == null ? null : Convert.ToInt16(userId),
-                    CreatedDate = System.DateTime.Now,
-                    ModofiedDate = System.DateTime.Now,
+                    Mobile = vm.Mobile,
                     IsActive = true,
-                    IsDeleted = false
+                   // IsDeleted = false
 
                 };
-            var client = await _clientRepo.Add(abc);
+            var client = await userRepo.Add(abc);
             if (client.Id != 0)
             {
                 result.IsSuccess = true;
-                result.Message = "Client Added Successfully";
+                result.Message = "User Added Successfully";
             }
             else
             {

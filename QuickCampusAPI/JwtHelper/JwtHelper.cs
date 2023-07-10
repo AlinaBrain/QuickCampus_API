@@ -79,4 +79,41 @@ public class JwtHelper
             return null;
         }
     }
+
+    public static string GetClientIdFromToken(string token, string secretKey)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var jwt = token.Replace("Bearer ", string.Empty);
+        var key = Encoding.ASCII.GetBytes(secretKey);
+
+        // Set the token validation parameters
+        var tokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
+
+        try
+        {
+
+
+            var claimsPrincipal = tokenHandler.ValidateToken(jwt, tokenValidationParameters, out var validatedToken);
+            var jwtToken = (JwtSecurityToken)validatedToken;
+
+            // Retrieve the "id" claim value
+            string nameClaim = string.Empty;
+
+            nameClaim = jwtToken.Claims.First(c => c.Type == "cilentId").Value;
+
+
+            return nameClaim;
+        }
+        catch (Exception)
+        {
+            // Handle any exceptions, such as token validation failure
+            return null;
+        }
+    }
 }
