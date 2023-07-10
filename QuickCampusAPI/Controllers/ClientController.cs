@@ -11,7 +11,7 @@ using QuickCampus_DAL.Context;
 
 namespace QuickCampusAPI.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
 
@@ -30,52 +30,65 @@ namespace QuickCampusAPI.Controllers
 
         [HttpGet]
         [Route("ClientList")]
-        public async Task<IActionResult> ClientList(int clientId)
+        public async Task<IActionResult> ClientList()
         {
 
 
             IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
-            var _jwtSecretKey = config["Jwt:Key"];
-            var ClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-
             List<UserVm> vm = new List<UserVm>();
-            var list = (await userRepo.GetAll()).Where(x => x.ClientId == clientId).ToList();
-            vm = list.Select(x => ((UserVm)x)).ToList();
+            var _jwtSecretKey = config["Jwt:Key"];
+
+            var cilentId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            if (cilentId == null)
+            {
+
+               
+                var list = (await userRepo.GetAll()).ToList();
+                vm = list.Select(x => ((UserVm)x)).ToList();
+                
+            }
+            else 
+            {
+               
+                var list = (await userRepo.GetAll()).ToList();
+                vm = list.Select(x => ((UserVm)x)).ToList();
+               
+            }
             return Ok(vm);
         }
         [HttpPost]
         [Route("AddClient")]
-        public async Task<IActionResult> AddClient(ClientVM vm)
+        public async Task<IActionResult> AddClient(UserVm vm)
         {
-            IGeneralResult<ClientVM> result = new GeneralResult<ClientVM>();
+            IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
             var _jwtSecretKey = config["Jwt:Key"];
             var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
 
 
-            if (_clientRepo.Any(x => x.Email == vm.Email && x.IsDeleted == false && x.Name == vm.Name))
+            if (userRepo.Any(x => x.Email == vm.Email && x.Name == vm.Name))
             {
                 result.Message = "Email Already Registered!";
                 result.Message = "Name Already Registered!";
             }
             else
             {
-                TblClient abc = new TblClient
+                TblUser abc = new TblUser
                 {
                     Name = vm.Name,
-                    Address = vm.Address,
-                    Phone = vm.Phone,
+                    UserName = vm.UserName,
+                    Password = vm.Password,
                     Email = vm.Email,
-                    Geolocation = vm.Geolocation,
-                    SubscriptionPlan = vm.SubscriptionPlan,
-                    CraetedBy = userId == null ? null : Convert.ToInt16(userId),
-                    ModifiedBy = userId == null ? null : Convert.ToInt16(userId),
-                    CreatedDate = System.DateTime.Now,
-                    ModofiedDate = System.DateTime.Now,
+                    Mobile = vm.Mobile,
+                    //SubscriptionPlan = vm.SubscriptionPlan,
+                   // CraetedBy = userId == null ? null : Convert.ToInt16(userId),
+                   // ModifiedBy = userId == null ? null : Convert.ToInt16(userId),
+                   // CreatedDate = System.DateTime.Now,
+                    //ModofiedDate = System.DateTime.Now,
                     IsActive = true,
-                    IsDeleted = false
+                   // IsDeleted = false
 
                 };
-            var client = await _clientRepo.Add(abc);
+            var client = await userRepo.Add(abc);
             if (client.Id != 0)
             {
                 result.IsSuccess = true;

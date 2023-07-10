@@ -103,7 +103,9 @@ public class JwtHelper
             var jwtToken = (JwtSecurityToken)validatedToken;
 
             // Retrieve the "id" claim value
-            var nameClaim = jwtToken.Claims.First(c => c.Type == "ClientId").Value;
+            string nameClaim = string.Empty;
+
+            nameClaim = jwtToken.Claims.First(c => c.Type == "cilentId").Value;
 
 
             return nameClaim;
