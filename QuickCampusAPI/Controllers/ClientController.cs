@@ -11,7 +11,7 @@ using QuickCampus_DAL.Context;
 
 namespace QuickCampusAPI.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
 
@@ -19,38 +19,29 @@ namespace QuickCampusAPI.Controllers
     public class ClientController : ControllerBase
     {
         private readonly IClientRepo _clientRepo;
+        private readonly IUserRepo userRepo;
         private IConfiguration config;
-        public ClientController(IClientRepo clientRepo, IConfiguration config)
+        public ClientController(IClientRepo clientRepo, IConfiguration config, IUserRepo userRepo)
         {
             _clientRepo = clientRepo;
             this.config = config;
+            this.userRepo = userRepo;
         }
 
         [HttpGet]
         [Route("ClientList")]
-        public async Task<IActionResult> ClientList()
+        public async Task<IActionResult> ClientList(int clientId)
         {
-            IGeneralResult<List<ClientVM>> result = new GeneralResult<List<ClientVM>>();
-            try
-            {
-                var clientList = (await _clientRepo.GetAll()).ToList();
-                var res = clientList.Select(x => ((ClientVM)x)).ToList();
-                if (res != null)
-                {
-                    result.IsSuccess = true;
-                    result.Message = "ClientList";
-                    result.Data = res;
-                }
-                else
-                {
-                    result.Message = "Client List Not Found";
-                }
-            }
-            catch (Exception ex)
-            {
-                result.Message = "Server Error";
-            }
-            return Ok(result);
+
+
+            IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
+            var _jwtSecretKey = config["Jwt:Key"];
+            var ClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+
+            List<UserVm> vm = new List<UserVm>();
+            var list = (await userRepo.GetAll()).Where(x => x.ClientId == clientId).ToList();
+            vm = list.Select(x => ((UserVm)x)).ToList();
+            return Ok(vm);
         }
         [HttpPost]
         [Route("AddClient")]
