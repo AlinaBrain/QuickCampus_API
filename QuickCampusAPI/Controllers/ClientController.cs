@@ -81,7 +81,7 @@ namespace QuickCampusAPI.Controllers
                     Password = vm.Password,
                     Email = vm.Email,
                     Mobile = vm.Mobile,
-                    ClientId = vm.ClientId,
+                    //ClientId = vm.ClientId,
                     IsActive = true,
 
                     // IsDeleted = false
