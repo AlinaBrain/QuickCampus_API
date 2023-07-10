@@ -46,7 +46,7 @@ namespace QuickCampusAPI.Controllers
 
                
                 var list = (await userRepo.GetAll()).ToList();
-                vm = list.Select(x => ((UserVm)x)).ToList();
+                vm = list.Select(x => ((UserVm)x)).Where(w=>w.ClientId==null).ToList();
                 
             }
             else 
