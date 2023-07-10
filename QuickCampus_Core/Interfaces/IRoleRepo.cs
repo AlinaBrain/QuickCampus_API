@@ -1,4 +1,5 @@
-﻿using QuickCampus_DAL.Context;
+﻿using QuickCampus_Core.ViewModel;
+using QuickCampus_DAL.Context;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,5 +10,6 @@ namespace QuickCampus_Core.Interfaces
 {
     public interface IRoleRepo : IGenericRepository<TblRole>
     {
+        Task<string> SetRolePermission(RoleMappingRequest roleMappingRequest);
     }
 }
