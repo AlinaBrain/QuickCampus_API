@@ -107,7 +107,9 @@ namespace QuickCampus_Core.Services
          {
                 new Claim(ClaimTypes.Name,clientId==0?string.Empty:clientId.ToString()),
                 new Claim(ClaimTypes.Role,"Admin"),
-                new Claim("UserId",userId.ToString())
+                new Claim("UserId",userId.ToString()),
+                new Claim("cilentId",clientId==0?string.Empty:clientId.ToString())
+
             };
             var token = new JwtSecurityToken(_config["Jwt:Issuer"],
                _config["Jwt:Audience"],

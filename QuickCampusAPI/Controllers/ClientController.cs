@@ -39,6 +39,8 @@ namespace QuickCampusAPI.Controllers
             var _jwtSecretKey = config["Jwt:Key"];
 
             var cilentId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            
+            
             if (cilentId == null)
             {
 
@@ -49,9 +51,9 @@ namespace QuickCampusAPI.Controllers
             }
             else 
             {
-               
+                int cId = Convert.ToInt32(cilentId);
                 var list = (await userRepo.GetAll()).ToList();
-                vm = list.Select(x => ((UserVm)x)).ToList();
+                vm = list.Select(x => ((UserVm)x)).Where(w=>w.ClientId== cId).ToList();
                
             }
             return Ok(vm);
@@ -78,11 +80,6 @@ namespace QuickCampusAPI.Controllers
                     Password = vm.Password,
                     Email = vm.Email,
                     Mobile = vm.Mobile,
-                    //SubscriptionPlan = vm.SubscriptionPlan,
-                   // CraetedBy = userId == null ? null : Convert.ToInt16(userId),
-                   // ModifiedBy = userId == null ? null : Convert.ToInt16(userId),
-                   // CreatedDate = System.DateTime.Now,
-                    //ModofiedDate = System.DateTime.Now,
                     IsActive = true,
                    // IsDeleted = false
 
@@ -91,7 +88,7 @@ namespace QuickCampusAPI.Controllers
             if (client.Id != 0)
             {
                 result.IsSuccess = true;
-                result.Message = "Client Added Successfully";
+                result.Message = "User Added Successfully";
             }
             else
             {
