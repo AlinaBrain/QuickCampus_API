@@ -176,5 +176,14 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
+
+
+        [HttpPost]
+        [Route("SetRolePermissions")]
+        public async Task<IActionResult> SetRolePermissions(RoleMappingRequest roleMappingRequest)
+        {
+            var response = await roleRepo.SetRolePermission(roleMappingRequest);
+            return Ok(response);
+        }
     }
 }

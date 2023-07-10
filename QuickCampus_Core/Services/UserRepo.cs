@@ -1,4 +1,6 @@
-﻿using QuickCampus_Core.Interfaces;
+﻿using Microsoft.Extensions.Configuration;
+using QuickCampus_Core.Interfaces;
+using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
 using System;
 using System.Collections.Generic;
@@ -10,5 +12,9 @@ namespace QuickCampus_Core.Services
 {
     public class UserRepo : BaseRepository<QuikCampusDevContext, TblUser>, IUserRepo
     {
+        
+        
+
+       
     }
 }
