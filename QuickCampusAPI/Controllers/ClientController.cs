@@ -62,12 +62,13 @@ namespace QuickCampusAPI.Controllers
         [Route("AddClient")]
         public async Task<IActionResult> AddClient(UserVm vm)
         {
+
             IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
             var _jwtSecretKey = config["Jwt:Key"];
-            var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var cilentId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
 
 
-            if (userRepo.Any(x => x.Email == vm.Email && x.Name == vm.Name))
+            if (userRepo.Any(x => x.Email == vm.Email))
             {
                 result.Message = "Email Already Registered!";
             }
@@ -80,31 +81,33 @@ namespace QuickCampusAPI.Controllers
                     Password = vm.Password,
                     Email = vm.Email,
                     Mobile = vm.Mobile,
+                    ClientId = vm.ClientId,
                     IsActive = true,
-                   // IsDeleted = false
+
+                    // IsDeleted = false
 
                 };
-            var client = await userRepo.Add(abc);
-            if (client.Id != 0)
-            {
-                result.IsSuccess = true;
-                result.Message = "User Added Successfully";
-            }
-            else
-            {
-                result.Message = "already record with this name exist";
-                result.Message = "something Went Wrong";
-            }
+                var client = await userRepo.Add(abc);
+                if (client.Id != 0)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "User Added Successfully";
+                }
+                else
+                {
+                    result.Message = "already record with this name exist";
+                    result.Message = "something Went Wrong";
+                }
 
 
-        }
+            }
 
             return Ok(result);
 
-    }
+        }
 
 
-    [HttpPost]
+        [HttpPost]
     [Route("Edit")]
     public async Task<IActionResult> Edit(int Id, ClientVM vm)
     {
