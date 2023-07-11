@@ -2,6 +2,7 @@ using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using QuickCampus_Core.Interfaces;
@@ -11,6 +12,7 @@ using QuickCampus_DAL.Context;
 using System.Reflection;
 using System.Text;
 using static QuickCampus_Core.ViewModel.ClientVM;
+using static QuickCampus_Core.ViewModel.UserVm;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
@@ -30,7 +32,8 @@ builder.Services.AddDbContext<QuikCampusDevContext>(
 
 builder.Services.AddControllers();
 builder.Services.AddScoped<IValidator<AdminLogin>, AdminLoginValidator>();
-builder.Services.AddScoped<IValidator<ClientVM>, ClientValidator>();
+builder.Services.AddScoped<IValidator<UserVm>, UserValidator>();
+
 
 
 
