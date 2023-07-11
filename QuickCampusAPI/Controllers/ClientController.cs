@@ -11,7 +11,7 @@ using QuickCampus_DAL.Context;
 
 namespace QuickCampusAPI.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
 
@@ -58,100 +58,159 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(vm);
         }
-        //[HttpPost]
-        //[Route("AddClient")]
-        //public async Task<IActionResult> AddClient(UserVm vm)
-        //{
-
-        //    IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
-        //    var _jwtSecretKey = config["Jwt:Key"];
-        //    var cilentId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-
-
-        //    if (userRepo.Any(x => x.Email == vm.Email))
-        //    {
-        //        result.Message = "Email Already Registered!";
-        //    }
-        //    else
-        //    {
-        //        TblUser abc = new TblUser
-        //        {
-        //            Name = vm.Name,
-        //            UserName = vm.UserName,
-        //            Password = vm.Password,
-        //            Email = vm.Email,
-        //            Mobile = vm.Mobile,
-        //            //ClientId = vm.ClientId,
-        //            IsActive = true,
-
-        //            // IsDeleted = false
-
-        //        };
-        //        var client = await userRepo.Add(abc);
-        //        if (client.Id != 0)
-        //        {
-        //            result.IsSuccess = true;
-        //            result.Message = "User Added Successfully";
-        //        }
-        //        else
-        //        {
-        //            result.Message = "already record with this name exist";
-        //            result.Message = "something Went Wrong";
-        //        }
-
-
-        //    }
-
-        //    return Ok(result);
-
-        //}
-
-
-    [HttpPost]
-    [Route("Edit")]
-    public async Task<IActionResult> Edit(int Id, ClientVM vm)
-    {
-        IGeneralResult<ClientVM> result = new GeneralResult<ClientVM>();
-        if (_clientRepo.Any(x => x.Email == vm.Email && x.IsActive == true  && x.Id!=vm.Id))
+        [HttpPost]
+        [Route("AddClient")]
+        public async Task<IActionResult> AddClient(UserVm vm)
         {
-            //result.Message = "Email Already Registered!";
-        }
-        else
-        {
-            var res = await _clientRepo.GetById(Id);
-            if (res != null)
+            IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
+            var _jwtSecretKey = config["Jwt:Key"];
+            if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.IsDelete == false))
             {
-                if (Id != null || vm.Id == null)
+                result.Message = "Email Already Registered!";
+            }
+            else
+            {
+                if (ModelState.IsValid)
                 {
-                    res.Id = Id;
-                    res.Name = vm.Name;
-                    res.Email = vm.Email;
-                    res.Phone = vm.Phone;
-                    res.SubscriptionPlan = vm.SubscriptionPlan;
-                    res.Geolocation = vm.Geolocation;
-                    res.IsActive = true;
-                    //res.IsDelete = false;
-                    await _clientRepo.Update(res);
-                    result.Message = "Client data is updated successfully";
+                    var clientId = JwtHelper.GetUserIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+
+                    if (!string.IsNullOrEmpty(clientId))
+                    {
+                        int parsedClientId;
+                        if (int.TryParse(clientId, out parsedClientId))
+                        {
+                            UserVm userVm = new UserVm
+                            {
+                                UserName = vm.UserName,
+                                Name = vm.Name,
+                                Email = vm.Email,
+                                Mobile = vm.Mobile,
+                                Password = vm.Password,
+                                ClientId = parsedClientId,
+                                IsActive = true,
+                                IsDelete = false
+                            };
+
+                            await userRepo.Add(userVm.toUserDBModel());
+                            result.IsSuccess = true;
+                            result.Message = "User added successfully.";
+                            result.Data = userVm;
+                            return Ok(result);
+                        }
+                        else
+                        {
+                            result.Message = "Invalid Client ID format.";
+                        }
+                    }
+                    else
+                    {
+                        UserVm userVm = new UserVm
+                        {
+                            UserName = vm.Email,
+                            Name = vm.Name,
+                            Email = vm.Email,
+                            Mobile = vm.Mobile,
+                            Password = vm.Password,
+                            ClientId = null,
+                            IsActive = true,
+                            IsDelete = false
+                        };
+
+                        await userRepo.Add(userVm.toUserDBModel());
+                        result.IsSuccess = true;
+                        result.Message = "User added successfully.";
+                        result.Data = userVm;
+                        return Ok(result);
+                    }
+
+                }
+                else
+                {
+                    result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
+                }
+            }
+
+            return Ok(result);
+
+        }
+
+        [HttpPost]
+        [Route("EditClient")]
+        public async Task<IActionResult> EditClient(int userId, UserModel vm)
+        {
+            IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
+            var _jwtSecretKey = config["Jwt:Key"];
+           
+                var res = await userRepo.GetById(userId);
+                if (res != null)
+                {
+                    var clientId = JwtHelper.GetUserIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                    //var clientId = vm.ClientId.HasValue ? await clientRepo.GetById((int)vm.ClientId) : null;
+
+                    if (clientId != null || clientId == "")
+                    {
+                        res.Id = userId;
+                        if (clientId == "")
+                        {
+                            res.ClientId = null; // Assign null to ClientId property
+                        }
+                        else
+                        {
+                            res.ClientId = Convert.ToInt32(clientId);
+                        }
+                        res.UserName = vm.UserName;
+                        res.Name = vm.Name;
+                        res.Email = vm.Email;
+                        res.Mobile = vm.Mobile;
+                       // res.Password = vm.Password;
+                        res.IsActive = true;
+                        res.IsDelete = false;
+                        await userRepo.Update(res);
+                        result.Message = "User data is updated successfully";
+                        result.IsSuccess = true;
+                        result.Data = (UserVm)res;
+                        return Ok(result);
+                    }
+                    else
+                    {
+                        result.Message = "Client ID not found.";
+                    }
+                }
+                else
+                {
+                    result.Message = "User ID not found.";
+                }
+            
+
+            return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("activeAndInactive")]
+        public async Task<IActionResult> activeAndInactive(bool IsActive, int id)
+        {
+            IGeneralResult<dynamic> result = new GeneralResult<dynamic>();
+            if (id > 0)
+            {
+                var res = await userRepo.GetById(id);
+                if (res != null)
+                {
+                    res.IsActive = IsActive;
+                    await userRepo.Update(res);
                     result.IsSuccess = true;
-                    result.Data = (ClientVM)res;
+                    result.Message = "Your status is changed successfully";
+                    result.Data = res;
                     return Ok(result);
                 }
                 else
                 {
-                    result.Message = "Id not found.";
+                    result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
                 }
             }
-            else
-            {
-                result.Message = "Id not found.";
-            }
+            return Ok(result);
         }
 
-        return Ok(result);
+
     }
-
-
-}
 }
 
