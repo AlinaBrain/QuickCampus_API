@@ -25,7 +25,7 @@ namespace QuickCampus_Core.ViewModel
     public class RolePermissions
     {
         public int Id { get; set; }
-        public string PermissionName { get; set; }
-        public string DisplayName { get; set; }
+        public string? PermissionName { get; set; }
+        public string? DisplayName { get; set; }
     }
 }

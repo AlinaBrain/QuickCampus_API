@@ -28,6 +28,8 @@ namespace QuickCampus_Core.Services
             _context = context;
         }
 
+        List<string> permissionRecord = new List<string>();
+
         public async Task<IGeneralResult<LoginResponseVM>> Login(AdminLogin adminLogin)
         {
             IGeneralResult<LoginResponseVM> response = new GeneralResult<LoginResponseVM>();
@@ -96,6 +98,11 @@ namespace QuickCampus_Core.Services
                 DisplayName = s.Permission.PermissionDisplay
             }).ToList();
 
+            foreach(var rec in rolePermissions)
+            {
+                permissionRecord.Add(rec.PermissionName);
+            }
+
             return rolePermissions;
         }
 
@@ -103,19 +110,22 @@ namespace QuickCampus_Core.Services
         {
             var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
-            var Claims = new[]
+            var claims = new List<Claim>
          {
                 new Claim(ClaimTypes.Name,clientId==0?string.Empty:clientId.ToString()),
-                new Claim(ClaimTypes.Role,"Admin"),
+                new Claim(ClaimTypes.Role,"AdminForTest"),
                 new Claim("UserId",userId.ToString()),
                 new Claim("cilentId",clientId==0?string.Empty:clientId.ToString())
-
             };
-            var token = new JwtSecurityToken(_config["Jwt:Issuer"],
-               _config["Jwt:Audience"],
-               Claims,
-               expires: DateTime.Now.AddHours(24),
-               signingCredentials: credentials);
+
+
+            foreach (var role in permissionRecord)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+
+            var token = new JwtSecurityToken(_config["Jwt:Issuer"],_config["Jwt:Audience"],claims,
+               expires: DateTime.Now.AddHours(24),signingCredentials: credentials);
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 

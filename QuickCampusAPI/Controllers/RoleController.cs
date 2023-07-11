@@ -10,7 +10,6 @@ using QuickCampus_Core.ViewModel;
 
 namespace QuickCampusAPI.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class RoleController : Controller
@@ -26,6 +25,8 @@ namespace QuickCampusAPI.Controllers
             this.clientRepo = clientRepo;
             this.config = config;
         }
+
+        [Authorize(Roles = "AddRole")]
         [HttpPost]
         [Route("roleAdd")]
         public async Task<IActionResult> roleAdd([FromBody] RoleModel vm)
@@ -41,7 +42,14 @@ namespace QuickCampusAPI.Controllers
 
                 if (ModelState.IsValid)
                 {
-                    var user = await userRepo.GetById(vm.userId);
+                    var userId = JwtHelper.GetuIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                    if(string.IsNullOrEmpty(userId))
+                    {
+                        result.Message = "User Not Found";
+                        result.IsSuccess = false;
+                        return Ok(result);
+                    }
+                    var user = await userRepo.GetById( Convert.ToInt32(userId));
                     var res = (user != null && user.IsDelete == true) ? user : null;
                     if (user != null)
                     {
@@ -105,6 +113,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "GetAllRole")]
         [HttpGet]
         [Route("roleList")]
         public async Task<IActionResult> roleList()
@@ -125,6 +134,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(roleVm);
         }
 
+        [Authorize(Roles = "UpdateRole")]
         [HttpPost]
         [Route("roleEdit")]
         public async Task<IActionResult> Edit(int roleId, RoleModel vm)
@@ -143,7 +153,6 @@ namespace QuickCampusAPI.Controllers
                 {
                     var res = await roleRepo.GetById(roleId);
                     var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-                    //var clientId = vm.ClientId.HasValue ? await clientRepo.GetById((int)vm.ClientId) : null;
 
                     if (clientId != null || clientId == "")
                     {
@@ -187,6 +196,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "EditRole")]
         [HttpGet]
         [Route("GetRoleByRoleId")]
         public async Task<IActionResult> GetRoleByRoleId(int roleId)
