@@ -34,8 +34,8 @@ namespace QuickCampusAPI.Controllers
         {
 
 
-            IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
-            List<UserVm> vm = new List<UserVm>();
+            IGeneralResult<UserVMM> result = new GeneralResult<UserVMM>();
+            List<UserVMM> vm = new List<UserVMM>();
             var _jwtSecretKey = config["Jwt:Key"];
 
             var cilentId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
@@ -46,14 +46,14 @@ namespace QuickCampusAPI.Controllers
 
                
                 var list = (await userRepo.GetAll()).ToList();
-                vm = list.Select(x => ((UserVm)x)).Where(w=>w.ClientId==null).ToList();
+                vm = list.Select(x => ((UserVMM)x)).Where(w=>w.ClientId==null).ToList();
                 
             }
             else 
             {
                 int cId = Convert.ToInt32(cilentId);
                 var list = (await userRepo.GetAll()).ToList();
-                vm = list.Select(x => ((UserVm)x)).Where(w=>w.ClientId== cId).ToList();
+                vm = list.Select(x => ((UserVMM)x)).Where(w=>w.ClientId== cId).ToList();
                
             }
             return Ok(vm);
@@ -106,7 +106,7 @@ namespace QuickCampusAPI.Controllers
                     {
                         UserVm userVm = new UserVm
                         {
-                            UserName = vm.Email,
+                            UserName = vm.UserName,
                             Name = vm.Name,
                             Email = vm.Email,
                             Mobile = vm.Mobile,
