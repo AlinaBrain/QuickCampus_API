@@ -110,56 +110,56 @@ namespace QuickCampus_Core.ViewModel
             };
         }
 
-        public class ClientValidator : AbstractValidator<ClientVM>
-        {
-            public ClientValidator()
-            {
-                RuleFor(x => x.Name)
-                   .Cascade(CascadeMode.StopOnFirstFailure)
-                   .NotNull().WithMessage("Name could not be null")
+       // public class ClientValidator : AbstractValidator<ClientVM>
+       // {
+       //     public ClientValidator()
+       //     {
+       //         RuleFor(x => x.Name)
+       //            .Cascade(CascadeMode.StopOnFirstFailure)
+       //            .NotNull().WithMessage("Name could not be null")
                    
-                   .NotEmpty().WithMessage("Name could not be empty")
-                   .Length(0, 20).WithMessage("Name lengh could not be greater than 20");
+       //            .NotEmpty().WithMessage("Name could not be empty")
+       //            .Length(0, 20).WithMessage("Name lengh could not be greater than 20");
 
-                RuleFor(x => x.Address)
-                  .Cascade(CascadeMode.StopOnFirstFailure)
-                  .NotNull().WithMessage("Address could not be null")
-                  .NotEmpty().WithMessage("Address could not be empty")
-                  .Length(0, 100).WithMessage("Address lengh could not be greater than 100");
+       //         RuleFor(x => x.Address)
+       //           .Cascade(CascadeMode.StopOnFirstFailure)
+       //           .NotNull().WithMessage("Address could not be null")
+       //           .NotEmpty().WithMessage("Address could not be empty")
+       //           .Length(0, 100).WithMessage("Address lengh could not be greater than 100");
 
-                RuleFor(x => x.Phone)
-                  .Cascade(CascadeMode.StopOnFirstFailure)
-                  .NotNull().WithMessage("Phone could not be null")
-                  .NotEmpty().WithMessage("Phone could not be empty");
+       //         RuleFor(x => x.Phone)
+       //           .Cascade(CascadeMode.StopOnFirstFailure)
+       //           .NotNull().WithMessage("Phone could not be null")
+       //           .NotEmpty().WithMessage("Phone could not be empty");
                   
-       //           .MinimumLength(10).WithMessage("PhoneNumber must not be less than 10 characters.")
-       //.MaximumLength(20).WithMessage("PhoneNumber must not exceed 50 characters.")
-       //.Matches(new Regex(@"((\(\d{3}\) ?)|(\d{3}-))?\d{3}-\d{4}")).WithMessage("PhoneNumber not valid");
+       ////           .MinimumLength(10).WithMessage("PhoneNumber must not be less than 10 characters.")
+       ////.MaximumLength(20).WithMessage("PhoneNumber must not exceed 50 characters.")
+       ////.Matches(new Regex(@"((\(\d{3}\) ?)|(\d{3}-))?\d{3}-\d{4}")).WithMessage("PhoneNumber not valid");
 
-                RuleFor(x => x.Email)
-                  .Cascade(CascadeMode.StopOnFirstFailure).EmailAddress()
-                  .NotNull().WithMessage("Email could not be null")
-                  .NotEmpty().WithMessage("Email could not be empty");
+       //         RuleFor(x => x.Email)
+       //           .Cascade(CascadeMode.StopOnFirstFailure).EmailAddress()
+       //           .NotNull().WithMessage("Email could not be null")
+       //           .NotEmpty().WithMessage("Email could not be empty");
                   
 
-                RuleFor(x => x.SubscriptionPlan)
-                  .Cascade(CascadeMode.StopOnFirstFailure)
-                  .NotNull().WithMessage("SubscriptionPlan could not be null")
-                  .NotEmpty().WithMessage("SubscriptionPlan could not be empty")
-                  .Length(0, 20).WithMessage("SubscriptionPlan lengh could not be greater than 20");
+       //         RuleFor(x => x.SubscriptionPlan)
+       //           .Cascade(CascadeMode.StopOnFirstFailure)
+       //           .NotNull().WithMessage("SubscriptionPlan could not be null")
+       //           .NotEmpty().WithMessage("SubscriptionPlan could not be empty")
+       //           .Length(0, 20).WithMessage("SubscriptionPlan lengh could not be greater than 20");
 
-                RuleFor(x => x.Geolocation)
-                 .Cascade(CascadeMode.StopOnFirstFailure)
-                 .NotNull().WithMessage("Geolocation could not be null")
-                 .NotEmpty().WithMessage("Geolocation could not be empty")
-                 .Length(0, 20).WithMessage("Geolocation lengh could not be greater than 20");
-            }
-            //private async Task<bool> IsUniquename(string Name, CancellationToken token)
-            //{
-            //    bool isExistingname = await ClientRepo.UsernameExistsAsync(Name);
-            //    return isExistingname;
-            //}
-        }
+       //         RuleFor(x => x.Geolocation)
+       //          .Cascade(CascadeMode.StopOnFirstFailure)
+       //          .NotNull().WithMessage("Geolocation could not be null")
+       //          .NotEmpty().WithMessage("Geolocation could not be empty")
+       //          .Length(0, 20).WithMessage("Geolocation lengh could not be greater than 20");
+       //     }
+       //     //private async Task<bool> IsUniquename(string Name, CancellationToken token)
+       //     //{
+       //     //    bool isExistingname = await ClientRepo.UsernameExistsAsync(Name);
+       //     //    return isExistingname;
+       //     //}
+       // }
 
 
     }

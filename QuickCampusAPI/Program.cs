@@ -29,7 +29,7 @@ builder.Services.AddDbContext<QuikCampusDevContext>(
 
 builder.Services.AddControllers();
 builder.Services.AddScoped<IValidator<AdminLogin>, AdminLoginValidator>();
-builder.Services.AddScoped<IValidator<ClientVM>, ClientValidator>();
+//builder.Services.AddScoped<IValidator<ClientVM>, ClientValidator>();
 
 
 
