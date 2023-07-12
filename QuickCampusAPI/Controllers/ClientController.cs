@@ -28,36 +28,31 @@ namespace QuickCampusAPI.Controllers
             this.userRepo = userRepo;
         }
 
+        [Authorize(Roles = "ClientList")]
         [HttpGet]
         [Route("ClientList")]
         public async Task<IActionResult> ClientList()
         {
-
-
             IGeneralResult<UserVMM> result = new GeneralResult<UserVMM>();
             List<UserVMM> vm = new List<UserVMM>();
             var _jwtSecretKey = config["Jwt:Key"];
-
             var cilentId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            
             
             if ( string.IsNullOrEmpty(cilentId))
             {
-
-               
                 var list = (await userRepo.GetAll()).ToList();
                 vm = list.Select(x => ((UserVMM)x)).Where(w=>w.ClientId==null).ToList();
-                
             }
             else 
             {
                 int cId = Convert.ToInt32(cilentId);
                 var list = (await userRepo.GetAll()).ToList();
                 vm = list.Select(x => ((UserVMM)x)).Where(w=>w.ClientId== cId).ToList();
-               
             }
             return Ok(vm);
         }
+
+        [Authorize(Roles = "AddClient")]
         [HttpPost]
         [Route("AddClient")]
         public async Task<IActionResult> AddClient(UserVm vm)
@@ -134,6 +129,7 @@ namespace QuickCampusAPI.Controllers
 
         }
 
+        [Authorize(Roles = "EditClient")]
         [HttpPost]
         [Route("EditClient")]
         public async Task<IActionResult> EditClient(int userId, UserModel vm)
@@ -185,8 +181,9 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "ActiveAndInactive")]
         [HttpGet]
-        [Route("activeAndInactive")]
+        [Route("ActiveAndInactive")]
         public async Task<IActionResult> activeAndInactive(bool IsActive, int id)
         {
             IGeneralResult<dynamic> result = new GeneralResult<dynamic>();
