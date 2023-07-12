@@ -136,9 +136,9 @@ namespace QuickCampusAPI.Controllers
 
         [HttpPost]
         [Route("EditClient")]
-        public async Task<IActionResult> EditClient(int userId, UserModel vm)
+        public async Task<IActionResult> EditClient(int userId, UserEVm vm)
         {
-            IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
+            IGeneralResult<UserEVm> result = new GeneralResult<UserEVm>();
             var _jwtSecretKey = config["Jwt:Key"];
            
                 var res = await userRepo.GetById(userId);
@@ -162,13 +162,12 @@ namespace QuickCampusAPI.Controllers
                         res.Name = vm.Name;
                         res.Email = vm.Email;
                         res.Mobile = vm.Mobile;
-                       // res.Password = vm.Password;
-                        res.IsActive = true;
-                        res.IsDelete = false;
+                       // res.IsActive = true;
+                       // res.IsDelete = false;
                         await userRepo.Update(res);
                         result.Message = "User data is updated successfully";
                         result.IsSuccess = true;
-                        result.Data = (UserVm)res;
+                        result.Data = (UserEVm)res;
                         return Ok(result);
                     }
                     else
