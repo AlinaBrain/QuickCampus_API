@@ -21,7 +21,7 @@ public partial class TblUser
 
     public string? Mobile { get; set; }
 
-    public int? ClientId { get; set; }
+    public int? ClientId { get; set; } 
 
     public virtual TblClient? Client { get; set; }
 

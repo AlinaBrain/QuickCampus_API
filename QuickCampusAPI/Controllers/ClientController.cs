@@ -106,7 +106,7 @@ namespace QuickCampusAPI.Controllers
                             Email = vm.Email,
                             Mobile = vm.Mobile,
                             Password = vm.Password,
-                            ClientId = null,
+                            ClientId = 0,
                             IsActive = true,
                             IsDelete = false
                         };
@@ -148,7 +148,7 @@ namespace QuickCampusAPI.Controllers
                         res.Id = userId;
                         if (clientId == "")
                         {
-                            res.ClientId = null; // Assign null to ClientId property
+                            res.ClientId = 0; // Assign null to ClientId property
                         }
                         else
                         {

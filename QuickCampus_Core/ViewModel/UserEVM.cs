@@ -13,8 +13,8 @@ namespace QuickCampus_Core.ViewModel
         {
             return new UserEVm
             {
-                //Id = item.Id,
-                //ClientId = item.ClientId,
+                Id = item.Id,
+                ClientId = item.ClientId,
                 UserName = item.UserName,
                 Name = item.Name,
                // Password = item.Password,
@@ -33,30 +33,30 @@ namespace QuickCampus_Core.ViewModel
        
         public string? Name { get; set; }
        
-        public bool? IsDelete { get; set; }
+       // public bool? IsDelete { get; set; }
 
-        public bool? IsActive { get; set; }
+      //  public bool? IsActive { get; set; }
        
         public string? Email { get; set; }
-        public string? Password { get; set; }
+       // public string? Password { get; set; }
         public string? Mobile { get; set; }
 
-        public string? ConfirmPassword { get; set; }
+        //public string? ConfirmPassword { get; set; }
 
 
         public TblUser toUserDBModel()
         {
             return new TblUser
             {
-                //Id = Id,
+                Id = Id,
                 ClientId = ClientId,
                 UserName = UserName,
                 Name = Name,
-                Password = Password,
+               // Password = Password,
                 Email = Email,
                 Mobile = Mobile,
-                IsDelete = false,
-                IsActive = true,
+                //IsDelete = false,
+               // IsActive = true,
             };
         }
 
@@ -67,7 +67,7 @@ namespace QuickCampus_Core.ViewModel
                 Id = Id,
                 UserName = UserName,
                 Name = Name,
-                Password = Password,
+               // Password = Password,
                 Email = Email,
                 Mobile = Mobile,
             };

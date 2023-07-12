@@ -41,15 +41,17 @@ namespace QuickCampus_Core.Services
             response.Data.RoleMasters = rm;
 
             var re = _context.TblUsers.Include(i => i.TblUserRoles).Where(w => w.Email == adminLogin.UserName && w.Password == adminLogin.Password && w.IsDelete == false && w.IsActive == true).FirstOrDefault();
-
+            
             if (re != null)
             {
+
+
                 var user = _context.TblUserRoles.
-                    Include(i => i.User)
-                    .Include(i => i.Role)
-                    .Include(i => i.Role.TblRolePermissions)
-                    .Where(w => w.User.Email.ToLower() == adminLogin.UserName.ToLower() && w.User.Password == adminLogin.Password && w.User.IsDelete == false && w.User.IsActive == true)
-                    .FirstOrDefault();
+                                Include(i => i.User)
+                                .Include(i => i.Role)
+                                .Include(i => i.Role.TblRolePermissions)
+                                .Where(w => w.User.Email.ToLower() == adminLogin.UserName.ToLower() && w.User.Password == adminLogin.Password && w.User.IsDelete == false && w.User.IsActive == true)
+                                .FirstOrDefault();
 
                 var uRoles = _context.TblUserRoles
                     .Where(w => w.User.Email.ToLower() == adminLogin.UserName.ToLower() && w.User.Password == adminLogin.Password && w.User.IsDelete == false && w.User.IsActive == true)
@@ -73,7 +75,7 @@ namespace QuickCampus_Core.Services
                 response.Message = "Login Successuflly";
                 List<string> record = new List<string>();
                 record = uRoles.Select(s => s.RoleName).ToList();
-                response.Data.Token = GenerateToken(adminLogin, record, re.ClientId == null ? 0 : re.ClientId, re.Id);
+                response.Data.Token = GenerateToken(adminLogin, record, re.ClientId == null ? 0 : re.ClientId, re.Id,response.Data.IsSuperAdmin);
                 response.Data.UserName = re.UserName;
                 response.Data.UserId = re.Id;
                 response.Data.CilentId = re.ClientId;
@@ -98,7 +100,7 @@ namespace QuickCampus_Core.Services
                 DisplayName = s.Permission.PermissionDisplay
             }).ToList();
 
-            foreach(var rec in rolePermissions)
+            foreach (var rec in rolePermissions)
             {
                 permissionRecord.Add(rec.PermissionName.Trim());
             }
@@ -106,25 +108,27 @@ namespace QuickCampus_Core.Services
             return rolePermissions;
         }
 
-        private string GenerateToken(AdminLogin adminlogin, List<string> obj, int? clientId ,int userId)
+        private string GenerateToken(AdminLogin adminlogin, List<string> obj, int? clientId, int userId, bool isSuperAdmin)
         {
             var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
             var claims = new List<Claim>
          {
-                new Claim(ClaimTypes.Name,clientId==0?string.Empty:clientId.ToString()),
+                //new Claim(ClaimTypes.Name,clientId==0?string.Empty:clientId.ToString()),
                 new Claim("UserId",userId.ToString()),
-                new Claim("cilentId",clientId==0?string.Empty:clientId.ToString())
+                new Claim("cilentId",clientId==0?string.Empty:clientId.ToString()),
+                new Claim(ClaimTypes.Role,"Test")
+                //new Claim("IsSuperAdmin",(isSuperAdmin==true?"True":"False").ToString().Trim())
             };
 
-
+           
             foreach (var role in permissionRecord)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
 
-            var token = new JwtSecurityToken(_config["Jwt:Issuer"],_config["Jwt:Audience"],claims,
-               expires: DateTime.Now.AddHours(24),signingCredentials: credentials);
+            var token = new JwtSecurityToken(_config["Jwt:Issuer"], _config["Jwt:Audience"], claims,
+               expires: DateTime.Now.AddHours(24), signingCredentials: credentials);
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
