@@ -16,7 +16,7 @@ namespace QuickCampus_Core.ViewModel
                 ClientId = item.ClientId,
                 UserName = item.UserName,
                 Name = item.Name,
-               Password = item.Password,
+                Password = item.Password,
                 IsDelete = item.IsDelete,
                 IsActive = item.IsActive,
                 Email = item.Email,
@@ -79,22 +79,25 @@ namespace QuickCampus_Core.ViewModel
                    .Cascade(CascadeMode.StopOnFirstFailure)
                   .NotNull().WithMessage("Name could not be null")
 
-                           .NotEmpty().WithMessage("Name could not be empty")
-                           .Length(0, 20).WithMessage("Name lengh could not be greater than 20");
+                  .NotEmpty().WithMessage("Name could not be empty")
+            .Matches(@"^[A-Za-z\s]*$").WithMessage("'{PropertyName}' should only contain letters.")
+            .Length(3, 30);
+                           
 
                 RuleFor(x => x.UserName)
                   .Cascade(CascadeMode.StopOnFirstFailure)
-                   .NotNull().WithMessage("Name could not be null")
+                   .NotNull().WithMessage("UserName could not be null")
 
-                   .NotEmpty().WithMessage("Name could not be empty")
-                   .Length(0, 20).WithMessage("Name lengh could not be greater than 20");
+                   .NotEmpty().WithMessage("UserName could not be empty")
+            .Matches(@"^[A-Za-z\s]*$").WithMessage("'{PropertyName}' should only contain letters.")
+            .Length(3, 30);
 
                 RuleFor(x => x.Mobile)
                   .Cascade(CascadeMode.StopOnFirstFailure)
                   .NotNull().WithMessage("Phone could not be null")
                   .NotEmpty().WithMessage("Phone could not be empty");
 
-                //           .MinimumLength(10).WithMessage("PhoneNumber must not be less than 10 characters.")
+                //.MinimumLength(10).WithMessage("PhoneNumber must not be less than 10 characters.")
                 //.MaximumLength(20).WithMessage("PhoneNumber must not exceed 50 characters.")
                 //.Matches(new Regex(@"((\(\d{3}\) ?)|(\d{3}-))?\d{3}-\d{4}")).WithMessage("PhoneNumber not valid");
 

@@ -84,10 +84,10 @@ namespace QuickCampus_Core.ViewModel
 
                 RuleFor(x => x.UserName)
                   .Cascade(CascadeMode.StopOnFirstFailure)
-                   .NotNull().WithMessage("Name could not be null")
+                   .NotNull().WithMessage("UserName could not be null")
 
-                   .NotEmpty().WithMessage("Name could not be empty")
-                   .Length(0, 20).WithMessage("Name lengh could not be greater than 20");
+                   .NotEmpty().WithMessage("UserName could not be empty")
+                   .Length(0, 20).WithMessage("UserName lengh could not be greater than 20");
 
                 RuleFor(x => x.Mobile)
                   .Cascade(CascadeMode.StopOnFirstFailure)
