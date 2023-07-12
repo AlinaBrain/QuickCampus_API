@@ -100,7 +100,7 @@ namespace QuickCampus_Core.Services
 
             foreach(var rec in rolePermissions)
             {
-                permissionRecord.Add(rec.PermissionName);
+                permissionRecord.Add(rec.PermissionName.Trim());
             }
 
             return rolePermissions;
@@ -113,7 +113,6 @@ namespace QuickCampus_Core.Services
             var claims = new List<Claim>
          {
                 new Claim(ClaimTypes.Name,clientId==0?string.Empty:clientId.ToString()),
-                new Claim(ClaimTypes.Role,"AdminForTest"),
                 new Claim("UserId",userId.ToString()),
                 new Claim("cilentId",clientId==0?string.Empty:clientId.ToString())
             };
