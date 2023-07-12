@@ -74,21 +74,6 @@ builder.Services.AddAuthentication(auth =>
 });
 
 
-
-//builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(
-//    options =>
-//    {
-//        options.TokenValidationParameters = new TokenValidationParameters
-//        {
-//            ValidateIssuer = true,
-//            ValidateAudience = true,
-//            ValidateLifetime = false,
-//            ValidateIssuerSigningKey = true,
-//            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-//            ValidAudience = builder.Configuration["Jwt:Audience"],
-//            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-//        };
-//    });
 builder.Services.AddTransient<IApplicationUserRepo, ApplicationUserService>();
 builder.Services.AddTransient<IApplicantRepo, ApplicantRepoServices>();
 builder.Services.AddScoped<ICampusRepo, CampusService>();
@@ -105,11 +90,11 @@ builder.Services.AddScoped<IClientRepo, ClientRepo>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+//}
 app.UseAuthentication();
 
 app.UseCors("MyAllowSpecificOrigins");
