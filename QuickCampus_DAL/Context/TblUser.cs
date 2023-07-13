@@ -34,4 +34,5 @@ public partial class TblUser
     public virtual ICollection<TblRole> TblRoleModifiedByNavigations { get; set; } = new List<TblRole>();
 
     public virtual ICollection<TblUserRole> TblUserRoles { get; set; } = new List<TblUserRole>();
+    //public object Modifiedby { get; set; }
 }

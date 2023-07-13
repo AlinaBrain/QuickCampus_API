@@ -14,6 +14,8 @@ namespace QuickCampus_Core.ViewModel
         public string UserName { get; set; }
         public bool IsSuperAdmin { get; set; }
         public List<RoleMaster> RoleMasters { get; set; }
+        public object Modifiedby { get; internal set; }
+        public object Createdby { get; internal set; }
     }
 
     public class RoleMaster
