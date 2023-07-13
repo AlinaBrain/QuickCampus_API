@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
-using QuickCampus_Core.Services;
 using QuickCampus_Core.ViewModel;
 
 namespace QuickCampusAPI.Controllers
@@ -43,54 +41,6 @@ namespace QuickCampusAPI.Controllers
             };
             return Ok(model);
         }
-
-        //public ActionResult AddCollege(CollegeGridViewModel model, HttpPostedFileBase LogoImage)
-        //{
-        //    IGeneralResult<dynamic> result = new GeneralResult<dynamic>();
-        //    if (ModelState.IsValid)
-        //    {
-        //        if (LogoImage != null && LogoImage.ContentLength > 0)
-        //        {
-        //            model.LogoImage = LogoImage.FileName;
-        //        }
-        //        if (model.CollegeID > 0)
-        //        {
-        //            result = collegeRepo.UpdateCollege(model);
-
-        //        }
-        //        else
-        //        {
-        //            result = collegeRepo.AddCollege(model);
-        //        }
-        //        if (result.IsSuccess)
-        //        {
-        //            #region -- Save College Logo ----
-        //            {
-
-        //                if (LogoImage != null && LogoImage.ContentLength > 0)
-        //                {
-        //                    string physicalPath = QuikCampus.Utility.Common.GenerateFilePath.GetCollegeLogoPath((int)result.Value) + LogoImage.FileName;
-        //                    LogoImage.SaveAs(physicalPath);
-        //                }
-        //            }
-        //            #endregion
-
-        //            //result.IsSuccess(result.Message, this);
-        //            //return RedirectToAction("Manage");
-        //        }
-        //        else
-        //        {
-        //            //NotificationHelper.Alert(result.Message, this);
-        //            //return RedirectToAction("Manage");
-        //        }
-        //    }
-        //    else
-        //    {
-        //    //    NotificationHelper.Success("Please enter required field", this);
-        //    //    return RedirectToAction("Manage");
-        //    }
-        //    return Ok(result);   
-        //}
 
         [HttpGet]
         [Route("activeAndInactive")]

@@ -1,18 +1,7 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using QuickCampus_Core.Common;
+﻿using Microsoft.AspNetCore.Mvc;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
-using QuickCampus_DAL.Context;
-using System.CodeDom.Compiler;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using Microsoft.AspNetCore.Authorization;
-using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace QuickCampusAPI.Controllers
 {

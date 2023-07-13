@@ -1,11 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace QuickCampus_Core.Services
 {

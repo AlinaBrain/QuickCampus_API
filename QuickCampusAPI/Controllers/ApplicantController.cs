@@ -1,19 +1,8 @@
-﻿using DocumentFormat.OpenXml.InkML;
-using DocumentFormat.OpenXml.Office2010.Excel;
-using DocumentFormat.OpenXml.Spreadsheet;
-using DocumentFormat.OpenXml.Wordprocessing;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
-using QuickCampus_Core.Services;
 using QuickCampus_Core.ViewModel;
-using QuickCampus_DAL.Context;
-using System.Net.Mail;
-using static Azure.Core.HttpHeader;
-using static QuickCampus_Core.ViewModel.ApplicantViewModel;
 
 namespace QuickCampusAPI.Controllers
 {
@@ -141,63 +130,7 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-        //[HttpPost]
-        //public JsonResult DeleteMultiple(int[] Ids)
-        //{
-        //    foreach (int Id in Ids)
-        //    {
-        //        ApplicantGridViewModel applicant = _applicantRepo.GetApplicantByID(Id);
-        //        applicant.StatusID = QuickCampus_Core.Common.(int)common.ApplicantStatus.Deleted;
-        //        var result = _applicantRepo.UpdateApplicant(applicant);
-        //    }
-        //    var model = new ApplicantViewModel()
-        //    {
-        //        ApplicantList = _applicantRepo.GetAllApplicant().Select(x => new ApplicantGridViewModel()
-        //        {
-        //            ApplicantID = x.ApplicantID,
-        //            ApplicantToken = x.ApplicantToken,
-        //            CollegeId = x.CollegeId,
-        //            Colleges = x.Colleges,
-        //            Comment = x.Comment,
-        //            EmailAddress = x.EmailAddress,
-        //            FirstName = x.FirstName,
-        //            HigestQualification = x.HigestQualification,
-        //            HigestQualificationPercentage = x.HigestQualificationPercentage,
-        //            IntermediatePercentage = x.IntermediatePercentage,
-        //            LastName = x.LastName,
-        //            MatricPercentage = x.MatricPercentage,
-        //            PhoneNumber = x.PhoneNumber,
-        //            RegisteredDate = x.RegisteredDate,
-        //            Skills = x.Skills,
-        //            StatusID = x.StatusID,
-        //            College = ApplicantManager.GetCollegeByApplicantId(x.ApplicantID)
-        //        }),
-        //        filter = new ApplicantFilter() { },
-        //    };
-        //    return Ok(new { data = RenderRazorViewToString("_ApplicantGrid", model) });
-        //}
-
-
-        //[HttpPost]
-        //[Route("AddApplicant")]
-        //public async Task<IActionResult> AddApplicant([FromBody] ApplicantViewModel applicantViewModel)
-        //{
-        //    IGeneralResult<ApplicantViewModel> result = new GeneralResult<ApplicantViewModel>();
-        //    var applicant = await _applicantRepo.Add(applicantViewModel.ToApplicantDbModel());
-        //    if (applicant.ApplicantId != 0)
-        //    {
-        //        result.IsSuccess = true;
-        //        result.Message = "Category Added Successfully";
-        //    }
-        //    else
-        //    {
-        //        result.Message = "something Went Wrong";
-        //    }
-        //    return Ok(result);
-        //}
-
-
-        
+  
     }
 }
 

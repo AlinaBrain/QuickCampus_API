@@ -1,13 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using QuickCampus_Core.ViewModel;
+﻿using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 using static QuickCampus_Core.ViewModel.ApplicantViewModel;
 
 namespace QuickCampus_Core.Interfaces
@@ -16,7 +8,6 @@ namespace QuickCampus_Core.Interfaces
     {
         Task AddAsync(ApplicantViewModel applicantViewModel);
 
-        //List<Applicant> GetApplicant(int StatusId);
         Task<IEnumerable<Applicant>> GetApplicant();
         
        

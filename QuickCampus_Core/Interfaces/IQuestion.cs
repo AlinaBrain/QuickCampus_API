@@ -1,12 +1,4 @@
-﻿using QuickCampus_Core.Common;
-using QuickCampus_Core.Services;
-using QuickCampus_Core.ViewModel;
-using QuickCampus_DAL.Context;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using QuickCampus_Core.ViewModel;
 
 namespace QuickCampus_Core.Interfaces
 {

@@ -1,13 +1,8 @@
-﻿using DocumentFormat.OpenXml.Office2010.Excel;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
-using QuickCampus_Core.Services;
 using QuickCampus_Core.ViewModel;
-using QuickCampus_DAL.Context;
 
 namespace QuickCampusAPI.Controllers
 {
@@ -141,7 +136,6 @@ namespace QuickCampusAPI.Controllers
                 if (res != null)
                 {
                     var clientId = JwtHelper.GetUserIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-                    //var clientId = vm.ClientId.HasValue ? await clientRepo.GetById((int)vm.ClientId) : null;
 
                     if (clientId != null || clientId == "")
                     {
@@ -158,8 +152,6 @@ namespace QuickCampusAPI.Controllers
                         res.Name = vm.Name;
                         res.Email = vm.Email;
                         res.Mobile = vm.Mobile;
-                       // res.IsActive = true;
-                       // res.IsDelete = false;
                         await userRepo.Update(res);
                         result.Message = "User data is updated successfully";
                         result.IsSuccess = true;

@@ -1,17 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
-using QuickCampus_Core.Common;
+﻿using Microsoft.EntityFrameworkCore;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace QuickCampus_Core.Services
 {

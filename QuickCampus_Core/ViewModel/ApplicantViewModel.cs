@@ -1,12 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using QuickCampus_DAL.Context;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Net.Mail;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace QuickCampus_Core.ViewModel
 {
