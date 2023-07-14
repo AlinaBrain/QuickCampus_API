@@ -1,8 +1,7 @@
-using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using QuickCampus_Core.Interfaces;
@@ -11,7 +10,6 @@ using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
 using System.Reflection;
 using System.Text;
-using static QuickCampus_Core.ViewModel.ClientVM;
 using static QuickCampus_Core.ViewModel.UserVm;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -88,22 +86,13 @@ builder.Services.AddScoped<IClientRepo, ClientRepo>();
 
 
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-//}
+app.UseSwagger();
+app.UseSwaggerUI();
 app.UseAuthentication();
-
 app.UseCors("MyAllowSpecificOrigins");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();

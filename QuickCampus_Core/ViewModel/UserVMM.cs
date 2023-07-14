@@ -62,7 +62,6 @@ namespace QuickCampus_Core.ViewModel
                 ClientId = ClientId,
                 UserName = UserName,
                 Name = Name,
-              //  Password = Password,
                 Email = Email,
                 Mobile = Mobile,
                 IsDelete = false,
@@ -94,22 +93,13 @@ namespace QuickCampus_Core.ViewModel
                   .NotNull().WithMessage("Phone could not be null")
                   .NotEmpty().WithMessage("Phone could not be empty");
 
-                //           .MinimumLength(10).WithMessage("PhoneNumber must not be less than 10 characters.")
-                //.MaximumLength(20).WithMessage("PhoneNumber must not exceed 50 characters.")
-                //.Matches(new Regex(@"((\(\d{3}\) ?)|(\d{3}-))?\d{3}-\d{4}")).WithMessage("PhoneNumber not valid");
-
                 RuleFor(x => x.Email)
                   .Cascade(CascadeMode.StopOnFirstFailure).EmailAddress()
                   .NotNull().WithMessage("Email could not be null")
                   .NotEmpty().WithMessage("Email could not be empty");
 
 
-            }
-            //private async Task<bool> IsUniquename(string Name, CancellationToken token)
-            //{
-            //    bool isExistingname = await ClientRepo.UsernameExistsAsync(Name);
-            //    return isExistingname;
-            //}
+            }      
         }
     }
 }

@@ -64,51 +64,6 @@ namespace QuickCampus_Core.ViewModel
         public DateTime? RegisteredDate { get; private set; }
         public string? CollegeName { get; set; }
 
-        //public Applicant ToApplicantDbModel()
-        //{
-        //    return new Applicant
-        //    {
-               
-        //        ApplicantToken = ApplicantToken,
-        //        FirstName = FirstName,
-        //        LastName = LastName,
-        //        EmailAddress = EmailAddress,
-        //        PhoneNumber = PhoneNumber,
-        //        HigestQualification = HigestQualification,
-        //        HigestQualificationPercentage = HigestQualificationPercentage,
-        //        MatricPercentage = MatricPercentage,
-        //        IntermediatePercentage = IntermediatePercentage,
-        //        Skills = Skills,
-        //        StatusID = StatusID,
-        //        Comment = Comment,
-        //        CollegeName = CollegeName
-        //        //CreatedDate = RegisteredDate,
-        //    };
-        //}
-        //public Applicant ToUpdateDbModel()
-        //{
-        //    return new Applicant
-        //    {
-        //        ApplicantId = ApplicantID,
-        //        ApplicantToken = ApplicantToken,
-        //        FirstName = FirstName,
-        //        LastName = LastName,
-        //        EmailAddress = EmailAddress,
-        //        PhoneNumber = PhoneNumber,
-        //        HigestQualification = HigestQualification,
-        //        HigestQualificationPercentage = HigestQualificationPercentage,
-        //        MatricPercentage = MatricPercentage,
-        //        IntermediatePercentage = IntermediatePercentage,
-        //        Skills = Skills,
-        //        StatusID = StatusID,
-        //        Comment = Comment,
-        //        RegisteredDate = RegisteredDate,
-        //        CollegeName = CollegeName
-        //    };
-        //}
-
-
-
         public class ApplicantGridViewModel
         {
             public int ApplicantID { get; set; }

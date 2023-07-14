@@ -1,12 +1,5 @@
-﻿using DocumentFormat.OpenXml.InkML;
-using Microsoft.AspNetCore.Http;
-using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Security.Claims;
 using System.Text;
 
 public class JwtHelper
@@ -62,8 +55,6 @@ public class JwtHelper
 
         try
         {
-
-
             var claimsPrincipal = tokenHandler.ValidateToken(jwt, tokenValidationParameters, out var validatedToken);
             var jwtToken = (JwtSecurityToken)validatedToken;
 

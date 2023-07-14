@@ -21,8 +21,7 @@ namespace QuickCampus_Core.ViewModel
             return new ApplicationUser
             {
                 UserName = UserName,
-                Password = Password,
-                
+                Password = Password,    
             };
         }
     }

@@ -1,15 +1,6 @@
-﻿using FluentValidation;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using QuickCampus_Core.Services;
+﻿using Microsoft.AspNetCore.Mvc;
 using QuickCampus_DAL.Context;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace QuickCampus_Core.ViewModel
 {
@@ -22,17 +13,11 @@ namespace QuickCampus_Core.ViewModel
             {
                 Id = items.Id,
                 Name = items.Name,
-                //CraetedBy = items.CraetedBy,
-                //CreatedDate = items.CreatedDate,
-                // ModifiedBy = items.ModifiedBy,
-                //ModofiedDate = items.ModofiedDate,
                 Address = items.Address,
                 Phone= items.Phone,
                 Email = items.Email,
                 SubscriptionPlan = items.SubscriptionPlan,
                 Geolocation = items.Geolocation,
-                //IsActive = items.IsActive,
-                //IsDeleted = items.IsDeleted,
             };
         }
         public int Id { get; set; }
@@ -77,11 +62,7 @@ namespace QuickCampus_Core.ViewModel
                 Email = Email,
                 Geolocation = Geolocation,
                 SubscriptionPlan = SubscriptionPlan,
-                //ModifiedBy = ModifiedBy,
-                //ModofiedDate = ModofiedDate,
-                //CraetedBy = CraetedBy,
                 Address = Address,
-               // CreatedDate = CreatedDate,
                 IsActive = true,
                 IsDeleted = false,
 
