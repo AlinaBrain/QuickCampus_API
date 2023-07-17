@@ -3,13 +3,11 @@ using System.Collections.Generic;
 
 namespace QuickCampus_DAL.Context;
 
-public partial class QuestionType
+public partial class Groupdl
 {
-    public int QuestionTypeId { get; set; }
+    public int GroupId { get; set; }
 
-    public string? QuestionType1 { get; set; }
-
-    public int? Marks { get; set; }
+    public string? GroupName { get; set; }
 
     public int? ClentId { get; set; }
 

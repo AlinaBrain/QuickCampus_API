@@ -35,6 +35,10 @@ namespace QuickCampusAPI.Controllers
             {
                 result.Message = "Email Already Registered!";
             }
+            //else if (_clientRepo.Any(x => x.IsActive == true && x.Name == vm.Name.Trim()))
+            //{
+            //    result.Message = "UserName Already Exist!";
+            //}
             else
             {
                 if (ModelState.IsValid)
@@ -46,20 +50,25 @@ namespace QuickCampusAPI.Controllers
                         Email = vm.Email,
                         Phone = vm.Phone,
                         Address = vm.Address,
-                        Geolocation = vm.Geolocation,
+                        CreatedDate = vm.CreatedDate,
+                        ModofiedDate = vm.ModofiedDate,
+                        IsDeleted = vm.IsDeleted,   
                         SubscriptionPlan = vm.SubscriptionPlan,
                         CraetedBy = Convert.ToInt32(userId),
                         ModifiedBy = Convert.ToInt32(userId),
-                        CreatedDate = DateTime.Now,
-                        ModofiedDate=DateTime.Now
+                        Latitude=vm.Latitude,
+                        Longitude=vm.Longitude,
+                        IsActive=vm.IsActive,
+                        
                     };
                     try
                     {
+                        result.Data = vmm;
                         var TblClien = vmm.ToClientDbModel();
                         await _clientRepo.Add(TblClien);
                         result.Message = "Client added successfully";
                         result.IsSuccess = true;
-                        result.Data = vmm;
+                       
                     }
                     catch(Exception ex)
                     {
@@ -101,12 +110,13 @@ namespace QuickCampusAPI.Controllers
                         Email = vm.Email,
                         Phone = vm.Phone,
                         Address = vm.Address,
-                        Geolocation = vm.Geolocation,
+                        IsDeleted = vm.IsDeleted,
+                        IsActive = vm.IsActive,
                         SubscriptionPlan = vm.SubscriptionPlan,
                         CraetedBy = Convert.ToInt32(userId),
                         ModifiedBy = Convert.ToInt32(userId),
-                        CreatedDate = DateTime.Now,
-                        ModofiedDate = DateTime.Now
+                        Longitude = vm.Longitude,
+                        Latitude=vm.Latitude
                     };
                     try
                     {
@@ -181,7 +191,7 @@ namespace QuickCampusAPI.Controllers
             }
             else
             {
-                result.Message = "Client does Not deleted";
+                result.Message = "Client does Not exist";
             }
             return Ok(result);
         }

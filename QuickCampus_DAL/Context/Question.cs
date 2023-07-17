@@ -21,9 +21,13 @@ public partial class Question
 
     public bool? IsDeleted { get; set; }
 
+    public int? ClentId { get; set; }
+
     public virtual ICollection<ApplicantTestSummary> ApplicantTestSummaries { get; set; } = new List<ApplicantTestSummary>();
 
-    public virtual Group? Group { get; set; }
+    public virtual TblClient? Clent { get; set; }
+
+    public virtual Groupdl? Group { get; set; }
 
     public virtual ICollection<QuestionOption> QuestionOptions { get; set; } = new List<QuestionOption>();
 

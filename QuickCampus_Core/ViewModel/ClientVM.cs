@@ -22,7 +22,10 @@ namespace QuickCampus_Core.ViewModel
                 Phone= items.Phone,
                 Email = items.Email,
                 SubscriptionPlan = items.SubscriptionPlan,
-                Geolocation = items.Geolocation,
+              Latitude = items.Latitude,
+              Longitude = items.Longitude,
+                IsActive = items.IsActive,
+                IsDeleted = items.IsDeleted,
             };
         }
         public int Id { get; set; }
@@ -44,24 +47,29 @@ namespace QuickCampus_Core.ViewModel
 
         public string? Email { get; set; }
 
-        public string? Geolocation { get; set; }
-
         public string? SubscriptionPlan { get; set; }
+
+        public bool? IsActive { get; set; }
+        public decimal? Longitude { get; set; }
+
+        public decimal? Latitude { get; set; }
+        public bool? IsDeleted { get; set; }
 
         public TblClient ToClientDbModel()
         {
             return new TblClient
-            {
+            {  
                 Name = Name,
                 Phone = Phone,
                 Email = Email,
-                Geolocation = Geolocation,
+               Longitude = Longitude,
+               Latitude = Latitude,
                 SubscriptionPlan = SubscriptionPlan,
                 ModifiedBy = ModifiedBy,
-                ModofiedDate = (DateTime)ModofiedDate,
+                ModofiedDate = DateTime.UtcNow,
                 CraetedBy = CraetedBy,
                 Address = Address,
-                CreatedDate = (DateTime)CreatedDate,
+                CreatedDate = DateTime.Now,
                 IsActive = true,
                 IsDeleted = false,
             };
@@ -76,12 +84,12 @@ namespace QuickCampus_Core.ViewModel
                 Phone = Phone,
                 Email = Email,
                 SubscriptionPlan = SubscriptionPlan,
-                Geolocation = Geolocation,
+                Longitude=Longitude,
+                Latitude=Latitude,
                 ModifiedBy = ModifiedBy,
-                ModofiedDate = (DateTime)ModofiedDate,
+                ModofiedDate = DateTime.UtcNow,
                 CraetedBy = CraetedBy,
                 Address = Address,
-                CreatedDate = (DateTime)CreatedDate,
                 IsActive = true,
                 IsDeleted = false,
             };
@@ -119,9 +127,7 @@ namespace QuickCampus_Core.ViewModel
                   .Cascade(CascadeMode.StopOnFirstFailure)
                   .Length(0, 20).WithMessage("SubscriptionPlan lengh could not be greater than 20");
 
-                RuleFor(x => x.Geolocation)
-                 .Cascade(CascadeMode.StopOnFirstFailure)
-                 .Length(0, 20).WithMessage("Geolocation lengh could not be greater than 20");
+                
             }
         }
 

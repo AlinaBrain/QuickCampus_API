@@ -88,7 +88,7 @@ namespace QuickCampus_Core.Services
         }
         public  async Task<List<GroupViewModelAdmin>> GetAllGroups()
         {
-            var Groups = await _context.Groups.Select(x => new GroupViewModelAdmin()
+            var Groups = await _context.Groupdls.Select(x => new GroupViewModelAdmin()
             {
                 GroupName = x.GroupName,
                 GroupId = x.GroupId

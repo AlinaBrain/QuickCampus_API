@@ -17,23 +17,33 @@ public partial class TblClient
 
     public DateTime ModofiedDate { get; set; }
 
-    public string? Address { get; set; }
-
-    public string? Phone { get; set; }
-
-    public string? Email { get; set; }
-
-    public string? Geolocation { get; set; }
-
-    public string? SubscriptionPlan { get; set; }
-
     public bool? IsActive { get; set; }
 
     public bool? IsDeleted { get; set; }
 
+    public string? Address { get; set; }
+
+    public string? Email { get; set; }
+
+    public string? Phone { get; set; }
+
+    public string? SubscriptionPlan { get; set; }
+
+    public decimal? Longitude { get; set; }
+
+    public decimal? Latitude { get; set; }
+
     public virtual TblUser? CraetedByNavigation { get; set; }
 
+    public virtual ICollection<Groupdl> Groupdls { get; set; } = new List<Groupdl>();
+
     public virtual TblUser? ModifiedByNavigation { get; set; }
+
+    public virtual ICollection<QuestionType> QuestionTypes { get; set; } = new List<QuestionType>();
+
+    public virtual ICollection<Question> Questions { get; set; } = new List<Question>();
+
+    public virtual ICollection<Section> Sections { get; set; } = new List<Section>();
 
     public virtual ICollection<TblRole> TblRoles { get; set; } = new List<TblRole>();
 

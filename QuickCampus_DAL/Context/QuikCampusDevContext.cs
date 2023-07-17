@@ -41,7 +41,7 @@ public partial class QuikCampusDevContext : DbContext
 
     public virtual DbSet<Error> Errors { get; set; }
 
-    public virtual DbSet<Group> Groups { get; set; }
+    public virtual DbSet<Groupdl> Groupdls { get; set; }
 
     public virtual DbSet<Question> Questions { get; set; }
 
@@ -275,17 +275,27 @@ public partial class QuikCampusDevContext : DbContext
                 .HasColumnName("Error");
         });
 
-        modelBuilder.Entity<Group>(entity =>
+        modelBuilder.Entity<Groupdl>(entity =>
         {
-            entity.ToTable("Group");
+            entity.HasKey(e => e.GroupId).HasName("PK_Group");
+
+            entity.ToTable("Groupdl");
 
             entity.Property(e => e.GroupId).ValueGeneratedNever();
             entity.Property(e => e.GroupName).HasMaxLength(50);
+
+            entity.HasOne(d => d.Clent).WithMany(p => p.Groupdls)
+                .HasForeignKey(d => d.ClentId)
+                .HasConstraintName("FK__Groupdl__ClentId__625A9A57");
         });
 
         modelBuilder.Entity<Question>(entity =>
         {
             entity.ToTable("Question");
+
+            entity.HasOne(d => d.Clent).WithMany(p => p.Questions)
+                .HasForeignKey(d => d.ClentId)
+                .HasConstraintName("FK__Question__ClentI__4D5F7D71");
 
             entity.HasOne(d => d.Group).WithMany(p => p.Questions)
                 .HasForeignKey(d => d.GroupId)
@@ -321,6 +331,10 @@ public partial class QuikCampusDevContext : DbContext
             entity.Property(e => e.QuestionType1)
                 .HasMaxLength(50)
                 .HasColumnName("QuestionType");
+
+            entity.HasOne(d => d.Clent).WithMany(p => p.QuestionTypes)
+                .HasForeignKey(d => d.ClentId)
+                .HasConstraintName("FK__QuestionT__Clent__607251E5");
         });
 
         modelBuilder.Entity<Section>(entity =>
@@ -333,6 +347,10 @@ public partial class QuikCampusDevContext : DbContext
             entity.Property(e => e.Section1)
                 .HasMaxLength(50)
                 .HasColumnName("Section");
+
+            entity.HasOne(d => d.Clent).WithMany(p => p.Sections)
+                .HasForeignKey(d => d.ClentId)
+                .HasConstraintName("FK__Section__ClentId__6166761E");
         });
 
         modelBuilder.Entity<State>(entity =>
@@ -363,20 +381,11 @@ public partial class QuikCampusDevContext : DbContext
 
             entity.ToTable("tbl_Client");
 
-            entity.Property(e => e.Address).HasMaxLength(1);
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
-            entity.Property(e => e.Email)
-                .HasMaxLength(1)
-                .HasColumnName("email");
-            entity.Property(e => e.Geolocation)
-                .HasMaxLength(1)
-                .HasColumnName("geolocation");
+            entity.Property(e => e.Latitude).HasColumnType("decimal(18, 0)");
+            entity.Property(e => e.Longitude).HasColumnType("decimal(18, 0)");
             entity.Property(e => e.ModofiedDate).HasColumnType("datetime");
             entity.Property(e => e.Name).HasMaxLength(100);
-            entity.Property(e => e.Phone)
-                .HasMaxLength(1)
-                .HasColumnName("phone");
-            entity.Property(e => e.SubscriptionPlan).HasMaxLength(1);
 
             entity.HasOne(d => d.CraetedByNavigation).WithMany(p => p.TblClientCraetedByNavigations)
                 .HasForeignKey(d => d.CraetedBy)
