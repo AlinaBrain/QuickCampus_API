@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using QuickCampus_DAL.Context;
 using System.ComponentModel.DataAnnotations;
 
@@ -13,10 +14,10 @@ namespace QuickCampus_Core.ViewModel
             {
                 Id = items.Id,
                 Name = items.Name,
-               //CraetedBy = items.CraetedBy?? 0,
-              // CreatedDate = items.CreatedDate,
-              // ModifiedBy = items.ModifiedBy,
-               //ModofiedDate = items.ModofiedDate,
+                CraetedBy = items.CraetedBy ?? 0,
+                CreatedDate = items.CreatedDate,
+                ModifiedBy = items.ModifiedBy,
+                ModofiedDate = items.ModofiedDate,
                 Address = items.Address,
                 Phone= items.Phone,
                 Email = items.Email,
@@ -25,20 +26,17 @@ namespace QuickCampus_Core.ViewModel
             };
         }
         public int Id { get; set; }
-        //[Required(ErrorMessage = "Name is required")]
-        //[RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "Only characters allowed.")]
+
         [Remote("IsAlreadyExist", "Client", HttpMethod = "POST", ErrorMessage = "Name already exists in database.")]
         public string? Name { get; set; }
 
        public int? CraetedBy { get; set; }
 
-        //[DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
-       public DateTime CreatedDate { get; set; }
+       public DateTime? CreatedDate { get; set; }
 
        public int? ModifiedBy { get; set; }
 
-      //  [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
-        public DateTime ModofiedDate { get; set; }
+        public DateTime? ModofiedDate { get; set; }
         public string? Address { get; set; }
         [Required]
         [RegularExpression(@"^[1-9][0-9]{9}$", ErrorMessage = "Please enter a valid 10-digit mobile number that does not start with 0.")]
@@ -50,13 +48,6 @@ namespace QuickCampus_Core.ViewModel
 
         public string? SubscriptionPlan { get; set; }
 
-        //public bool? IsActive { get; set; }
-
-        //public bool? IsDeleted { get; set; }
-
-
-        //ublic IEnumerable<SelectListItem> rec { get; set; }
-
         public TblClient ToClientDbModel()
         {
             return new TblClient
@@ -67,33 +58,34 @@ namespace QuickCampus_Core.ViewModel
                 Geolocation = Geolocation,
                 SubscriptionPlan = SubscriptionPlan,
                 ModifiedBy = ModifiedBy,
-                ModofiedDate = ModofiedDate,
+                ModofiedDate = (DateTime)(Id >0? ModofiedDate : null),
                 CraetedBy = CraetedBy,
                 Address = Address,
-                CreatedDate = CreatedDate,
+                CreatedDate = (DateTime)(Id < 0 ? CreatedDate : null),
                 IsActive = true,
                 IsDeleted = false,
             };
         }
 
-        //public TblClient ToUpdateDbModel()
-        //{
-        //    return new TblClient
-        //    {
-        //        Id = Id,
-        //        Name = Name,
-        //        Phone= Phone,
-        //        Email = Email,
-        //        SubscriptionPlan = SubscriptionPlan,
-        //        Geolocation = Geolocation,
-        //        ModifiedBy = ModifiedBy,
-        //        ModofiedDate = ModofiedDate,
-        //        CraetedBy = CraetedBy,
-        //        CreatedDate = CreatedDate,
-        //        IsActive = true,
-        //        IsDeleted = false,
-        //    };
-        //}
+        public TblClient ToUpdateDbModel()
+        {
+            return new TblClient
+            {
+                Id = Id,
+                Name = Name,
+                Phone = Phone,
+                Email = Email,
+                SubscriptionPlan = SubscriptionPlan,
+                Geolocation = Geolocation,
+                ModifiedBy = ModifiedBy,
+                ModofiedDate = (DateTime)ModofiedDate,
+                CraetedBy = CraetedBy,
+                Address = Address,
+                CreatedDate = (DateTime)CreatedDate,
+                IsActive = true,
+                IsDeleted = false,
+            };
+        }
 
         public class ClientValidator : AbstractValidator<ClientVM>
         {
@@ -117,10 +109,6 @@ namespace QuickCampus_Core.ViewModel
                   .NotNull().WithMessage("Phone could not be null")
                   .NotEmpty().WithMessage("Phone could not be empty");
 
-                //           .MinimumLength(10).WithMessage("PhoneNumber must not be less than 10 characters.")
-                //.MaximumLength(20).WithMessage("PhoneNumber must not exceed 50 characters.")
-                //.Matches(new Regex(@"((\(\d{3}\) ?)|(\d{3}-))?\d{3}-\d{4}")).WithMessage("PhoneNumber not valid");
-
                 RuleFor(x => x.Email)
                   .Cascade(CascadeMode.StopOnFirstFailure).EmailAddress()
                   .NotNull().WithMessage("Email could not be null")
@@ -129,21 +117,12 @@ namespace QuickCampus_Core.ViewModel
 
                 RuleFor(x => x.SubscriptionPlan)
                   .Cascade(CascadeMode.StopOnFirstFailure)
-                  .NotNull().WithMessage("SubscriptionPlan could not be null")
-                  .NotEmpty().WithMessage("SubscriptionPlan could not be empty")
                   .Length(0, 20).WithMessage("SubscriptionPlan lengh could not be greater than 20");
 
                 RuleFor(x => x.Geolocation)
                  .Cascade(CascadeMode.StopOnFirstFailure)
-                 .NotNull().WithMessage("Geolocation could not be null")
-                 .NotEmpty().WithMessage("Geolocation could not be empty")
                  .Length(0, 20).WithMessage("Geolocation lengh could not be greater than 20");
             }
-            //private async Task<bool> IsUniquename(string Name, CancellationToken token)
-            //{
-            //    bool isExistingname = await ClientRepo.UsernameExistsAsync(Name);
-            //    return isExistingname;
-            //}
         }
 
 

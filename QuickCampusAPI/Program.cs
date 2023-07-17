@@ -10,6 +10,7 @@ using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
 using System.Reflection;
 using System.Text;
+using static QuickCampus_Core.ViewModel.ClientVM;
 using static QuickCampus_Core.ViewModel.UserVm;
 
 var builder = WebApplication.CreateBuilder(args);
