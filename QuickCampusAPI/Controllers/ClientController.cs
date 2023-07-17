@@ -57,29 +57,25 @@ namespace QuickCampusAPI.Controllers
                     {
                         var TblClien = vmm.ToClientDbModel();
                         await _clientRepo.Add(TblClien);
-                       // await _clientRepo.Save();
+                        result.Message = "Client added successfully";
+                        result.IsSuccess = true;
+                        result.Data = vmm;
                     }
                     catch(Exception ex)
                     {
-
+                        result.Message = ex.Message;
                     }
-                    result.Message = "Client added successfully";
-                    result.IsSuccess = true;
-                    result.Data = vmm;
+                  
                     return Ok(result);
                 }
                     else
                     {
                         result.Message = "something Went Wrong";
-
-
-
                     }
 
             }
             return Ok(result);
         }
-
 
         [Authorize(Roles = "EditClient")]
         [HttpPost]
@@ -135,26 +131,60 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
-        //[Authorize(Roles = "GetAllClient")]
-        //[HttpGet]
-        //[Route("getAllClient")]
-        //public async Task<IActionResult> roleList()
-        //{
-        //    var _jwtSecretKey = config["Jwt:Key"];
-        //    var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-        //    List<RoleVm> roleVm = new List<RoleVm>();
-        //    var rolelist = (await roleRepo.GetAll()).ToList();
+        [Authorize(Roles = "GetAllClient")]
+        [HttpGet]
+        [Route("GetAllClient")]
+        public async Task<IActionResult> GetAllClient()
+        {
+            var _jwtSecretKey = config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            IGeneralResult<List<ClientVM>> result = new GeneralResult<List<ClientVM>>();
+            try
+            {
+                var categoryList = (await _clientRepo.GetAll()).Where(x => x.IsDeleted == false || x.IsDeleted == null).ToList();
+                var res = categoryList.Select(x => ((ClientVM)x)).ToList();
+                if (res != null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "ClientList";
+                    result.Data = res;
+                }
+                else
+                {
+                    result.Message = "Client List Not Found";
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+            return Ok(result);
+        }
 
-        //    if (string.IsNullOrEmpty(clientId))
-        //    {
-        //        roleVm = rolelist.Select(x => ((RoleVm)x)).Where(w => w.ClientId == null).ToList();
-        //    }
-        //    else
-        //    {
-        //        roleVm = rolelist.Select(x => ((RoleVm)x)).Where(w => w.ClientId == Convert.ToInt32(clientId)).ToList();
-        //    }
-        //    return Ok(roleVm);
-        //}
+        [Authorize(Roles = "DeleteClient")]
+        [HttpDelete]
+        [Route("DeleteClient")]
+        public async Task<IActionResult> DeleteClient(int Id)
+        {
+            var _jwtSecretKey = config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            IGeneralResult<ClientVM> result = new GeneralResult<ClientVM>();
+            var res = await _clientRepo.GetById(Id);
+            if (res != null)
+            {
+              
+                res.IsActive = false;
+                res.IsDeleted = true;
+                await _clientRepo.Update(res);
+                result.IsSuccess = true;
+                result.Message = "Client Deleted Succesfully";
+            }
+            else
+            {
+                result.Message = "Client does Not deleted";
+            }
+            return Ok(result);
+        }
 
     }
 }

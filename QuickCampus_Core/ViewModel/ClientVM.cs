@@ -58,10 +58,10 @@ namespace QuickCampus_Core.ViewModel
                 Geolocation = Geolocation,
                 SubscriptionPlan = SubscriptionPlan,
                 ModifiedBy = ModifiedBy,
-                ModofiedDate = (DateTime)(Id >0? ModofiedDate : null),
+                ModofiedDate = (DateTime)ModofiedDate,
                 CraetedBy = CraetedBy,
                 Address = Address,
-                CreatedDate = (DateTime)(Id < 0 ? CreatedDate : null),
+                CreatedDate = (DateTime)CreatedDate,
                 IsActive = true,
                 IsDeleted = false,
             };
