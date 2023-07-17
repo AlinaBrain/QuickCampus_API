@@ -4,5 +4,6 @@ namespace QuickCampus_Core.Interfaces
 {
     public interface IUserRepo : IGenericRepository<TblUser>
     {
+        Task Add(TblClient tblClient);
     }
 }

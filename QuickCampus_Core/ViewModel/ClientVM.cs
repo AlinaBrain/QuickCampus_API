@@ -13,6 +13,10 @@ namespace QuickCampus_Core.ViewModel
             {
                 Id = items.Id,
                 Name = items.Name,
+               //CraetedBy = items.CraetedBy?? 0,
+              // CreatedDate = items.CreatedDate,
+              // ModifiedBy = items.ModifiedBy,
+               //ModofiedDate = items.ModofiedDate,
                 Address = items.Address,
                 Phone= items.Phone,
                 Email = items.Email,
@@ -26,15 +30,15 @@ namespace QuickCampus_Core.ViewModel
         [Remote("IsAlreadyExist", "Client", HttpMethod = "POST", ErrorMessage = "Name already exists in database.")]
         public string? Name { get; set; }
 
-       // public int? CraetedBy { get; set; }
+       public int? CraetedBy { get; set; }
 
         //[DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
-       // public DateTime CreatedDate { get; set; }
+       public DateTime CreatedDate { get; set; }
 
-      //  public int? ModifiedBy { get; set; }
+       public int? ModifiedBy { get; set; }
 
       //  [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
-       // public DateTime ModofiedDate { get; set; }
+        public DateTime ModofiedDate { get; set; }
         public string? Address { get; set; }
         [Required]
         [RegularExpression(@"^[1-9][0-9]{9}$", ErrorMessage = "Please enter a valid 10-digit mobile number that does not start with 0.")]
@@ -62,85 +66,85 @@ namespace QuickCampus_Core.ViewModel
                 Email = Email,
                 Geolocation = Geolocation,
                 SubscriptionPlan = SubscriptionPlan,
+                ModifiedBy = ModifiedBy,
+                ModofiedDate = ModofiedDate,
+                CraetedBy = CraetedBy,
                 Address = Address,
+                CreatedDate = CreatedDate,
                 IsActive = true,
                 IsDeleted = false,
-
-
-
-               
             };
         }
 
-        public TblClient ToUpdateDbModel()
+        //public TblClient ToUpdateDbModel()
+        //{
+        //    return new TblClient
+        //    {
+        //        Id = Id,
+        //        Name = Name,
+        //        Phone= Phone,
+        //        Email = Email,
+        //        SubscriptionPlan = SubscriptionPlan,
+        //        Geolocation = Geolocation,
+        //        ModifiedBy = ModifiedBy,
+        //        ModofiedDate = ModofiedDate,
+        //        CraetedBy = CraetedBy,
+        //        CreatedDate = CreatedDate,
+        //        IsActive = true,
+        //        IsDeleted = false,
+        //    };
+        //}
+
+        public class ClientValidator : AbstractValidator<ClientVM>
         {
-            return new TblClient
+            public ClientValidator()
             {
-                Id = Id,
-                Name = Name,
-                Phone= Phone,
-                Email = Email,
-                SubscriptionPlan = SubscriptionPlan,
-                Geolocation = Geolocation,
-               // ModifiedBy = ModifiedBy,
-               //ModofiedDate = ModofiedDate,
-               //CraetedBy = CraetedBy,
-               // CreatedDate = CreatedDate,
-                IsActive = true,
-                IsDeleted = false,
-            };
+                RuleFor(x => x.Name)
+                     .Cascade(CascadeMode.StopOnFirstFailure)
+                  .NotNull().WithMessage("Name could not be null")
+
+                  .NotEmpty().WithMessage("Name could not be empty")
+            .Matches(@"^[A-Za-z\s]*$").WithMessage("'{PropertyName}' should only contain letters.")
+            .Length(3, 30);
+                RuleFor(x => x.Address)
+                  .Cascade(CascadeMode.StopOnFirstFailure)
+                  .NotNull().WithMessage("Address could not be null")
+                  .NotEmpty().WithMessage("Address could not be empty")
+                  .Length(0, 100).WithMessage("Address lengh could not be greater than 100");
+
+                RuleFor(x => x.Phone)
+                  .Cascade(CascadeMode.StopOnFirstFailure)
+                  .NotNull().WithMessage("Phone could not be null")
+                  .NotEmpty().WithMessage("Phone could not be empty");
+
+                //           .MinimumLength(10).WithMessage("PhoneNumber must not be less than 10 characters.")
+                //.MaximumLength(20).WithMessage("PhoneNumber must not exceed 50 characters.")
+                //.Matches(new Regex(@"((\(\d{3}\) ?)|(\d{3}-))?\d{3}-\d{4}")).WithMessage("PhoneNumber not valid");
+
+                RuleFor(x => x.Email)
+                  .Cascade(CascadeMode.StopOnFirstFailure).EmailAddress()
+                  .NotNull().WithMessage("Email could not be null")
+                  .NotEmpty().WithMessage("Email could not be empty");
+
+
+                RuleFor(x => x.SubscriptionPlan)
+                  .Cascade(CascadeMode.StopOnFirstFailure)
+                  .NotNull().WithMessage("SubscriptionPlan could not be null")
+                  .NotEmpty().WithMessage("SubscriptionPlan could not be empty")
+                  .Length(0, 20).WithMessage("SubscriptionPlan lengh could not be greater than 20");
+
+                RuleFor(x => x.Geolocation)
+                 .Cascade(CascadeMode.StopOnFirstFailure)
+                 .NotNull().WithMessage("Geolocation could not be null")
+                 .NotEmpty().WithMessage("Geolocation could not be empty")
+                 .Length(0, 20).WithMessage("Geolocation lengh could not be greater than 20");
+            }
+            //private async Task<bool> IsUniquename(string Name, CancellationToken token)
+            //{
+            //    bool isExistingname = await ClientRepo.UsernameExistsAsync(Name);
+            //    return isExistingname;
+            //}
         }
-
-       // public class ClientValidator : AbstractValidator<ClientVM>
-       // {
-       //     public ClientValidator()
-       //     {
-       //         RuleFor(x => x.Name)
-       //            .Cascade(CascadeMode.StopOnFirstFailure)
-       //            .NotNull().WithMessage("Name could not be null")
-                   
-       //            .NotEmpty().WithMessage("Name could not be empty")
-       //            .Length(0, 20).WithMessage("Name lengh could not be greater than 20");
-
-       //         RuleFor(x => x.Address)
-       //           .Cascade(CascadeMode.StopOnFirstFailure)
-       //           .NotNull().WithMessage("Address could not be null")
-       //           .NotEmpty().WithMessage("Address could not be empty")
-       //           .Length(0, 100).WithMessage("Address lengh could not be greater than 100");
-
-       //         RuleFor(x => x.Phone)
-       //           .Cascade(CascadeMode.StopOnFirstFailure)
-       //           .NotNull().WithMessage("Phone could not be null")
-       //           .NotEmpty().WithMessage("Phone could not be empty");
-                  
-       ////           .MinimumLength(10).WithMessage("PhoneNumber must not be less than 10 characters.")
-       ////.MaximumLength(20).WithMessage("PhoneNumber must not exceed 50 characters.")
-       ////.Matches(new Regex(@"((\(\d{3}\) ?)|(\d{3}-))?\d{3}-\d{4}")).WithMessage("PhoneNumber not valid");
-
-       //         RuleFor(x => x.Email)
-       //           .Cascade(CascadeMode.StopOnFirstFailure).EmailAddress()
-       //           .NotNull().WithMessage("Email could not be null")
-       //           .NotEmpty().WithMessage("Email could not be empty");
-                  
-
-       //         RuleFor(x => x.SubscriptionPlan)
-       //           .Cascade(CascadeMode.StopOnFirstFailure)
-       //           .NotNull().WithMessage("SubscriptionPlan could not be null")
-       //           .NotEmpty().WithMessage("SubscriptionPlan could not be empty")
-       //           .Length(0, 20).WithMessage("SubscriptionPlan lengh could not be greater than 20");
-
-       //         RuleFor(x => x.Geolocation)
-       //          .Cascade(CascadeMode.StopOnFirstFailure)
-       //          .NotNull().WithMessage("Geolocation could not be null")
-       //          .NotEmpty().WithMessage("Geolocation could not be empty")
-       //          .Length(0, 20).WithMessage("Geolocation lengh could not be greater than 20");
-       //     }
-       //     //private async Task<bool> IsUniquename(string Name, CancellationToken token)
-       //     //{
-       //     //    bool isExistingname = await ClientRepo.UsernameExistsAsync(Name);
-       //     //    return isExistingname;
-       //     //}
-       // }
 
 
     }
