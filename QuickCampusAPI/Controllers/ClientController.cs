@@ -29,7 +29,7 @@ namespace QuickCampusAPI.Controllers
             this.userRepo = userRepo;
         }
 
-       // [Authorize(Roles = "AddClient")]
+        [Authorize(Roles = "AddClient")]
         [HttpPost]
         [Route("AddClient")]
         public async Task<IActionResult> AddClient([FromBody] ClientVM vm)

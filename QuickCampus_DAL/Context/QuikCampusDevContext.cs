@@ -71,7 +71,7 @@ public partial class QuikCampusDevContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=103.133.215.42,1434;Database=QuikCampusDev;TrustServerCertificate=true;user id=bt;password=bT@nEw#1234%^;Integrated Security=false;");
+        => optionsBuilder.UseSqlServer("Server=103.133.215.42,1434;Database=QuikCampusDev;TrustServerCertificate=true;user id=bt;password=Tech#90@428;Integrated Security=false;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
