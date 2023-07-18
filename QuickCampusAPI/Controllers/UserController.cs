@@ -59,7 +59,7 @@ namespace QuickCampusAPI.Controllers
                                 IsDelete = false
                             };
 
-                            await userRepo.Add(userVm.toUserDBModel());
+                            await userRepo.Add(userVm.toUserDbModel());
                             result.IsSuccess = true;
                             result.Message = "User added successfully.";
                             result.Data = userVm;
@@ -84,7 +84,7 @@ namespace QuickCampusAPI.Controllers
                             IsDelete = false
                         };
 
-                        await userRepo.Add(userVm.toUserDBModel());
+                        await userRepo.Add(userVm.toUserDbModel());
                         result.IsSuccess = true;
                         result.Message = "User added successfully.";
                         result.Data = userVm;
