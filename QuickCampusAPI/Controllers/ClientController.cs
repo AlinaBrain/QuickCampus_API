@@ -57,12 +57,28 @@ namespace QuickCampusAPI.Controllers
                         Latitude = vm.Latitude,
                         Longitude = vm.Longitude,
                         UserName=vm.UserName,
-                        Password=vm.Password,
-                        
+                        Password=vm.Password,         
                 };
+
+                    
                     try
                     {
-                        result.Data = (ClientResponseVm)await _clientRepo.Add(clientVM.ToClientDbModel());
+                        //result.Data = (ClientResponseVm)await _clientRepo.Add(clientVM.ToClientDbModel());
+                        var clientdata= await _clientRepo.Add(clientVM.ToClientDbModel());
+
+                        UserVm userVm = new UserVm()
+                        {
+                           Name= clientdata.Name,
+                            Password = clientdata.Password,
+                            Email = clientdata.Email,
+                            ClientId=clientdata.Id,
+                            Mobile=clientdata.Phone,
+                            UserName=clientdata.UserName,   
+                            
+                        };
+
+                        var userdetails = userRepo.Add(userVm.ToUserDbModel());
+                        result.Data = (ClientResponseVm)clientdata;
                         result.Message = "Client added successfully";
                         result.IsSuccess = true;
 
@@ -86,7 +102,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "EditClient")]
         [HttpPost]
         [Route("EditClient")]
-        public async Task<IActionResult> EditClient([FromBody] ClientVM vm)
+        public async Task<IActionResult> EditClient([FromBody] ClientUpdateRequest vm)
         {
             IGeneralResult<ClientResponseVm> result = new GeneralResult<ClientResponseVm>();
             var _jwtSecretKey = config["Jwt:Key"];

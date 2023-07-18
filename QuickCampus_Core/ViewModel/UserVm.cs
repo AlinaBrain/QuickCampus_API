@@ -55,7 +55,7 @@ namespace QuickCampus_Core.ViewModel
         public string? ConfirmPassword { get; set; }
 
 
-        public TblUser toUserDBModel()
+        public TblUser ToUserDbModel()
         {
             return new TblUser
             {

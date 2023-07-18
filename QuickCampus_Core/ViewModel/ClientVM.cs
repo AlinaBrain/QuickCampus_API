@@ -12,7 +12,6 @@ namespace QuickCampus_Core.ViewModel
         {
             return new ClientVM
             {
-                Id = items.Id,
                 Name = items.Name,
                 Address = items.Address,
                 Phone= items.Phone,
@@ -20,8 +19,6 @@ namespace QuickCampus_Core.ViewModel
                 SubscriptionPlan = items.SubscriptionPlan,
                 Latitude = items.Latitude,
                 Longitude = items.Longitude,
-                IsActive = items.IsActive,
-                IsDeleted = items.IsDeleted,
                 UserName = items.UserName,
                 Password = items.Password,
                 ConfirmPassword = items.Password  
