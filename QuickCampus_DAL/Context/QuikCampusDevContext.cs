@@ -382,10 +382,12 @@ public partial class QuikCampusDevContext : DbContext
             entity.ToTable("tbl_Client");
 
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
-            entity.Property(e => e.Latitude).HasColumnType("decimal(18, 0)");
-            entity.Property(e => e.Longitude).HasColumnType("decimal(18, 0)");
+            entity.Property(e => e.Latitude).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.Longitude).HasColumnType("decimal(20, 2)");
             entity.Property(e => e.ModofiedDate).HasColumnType("datetime");
             entity.Property(e => e.Name).HasMaxLength(100);
+            entity.Property(e => e.Password).HasMaxLength(100);
+            entity.Property(e => e.UserName).HasMaxLength(100);
 
             entity.HasOne(d => d.CraetedByNavigation).WithMany(p => p.TblClientCraetedByNavigations)
                 .HasForeignKey(d => d.CraetedBy)

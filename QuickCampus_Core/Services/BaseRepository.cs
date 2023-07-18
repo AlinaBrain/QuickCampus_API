@@ -72,7 +72,7 @@ namespace QuickCampus_Core.Services
             return;
         }
 
-        public async virtual Task Update(T entity)
+        public async virtual Task<T> Update(T entity)
         {
             try
             {
@@ -83,7 +83,7 @@ namespace QuickCampus_Core.Services
             {
                 string msg = ex.Message;
             }
-            return;
+            return entity;
         }
 
         public async virtual Task Save()

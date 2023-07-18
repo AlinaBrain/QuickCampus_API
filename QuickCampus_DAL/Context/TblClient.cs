@@ -11,11 +11,11 @@ public partial class TblClient
 
     public int? CraetedBy { get; set; }
 
-    public DateTime CreatedDate { get; set; }
+    public DateTime? CreatedDate { get; set; }
 
     public int? ModifiedBy { get; set; }
 
-    public DateTime ModofiedDate { get; set; }
+    public DateTime? ModofiedDate { get; set; }
 
     public bool? IsActive { get; set; }
 
@@ -32,6 +32,10 @@ public partial class TblClient
     public decimal? Longitude { get; set; }
 
     public decimal? Latitude { get; set; }
+
+    public string? UserName { get; set; }
+
+    public string? Password { get; set; }
 
     public virtual TblUser? CraetedByNavigation { get; set; }
 

@@ -14,18 +14,17 @@ namespace QuickCampus_Core.ViewModel
             {
                 Id = items.Id,
                 Name = items.Name,
-                CraetedBy = items.CraetedBy ?? 0,
-                CreatedDate = items.CreatedDate,
-                ModifiedBy = items.ModifiedBy,
-                ModofiedDate = items.ModofiedDate,
                 Address = items.Address,
                 Phone= items.Phone,
                 Email = items.Email,
                 SubscriptionPlan = items.SubscriptionPlan,
-              Latitude = items.Latitude,
-              Longitude = items.Longitude,
+                Latitude = items.Latitude,
+                Longitude = items.Longitude,
                 IsActive = items.IsActive,
                 IsDeleted = items.IsDeleted,
+                UserName = items.UserName,
+                Password = items.Password,
+                ConfirmPassword = items.Password  
             };
         }
         public int Id { get; set; }
@@ -54,7 +53,13 @@ namespace QuickCampus_Core.ViewModel
 
         public decimal? Latitude { get; set; }
         public bool? IsDeleted { get; set; }
+        public string? UserName { get; set; }
 
+        public string? Password { get; set; }
+
+        [Required]
+        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        public string? ConfirmPassword { get; set; }
         public TblClient ToClientDbModel()
         {
             return new TblClient
@@ -62,16 +67,18 @@ namespace QuickCampus_Core.ViewModel
                 Name = Name,
                 Phone = Phone,
                 Email = Email,
-               Longitude = Longitude,
-               Latitude = Latitude,
+                Longitude = Longitude,
+                Latitude = Latitude,
                 SubscriptionPlan = SubscriptionPlan,
                 ModifiedBy = ModifiedBy,
-                ModofiedDate = DateTime.UtcNow,
+                ModofiedDate = Id>0 ?DateTime.UtcNow : null,
                 CraetedBy = CraetedBy,
+                CreatedDate = DateTime.UtcNow,
                 Address = Address,
-                CreatedDate = DateTime.Now,
                 IsActive = true,
                 IsDeleted = false,
+                UserName = UserName,
+                Password = Password,
             };
         }
 
@@ -89,6 +96,7 @@ namespace QuickCampus_Core.ViewModel
                 ModifiedBy = ModifiedBy,
                 ModofiedDate = DateTime.UtcNow,
                 CraetedBy = CraetedBy,
+                CreatedDate= Id<0? DateTime.Now : null,
                 Address = Address,
                 IsActive = true,
                 IsDeleted = false,
@@ -127,7 +135,17 @@ namespace QuickCampus_Core.ViewModel
                   .Cascade(CascadeMode.StopOnFirstFailure)
                   .Length(0, 20).WithMessage("SubscriptionPlan lengh could not be greater than 20");
 
-                
+                RuleFor(x => x.UserName)
+               .Cascade(CascadeMode.StopOnFirstFailure)
+               .NotNull().WithMessage("UserName could not be null")
+               .NotEmpty().WithMessage("UserName could not be empty")
+               .Length(3, 100).WithMessage("UserName lengh could not be greater than 100");
+
+                RuleFor(x => x.Password)
+                  .Cascade(CascadeMode.StopOnFirstFailure)
+                  .NotNull().WithMessage("Password could not be null")
+                  .NotEmpty().WithMessage("Password could not be empty")
+                  .Length(4, 50).WithMessage("Password lengh could not be greater than 500");
             }
         }
 

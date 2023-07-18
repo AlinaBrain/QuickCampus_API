@@ -81,7 +81,6 @@ builder.Services.AddScoped<ICampusRepo, CampusService>();
 builder.Services.AddScoped<ICountryRepo, CountryService>();
 builder.Services.AddScoped<ICollegeRepo, CollegeRepo>();
 builder.Services.AddScoped<IUserRepo, UserRepo>();
-builder.Services.AddScoped<IClientRepo, ClientRepo>();
 builder.Services.AddScoped<IRoleRepo, RoleRepo>();
 builder.Services.AddScoped<IAccount, AccountService>();
 builder.Services.AddScoped<IClientRepo, ClientRepo>();

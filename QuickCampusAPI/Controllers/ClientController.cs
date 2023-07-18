@@ -23,64 +23,61 @@ namespace QuickCampusAPI.Controllers
             this.userRepo = userRepo;
         }
 
-        [Authorize(Roles = "AddClient")]
+        //[Authorize(Roles = "AddClient")]
         [HttpPost]
         [Route("AddClient")]
         public async Task<IActionResult> AddClient([FromBody] ClientVM vm)
         {
-            IGeneralResult<ClientVM> result = new GeneralResult<ClientVM>();
+            IGeneralResult<ClientResponseVm> result = new GeneralResult<ClientResponseVm>();
             var _jwtSecretKey = config["Jwt:Key"];
             var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             if (_clientRepo.Any(x => x.Email == vm.Email && x.IsActive == true))
             {
                 result.Message = "Email Already Registered!";
             }
-            //else if (_clientRepo.Any(x => x.IsActive == true && x.Name == vm.Name.Trim()))
-            //{
-            //    result.Message = "UserName Already Exist!";
-            //}
+            else if (_clientRepo.Any(x => x.IsActive == true && x.Name == vm.Name.Trim()))
+            {
+                result.Message = "UserName Already Exist!";
+            }
             else
             {
                 if (ModelState.IsValid)
                 {
+                    vm.Password = EncodePasswordToBase64(vm.Password);
 
-                    ClientVM vmm = new ClientVM
+                    ClientVM clientVM = new ClientVM
                     {
                         Name = vm.Name,
                         Email = vm.Email,
                         Phone = vm.Phone,
                         Address = vm.Address,
-                        CreatedDate = vm.CreatedDate,
-                        ModofiedDate = vm.ModofiedDate,
-                        IsDeleted = vm.IsDeleted,   
-                        SubscriptionPlan = vm.SubscriptionPlan,
                         CraetedBy = Convert.ToInt32(userId),
                         ModifiedBy = Convert.ToInt32(userId),
-                        Latitude=vm.Latitude,
-                        Longitude=vm.Longitude,
-                        IsActive=vm.IsActive,
+                        SubscriptionPlan = vm.SubscriptionPlan,
+                        Latitude = vm.Latitude,
+                        Longitude = vm.Longitude,
+                        UserName=vm.UserName,
+                        Password=vm.Password,
                         
-                    };
+                };
                     try
                     {
-                        result.Data = vmm;
-                        var TblClien = vmm.ToClientDbModel();
-                        await _clientRepo.Add(TblClien);
+                        result.Data = (ClientResponseVm)await _clientRepo.Add(clientVM.ToClientDbModel());
                         result.Message = "Client added successfully";
                         result.IsSuccess = true;
-                       
+
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         result.Message = ex.Message;
                     }
-                  
+
                     return Ok(result);
                 }
-                    else
-                    {
-                        result.Message = "something Went Wrong";
-                    }
+                else
+                {
+                    result.Message = "something Went Wrong";
+                }
 
             }
             return Ok(result);
@@ -91,45 +88,55 @@ namespace QuickCampusAPI.Controllers
         [Route("EditClient")]
         public async Task<IActionResult> EditClient([FromBody] ClientVM vm)
         {
-            IGeneralResult<ClientVM> result = new GeneralResult<ClientVM>();
+            IGeneralResult<ClientResponseVm> result = new GeneralResult<ClientResponseVm>();
             var _jwtSecretKey = config["Jwt:Key"];
             var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            if (_clientRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.Id != vm.Id))
+            if (_clientRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.Id != vm.Id ))
             {
                 result.Message = "Email Already Registered!";
             }
+            else if (_clientRepo.Any(x => x.IsActive == true && x.Name == vm.Name.Trim()))
+            {
+                result.Message = "UserName Already Exist!";
+            }
             else
             {
-                if (ModelState.IsValid && vm.Id>0)
+                var res = await _clientRepo.GetById(vm.Id);
+                bool isDeleted = (bool)res.IsDeleted ? true : false;
+                if (isDeleted)
+                {
+                    result.Message = " Client does Not Exist";
+                    return Ok(result);
+                }
+                
+                if (ModelState.IsValid && vm.Id > 0 && res.IsDeleted==false)
                 {
 
-                    ClientVM vmm = new ClientVM
+                    
+                    ClientVM clientVM = new ClientVM
                     {
                         Id = vm.Id,
                         Name = vm.Name,
                         Email = vm.Email,
                         Phone = vm.Phone,
                         Address = vm.Address,
-                        IsDeleted = vm.IsDeleted,
-                        IsActive = vm.IsActive,
                         SubscriptionPlan = vm.SubscriptionPlan,
                         CraetedBy = Convert.ToInt32(userId),
                         ModifiedBy = Convert.ToInt32(userId),
                         Longitude = vm.Longitude,
-                        Latitude=vm.Latitude
+                        Latitude = vm.Latitude,
                     };
                     try
                     {
-                        var TblClien = vmm.ToUpdateDbModel();
-                        await _clientRepo.Update(TblClien);
+                        var TblClien = clientVM.ToUpdateDbModel();
+                      result.Data = (ClientResponseVm)await _clientRepo.Update(clientVM.ToUpdateDbModel());
                         result.Message = "Client updated successfully";
                         result.IsSuccess = true;
-                        result.Data = vmm;
                     }
                     catch (Exception ex)
                     {
-                        result.Message=ex.Message;
-                    }        
+                        result.Message = ex.Message;
+                    }
                     return Ok(result);
                 }
                 else
@@ -148,11 +155,11 @@ namespace QuickCampusAPI.Controllers
         {
             var _jwtSecretKey = config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            IGeneralResult<List<ClientVM>> result = new GeneralResult<List<ClientVM>>();
+            IGeneralResult<List<ClientResponseVm>> result = new GeneralResult<List<ClientResponseVm>>();
             try
             {
                 var categoryList = (await _clientRepo.GetAll()).Where(x => x.IsDeleted == false || x.IsDeleted == null).ToList();
-                var res = categoryList.Select(x => ((ClientVM)x)).ToList();
+                var res = categoryList.Select(x => ((ClientResponseVm)x)).ToList();
                 if (res != null)
                 {
                     result.IsSuccess = true;
@@ -180,9 +187,9 @@ namespace QuickCampusAPI.Controllers
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             IGeneralResult<ClientVM> result = new GeneralResult<ClientVM>();
             var res = await _clientRepo.GetById(Id);
-            if (res != null)
+            if (res.IsDeleted ==false)
             {
-              
+
                 res.IsActive = false;
                 res.IsDeleted = true;
                 await _clientRepo.Update(res);
@@ -196,6 +203,20 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        private string EncodePasswordToBase64(string password)
+        {
+            try
+            {
+                byte[] encData_byte = new byte[password.Length];
+                encData_byte = System.Text.Encoding.UTF8.GetBytes(password);
+                string encodedData = Convert.ToBase64String(encData_byte);
+                return encodedData;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error in base64Encode" + ex.Message);
+            }
+        }
     }
 }
 
