@@ -106,10 +106,30 @@ namespace QuickCampusAPI.Controllers
         [Route("userList")]
         public async Task<IActionResult> userList()
         {
-            List<UserVm> vm = new List<UserVm>();
-            var list = (await userRepo.GetAll()).Where(x => x.IsDelete == false).ToList();
-            vm = list.Select(x => ((UserVm)x)).ToList();
-            return Ok(vm);
+
+            var _jwtSecretKey = config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            IGeneralResult<List<UserResponseVm>> result = new GeneralResult<List<UserResponseVm>>();
+            try
+            {
+                var categoryList = (await userRepo.GetAll()).Where(x => x.IsDelete == false || x.IsDelete == null).ToList();
+                var res = categoryList.Select(x => ((UserResponseVm)x)).ToList();
+                if (res != null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "ClientList";
+                    result.Data = res;
+                }
+                else
+                {
+                    result.Message = "Client List Not Found";
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+            return Ok(result);
         }
         [HttpGet]
         [Route("userDelete")]
