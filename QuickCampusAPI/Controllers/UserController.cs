@@ -102,8 +102,8 @@ namespace QuickCampusAPI.Controllers
     }
 
         [HttpGet]
-        [Route("userList")]
-        public async Task<IActionResult> userList()
+        [Route("UserList")]
+        public async Task<IActionResult> UserList()
         {
 
             var _jwtSecretKey = config["Jwt:Key"];
@@ -155,16 +155,18 @@ namespace QuickCampusAPI.Controllers
         }
         [HttpPost]
         [Route("EditUser")]
-        public async Task<IActionResult> EditUser( UserVm vm)
+        public async Task<IActionResult> EditUser(EditUserResponseVm vm)
         {
-            IGeneralResult<UserResponseVm> result = new GeneralResult<UserResponseVm>();
+            IGeneralResult<EditUserResponseVm> result = new GeneralResult<EditUserResponseVm>();
             var _jwtSecretKey = config["Jwt:Key"];
-            var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var clientId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            
+            
             if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.Id != vm.Id))
             {
                 result.Message = "Email Already Registered!";
             }
-            else if (userRepo.Any(x => x.IsActive == true && x.Name == vm.Name.Trim()))
+            else if (userRepo.Any(x => x.IsActive == true && x.UserName == vm.UserName.Trim()))
             {
                 result.Message = "UserName Already Exist!";
             }
@@ -182,21 +184,24 @@ namespace QuickCampusAPI.Controllers
                 {
 
 
-                    UserVm userVm = new UserVm
+                    EditUserResponseVm userVm = new EditUserResponseVm
                     {
                         Id = vm.Id,
-                        Name = vm.Name,
+                        UserName = vm.UserName,
                         Email = vm.Email,
                         Mobile = vm.Mobile,
-                        
+                        ClientId= Convert.ToInt32(clientId),
+                        Name= vm.Name,
+                        IsDelete=false,
+                        IsActive=true
 
-                        
                     };
                     try
                     {
+                        var user = await userRepo.GetById(vm.Id);
                         var TblClien = userVm.ToUpdateDbModel();
-                        result.Data = (UserResponseVm)await userRepo.Update(userVm.ToUpdateDbModel());
-                        result.Message = "Client updated successfully";
+                        result.Data = (EditUserResponseVm)await userRepo.Update(userVm.ToUpdateDbModel());
+                        result.Message = "User updated successfully";
                         result.IsSuccess = true;
                     }
                     catch (Exception ex)
