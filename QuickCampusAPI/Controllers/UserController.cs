@@ -21,7 +21,7 @@ namespace QuickCampusAPI.Controllers
             this.config = config;
         }
 
-        [Route("userAdd")]
+        [Route("AddUser")]
         [HttpPost]
         public async Task<IActionResult> AddUser(UserModel vm)
         {
@@ -58,7 +58,6 @@ namespace QuickCampusAPI.Controllers
                                 IsActive = true,
                                 IsDelete = false
                             };
-
                             await userRepo.Add(userVm.toUserDbModel());
                             result.IsSuccess = true;
                             result.Message = "User added successfully.";
@@ -79,7 +78,7 @@ namespace QuickCampusAPI.Controllers
                             Email = vm.Email,
                             Mobile = vm.Mobile,
                             Password = vm.Password,
-                            ClientId = 0, // Assign null to ClientId property
+                            ClientId = 0, 
                             IsActive = true,
                             IsDelete = false
                         };
@@ -132,83 +131,86 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
         [HttpGet]
-        [Route("userDelete")]
-        public async Task<IActionResult> Delete(int id)
+        [Route("DeleteUser")]
+        public async Task<IActionResult> DeleteUser(int id)
         {
-            IGeneralResult<dynamic> result = new GeneralResult<dynamic>();
-            var user = await userRepo.GetById(id);
-
-            var res = (user != null&& user.IsDelete == false) ? user : null;
-            if (res != null)
+            var _jwtSecretKey = config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
+            var res = await userRepo.GetById(id);
+            if (res.IsDelete == false)
             {
+
                 res.IsActive = false;
                 res.IsDelete = true;
                 await userRepo.Update(res);
                 result.IsSuccess = true;
-                result.Message = "Your data is deleted successfully";
-                result.Data = res;
-                return Ok(result);
+                result.Message = "USer Deleted Succesfully";
             }
             else
             {
-                result.IsSuccess = false;
-                result.Message = "User Id is not found.";
+                result.Message = "User does Not exist";
             }
             return Ok(result);
         }
         [HttpPost]
-        [Route("userEdit")]
-        public async Task<IActionResult> Edit(int userId, UserModel vm)
+        [Route("EditUser")]
+        public async Task<IActionResult> EditUser( UserVm vm)
         {
-            IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
+            IGeneralResult<UserResponseVm> result = new GeneralResult<UserResponseVm>();
             var _jwtSecretKey = config["Jwt:Key"];
-            if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.Id != userId && x.IsDelete == false))
+            var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.Id != vm.Id))
             {
                 result.Message = "Email Already Registered!";
             }
+            else if (userRepo.Any(x => x.IsActive == true && x.Name == vm.Name.Trim()))
+            {
+                result.Message = "UserName Already Exist!";
+            }
             else
             {
-                var res = await userRepo.GetById(userId);
-                if (res != null)
+                var res = await userRepo.GetById(vm.Id);
+                bool isDeleted = (bool)res.IsDelete ? true : false;
+                if (isDeleted)
                 {
-                    var clientId = JwtHelper.GetUserIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-                    //var clientId = vm.ClientId.HasValue ? await clientRepo.GetById((int)vm.ClientId) : null;
+                    result.Message = " User does Not Exist";
+                    return Ok(result);
+                }
 
-                    if (clientId != null || clientId == "")
+                if (ModelState.IsValid && vm.Id > 0 && res.IsDelete == false)
+                {
+
+
+                    UserVm userVm = new UserVm
                     {
-                        res.Id = userId;
-                        if (clientId == "")
-                        {
-                            res.ClientId = 0; // Assign null to ClientId property
-                        }
-                        else
-                        {
-                            res.ClientId = Convert.ToInt32(clientId);
-                        }
-                        res.UserName = vm.Email;
-                        res.Name = vm.Name;
-                        res.Email = vm.Email;
-                        res.Mobile = vm.Mobile;
-                        res.Password = vm.Password;
-                        res.IsActive = true;
-                        res.IsDelete = false;
-                        await userRepo.Update(res);
-                        result.Message = "User data is updated successfully";
+                        Id = vm.Id,
+                        Name = vm.Name,
+                        Email = vm.Email,
+                        Mobile = vm.Mobile,
+                        
+
+                        
+                    };
+                    try
+                    {
+                        var TblClien = userVm.ToUpdateDbModel();
+                        result.Data = (UserResponseVm)await userRepo.Update(userVm.ToUpdateDbModel());
+                        result.Message = "Client updated successfully";
                         result.IsSuccess = true;
-                        result.Data = (UserVm)res;
-                        return Ok(result);
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        result.Message = "Client ID not found.";
+                        result.Message = ex.Message;
                     }
+                    return Ok(result);
                 }
                 else
                 {
-                    result.Message = "User ID not found.";
+                    result.Message = "something Went Wrong";
                 }
-            }
 
+            }
             return Ok(result);
         }
 
