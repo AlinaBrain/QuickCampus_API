@@ -1,11 +1,5 @@
 ﻿using FluentValidation;
 using QuickCampus_DAL.Context;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace QuickCampus_Core.ViewModel
 {
@@ -94,9 +88,9 @@ namespace QuickCampus_Core.ViewModel
 
     }
   
-    public class ClientValidator : AbstractValidator<ClientUpdateRequest>
+    public class ClientValidatorRequest : AbstractValidator<ClientUpdateRequest>
     {
-        public ClientValidator()
+        public ClientValidatorRequest()
         {
             RuleFor(x => x.Name)
                  .Cascade(CascadeMode.StopOnFirstFailure)
@@ -127,7 +121,5 @@ namespace QuickCampus_Core.ViewModel
               .Length(0, 20).WithMessage("SubscriptionPlan lengh could not be greater than 20"); 
         }
     }
-
-
 
 }
