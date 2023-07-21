@@ -21,13 +21,15 @@ namespace QuickCampusAPI.Controllers
             this.config = config;
         }
 
-        [Route("AddUser")]
         [HttpPost]
+        [Route("AddUser")]
         public async Task<IActionResult> AddUser(UserModel vm)
         {
             vm.Password = EncodePasswordToBase64(vm.Password);
             IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
+            //var _jwtSecretKey = config["Jwt:Key"];
             var _jwtSecretKey = config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.IsDelete == false))
             {
                 result.Message = "Email Already Registered!";
@@ -38,7 +40,7 @@ namespace QuickCampusAPI.Controllers
                 {
                     // Decode the JWT token and retrieve the "id" claim
 
-                    var clientId = JwtHelper.GetUserIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                    //var clientId = JwtHelper.GetUserIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
 
                     //var clientId = vm.ClientId.HasValue ? await clientRepo.GetById((int)vm.ClientId) : null;
 
@@ -58,7 +60,7 @@ namespace QuickCampusAPI.Controllers
                                 IsActive = true,
                                 IsDelete = false
                             };
-                            await userRepo.Add(userVm.toUserDbModel());
+                            await userRepo.Add(userVm.ToUserDbModel());
                             result.IsSuccess = true;
                             result.Message = "User added successfully.";
                             result.Data = userVm;
@@ -83,7 +85,7 @@ namespace QuickCampusAPI.Controllers
                             IsDelete = false
                         };
 
-                        await userRepo.Add(userVm.toUserDbModel());
+                        await userRepo.Add(userVm.ToUserDbModel());
                         result.IsSuccess = true;
                         result.Message = "User added successfully.";
                         result.Data = userVm;
@@ -112,6 +114,14 @@ namespace QuickCampusAPI.Controllers
             try
             {
                 var categoryList = (await userRepo.GetAll()).Where(x => x.IsDelete == false || x.IsDelete == null).ToList();
+                if(clientId != null)
+                {
+                  var response =  categoryList.Select(x => ((UserResponseVm)x)).Where(x =>x.ClientId ==Convert.ToInt32(clientId)).ToList();
+                    result.IsSuccess = true;
+                    result.Message = "ClientList";
+                    result.Data = response;
+                    return Ok(result);
+                }
                 var res = categoryList.Select(x => ((UserResponseVm)x)).ToList();
                 if (res != null)
                 {
@@ -130,7 +140,7 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-        [HttpGet]
+        [HttpDelete]
         [Route("DeleteUser")]
         public async Task<IActionResult> DeleteUser(int id)
         {
@@ -160,9 +170,8 @@ namespace QuickCampusAPI.Controllers
             IGeneralResult<EditUserResponseVm> result = new GeneralResult<EditUserResponseVm>();
             var _jwtSecretKey = config["Jwt:Key"];
             var clientId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            
-            
-            if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.Id != vm.Id))
+
+            if (userRepo.Any(x => x.UserName == vm.UserName && x.IsActive == true && x.Id != vm.Id))
             {
                 result.Message = "Email Already Registered!";
             }
@@ -188,18 +197,11 @@ namespace QuickCampusAPI.Controllers
                     {
                         Id = vm.Id,
                         UserName = vm.UserName,
-                        Email = vm.Email,
                         Mobile = vm.Mobile,
                         ClientId= Convert.ToInt32(clientId),
-                        Name= vm.Name,
-                        IsDelete=false,
-                        IsActive=true
-
                     };
                     try
-                    {
-                        var user = await userRepo.GetById(vm.Id);
-                        var TblClien = userVm.ToUpdateDbModel();
+                    {  
                         result.Data = (EditUserResponseVm)await userRepo.Update(userVm.ToUpdateDbModel());
                         result.Message = "User updated successfully";
                         result.IsSuccess = true;

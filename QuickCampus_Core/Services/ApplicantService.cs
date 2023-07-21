@@ -96,11 +96,6 @@ namespace QuickCampus_Core.Services
             throw new NotImplementedException();
         }
 
-       
-        //public async Task<IEnumerable<Applicant>> AddAsync(ApplicantViewModel applicantViewModel)
-        //{
-        //    return await (from f in dbContext.Applicants.AsQueryable() select f).ToListAsync();
-        //}
         public Task SaveChangesAsync(ApplicantViewModel applicantViewModel)
         {
             throw new NotImplementedException();
@@ -174,25 +169,6 @@ namespace QuickCampus_Core.Services
             }
             var result = dbContext.Entry(applicant).State = EntityState.Modified;
             dbContext.SaveChanges();
-            //if (result > 0)
-            //{
-            //    return new GeneralResult()
-            //    {
-            //        Successful = true,
-            //        Message = "Applicant has been updated successfully.",
-            //        Value = applicant.ApplicantId
-            //    };
-            //}
-            //else
-            //{
-            //    return new GeneralResult()
-            //    {
-            //        Successful = false,
-            //        Message = "Applicant has not been updated.",
-
-            //    };
-            //}
-
         }
 
         public IEnumerable<object> GetAllApplicant()
@@ -200,52 +176,5 @@ namespace QuickCampus_Core.Services
             throw new NotImplementedException();
         }
 
-
-
-        //public ApplicantViewModel Add(ApplicantViewModel applicantViewModel)
-        //{
-        //        dbContext.Set<Applicant>().Add(applicantViewModel);
-        //        dbContext.SaveChangesAsync();
-        //        return applicantViewModel;
-        //}
-        //public async Task<IGeneralResult<string>> AddCommentOrEditComments(ApplicantViewModel dto)
-        //{
-        //    var oldValue = dbContext.Applicants.Where(w => w.ApplicantId == dto.ApplicantID ).FirstOrDefault();
-        //    GeneralResult<string> result = new GeneralResult<string>();
-        //    ApplicantViewModel res = new ApplicantViewModel();
-
-        //    if (dto.ApplicantID > 0)
-        //    {
-        //        {
-        //           var  applicantdata = dbContext.Applicants.Where(w => w.ApplicantId == dto.ApplicantID).FirstOrDefault();
-        //        }
-
-        //        applicantdata.FirstName = dto.FirstName;
-        //        applicantdata.LastName = dto.LastName;
-        //        applicantdata.EmailAddress = dto.EmailAddress;
-
-        //    }
-
-        //    dto.ApplicantID > 0 ? dbContext.Update(dto) : await dbContext.Applicants.AddAsync(dto);
-        //    int save = await dbContext.SaveChangesAsync();
-        //    if (save > 0)
-        //    {
-        //        if (dto.ApplicantID > 0)
-        //        {
-        //            var newdata = dbContext.Applicants.Where(w => w.ApplicantId == dto.ApplicantID ).FirstOrDefault();
-
-        //            dbContext.Update(dto);
-        //        }
-        //        result.IsSuccess = true;
-        //        result.Message = "Comment  is Added Successfully";
-        //    }
-        //    else
-        //    {
-        //        result.IsSuccess = false;
-        //        result.Message = "Something Went Wrong";
-        //    }
-
-        //    return result;
-        //}
     }
 }

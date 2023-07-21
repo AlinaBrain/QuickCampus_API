@@ -150,11 +150,6 @@ namespace QuickCampus_Core.Services
             throw new NotImplementedException();
         }
 
-      //  Task IGenericRepository<WalkIn>.Update(WalkIn entity)
-     //   {
-       //     throw new NotImplementedException();
-       // }
-
 
     }
 }
