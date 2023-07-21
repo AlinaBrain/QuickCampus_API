@@ -22,7 +22,7 @@ namespace QuickCampus_Core.ViewModel
                 Latitude = items.Latitude,
                 Longitude = items.Longitude,
                 IsActive = items.IsActive,
-                IsDeleted = items.IsDeleted,
+              
             };
         }
         public int Id { get; set; }
@@ -38,8 +38,6 @@ namespace QuickCampus_Core.ViewModel
         public DateTime? ModofiedDate { get; set; }
 
         public bool? IsActive { get; set; }
-
-        public bool? IsDeleted { get; set; }
 
         public string? Address { get; set; }
 

@@ -13,7 +13,7 @@ namespace QuickCampus_Core.ViewModel
         {
             return new UserVm
             {
-                //Id = item.Id,
+                Id = item.Id,
                 ClientId = item.ClientId,
                 UserName = item.UserName,
                 Name = item.Name,
@@ -55,7 +55,7 @@ namespace QuickCampus_Core.ViewModel
         public string? ConfirmPassword { get; set; }
 
 
-        public TblUser ToUserDbModel()
+        public TblUser toUserDbModel()
         {
             return new TblUser
             {
