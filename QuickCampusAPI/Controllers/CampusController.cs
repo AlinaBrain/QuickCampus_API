@@ -7,7 +7,7 @@ using QuickCampus_Core.ViewModel;
 
 namespace QuickCampusAPI.Controllers
 {
-    
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class CampusController : ControllerBase
@@ -15,25 +15,40 @@ namespace QuickCampusAPI.Controllers
         private readonly ICampusRepo _campusrepo;
         private readonly ICountryRepo _country;
         private readonly IStateRepo _staterepo;
-
+        private IConfiguration _config;
         public CampusController(IConfiguration configuration, ICampusRepo campusrepo, ICountryRepo countryRepo, IStateRepo stateRepo)
         {
             _campusrepo = campusrepo;
-             _country = countryRepo;
+            _country = countryRepo;
             _staterepo = stateRepo;
+            _config = configuration;
+
+
         }
 
         [HttpGet]
         [Route("ManageCampus")]
-        public async Task<IActionResult> ManageCampus(int WalkInId)
+        public async Task<IActionResult> ManageCampus(int WalkInId,int? clientid )
         {
             IGeneralResult<List<CampusGridViewModel>> result = new GeneralResult<List<CampusGridViewModel>>();
+            var _jwtSecretKey = _config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var isSuperAdmin  = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
 
-            var rec = await _campusrepo.GetAllCampus();
+
+            int getClientId = 0;
+
+            if (isSuperAdmin)
+            {
+                getClientId = (int)clientid;
+            }
+
+
+            var rec = await _campusrepo.GetAllCampus(string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId));
             var CampusList = rec.Where(x => x.WalkInID != null).ToList();
             var res = CampusList.Select(x => ((CampusGridViewModel)x)).ToList();
 
-            if (res != null)
+            if (!res.Any())
             {
                 result.IsSuccess = true;
                 result.Message = "List of Campus.";
@@ -64,17 +79,18 @@ namespace QuickCampusAPI.Controllers
 
         [HttpGet]
         [Route("getcampusbyid")]
-        public async Task<IActionResult> getcampusbyid( int campusId)
+        public async Task<IActionResult> getcampusbyid(int campusId)
         {
-
-            var result = await _campusrepo.GetCampusByID(campusId);
+            var _jwtSecretKey = _config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var result = await _campusrepo.GetCampusByID(campusId, string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId));
             return Ok(result);
         }
     }
 
-    
+
 }
-    
+
 
 
 

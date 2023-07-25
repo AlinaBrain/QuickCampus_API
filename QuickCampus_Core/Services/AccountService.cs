@@ -40,7 +40,6 @@ namespace QuickCampus_Core.Services
             if (re != null)
             {
 
-
                 var user = _context.TblUserRoles.
                                 Include(i => i.User)
                                 .Include(i => i.Role)
@@ -113,7 +112,8 @@ namespace QuickCampus_Core.Services
                 //new Claim(ClaimTypes.Name,clientId==0?string.Empty:clientId.ToString()),
                 new Claim("UserId",userId.ToString()),
                 new Claim("cilentId",clientId==0?string.Empty:clientId.ToString()),
-                new Claim(ClaimTypes.Role,"Test")
+                new Claim(ClaimTypes.Role,"Test"),
+                new Claim("IsSuperAdmin",isSuperAdmin==true?"1":"0")
                 //new Claim("IsSuperAdmin",(isSuperAdmin==true?"True":"False").ToString().Trim())
             };
 

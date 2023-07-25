@@ -31,9 +31,13 @@ public partial class WalkIn
 
     public int? CreatedBy { get; set; }
 
+    public int? ClientId { get; set; }
+
     public virtual ICollection<ApplicantTest> ApplicantTests { get; set; } = new List<ApplicantTest>();
 
     public virtual ICollection<CampusWalkInCollege> CampusWalkInColleges { get; set; } = new List<CampusWalkInCollege>();
+
+    public virtual TblClient? Client { get; set; }
 
     public virtual Country? Country { get; set; }
 

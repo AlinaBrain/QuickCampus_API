@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
@@ -19,9 +20,9 @@ namespace QuickCampus_Core.Services
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<CampusGridViewModel>> GetAllCampus()
+        public async Task<IEnumerable<CampusGridViewModel>> GetAllCampus(int clientId)
         {
-            var campuses = _context.WalkIns.Include("State").Include("Country").Where(x => x.IsDeleted == false).OrderByDescending(x => x.WalkInDate).Select(x => new CampusGridViewModel()
+            var campuses = _context.WalkIns.Where(x => x.IsDeleted == false && (clientId==0?true: x.ClientId == clientId)).Include(x=>x.State).Include(x=>x.Country).OrderByDescending(x => x.WalkInDate).Select(x => new CampusGridViewModel()
             {
                 WalkInID = x.WalkInId,
                 Address1 = x.Address1,
@@ -56,17 +57,29 @@ namespace QuickCampus_Core.Services
             }
         }
 
-        public async Task<CampusGridViewModel> GetCampusByID(int id)
+        public async Task<IGeneralResult<CampusGridViewModel>> GetCampusByID(int id, int clientId)
         {
-            var campus =  _context.WalkIns.Where(x => x.WalkInId == id && x.IsActive == true && x.IsDeleted == false).Include(x=>x.State).Include(x=>x.Country).Include(x=>x.CampusWalkInColleges).FirstOrDefault();
+            IGeneralResult<CampusGridViewModel> result = new GeneralResult<CampusGridViewModel>();
+            result.Data = new CampusGridViewModel();
+            WalkIn campus = new WalkIn();
+            if (clientId == 0)
+                campus = _context.WalkIns.Where(x => x.WalkInId == id && x.IsActive == true && x.IsDeleted == false).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
+            else
+                campus = _context.WalkIns.Where(x => x.WalkInId == id && x.IsActive == true && x.IsDeleted == false && x.ClientId == clientId).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
 
-            CampusGridViewModel campusGridViewModel = new CampusGridViewModel()
+            if (campus == null)
+            {
+                result.IsSuccess = false;
+                result.Message = "Record Not Found";
+                return result;
+            }
+            var campusGridViewModel = new CampusGridViewModel()
             {
                 WalkInID = campus.WalkInId,
                 Address1 = campus.Address1,
-                Address2 = campus.Address2, 
-                City = campus.City==null?"": campus.City,
-                StateID = campus.State.StateId,
+                Address2 = campus.Address2,
+                City = campus.City == null ? "" : campus.City,
+                StateID = campus.StateId,
                 StateName = campus.StateId > 0 ? campus.State.StateName : "",
                 CountryID = campus.CountryId,
                 CountryName = campus.CountryId > 0 ? campus.Country.CountryName : "",
@@ -82,75 +95,13 @@ namespace QuickCampus_Core.Services
                     CollegeName = y.College.CollegeName,
                     ExamEndTime = y.ExamEndTime.Value.ToString(),
                     ExamStartTime = y.ExamStartTime.Value.ToString()
-
                 }).ToList()
             };
 
-            return campusGridViewModel;
-
-
+            result.Data = campusGridViewModel;
+            result.Message = "Record Fatch Successfully";
+            result.IsSuccess = true;
+            return result;
         }
-
-        Task<WalkIn> IGenericRepository<WalkIn>.Add(WalkIn entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task IGenericRepository<WalkIn>.AddApplicantAsync(ApplicantViewModel model)
-        {
-            throw new NotImplementedException();
-        }
-
-        bool IGenericRepository<WalkIn>.Any(Expression<Func<WalkIn, bool>> predicate)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<bool> IGenericRepository<WalkIn>.AnyAsync(Expression<Func<WalkIn, bool>> predicate)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task IGenericRepository<WalkIn>.Delete(WalkIn entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        WalkIn IGenericRepository<WalkIn>.FirstOrDefault(Expression<Func<WalkIn, bool>> predicate)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<WalkIn> IGenericRepository<WalkIn>.FirstOrDefaultAsync(Expression<Func<WalkIn, bool>> predicate)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<List<WalkIn>> IGenericRepository<WalkIn>.GetAll()
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<List<WalkIn>> IGenericRepository<WalkIn>.GetAll(Expression<Func<WalkIn, bool>> predicate)
-        {
-            throw new NotImplementedException();
-        }
-
-        IQueryable<WalkIn> IGenericRepository<WalkIn>.GetAllQuerable()
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<WalkIn> IGenericRepository<WalkIn>.GetById(int Id)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task IGenericRepository<WalkIn>.Save()
-        {
-            throw new NotImplementedException();
-        }
-
-
     }
 }
