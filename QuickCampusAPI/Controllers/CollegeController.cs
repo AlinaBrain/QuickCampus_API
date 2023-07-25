@@ -6,9 +6,9 @@ using QuickCampus_Core.ViewModel;
 
 namespace QuickCampusAPI.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
     [Authorize]
+    [Route("api/[controller]")]
+    [ApiController]
     public class CollegeController : ControllerBase
     {
         private readonly ICollegeRepo collegeRepo;
@@ -20,24 +20,24 @@ namespace QuickCampusAPI.Controllers
         [Route("getCollegeManage")]
         public async Task<IActionResult> Manage()
         {
-            var model = new CollegeViewModel()
+            var model = new CollegeVM()
             {
-                CollegeList = (await collegeRepo.GetAllCollege()).Select(x => new CollegeGridViewModel()
-                {
-                    CollegeID = x.CollegeID,
-                    CollegeName = x.CollegeName,
-                    Address1 = x.Address1,
-                    Address2 = x.Address2,
-                    City = x.City,
-                    StateName = x.StateName,
-                    CountryName = x.CountryName,
-                    IsActive = x.IsActive,
-                    CreatedDate = x.CreatedDate,
-                    ContectPerson = x.ContectPerson,
-                    ContectEmail = x.ContectEmail,
-                    ContectPhone = x.ContectPhone
-                }),
-                filter = new CollegeFilter() { },
+                //CollegeList = (await collegeRepo.GetAllCollege()).Select(x => new CollegeVM()
+                //{
+                //    CollegeID = x.CollegeID,
+                //    CollegeName = x.CollegeName,
+                //    Address1 = x.Address1,
+                //    Address2 = x.Address2,
+                //    City = x.City,
+                //    StateName = x.StateName,
+                //    CountryName = x.CountryName,
+                //    IsActive = x.IsActive,
+                //    CreatedDate = x.CreatedDate,
+                //    ContectPerson = x.ContectPerson,
+                //    ContectEmail = x.ContectEmail,
+                //    ContectPhone = x.ContectPhone
+                //}),
+                //filter = new CollegeFilter() { },
             };
             return Ok(model);
         }

@@ -7,16 +7,16 @@ namespace QuickCampus_Core.Services
 {
     public class CollegeRepo : BaseRepository<QuikCampusDevContext, College>, ICollegeRepo
     {
-        public  CollegeGridViewModel GetCollegeByID(int id)
+        public  CollegeVM GetCollegeByID(int id)
         {
             using (var context = new QuikCampusDevContext())
             {
                 var college = context.Colleges.Where(x => x.CollegeId == id && x.IsActive == true && x.IsDeleted == false).FirstOrDefault();
-                return college != null ? new CollegeGridViewModel()
+                return college != null ? new CollegeVM()
                 {
                     CollegeID = college.CollegeId,
                     CollegeName = college.CollegeName,
-                    LogoImage = college.Logo,
+                    Logo = college.Logo,
                     Address1 = college.Address1,
                     Address2 = college.Address2,
                     City = college.City,
@@ -30,15 +30,15 @@ namespace QuickCampus_Core.Services
                     ContectPhone = college.ContectPhone,
                     ContectPerson = college.ContectPerson,
                     ContectEmail = college.ContectEmail
-                } : new CollegeGridViewModel();
+                } : new CollegeVM();
             }
         }
 
-        public async Task <IEnumerable<CollegeGridViewModel>> GetAllCollege()
+        public async Task <IEnumerable<CollegeVM>> GetAllCollege()
         {
             using (var context = new QuikCampusDevContext())
             {
-                var colleges = await dbContext.Colleges.Where(x => x.IsDeleted == false).OrderBy(x => x.CollegeName).Select(x => new CollegeGridViewModel()
+                var colleges = await dbContext.Colleges.Where(x => x.IsDeleted == false).OrderBy(x => x.CollegeName).Select(x => new CollegeVM()
                 {
                     CollegeID = x.CollegeId,
                     CollegeName = x.CollegeName,
@@ -62,7 +62,7 @@ namespace QuickCampus_Core.Services
                 }
                 else
                 {
-                    return new List<CollegeGridViewModel>();
+                    return new List<CollegeVM>();
                 }
             }
         }

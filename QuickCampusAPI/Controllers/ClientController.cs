@@ -9,8 +9,6 @@ namespace QuickCampusAPI.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-
-
     public class ClientController : ControllerBase
     {
         private readonly IClientRepo _clientRepo;
@@ -23,7 +21,7 @@ namespace QuickCampusAPI.Controllers
             this.userRepo = userRepo;
         }
 
-        //[Authorize(Roles = "AddClient")]
+        [Authorize(Roles = "AddClient")]
         [HttpPost]
         [Route("AddClient")]
         public async Task<IActionResult> AddClient([FromBody] ClientVM vm)
@@ -63,7 +61,6 @@ namespace QuickCampusAPI.Controllers
                     
                     try
                     {
-                        //result.Data = (ClientResponseVm)await _clientRepo.Add(clientVM.ToClientDbModel());
                         var clientdata= await _clientRepo.Add(clientVM.ToClientDbModel());
 
                         UserVm userVm = new UserVm()
@@ -211,6 +208,54 @@ namespace QuickCampusAPI.Controllers
                 await _clientRepo.Update(res);
                 result.IsSuccess = true;
                 result.Message = "Client Deleted Succesfully";
+            }
+            else
+            {
+                result.Message = "Client does Not exist";
+            }
+            return Ok(result);
+        }
+
+        [Authorize(Roles = "ActiveInActive")]
+        [HttpGet]
+        [Route("activeAndInactive")]
+        public async Task<IActionResult> ActiveAndInactive(bool isActive, int id)
+        {
+            var _jwtSecretKey = config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            IGeneralResult<ClientVM> result = new GeneralResult<ClientVM>();
+            var res = await _clientRepo.GetById(id);
+            if (res.IsDeleted == false)
+            {
+
+                res.IsActive = false;
+                res.IsDeleted = true;
+              var data =  await _clientRepo.Update(res);
+                result.Data = (ClientVM)data;
+                result.IsSuccess = true;
+                result.Message = "Client status changed succesfully";
+            }
+            else
+            {
+                result.Message = "Client does Not exist";
+            }
+            return Ok(result);
+        }
+
+        [Authorize(Roles = "DeleteClient")]
+        [HttpGet]
+        [Route("DetailsClient")]
+        public async Task<IActionResult> DetailsClient(int Id)
+        {
+            var _jwtSecretKey = config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            IGeneralResult<ClientVM> result = new GeneralResult<ClientVM>();
+            var res = await _clientRepo.GetById(Id);
+            if (res.IsDeleted == false && res.IsActive == true)
+            {
+                result.Data = (ClientVM)res;
+                result.IsSuccess = true;
+                result.Message = "Client details getting succesfully";
             }
             else
             {

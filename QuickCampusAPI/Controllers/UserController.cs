@@ -223,15 +223,15 @@ namespace QuickCampusAPI.Controllers
 
         [HttpGet]
         [Route("activeAndInactive")]
-        public async Task<IActionResult> activeAndInactive(bool IsActive, int id)
+        public async Task<IActionResult> ActiveAndInactive(bool isActive, int id)
         {
             IGeneralResult<dynamic> result = new GeneralResult<dynamic>();
             if (id > 0)
             {
                 var res = await userRepo.GetById(id);
-                if (res != null)
+                if (res != null && res.IsDelete == false)
                 {
-                    res.IsActive = IsActive;
+                    res.IsActive = isActive;
                     await userRepo.Update(res);
                     result.IsSuccess = true;
                     result.Message = "Your status is changed successfully";

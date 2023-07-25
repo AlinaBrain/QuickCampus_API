@@ -37,6 +37,10 @@ public partial class College
 
     public string? ContectEmail { get; set; }
 
+    public int? ModifiedBy { get; set; }
+
+    public DateTime? ModifiedDate { get; set; }
+
     public virtual ICollection<CampusWalkInCollege> CampusWalkInColleges { get; set; } = new List<CampusWalkInCollege>();
 
     public virtual Country? Country { get; set; }
