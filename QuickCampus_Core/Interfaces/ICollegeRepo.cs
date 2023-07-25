@@ -5,6 +5,6 @@ namespace QuickCampus_Core.Interfaces
 {
     public interface ICollegeRepo : IGenericRepository<College>
     {
-       Task <IEnumerable<CollegeVM>> GetAllCollege();
+
     }
 }

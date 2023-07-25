@@ -11,85 +11,223 @@ namespace QuickCampusAPI.Controllers
     [ApiController]
     public class CollegeController : ControllerBase
     {
-        private readonly ICollegeRepo collegeRepo;
-        public CollegeController(ICollegeRepo collegeRepo)
+        private readonly ICollegeRepo _collegeRepo;
+        private IConfiguration _config;
+        public CollegeController(ICollegeRepo collegeRepo, IConfiguration config)
         {
-            this.collegeRepo = collegeRepo;  
-        }
-        [HttpGet]
-        [Route("getCollegeManage")]
-        public async Task<IActionResult> Manage()
-        {
-            var model = new CollegeVM()
-            {
-                //CollegeList = (await collegeRepo.GetAllCollege()).Select(x => new CollegeVM()
-                //{
-                //    CollegeID = x.CollegeID,
-                //    CollegeName = x.CollegeName,
-                //    Address1 = x.Address1,
-                //    Address2 = x.Address2,
-                //    City = x.City,
-                //    StateName = x.StateName,
-                //    CountryName = x.CountryName,
-                //    IsActive = x.IsActive,
-                //    CreatedDate = x.CreatedDate,
-                //    ContectPerson = x.ContectPerson,
-                //    ContectEmail = x.ContectEmail,
-                //    ContectPhone = x.ContectPhone
-                //}),
-                //filter = new CollegeFilter() { },
-            };
-            return Ok(model);
+            _collegeRepo = collegeRepo;
+            _config = config;
         }
 
         [HttpGet]
-        [Route("activeAndInactive")]
-        public async Task<IActionResult> activeAndInactive(bool IsActive, int id)
+        [Route("GetAllCollege")]
+        public async Task<IActionResult> GetAllCollege()
         {
-            IGeneralResult<dynamic> result = new GeneralResult<dynamic>();
-            if (id > 0)
+            var _jwtSecretKey = _config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            IGeneralResult<List<CollegeVM>> result = new GeneralResult<List<CollegeVM>>();
+            try
             {
-                var res = await collegeRepo.GetById(id);
+                var collegeList = (await _collegeRepo.GetAll()).Where(x => x.IsDeleted == false || x.IsDeleted == null).ToList();
+                var res = collegeList.Select(x => ((CollegeVM)x)).ToList();
                 if (res != null)
                 {
-                    res.IsActive = IsActive;
-                    await collegeRepo.Update(res);
                     result.IsSuccess = true;
-                    result.Message = "Your status is changed successfully";
+                    result.Message = "College get successfully";
                     result.Data = res;
+                }
+                else
+                {
+                    result.Message = "College List Not Found";
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+            return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("CollegeDetails")]
+        public async Task<IActionResult> CollegeDetails(int Id)
+        {
+            var _jwtSecretKey = _config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            IGeneralResult<CollegeVM> result = new GeneralResult<CollegeVM>();
+            var res = await _collegeRepo.GetById(Id);
+            if (res.IsDeleted == false && res.IsActive == true)
+            {
+                result.Data = (CollegeVM)res;
+                result.IsSuccess = true;
+                result.Message = "College details getting succesfully";
+            }
+            else
+            {
+                result.Message = "College does Not exist";
+            }
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("AddCollege")]
+        public async Task<IActionResult> AddCollege([FromBody] CollegeVM vm)
+        {
+            IGeneralResult<CollegeVM> result = new GeneralResult<CollegeVM>();
+            var _jwtSecretKey = _config["Jwt:Key"];
+            var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            if(vm != null)
+            {
+                if (ModelState.IsValid)
+                {
+
+                    CollegeVM collegeVM = new CollegeVM
+                    {
+                        CollegeName = vm.CollegeName,
+                        Logo = vm.Logo,
+                        Address1 = vm.Address1,
+                        Address2 = vm.Address2,
+                        CreatedBy = Convert.ToInt32(userId),
+                        ModifiedBy = Convert.ToInt32(userId),
+                        City = vm.City,
+                        StateId = vm.StateId,
+                        CountryID = vm.CountryID,
+                        CollegeCode = vm.CollegeCode,
+                        ContectPerson = vm.ContectPerson,
+                        ContectEmail = vm.ContectEmail,
+                        ContectPhone = vm.ContectPhone,
+                    };
+                    try
+                    {
+                        var collegedata = await _collegeRepo.Add(collegeVM.ToCollegeDbModel());
+                        result.Data = (CollegeVM)collegedata;
+                        result.Message = "College added successfully";
+                        result.IsSuccess = true;
+
+                    }
+                    catch (Exception ex)
+                    {
+                        result.Message = ex.Message;
+                    }
+
                     return Ok(result);
                 }
                 else
                 {
-                    result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
+                    result.Message = "something Went Wrong";
                 }
+
             }
             return Ok(result);
         }
-        [HttpGet]
-        [Route("collegeDelete")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            IGeneralResult<dynamic> result = new GeneralResult<dynamic>();
-            var college = await collegeRepo.GetById(id);
 
-            var res = (college != null && college.IsDeleted == false ) ? college : null;
-            if (res != null)
+        [HttpPost]
+        [Route("EditCollege")]
+        public async Task<IActionResult> EditCollege([FromBody] CollegeVM vm)
+        {
+            IGeneralResult<CollegeVM> result = new GeneralResult<CollegeVM>();
+            var _jwtSecretKey = _config["Jwt:Key"];
+            var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+          
+            if(vm != null)
+            {
+                var res = await _collegeRepo.GetById(vm.CollegeID);
+                bool isDeleted = (bool)res.IsDeleted ? true : false;
+                if (isDeleted)
+                {
+                    result.Message = " College does Not Exist";
+                    return Ok(result);
+                }
+
+                if (ModelState.IsValid && vm.CollegeID > 0 && res.IsDeleted == false)
+                {
+
+
+                    CollegeVM collegeVM = new CollegeVM
+                    {
+                        CollegeID = vm.CollegeID,
+                        CollegeName = vm.CollegeName,
+                        Logo = vm.Logo,
+                        Address1 = vm.Address1,
+                        Address2 = vm.Address2,
+                        CreatedBy = Convert.ToInt32(userId),
+                        ModifiedBy = Convert.ToInt32(userId),
+                        City = vm.City,
+                        StateId = vm.StateId,
+                        CountryID = vm.CountryID,
+                        CollegeCode = vm.CollegeCode,
+                        ContectPerson = vm.ContectPerson,
+                        ContectEmail = vm.ContectEmail,
+                        ContectPhone = vm.ContectPhone,
+                    };
+                    try
+                    {
+                        result.Data =(CollegeVM) await _collegeRepo.Update(collegeVM.ToUpdateDbModel());
+                        result.Message = "College updated successfully";
+                        result.IsSuccess = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        result.Message = ex.Message;
+                    }
+                    return Ok(result);
+                }
+                else
+                {
+                    result.Message = "something Went Wrong";
+                }
+
+            }
+            return Ok(result);
+        }
+
+        [HttpDelete]
+        [Route("DeleteCollege")]
+        public async Task<IActionResult> DeleteCollege(int Id)
+        {
+            var _jwtSecretKey = _config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            IGeneralResult<CollegeVM> result = new GeneralResult<CollegeVM>();
+            var res = await _collegeRepo.GetById(Id);
+            if (res.IsDeleted == false)
             {
                 res.IsActive = false;
                 res.IsDeleted = true;
-                await collegeRepo.Update(res);
+                await _collegeRepo.Update(res);
                 result.IsSuccess = true;
-                result.Message = "Your data is deleted successfully";
-                result.Data = res;
-                return Ok(result);
+                result.Message = "College Deleted Succesfully";
             }
             else
             {
-                result.IsSuccess = false;
-                result.Message = "College Id is not found.";
+                result.Message = "College does Not exist";
             }
             return Ok(result);
         }
+
+        [HttpGet]
+        [Route("activeAndInactive")]
+        public async Task<IActionResult> ActiveAndInactive(bool isActive, int id)
+        {
+            var _jwtSecretKey = _config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            IGeneralResult<CollegeVM> result = new GeneralResult<CollegeVM>();
+            var res = await _collegeRepo.GetById(id);
+            if (res.IsDeleted == false)
+            {
+
+                res.IsActive = false;
+                res.IsDeleted = true;
+                var data = await _collegeRepo.Update(res);
+                result.Data = (CollegeVM)data;
+                result.IsSuccess = true;
+                result.Message = "College status changed succesfully";
+            }
+            else
+            {
+                result.Message = "College does Not exist";
+            }
+            return Ok(result);
+        }
+
     }
 }

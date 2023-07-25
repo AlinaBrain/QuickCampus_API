@@ -12,13 +12,13 @@ namespace QuickCampusAPI.Controllers
     public class ClientController : ControllerBase
     {
         private readonly IClientRepo _clientRepo;
-        private readonly IUserRepo userRepo;
-        private IConfiguration config;
+        private readonly IUserRepo _userRepo;
+        private IConfiguration _config;
         public ClientController(IClientRepo clientRepo, IConfiguration config, IUserRepo userRepo)
         {
             _clientRepo = clientRepo;
-            this.config = config;
-            this.userRepo = userRepo;
+            _config = config;
+            _userRepo = userRepo;
         }
 
         [Authorize(Roles = "AddClient")]
@@ -27,7 +27,7 @@ namespace QuickCampusAPI.Controllers
         public async Task<IActionResult> AddClient([FromBody] ClientVM vm)
         {
             IGeneralResult<ClientResponseVm> result = new GeneralResult<ClientResponseVm>();
-            var _jwtSecretKey = config["Jwt:Key"];
+            var _jwtSecretKey = _config["Jwt:Key"];
             var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             if (_clientRepo.Any(x => x.Email == vm.Email && x.IsActive == true))
             {
@@ -56,9 +56,7 @@ namespace QuickCampusAPI.Controllers
                         Longitude = vm.Longitude,
                         UserName=vm.UserName,
                         Password=vm.Password,         
-                };
-
-                    
+                };   
                     try
                     {
                         var clientdata= await _clientRepo.Add(clientVM.ToClientDbModel());
@@ -74,7 +72,7 @@ namespace QuickCampusAPI.Controllers
                             
                         };
 
-                        var userdetails = userRepo.Add(userVm.ToUserDbModel());
+                        var userdetails = _userRepo.Add(userVm.ToUserDbModel());
                         result.Data = (ClientResponseVm)clientdata;
                         result.Message = "Client added successfully";
                         result.IsSuccess = true;
@@ -102,7 +100,7 @@ namespace QuickCampusAPI.Controllers
         public async Task<IActionResult> EditClient([FromBody] ClientUpdateRequest vm)
         {
             IGeneralResult<ClientResponseVm> result = new GeneralResult<ClientResponseVm>();
-            var _jwtSecretKey = config["Jwt:Key"];
+            var _jwtSecretKey = _config["Jwt:Key"];
             var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             if (_clientRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.Id != vm.Id ))
             {
@@ -166,7 +164,7 @@ namespace QuickCampusAPI.Controllers
         [Route("GetAllClient")]
         public async Task<IActionResult> GetAllClient()
         {
-            var _jwtSecretKey = config["Jwt:Key"];
+            var _jwtSecretKey = _config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             IGeneralResult<List<ClientResponseVm>> result = new GeneralResult<List<ClientResponseVm>>();
             try
@@ -196,7 +194,7 @@ namespace QuickCampusAPI.Controllers
         [Route("DeleteClient")]
         public async Task<IActionResult> DeleteClient(int Id)
         {
-            var _jwtSecretKey = config["Jwt:Key"];
+            var _jwtSecretKey = _config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             IGeneralResult<ClientVM> result = new GeneralResult<ClientVM>();
             var res = await _clientRepo.GetById(Id);
@@ -221,7 +219,7 @@ namespace QuickCampusAPI.Controllers
         [Route("activeAndInactive")]
         public async Task<IActionResult> ActiveAndInactive(bool isActive, int id)
         {
-            var _jwtSecretKey = config["Jwt:Key"];
+            var _jwtSecretKey = _config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             IGeneralResult<ClientVM> result = new GeneralResult<ClientVM>();
             var res = await _clientRepo.GetById(id);
@@ -242,12 +240,12 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = "DeleteClient")]
+        [Authorize(Roles = "DetailsClient")]
         [HttpGet]
         [Route("DetailsClient")]
         public async Task<IActionResult> DetailsClient(int Id)
         {
-            var _jwtSecretKey = config["Jwt:Key"];
+            var _jwtSecretKey = _config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             IGeneralResult<ClientVM> result = new GeneralResult<ClientVM>();
             var res = await _clientRepo.GetById(Id);
