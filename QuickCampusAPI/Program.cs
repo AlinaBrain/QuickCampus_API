@@ -85,6 +85,7 @@ builder.Services.AddScoped<IUserRepo, UserRepo>();
 builder.Services.AddScoped<IRoleRepo, RoleRepo>();
 builder.Services.AddScoped<IAccount, AccountService>();
 builder.Services.AddScoped<IClientRepo, ClientRepo>();
+builder.Services.AddScoped<IStateRepo, StateServices>();
 
 
 

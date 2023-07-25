@@ -6,7 +6,7 @@ namespace QuickCampus_Core.Interfaces
     public interface ICampusRepo : IGenericRepository<WalkIn>
     {
         Task<IEnumerable<CampusGridViewModel>> GetAllCampus();
-        Task<IEnumerable<CampusGridViewModel>> GetCampusByID(int id);
+        Task<CampusGridViewModel> GetCampusByID(int id);
         Task<IEnumerable<CampusGridViewModel>> Add(CampusGridViewModel campusGridViewModel);
 
 

@@ -56,38 +56,39 @@ namespace QuickCampus_Core.Services
             }
         }
 
-        public async Task<IEnumerable<CampusGridViewModel>> GetCampusByID(int id)
+        public async Task<CampusGridViewModel> GetCampusByID(int id)
         {
-            var campus = _context.WalkIns.Where(x => x.WalkInId == id && x.IsActive == true && x.IsDeleted == false).FirstOrDefault();
-            return (IEnumerable<CampusGridViewModel>)(campus != null ? new CampusGridViewModel()
+            var campus =  _context.WalkIns.Where(x => x.WalkInId == id && x.IsActive == true && x.IsDeleted == false).Include(x=>x.State).Include(x=>x.Country).Include(x=>x.CampusWalkInColleges).FirstOrDefault();
+
+            CampusGridViewModel campusGridViewModel = new CampusGridViewModel()
             {
                 WalkInID = campus.WalkInId,
-                WalkInDate = campus.WalkInDate,
-                JobDescription = campus.JobDescription,
                 Address1 = campus.Address1,
-                Address2 = campus.Address2,
-                City = campus.City,
-                StateID = campus.StateId,
+                Address2 = campus.Address2, 
+                City = campus.City==null?"": campus.City,
+                StateID = campus.State.StateId,
                 StateName = campus.StateId > 0 ? campus.State.StateName : "",
                 CountryID = campus.CountryId,
                 CountryName = campus.CountryId > 0 ? campus.Country.CountryName : "",
                 CreatedDate = campus.CreatedDate,
-                CreatedBy = campus.CreatedBy ?? 0,
-                //WalkInStartTime = campus.CampusWalkInColleges.FirstOrDefault() != null ? campus.CampusWalkInColleges.FirstOrDefault().StartDateTime.ToString() : "",
+                JobDescription = campus.JobDescription,
+                WalkInDate = campus.WalkInDate,
                 IsActive = campus.IsActive ?? false,
                 Title = campus.Title,
-                Colleges = campus.CampusWalkInColleges != null ? campus.CampusWalkInColleges.Select(walkincolleges => new CampusWalkInModel()
+                Colleges = campus.CampusWalkInColleges.Select(y => new CampusWalkInModel()
                 {
-                    CollegeId = walkincolleges.CollegeId ?? 0,
-                    CollegeName = walkincolleges.College.CollegeName,
-                    IsIncludeInWalkIn = true,
-                    ExamEndTime = walkincolleges.ExamEndTime.ToString(),
-                    ExamStartTime = walkincolleges.ExamStartTime.ToString(),
-                    CollegeCode = walkincolleges.CollegeCode,
-                    StartDateTime = walkincolleges.StartDateTime
+                    CollegeCode = y.CollegeCode,
+                    CollegeId = y.CollegeId ?? 0,
+                    CollegeName = y.College.CollegeName,
+                    ExamEndTime = y.ExamEndTime.Value.ToString(),
+                    ExamStartTime = y.ExamStartTime.Value.ToString()
 
-                }).ToList() : new List<CampusWalkInModel>()
-            } : new CampusGridViewModel());
+                }).ToList()
+            };
+
+            return campusGridViewModel;
+
+
         }
 
         Task<WalkIn> IGenericRepository<WalkIn>.Add(WalkIn entity)

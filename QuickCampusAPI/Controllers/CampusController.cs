@@ -7,7 +7,7 @@ using QuickCampus_Core.ViewModel;
 
 namespace QuickCampusAPI.Controllers
 {
-    [Authorize]
+    
     [ApiController]
     [Route("api/[controller]")]
     public class CampusController : ControllerBase
@@ -60,7 +60,16 @@ namespace QuickCampusAPI.Controllers
                 Colleges = new List<CampusWalkInModel>()
             };
             return Ok(model);
-        } 
+        }
+
+        [HttpGet]
+        [Route("getcampusbyid")]
+        public async Task<IActionResult> getcampusbyid( int campusId)
+        {
+
+            var result = await _campusrepo.GetCampusByID(campusId);
+            return Ok(result);
+        }
     }
 
     
