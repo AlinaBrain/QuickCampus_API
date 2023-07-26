@@ -107,7 +107,7 @@ namespace QuickCampusAPI.Controllers
             try
             {
                 var categoryList = (await userRepo.GetAll()).Where(x => x.IsDelete == false || x.IsDelete == null).ToList();
-                if(clientId != null)
+                if(clientId != null && clientId != "")
                 {
                   var response =  categoryList.Select(x => ((UserResponseVm)x)).Where(x =>x.ClientId ==Convert.ToInt32(clientId)).ToList();
                     result.IsSuccess = true;
