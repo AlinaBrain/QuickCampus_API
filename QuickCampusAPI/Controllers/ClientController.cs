@@ -138,8 +138,7 @@ namespace QuickCampusAPI.Controllers
                         Latitude = vm.Latitude,
                     };
                     try
-                    {
-                        var TblClien = clientVM.ToUpdateDbModel();
+                    { 
                       result.Data = (ClientResponseVm)await _clientRepo.Update(clientVM.ToUpdateDbModel());
                         result.Message = "Client updated successfully";
                         result.IsSuccess = true;

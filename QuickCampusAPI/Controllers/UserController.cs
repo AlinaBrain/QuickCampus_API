@@ -27,7 +27,6 @@ namespace QuickCampusAPI.Controllers
         {
             vm.Password = EncodePasswordToBase64(vm.Password);
             IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
-            //var _jwtSecretKey = config["Jwt:Key"];
             var _jwtSecretKey = config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.IsDelete == false))
@@ -38,12 +37,6 @@ namespace QuickCampusAPI.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    // Decode the JWT token and retrieve the "id" claim
-
-                    //var clientId = JwtHelper.GetUserIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-
-                    //var clientId = vm.ClientId.HasValue ? await clientRepo.GetById((int)vm.ClientId) : null;
-
                     if (!string.IsNullOrEmpty(clientId))
                     {
                         int parsedClientId;

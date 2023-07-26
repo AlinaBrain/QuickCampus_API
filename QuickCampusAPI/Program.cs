@@ -11,6 +11,7 @@ using QuickCampus_DAL.Context;
 using System.Reflection;
 using System.Text;
 using static QuickCampus_Core.ViewModel.ClientVM;
+using static QuickCampus_Core.ViewModel.CollegeVM;
 using static QuickCampus_Core.ViewModel.UserVm;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,9 +35,7 @@ builder.Services.AddScoped<IValidator<AdminLogin>, AdminLoginValidator>();
 builder.Services.AddScoped<IValidator<UserVm>, UserValidator>();
 builder.Services.AddScoped<IValidator<ClientVM>, ClientValidator>();
 builder.Services.AddScoped<IValidator<ClientUpdateRequest>, ClientValidatorRequest>();
-
-
-
+builder.Services.AddScoped<IValidator<CollegeVM>, CollegeValidator>();
 
 
 builder.Services.AddControllers()

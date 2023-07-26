@@ -23,4 +23,8 @@
     <ProjectReference Include="..\QuickCampus_Core\QuickCampus_Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\UploadFiles\" />
+  </ItemGroup>
+
 </Project>
