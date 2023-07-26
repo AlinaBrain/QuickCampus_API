@@ -50,20 +50,20 @@ namespace QuickCampus_Core.ViewModel
 
 
         //[Required( ErrorMessage = "Address is required." )]
-        public string Address1 { get; set; }
+        public string? Address1 { get; set; }
 
-        public string Address2 { get; set; }
+        public string? Address2 { get; set; }
         //[Required( ErrorMessage = "City is required." )]      
-        public string City { get; set; }
+        public string? City { get; set; }
 
         //[Required( ErrorMessage = "State is required." )]
         public int? StateID { get; set; }
 
-        public string StateName { get; set; }
+        public string? StateName { get; set; }
 
         public IEnumerable<SelectListItem> States { get; set; }
 
-        public string CountryName { get; set; }
+        public string? CountryName { get; set; }
 
         public IEnumerable<SelectListItem> Countries { get; set; }
 
@@ -75,7 +75,7 @@ namespace QuickCampus_Core.ViewModel
         public DateTime? WalkInDate { get; set; }
 
         [Required(ErrorMessage = "Description is required.")]
-        public string JobDescription { get; set; }
+        public string? JobDescription { get; set; }
 
         //[Required( ErrorMessage = "Time is required." )]
         //[DisplayFormat( DataFormatString = "hh:mm tt" )]
@@ -84,7 +84,7 @@ namespace QuickCampus_Core.ViewModel
         public bool IsDelete { get; set; }
         public DateTime? CreatedDate { get; set; }
         [Required(ErrorMessage = "Title is required.")]
-        public string Title { get; set; }
+        public string? Title { get; set; }
         public int CreatedBy { get; set; }
         public List<CampusWalkInModel> Colleges { get; set; }
 
@@ -92,41 +92,43 @@ namespace QuickCampus_Core.ViewModel
 
     public class CampusWalkInModel
     {
+        [Required]
         public int CollegeId { get; set; }
 
+        [Required]
         public int StateId { get; set; }
 
-        public string CollegeName { get; set; }
+        public string? CollegeName { get; set; }
 
         [Required(ErrorMessage = "Time is required.")]
         [DisplayFormat(DataFormatString = "hh:mm tt")]
-        public string ExamStartTime { get; set; }
+        public string? ExamStartTime { get; set; }
 
         [Required(ErrorMessage = "Time is required.")]
         [DisplayFormat(DataFormatString = "hh:mm tt")]
-        public string ExamEndTime { get; set; }
+        public string? ExamEndTime { get; set; }
 
         [Required(ErrorMessage = "Time is required.")]
         public bool IsIncludeInWalkIn { get; set; }
-
-        public string CollegeCode { get; set; }
+        [Required]
+        public string? CollegeCode { get; set; }
 
         public DateTime? StartDateTime { get; set; }
 
     }
     public class CollegeFilter
     {
-        public string CollegeName { get; set; }
+        public string? CollegeName { get; set; }
     }
     public class CountryModel
     {
         public int CountryID { get; set; }
-        public string CountryName { get; set; }
+        public string? CountryName { get; set; }
     }
     public class StateModel
     {
         public int StateID { get; set; }
-        public string StateName { get; set; }
+        public string? StateName { get; set; }
         public int CountryID { get; set; }
     }
 

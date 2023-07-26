@@ -40,7 +40,6 @@ namespace QuickCampus_Core.Services
             if (re != null)
             {
 
-
                 var user = _context.TblUserRoles.
                                 Include(i => i.User)
                                 .Include(i => i.Role)
@@ -48,13 +47,15 @@ namespace QuickCampus_Core.Services
                                 .Where(w => w.User.Email.ToLower() == adminLogin.UserName.ToLower() && w.User.Password == adminLogin.Password && w.User.IsDelete == false && w.User.IsActive == true)
                                 .FirstOrDefault();
 
-                var uRoles = _context.TblUserRoles
+                var uRoles = _context.TblUserRoles.Include(w=>w.Role)
                     .Where(w => w.User.Email.ToLower() == adminLogin.UserName.ToLower() && w.User.Password == adminLogin.Password && w.User.IsDelete == false && w.User.IsActive == true)
                     .Select(s => new RoleMaster()
                     {
                         Id = s.Role.Id,
                         RoleName = s.Role.Name
                     }).ToList();
+
+                response.Data.IsSuperAdmin = uRoles.Any(w => w.RoleName == "SuperAdmin");
 
                 foreach (var rec in uRoles)
                 {
@@ -113,7 +114,8 @@ namespace QuickCampus_Core.Services
                 //new Claim(ClaimTypes.Name,clientId==0?string.Empty:clientId.ToString()),
                 new Claim("UserId",userId.ToString()),
                 new Claim("cilentId",clientId==0?string.Empty:clientId.ToString()),
-                new Claim(ClaimTypes.Role,"Test")
+                new Claim(ClaimTypes.Role,"Test"),
+                new Claim("IsSuperAdmin",isSuperAdmin==true?"1":"0")
                 //new Claim("IsSuperAdmin",(isSuperAdmin==true?"True":"False").ToString().Trim())
             };
 
