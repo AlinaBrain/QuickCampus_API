@@ -24,7 +24,7 @@ namespace QuickCampus_Core.Services
         public async Task<IGeneralResult<string>> AddCampus(CampusGridRequestVM vm, int clientId, int userId)
         {
             IGeneralResult<string> result = new GeneralResult<string>();
-
+        
             var isCountryExist = _context.Countries.Where(w=>w.IsDeleted==false).Any(a => a.CountryId == vm.CountryID);
             var allCollages = _context.Colleges.Where(s => s.IsDeleted == false).Select(s => s.CollegeId).ToList();
             var allStates = _context.States.Where(w=>w.IsDeleted==false).Select(s=>s.StateId).ToList();
@@ -87,7 +87,6 @@ namespace QuickCampus_Core.Services
                 {
                     if (rec.IsIncludeInWalkIn)
                     {
-                        var isClgExist = _context.Colleges.Any(a => a.CollegeId == rec.CollegeId);
                         CampusWalkInCollege campusWalkInCollege = new CampusWalkInCollege()
                         {
                             WalkInId = sv.WalkInId,
@@ -102,8 +101,8 @@ namespace QuickCampus_Core.Services
                     }
                 }
 
-                int response = _context.SaveChanges();
-                if (response == 1)
+                int  response = _context.SaveChanges();
+                if (response > 0)
                 {
                     result.IsSuccess = true;
                     result.Message = "Record Saved Successfully";
