@@ -87,7 +87,6 @@ namespace QuickCampus_Core.Services
                 {
                     if (rec.IsIncludeInWalkIn)
                     {
-                        var isClgExist = _context.Colleges.Any(a => a.CollegeId == rec.CollegeId);
                         CampusWalkInCollege campusWalkInCollege = new CampusWalkInCollege()
                         {
                             WalkInId = sv.WalkInId,
