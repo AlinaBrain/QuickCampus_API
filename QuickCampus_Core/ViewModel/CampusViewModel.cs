@@ -92,8 +92,10 @@ namespace QuickCampus_Core.ViewModel
 
     public class CampusWalkInModel
     {
+        [Required]
         public int CollegeId { get; set; }
 
+        [Required]
         public int StateId { get; set; }
 
         public string? CollegeName { get; set; }
@@ -108,7 +110,7 @@ namespace QuickCampus_Core.ViewModel
 
         [Required(ErrorMessage = "Time is required.")]
         public bool IsIncludeInWalkIn { get; set; }
-
+        [Required]
         public string? CollegeCode { get; set; }
 
         public DateTime? StartDateTime { get; set; }

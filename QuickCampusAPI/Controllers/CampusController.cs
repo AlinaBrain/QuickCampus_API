@@ -26,8 +26,10 @@ namespace QuickCampusAPI.Controllers
 
         }
 
+        [Authorize(Roles = "ManageCampus")]
         [HttpGet]
         [Route("ManageCampus")]
+       
         public async Task<IActionResult> ManageCampus(int WalkInId,int clientid=0 )
         {
             IGeneralResult<List<CampusGridViewModel>> result = new GeneralResult<List<CampusGridViewModel>>();
@@ -51,7 +53,6 @@ namespace QuickCampusAPI.Controllers
             {
                 getClientId = Convert.ToInt32(clientId);
             }
-
             var rec = await _campusrepo.GetAllCampus(getClientId);
             var CampusList = rec.Where(x => x.WalkInID != null).ToList();
             var res = CampusList.Select(x => ((CampusGridViewModel)x)).ToList();
@@ -66,27 +67,27 @@ namespace QuickCampusAPI.Controllers
             {
                 result.Message = "Campus not found!";
             }
-
             return Ok(result);
         }
 
-
+        [Authorize(Roles = "AddCampus")]
         [HttpPost]
         [Route("AddCampus")]
 
-        public async Task<IActionResult> AddCampus()
+        public async Task<IActionResult> AddCampus(CampusGridRequestVM dto)
         {
-            var model = new CampusGridViewModel()
-            {
-                States = new List<SelectListItem>() { },
-                Countries = new List<SelectListItem>() { },
-                Colleges = new List<CampusWalkInModel>()
-            };
-            return Ok(model);
+            var _jwtSecretKey = _config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            
+            var response = await _campusrepo.AddCampus(dto, string.IsNullOrEmpty(clientId)?0:Convert.ToInt32(clientId), string.IsNullOrEmpty(userId)?0:Convert.ToInt32(userId));
+
+            return Ok(response);
         }
 
+        [Authorize(Roles = "GetCampusByCampusId")]
         [HttpGet]
-        [Route("getcampusbyid")]
+        [Route("getCampusByCampusId")]
         public async Task<IActionResult> getcampusbyid(int campusId)
         {
             var _jwtSecretKey = _config["Jwt:Key"];

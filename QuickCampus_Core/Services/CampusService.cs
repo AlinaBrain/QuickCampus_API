@@ -20,9 +20,112 @@ namespace QuickCampus_Core.Services
             throw new NotImplementedException();
         }
 
+
+        public async Task<IGeneralResult<string>> AddCampus(CampusGridRequestVM vm, int clientId, int userId)
+        {
+            IGeneralResult<string> result = new GeneralResult<string>();
+
+            var isCountryExist = _context.Countries.Where(w=>w.IsDeleted==false).Any(a => a.CountryId == vm.CountryID);
+            var allCollages = _context.Colleges.Where(s => s.IsDeleted == false).Select(s => s.CollegeId).ToList();
+            var allStates = _context.States.Where(w=>w.IsDeleted==false).Select(s=>s.StateId).ToList();
+            var isStateExist = allStates.Any(a => a == vm.StateID);
+
+            foreach(var clg in vm.Colleges)
+            {
+                var checkclg = allCollages.Any(s => s == clg.CollegeId);
+                if (!checkclg)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "College id "+clg.CollegeId+" is not exist";
+                    return result;
+                }
+                var checkstate = allStates.Any(s => s == clg.StateId);
+                if (!checkstate)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "state id " + clg.StateId + " is not exist";
+                    return result;
+                }
+            }
+
+            if (!isCountryExist)
+            {
+                result.IsSuccess = false;
+                result.Message = "Counrty is not exist";
+                return result;
+            }
+            else if (!isStateExist)
+            {
+                result.IsSuccess = false;
+                result.Message = "State is not exist";
+                return result;
+            }
+
+            try
+            {
+
+                var sv = new WalkIn()
+                {
+                    WalkInDate = vm.WalkInDate,
+                    JobDescription = vm.JobDescription,
+                    Address1 = vm.Address1,
+                    Address2 = vm.Address2,
+                    City = vm.City,
+                    StateId = vm.StateID,
+                    CountryId = vm.CountryID,
+                    IsActive = true,
+                    IsDeleted = false,
+                    CreatedBy = userId,
+                    CreatedDate = DateTime.Now,
+                    Title = vm.Title,
+                    ClientId = clientId == 0 ? 0 : clientId
+                };
+                _context.WalkIns.Add(sv);
+                _context.SaveChanges();
+
+                foreach (var rec in vm.Colleges)
+                {
+                    if (rec.IsIncludeInWalkIn)
+                    {
+                        var isClgExist = _context.Colleges.Any(a => a.CollegeId == rec.CollegeId);
+                        CampusWalkInCollege campusWalkInCollege = new CampusWalkInCollege()
+                        {
+                            WalkInId = sv.WalkInId,
+                            CollegeId = rec.CollegeId,
+                            ExamStartTime = TimeSpan.Parse(rec.ExamStartTime),
+                            ExamEndTime = TimeSpan.Parse(rec.ExamEndTime),
+                            CollegeCode = rec.CollegeCode,
+                            StartDateTime = rec.StartDateTime,
+                            IsCompleted = null
+                        };
+                        _context.CampusWalkInColleges.Add(campusWalkInCollege);
+                    }
+                }
+
+                int response = _context.SaveChanges();
+                if (response == 1)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Record Saved Successfully";
+                }
+                else
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Something went wrong.";
+                }
+            }
+            catch(Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = "Something went wrong";
+            }
+           
+            return result;
+        }
+
         public async Task<IEnumerable<CampusGridViewModel>> GetAllCampus(int clientId)
         {
-            var campuses = _context.WalkIns.Where(x => x.IsDeleted == false && (clientId==0?true: x.ClientId == clientId)).Include(x=>x.State).Include(x=>x.Country).OrderByDescending(x => x.WalkInDate).Select(x => new CampusGridViewModel()
+            var campuses = _context.WalkIns.Where(x => x.IsDeleted == false && (clientId == 0 ? true : x.ClientId == clientId)).Include(x => x.State).Include(x => x.Country).OrderByDescending(x => x.WalkInDate).Select(x => new CampusGridViewModel()
             {
                 WalkInID = x.WalkInId,
                 Address1 = x.Address1,

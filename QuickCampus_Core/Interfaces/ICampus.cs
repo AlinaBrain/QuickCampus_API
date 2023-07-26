@@ -9,6 +9,7 @@ namespace QuickCampus_Core.Interfaces
         Task<IEnumerable<CampusGridViewModel>> GetAllCampus(int clientId);
         Task<IGeneralResult<CampusGridViewModel>> GetCampusByID(int id, int clientId);
         Task<IEnumerable<CampusGridViewModel>> Add(CampusGridViewModel campusGridViewModel);
+        Task<IGeneralResult<string>> AddCampus(CampusGridRequestVM vm, int clientId, int userId);
 
 
     }
