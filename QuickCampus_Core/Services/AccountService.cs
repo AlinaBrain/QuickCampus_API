@@ -47,13 +47,15 @@ namespace QuickCampus_Core.Services
                                 .Where(w => w.User.Email.ToLower() == adminLogin.UserName.ToLower() && w.User.Password == adminLogin.Password && w.User.IsDelete == false && w.User.IsActive == true)
                                 .FirstOrDefault();
 
-                var uRoles = _context.TblUserRoles
+                var uRoles = _context.TblUserRoles.Include(w=>w.Role)
                     .Where(w => w.User.Email.ToLower() == adminLogin.UserName.ToLower() && w.User.Password == adminLogin.Password && w.User.IsDelete == false && w.User.IsActive == true)
                     .Select(s => new RoleMaster()
                     {
                         Id = s.Role.Id,
                         RoleName = s.Role.Name
                     }).ToList();
+
+                response.Data.IsSuperAdmin = uRoles.Any(w => w.RoleName == "SuperAdmin");
 
                 foreach (var rec in uRoles)
                 {

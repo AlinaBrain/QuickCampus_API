@@ -28,27 +28,35 @@ namespace QuickCampusAPI.Controllers
 
         [HttpGet]
         [Route("ManageCampus")]
-        public async Task<IActionResult> ManageCampus(int WalkInId,int? clientid )
+        public async Task<IActionResult> ManageCampus(int WalkInId,int clientid=0 )
         {
             IGeneralResult<List<CampusGridViewModel>> result = new GeneralResult<List<CampusGridViewModel>>();
             var _jwtSecretKey = _config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             var isSuperAdmin  = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
-
-
             int getClientId = 0;
+            
+            if (!isSuperAdmin && clientId=="0")
+            {
+                result.Data = null;
+                result.IsSuccess = false;
+                result.Message = "Please enter clientID";
+            }
 
             if (isSuperAdmin)
             {
                 getClientId = (int)clientid;
             }
+            else
+            {
+                getClientId = Convert.ToInt32(clientId);
+            }
 
-
-            var rec = await _campusrepo.GetAllCampus(string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId));
+            var rec = await _campusrepo.GetAllCampus(getClientId);
             var CampusList = rec.Where(x => x.WalkInID != null).ToList();
             var res = CampusList.Select(x => ((CampusGridViewModel)x)).ToList();
 
-            if (!res.Any())
+            if (res.Any())
             {
                 result.IsSuccess = true;
                 result.Message = "List of Campus.";
