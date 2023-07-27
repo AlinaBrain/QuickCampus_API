@@ -133,6 +133,7 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
+
         [HttpDelete]
         [Route("DeleteUser")]
         public async Task<IActionResult> DeleteUser(int id)
