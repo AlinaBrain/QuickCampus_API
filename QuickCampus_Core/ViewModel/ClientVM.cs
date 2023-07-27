@@ -107,10 +107,8 @@ namespace QuickCampus_Core.ViewModel
                 RuleFor(x => x.Name)
                      .Cascade(CascadeMode.StopOnFirstFailure)
                   .NotNull().WithMessage("Name could not be null")
-
                   .NotEmpty().WithMessage("Name could not be empty")
-            .Matches(@"^[A-Za-z\s]*$").WithMessage("'{PropertyName}' should only contain letters.")
-            .Length(3, 30);
+            .Length(3, 100);
                 RuleFor(x => x.Address)
                   .Cascade(CascadeMode.StopOnFirstFailure)
                   .NotNull().WithMessage("Address could not be null")
@@ -133,7 +131,7 @@ namespace QuickCampus_Core.ViewModel
                   .Length(0, 20).WithMessage("SubscriptionPlan lengh could not be greater than 20");
 
                 RuleFor(x => x.UserName)
-               .Cascade(CascadeMode.StopOnFirstFailure)
+               .Cascade(CascadeMode.StopOnFirstFailure).EmailAddress()
                .NotNull().WithMessage("UserName could not be null")
                .NotEmpty().WithMessage("UserName could not be empty")
                .Length(3, 100).WithMessage("UserName lengh could not be greater than 100");
