@@ -72,11 +72,9 @@ namespace QuickCampusAPI.Controllers
                         {
                             Name = clientdata.Name,
                             Password = clientdata.Password,
-                            Email = clientdata.Email,
+                            Email = clientdata.UserName,
                             ClientId = clientdata.Id,
                             Mobile = clientdata.Phone,
-                            UserName = clientdata.UserName,
-
                         };
 
                         var userdetails = _userRepo.Add(userVm.ToUserDbModel());

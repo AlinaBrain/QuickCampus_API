@@ -1,11 +1,5 @@
 ﻿using Microsoft.Identity.Client;
 using QuickCampus_DAL.Context;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace QuickCampus_Core.ViewModel
 {
@@ -16,10 +10,8 @@ namespace QuickCampus_Core.ViewModel
                 return new ClientUserVM
                 {
                     Id = item.Id,
-                    UserName = item.UserName,
-                    Name = item.Name
-                    
-                    
+                    UserName = item.Email,
+                    Name = item.Name 
                 };
             }
             public int ProcessId { get; set; }

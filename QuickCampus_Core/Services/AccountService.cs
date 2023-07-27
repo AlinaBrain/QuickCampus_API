@@ -72,7 +72,7 @@ namespace QuickCampus_Core.Services
                 List<string> record = new List<string>();
                 record = uRoles.Select(s => s.RoleName).ToList();
                 response.Data.Token = GenerateToken(adminLogin, record, re.ClientId == null ? 0 : re.ClientId, re.Id,response.Data.IsSuperAdmin);
-                response.Data.UserName = re.UserName;
+                response.Data.UserName = re.Email;
                 response.Data.UserId = re.Id;
                 response.Data.CilentId = re.ClientId;
                // response.Data.Createdby = re.Createdby;

@@ -44,7 +44,6 @@ namespace QuickCampusAPI.Controllers
                         {
                             UserVm userVm = new UserVm
                             {
-                                UserName = vm.Email,
                                 Name = vm.Name,
                                 Email = vm.Email,
                                 Mobile = vm.Mobile,
@@ -68,7 +67,6 @@ namespace QuickCampusAPI.Controllers
                     {
                         UserVm userVm = new UserVm
                         {
-                            UserName = vm.Email,
                             Name = vm.Name,
                             Email = vm.Email,
                             Mobile = vm.Mobile,
@@ -165,11 +163,11 @@ namespace QuickCampusAPI.Controllers
             var _jwtSecretKey = config["Jwt:Key"];
             var clientId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
 
-            if (userRepo.Any(x => x.UserName == vm.UserName && x.IsActive == true && x.Id != vm.Id))
+            if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.Id != vm.Id))
             {
                 result.Message = "Email Already Registered!";
             }
-            else if (userRepo.Any(x => x.IsActive == true && x.UserName == vm.UserName.Trim()))
+            else if (userRepo.Any(x => x.IsActive == true && x.Email == vm.Email.Trim()))
             {
                 result.Message = "UserName Already Exist!";
             }
@@ -190,7 +188,7 @@ namespace QuickCampusAPI.Controllers
                     EditUserResponseVm userVm = new EditUserResponseVm
                     {
                         Id = vm.Id,
-                        UserName = vm.UserName,
+                        Email = vm.Email,
                         Mobile = vm.Mobile,
                         ClientId= Convert.ToInt32(clientId),
                     };

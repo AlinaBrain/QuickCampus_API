@@ -19,12 +19,12 @@ namespace QuickCampus_Core.ViewModel
                 IsDelete = item.IsDelete,
                 IsActive = item.IsActive,
                 Email = item.Email,
-                Mobile = item.Mobile,                
+                Mobile = item.Mobile,
             };
 
         }
         public int Id { get; set; }
-        public int?ClientId { get; set; }
+        public int? ClientId { get; set; }
         public string? Name { get; set; }
         [Required]
         [DataType(DataType.Password)]
@@ -41,7 +41,7 @@ namespace QuickCampus_Core.ViewModel
         [Remote("EmailExist", "User", AdditionalFields = "Id", ErrorMessage = ("Email already exist!"))]
         [EmailAddress(ErrorMessage = "Invalid email address")]
         public string? Email { get; set; }
-        [Required,MaxLength(10)]
+        [Required, MaxLength(10)]
         [RegularExpression(@"^\d{10}$", ErrorMessage = "Mobile number must be a 10-digit number.")]
         public string? Mobile { get; set; }
         [Required]
@@ -53,8 +53,8 @@ namespace QuickCampus_Core.ViewModel
         {
             return new TblUser
             {
-              
-                ClientId= ClientId,
+
+                ClientId = ClientId,
                 Name = Name,
                 Password = Password,
                 Email = Email,
@@ -99,8 +99,8 @@ namespace QuickCampus_Core.ViewModel
                   .NotNull().WithMessage("Email could not be null")
                   .NotEmpty().WithMessage("Email could not be empty");
 
-            } 
-    
+            }
+
         }
     }
 }
