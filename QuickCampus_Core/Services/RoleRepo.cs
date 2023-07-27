@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
@@ -6,60 +7,71 @@ using QuickCampus_DAL.Context;
 
 namespace QuickCampus_Core.Services
 {
-    public class RoleRepo :BaseRepository<QuikCampusDevContext, TblRole>, IRoleRepo
+    public class RoleRepo : BaseRepository<QuikCampusDevContext, TblRole>, IRoleRepo
     {
         private readonly QuikCampusDevContext _context;
         private IConfiguration _config;
 
-        public RoleRepo (QuikCampusDevContext context, IConfiguration config)
+        public RoleRepo(QuikCampusDevContext context, IConfiguration config)
         {
             _config = config;
             _context = context;
         }
-        public async Task<string> SetRolePermission(RoleMappingRequest roleMappingRequest)
+        public async Task<IGeneralResult<string>> SetRolePermission(RoleMappingRequest roleMappingRequest)
         {
+            IGeneralResult<string> result = new GeneralResult<string>();
 
             var roleIds = _context.TblRoles.Select(s => s.Id).ToList();
             var permissionIds = _context.TblPermissions.Select(s => s.Id).ToList();
+            var assignPermission = _context.TblRolePermissions.Where(w => w.RoleId == roleMappingRequest.RoleId).ToList();
 
-            var rolePermissions = _context.TblRolePermissions.ToList();
-
-            foreach (var rIds in roleMappingRequest.roleIds)
+            bool isRoleIdExist = roleIds.Contains(roleMappingRequest.RoleId);
+            if (!isRoleIdExist)
             {
-                bool isRoleIdExist = roleIds.Contains(rIds.RoleId);
-                if (!isRoleIdExist)
-                {
-                    break ;
-                }
-                foreach (var pId in rIds.PermissionIds)
-                {
-                    bool isPermissionIdExist = permissionIds.Contains(pId);
-                    if (!isPermissionIdExist)
-                    {
-                        break;
-                    }
-
-                    int count = rolePermissions.Where(w => w.PermissionId == pId && w.RoleId == rIds.RoleId).Count(); 
-                    
-                    if(count > 0)
-                    {
-                        break;
-                    }
-                    
-
-
-                    TblRolePermission record = new TblRolePermission()
-                    {
-                        PermissionId = pId,
-                        RoleId = rIds.RoleId,
-                        PermissionName = "",
-                        DisplayName = ""
-                    };
-                    _context.TblRolePermissions.Add(record);
-                }
+                result.IsSuccess = false;
+                result.Message = "RoleId does not exist.";
+                result.Data = null;
+                return result;
             }
-            int save =  _context.SaveChanges();
-            return "SetRolePermissions";
+            
+
+            if (roleMappingRequest.RoleId > 0)
+            {
+                _context.TblRolePermissions.RemoveRange(assignPermission);
+            }
+
+                
+            foreach (var pId in roleMappingRequest.permissions)
+            {
+                bool isPermissionIdExist = permissionIds.Contains(pId.PermissionIds);
+                if (!isPermissionIdExist)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Permissionid does not exist.";
+                    result.Data = null;
+                    return result;
+                }
+
+                TblRolePermission record = new TblRolePermission()
+                {
+                    PermissionId = pId.PermissionIds,
+                    RoleId = roleMappingRequest.RoleId,
+                    PermissionName = "",
+                    DisplayName = ""
+                };
+                _context.TblRolePermissions.Add(record);
+
+            }
+            int save = _context.SaveChanges();
+
+            if (save > 0)
+            {
+                result.IsSuccess = true;
+                result.Message = "Permission assigned successfully.";
+                result.Data = null;
+                return result;
+            }
+            return result;
         }
     }
 }
