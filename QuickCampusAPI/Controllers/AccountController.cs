@@ -22,9 +22,9 @@ namespace QuickCampusAPI.Controllers
         [AllowAnonymous]
         [HttpPost]  
         [Route("AdminLogin")]
-        public IActionResult AdminLogin(AdminLogin adminlogin)
+        public async Task<IActionResult> AdminLogin(AdminLogin adminlogin)
         {
-            var res = _account.Login(adminlogin);
+            var res = await _account.Login(adminlogin);
             return Ok(res);
         }
 
