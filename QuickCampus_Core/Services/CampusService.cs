@@ -24,19 +24,19 @@ namespace QuickCampus_Core.Services
         public async Task<IGeneralResult<string>> AddCampus(CampusGridRequestVM vm, int clientId, int userId)
         {
             IGeneralResult<string> result = new GeneralResult<string>();
-        
-            var isCountryExist = _context.Countries.Where(w=>w.IsDeleted==false).Any(a => a.CountryId == vm.CountryID);
+
+            var isCountryExist = _context.Countries.Where(w => w.IsDeleted == false).Any(a => a.CountryId == vm.CountryID);
             var allCollages = _context.Colleges.Where(s => s.IsDeleted == false).Select(s => s.CollegeId).ToList();
-            var allStates = _context.States.Where(w=>w.IsDeleted==false).Select(s=>s.StateId).ToList();
+            var allStates = _context.States.Where(w => w.IsDeleted == false).Select(s => s.StateId).ToList();
             var isStateExist = allStates.Any(a => a == vm.StateID);
 
-            foreach(var clg in vm.Colleges)
+            foreach (var clg in vm.Colleges)
             {
                 var checkclg = allCollages.Any(s => s == clg.CollegeId);
                 if (!checkclg)
                 {
                     result.IsSuccess = false;
-                    result.Message = "College id "+clg.CollegeId+" is not exist";
+                    result.Message = "College id " + clg.CollegeId + " is not exist";
                     return result;
                 }
                 var checkstate = allStates.Any(s => s == clg.StateId);
@@ -63,6 +63,58 @@ namespace QuickCampus_Core.Services
 
             try
             {
+                if (vm.WalkInID > 0)
+                {
+                    WalkIn campus = _context.WalkIns.Where(x => x.WalkInId == vm.WalkInID).Include(x => x.CampusWalkInColleges).FirstOrDefault();
+                    if (campus != null)
+                    {
+                        campus.WalkInDate = vm.WalkInDate;
+                        campus.JobDescription = vm.JobDescription;
+                        campus.Address1 = vm.Address1;
+                        campus.Address2 = vm.Address2;
+                        campus.City = vm.City;
+                        campus.StateId = vm.StateID;
+                        campus.CountryId = vm.CountryID;
+                        campus.Title = vm.Title;
+
+                        _context.Update(campus);
+
+                        if (campus.CampusWalkInColleges != null)
+                        {
+                            _context.CampusWalkInColleges.RemoveRange(campus.CampusWalkInColleges);
+                        }
+
+                        foreach (var rec in vm.Colleges)
+                        {
+                            if (rec.IsIncludeInWalkIn)
+                            {
+                                CampusWalkInCollege campusWalkInCollege = new CampusWalkInCollege()
+                                {
+                                    WalkInId = campus.WalkInId,
+                                    CollegeId = rec.CollegeId,
+                                    ExamStartTime = TimeSpan.Parse(rec.ExamStartTime),
+                                    ExamEndTime = TimeSpan.Parse(rec.ExamEndTime),
+                                    CollegeCode = rec.CollegeCode,
+                                    StartDateTime = rec.StartDateTime,
+                                    IsCompleted = null
+                                };
+                                _context.CampusWalkInColleges.Add(campusWalkInCollege);
+                            }
+                        }
+                    }
+                    var UpdateResult = _context.SaveChanges();
+                    if (UpdateResult > 0)
+                    {
+                        result.IsSuccess = true;
+                        result.Message = "Record Update Successfully";
+                    }
+                    else
+                    {
+                        result.IsSuccess = false;
+                        result.Message = "Something went wrong.";
+                    }
+                    return result;
+                }
 
                 var sv = new WalkIn()
                 {
@@ -101,7 +153,7 @@ namespace QuickCampus_Core.Services
                     }
                 }
 
-                int  response = _context.SaveChanges();
+                int response = _context.SaveChanges();
                 if (response > 0)
                 {
                     result.IsSuccess = true;
@@ -113,12 +165,12 @@ namespace QuickCampus_Core.Services
                     result.Message = "Something went wrong.";
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 result.IsSuccess = false;
                 result.Message = "Something went wrong";
             }
-           
+
             return result;
         }
 

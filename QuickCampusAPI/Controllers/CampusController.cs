@@ -7,7 +7,7 @@ using QuickCampus_Core.ViewModel;
 
 namespace QuickCampusAPI.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class CampusController : ControllerBase
@@ -70,7 +70,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = "AddCampus")]
+        //[Authorize(Roles = "AddCampus")]
         [HttpPost]
         [Route("AddCampus")]
 
