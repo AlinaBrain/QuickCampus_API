@@ -65,7 +65,7 @@ namespace QuickCampus_Core.Services
             {
                 if (vm.WalkInID > 0)
                 {
-                    WalkIn campus = _context.WalkIns.Where(x => x.WalkInId == vm.WalkInID).Include(x => x.CampusWalkInColleges).FirstOrDefault();
+                    WalkIn campus = _context.WalkIns.Where(x => x.WalkInId == vm.WalkInID && clientId==0?true:x.ClientId == clientId).Include(x => x.CampusWalkInColleges).FirstOrDefault();
                     if (campus != null)
                     {
                         campus.WalkInDate = vm.WalkInDate;
