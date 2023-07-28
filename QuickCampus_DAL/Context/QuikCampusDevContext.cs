@@ -463,7 +463,6 @@ public partial class QuikCampusDevContext : DbContext
             entity.Property(e => e.Mobile).HasMaxLength(15);
             entity.Property(e => e.Name).HasMaxLength(100);
             entity.Property(e => e.Password).HasMaxLength(500);
-            entity.Property(e => e.UserName).HasMaxLength(100);
 
             entity.HasOne(d => d.Client).WithMany(p => p.TblUsers)
                 .HasForeignKey(d => d.ClientId)
@@ -497,10 +496,6 @@ public partial class QuikCampusDevContext : DbContext
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
             entity.Property(e => e.Title).HasMaxLength(250);
             entity.Property(e => e.WalkInDate).HasColumnType("datetime");
-
-            entity.HasOne(d => d.Client).WithMany(p => p.WalkIns)
-                .HasForeignKey(d => d.ClientId)
-                .HasConstraintName("FK__WalkIn__ClientId__73852659");
 
             entity.HasOne(d => d.Country).WithMany(p => p.WalkIns)
                 .HasForeignKey(d => d.CountryId)

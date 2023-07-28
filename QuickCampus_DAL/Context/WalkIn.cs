@@ -37,8 +37,6 @@ public partial class WalkIn
 
     public virtual ICollection<CampusWalkInCollege> CampusWalkInColleges { get; set; } = new List<CampusWalkInCollege>();
 
-    public virtual TblClient? Client { get; set; }
-
     public virtual Country? Country { get; set; }
 
     public virtual State? State { get; set; }

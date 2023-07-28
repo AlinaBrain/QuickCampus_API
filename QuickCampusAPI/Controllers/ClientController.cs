@@ -32,10 +32,17 @@ namespace QuickCampusAPI.Controllers
             if (_clientRepo.Any(x => x.Email == vm.Email && x.IsActive == true))
             {
                 result.Message = "Email Already Registered!";
+                return Ok(result);
             }
             else if (_clientRepo.Any(x => x.IsActive == true && x.Name == vm.Name.Trim()))
             {
-                result.Message = "UserName Already Exist!";
+                result.Message = "Name Already Exist!";
+                return Ok(result);
+            }
+            else if (_clientRepo.Any(x => x.UserName == vm.UserName && x.IsActive == true))
+            {
+                result.Message = "Username Already Registered! Please use diffrent name";
+                return Ok(result);
             }
             else
             {
@@ -54,22 +61,20 @@ namespace QuickCampusAPI.Controllers
                         SubscriptionPlan = vm.SubscriptionPlan,
                         Latitude = vm.Latitude,
                         Longitude = vm.Longitude,
-                        UserName=vm.UserName,
-                        Password=vm.Password,         
-                };   
+                        UserName = vm.UserName,
+                        Password = vm.Password,
+                    };
                     try
                     {
-                        var clientdata= await _clientRepo.Add(clientVM.ToClientDbModel());
+                        var clientdata = await _clientRepo.Add(clientVM.ToClientDbModel());
 
                         UserVm userVm = new UserVm()
                         {
-                           Name= clientdata.Name,
+                            Name = clientdata.Name,
                             Password = clientdata.Password,
-                            Email = clientdata.Email,
-                            ClientId=clientdata.Id,
-                            Mobile=clientdata.Phone,
-                            UserName=clientdata.UserName,   
-                            
+                            Email = clientdata.UserName,
+                            ClientId = clientdata.Id,
+                            Mobile = clientdata.Phone,
                         };
 
                         var userdetails = _userRepo.Add(userVm.ToUserDbModel());
@@ -102,14 +107,10 @@ namespace QuickCampusAPI.Controllers
             IGeneralResult<ClientResponseVm> result = new GeneralResult<ClientResponseVm>();
             var _jwtSecretKey = _config["Jwt:Key"];
             var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            if (_clientRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.Id != vm.Id ))
+            if (_clientRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.Id != vm.Id))
             {
                 result.Message = "Email Already Registered!";
-            }
-            else if (_clientRepo.Any(x => x.IsActive == true && x.Name == vm.Name.Trim()))
-            {
-                result.Message = "UserName Already Exist!";
-            }
+            } 
             else
             {
                 var res = await _clientRepo.GetById(vm.Id);
@@ -119,28 +120,21 @@ namespace QuickCampusAPI.Controllers
                     result.Message = " Client does Not Exist";
                     return Ok(result);
                 }
-                
-                if (ModelState.IsValid && vm.Id > 0 && res.IsDeleted==false)
-                {
 
-                    
-                    ClientVM clientVM = new ClientVM
-                    {
-                        Id = vm.Id,
-                        Name = vm.Name,
-                        Email = vm.Email,
-                        Phone = vm.Phone,
-                        Address = vm.Address,
-                        SubscriptionPlan = vm.SubscriptionPlan,
-                        CraetedBy = Convert.ToInt32(userId),
-                        ModifiedBy = Convert.ToInt32(userId),
-                        Longitude = vm.Longitude,
-                        Latitude = vm.Latitude,
-                    };
+                if (ModelState.IsValid && vm.Id > 0 && res.IsDeleted == false)
+                {
+                   res.Email = vm.Email;
+                    res.Phone = vm.Phone;
+                    res.Address = vm.Address;
+                    res.SubscriptionPlan = vm.SubscriptionPlan;
+                    res.CraetedBy = Convert.ToInt32(userId);
+                    res.ModifiedBy = Convert.ToInt32(userId);
+                    res.Longitude = vm.Longitude;
+                    res.Latitude = vm.Latitude;
+                    res.ModofiedDate = DateTime.Now;
                     try
                     {
-                        var TblClien = clientVM.ToUpdateDbModel();
-                      result.Data = (ClientResponseVm)await _clientRepo.Update(clientVM.ToUpdateDbModel());
+                        result.Data = (ClientResponseVm)await _clientRepo.Update(res);
                         result.Message = "Client updated successfully";
                         result.IsSuccess = true;
                     }
@@ -198,7 +192,7 @@ namespace QuickCampusAPI.Controllers
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             IGeneralResult<ClientVM> result = new GeneralResult<ClientVM>();
             var res = await _clientRepo.GetById(Id);
-            if (res.IsDeleted ==false)
+            if (res.IsDeleted == false)
             {
 
                 res.IsActive = false;
@@ -228,7 +222,7 @@ namespace QuickCampusAPI.Controllers
 
                 res.IsActive = false;
                 res.IsDeleted = true;
-              var data =  await _clientRepo.Update(res);
+                var data = await _clientRepo.Update(res);
                 result.Data = (ClientVM)data;
                 result.IsSuccess = true;
                 result.Message = "Client status changed succesfully";

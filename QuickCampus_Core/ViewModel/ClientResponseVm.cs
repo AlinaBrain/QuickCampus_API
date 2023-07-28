@@ -21,8 +21,7 @@ namespace QuickCampus_Core.ViewModel
                 SubscriptionPlan = items.SubscriptionPlan,
                 Latitude = items.Latitude,
                 Longitude = items.Longitude,
-                IsActive = items.IsActive,
-              
+                IsActive = items.IsActive, 
             };
         }
         public int Id { get; set; }
@@ -60,7 +59,6 @@ namespace QuickCampus_Core.ViewModel
             return new ClientUpdateRequest
             {
                 Id = items.Id,
-                Name = items.Name,
                 Address = items.Address,
                 Phone = items.Phone,
                 Email = items.Email,
@@ -71,7 +69,6 @@ namespace QuickCampus_Core.ViewModel
         }
         public int Id { get; set; }
 
-        public string? Name { get; set; }
         public string? Address { get; set; }
 
         public string? Email { get; set; }
@@ -89,14 +86,7 @@ namespace QuickCampus_Core.ViewModel
     public class ClientValidatorRequest : AbstractValidator<ClientUpdateRequest>
     {
         public ClientValidatorRequest()
-        {
-            RuleFor(x => x.Name)
-                 .Cascade(CascadeMode.StopOnFirstFailure)
-              .NotNull().WithMessage("Name could not be null")
-
-              .NotEmpty().WithMessage("Name could not be empty")
-        .Matches(@"^[A-Za-z\s]*$").WithMessage("'{PropertyName}' should only contain letters.")
-        .Length(3, 30);
+        {  
             RuleFor(x => x.Address)
               .Cascade(CascadeMode.StopOnFirstFailure)
               .NotNull().WithMessage("Address could not be null")

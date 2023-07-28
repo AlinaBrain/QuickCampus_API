@@ -1,9 +1,4 @@
 ﻿using QuickCampus_DAL.Context;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace QuickCampus_Core.ViewModel
 {
@@ -13,19 +8,13 @@ namespace QuickCampus_Core.ViewModel
         {
             return new UserResponseVm
             {
-                Id = items.Id,
-                UserName = items.UserName,
                 Name = items.Name,
                 Email = items.Email,
-                ClientId = items.ClientId,
-               
+                ClientId = items.ClientId, 
                 Mobile = items.Mobile,
-
             };
             }
         public int Id { get; set; }
-
-        public string? UserName { get; set; }
 
         public string? Name { get; set; }
 

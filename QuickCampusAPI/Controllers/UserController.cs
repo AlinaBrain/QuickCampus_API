@@ -27,7 +27,6 @@ namespace QuickCampusAPI.Controllers
         {
             vm.Password = EncodePasswordToBase64(vm.Password);
             IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
-            //var _jwtSecretKey = config["Jwt:Key"];
             var _jwtSecretKey = config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.IsDelete == false))
@@ -38,12 +37,6 @@ namespace QuickCampusAPI.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    // Decode the JWT token and retrieve the "id" claim
-
-                    //var clientId = JwtHelper.GetUserIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-
-                    //var clientId = vm.ClientId.HasValue ? await clientRepo.GetById((int)vm.ClientId) : null;
-
                     if (!string.IsNullOrEmpty(clientId))
                     {
                         int parsedClientId;
@@ -51,7 +44,6 @@ namespace QuickCampusAPI.Controllers
                         {
                             UserVm userVm = new UserVm
                             {
-                                UserName = vm.Email,
                                 Name = vm.Name,
                                 Email = vm.Email,
                                 Mobile = vm.Mobile,
@@ -75,7 +67,6 @@ namespace QuickCampusAPI.Controllers
                     {
                         UserVm userVm = new UserVm
                         {
-                            UserName = vm.Email,
                             Name = vm.Name,
                             Email = vm.Email,
                             Mobile = vm.Mobile,
@@ -114,7 +105,7 @@ namespace QuickCampusAPI.Controllers
             try
             {
                 var categoryList = (await userRepo.GetAll()).Where(x => x.IsDelete == false || x.IsDelete == null).ToList();
-                if(clientId != null)
+                if(clientId != null && clientId != "")
                 {
                   var response =  categoryList.Select(x => ((UserResponseVm)x)).Where(x =>x.ClientId ==Convert.ToInt32(clientId)).ToList();
                     result.IsSuccess = true;
@@ -140,6 +131,7 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
+
         [HttpDelete]
         [Route("DeleteUser")]
         public async Task<IActionResult> DeleteUser(int id)
@@ -171,11 +163,11 @@ namespace QuickCampusAPI.Controllers
             var _jwtSecretKey = config["Jwt:Key"];
             var clientId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
 
-            if (userRepo.Any(x => x.UserName == vm.UserName && x.IsActive == true && x.Id != vm.Id))
+            if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.Id != vm.Id))
             {
                 result.Message = "Email Already Registered!";
             }
-            else if (userRepo.Any(x => x.IsActive == true && x.UserName == vm.UserName.Trim()))
+            else if (userRepo.Any(x => x.IsActive == true && x.Email == vm.Email.Trim()))
             {
                 result.Message = "UserName Already Exist!";
             }
@@ -196,7 +188,7 @@ namespace QuickCampusAPI.Controllers
                     EditUserResponseVm userVm = new EditUserResponseVm
                     {
                         Id = vm.Id,
-                        UserName = vm.UserName,
+                        Email = vm.Email,
                         Mobile = vm.Mobile,
                         ClientId= Convert.ToInt32(clientId),
                     };

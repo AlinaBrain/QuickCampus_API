@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Http;
 using QuickCampus_DAL.Context;
 using System.ComponentModel.DataAnnotations;
 
@@ -11,14 +11,14 @@ namespace QuickCampus_Core.ViewModel
         {
             return new CollegeVM
             {
-                CollegeID=items.CollegeId,
+                CollegeId=items.CollegeId,
                 CollegeName = items.CollegeName,
-                Logo = items.Logo,
                 Address1 = items.Address2,
+                Logo = items.Logo,
                 Address2 = items.Address2,
                 City = items.City,
                 StateId = items.StateId,
-                CountryID = items.CountryId,
+                CountryId = items.CountryId,
                 CollegeCode = items.CollegeCode,
                 ContectPerson = items.ContectPerson,
                 ContectPhone = items.ContectPhone,
@@ -27,7 +27,7 @@ namespace QuickCampus_Core.ViewModel
                 ModifiedDate = items.ModifiedDate,
             };
         }
-        public int CollegeID { get; set; }
+        public int CollegeId { get; set; }
         [Required(ErrorMessage = "College Name is required.")]
         public string? CollegeName { get; set; }
         public string? Logo { get; set; }
@@ -38,12 +38,8 @@ namespace QuickCampus_Core.ViewModel
         public string? City { get; set; }
         [Required(ErrorMessage = "State is required.")]
         public int? StateId { get; set; }
-        public string? StateName { get; set; }
-        public IEnumerable<SelectListItem>? States { get; set; }
-        public string? CountryName { get; set; }
-        public IEnumerable<SelectListItem>? Countries { get; set; }
         [Required(ErrorMessage = "Country is required.")]
-        public int? CountryID { get; set; }
+        public int? CountryId { get; set; }
         public bool IsActive { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int CreatedBy { get; set; }
@@ -58,6 +54,9 @@ namespace QuickCampus_Core.ViewModel
         public int? ModifiedBy { get; set; }
 
         public DateTime? ModifiedDate { get; set; }
+        public bool? IsDeleted { get; set; }
+
+       // public IFormFile file { get; set; }
 
         public College ToCollegeDbModel()
         {
@@ -69,7 +68,7 @@ namespace QuickCampus_Core.ViewModel
                 Address2 = Address2,
                 City = City,
                 StateId = StateId,
-                CountryId = CountryID,
+                CountryId = CountryId,
                 CollegeCode = CollegeCode,
                 ContectPerson = ContectPerson,
                 ContectPhone = ContectPhone,
@@ -79,7 +78,7 @@ namespace QuickCampus_Core.ViewModel
                 CreatedBy = CreatedBy,
                 CreatedDate = DateTime.UtcNow,
                 ModifiedBy = ModifiedBy,
-                ModifiedDate = CollegeID > 0 ? DateTime.UtcNow : null,
+                ModifiedDate = CollegeId > 0 ? DateTime.UtcNow : null,
             };
         }
 
@@ -87,24 +86,21 @@ namespace QuickCampus_Core.ViewModel
         {
             return new College
             {
-                CollegeId = CollegeID,
+                CollegeId = CollegeId,
                 CollegeName = CollegeName,
                 Logo = Logo,
                 Address1 = Address1,
                 Address2 = Address2,
                 City = City,
                 StateId = StateId,
-                CountryId = CountryID,
+                CountryId = CountryId,
                 CollegeCode = CollegeCode,
                 ContectPerson = ContectPerson,
                 ContectPhone = ContectPhone,
                 ContectEmail = ContectEmail,
-                IsActive = true,
-                IsDeleted = false,
-                CreatedBy = CreatedBy,
-                CreatedDate = CollegeID < 0 ? DateTime.Now : null,
+                CreatedBy = CreatedBy, 
                 ModifiedBy = ModifiedBy,
-                ModifiedDate = DateTime.UtcNow,
+                ModifiedDate = DateTime.Now
             };
         }
 
@@ -115,7 +111,6 @@ namespace QuickCampus_Core.ViewModel
                 RuleFor(x => x.CollegeName)
                      .Cascade(CascadeMode.StopOnFirstFailure)
                   .NotNull().WithMessage("College Name could not be null")
-
                   .NotEmpty().WithMessage("College Name could not be empty")
             .Matches(@"^[A-Za-z\s]*$").WithMessage("'{PropertyName}' should only contain letters.")
             .Length(3, 250);
@@ -131,13 +126,13 @@ namespace QuickCampus_Core.ViewModel
                   .NotEmpty().WithMessage("City could not be empty");
 
                 RuleFor(x => x.ContectPerson)
-                  .Cascade(CascadeMode.StopOnFirstFailure).EmailAddress()
+                  .Cascade(CascadeMode.StopOnFirstFailure)
                   .NotNull().WithMessage("Contect Person could not be null")
                   .NotEmpty().WithMessage("Contect Person could not be empty");
 
 
                 RuleFor(x => x.ContectEmail)
-                  .Cascade(CascadeMode.StopOnFirstFailure).NotNull().WithMessage("Contect Email could not be null")
+                  .Cascade(CascadeMode.StopOnFirstFailure).EmailAddress().NotNull().WithMessage("Contect Email could not be null")
                   .NotEmpty().WithMessage("Contect Email could not be empty")
                   .Length(5, 50).WithMessage("Contect Email lengh could not be greater than 50");
 
