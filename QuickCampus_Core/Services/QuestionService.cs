@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
@@ -12,10 +13,15 @@ namespace QuickCampus_Core.Services
         {
             _context = context;
         }
-        public async  Task<List<QuestionViewModelAdmin>> GetAllQuestion()
+        public async Task<IGeneralResult<List<QuestionViewModelAdmin>>> GetAllQuestion(int clientid, bool issuperadmin)
         {
+            IGeneralResult<List<QuestionViewModelAdmin>> result = new GeneralResult<List<QuestionViewModelAdmin>>();
+
             List<QuestionViewModelAdmin> record = new List<QuestionViewModelAdmin>();
-               record =  _context.Questions.Where(x => x.IsDeleted == false && x.IsActive == true).Select(x => new QuestionViewModelAdmin()
+
+            if (issuperadmin)
+            {
+                result.Data = _context.Questions.Where(x => x.IsDeleted == false && x.IsActive == true && (clientid == 0 ? true : x.ClentId == clientid)).Select(x => new QuestionViewModelAdmin()
                 {
                     QuestionId = x.QuestionId,
                     QuestionTypeName = x.QuestionType.QuestionType1,
@@ -24,7 +30,39 @@ namespace QuickCampus_Core.Services
                     Question = x.Text,
                     IsActive = x.IsActive ?? false
                 }).ToList();
-            return record;
+                if (result.Data.Count > 0)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Record Fetch Successfully";
+                }
+                else
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Record Not Found";
+                }
+                return result;
+            }
+            result.Data = _context.Questions.Where(x => x.IsDeleted == false && x.IsActive == true && x.ClentId == clientid).Select(x => new QuestionViewModelAdmin()
+            {
+                QuestionId = x.QuestionId,
+                QuestionTypeName = x.QuestionType.QuestionType1,
+                QuestionSection = x.Section.Section1,
+                QuestionGroup = x.Group.GroupName,
+                Question = x.Text,
+                IsActive = x.IsActive ?? false
+            }).ToList();
+
+            if (result.Data.Count > 0)
+            {
+                result.IsSuccess = true;
+                result.Message = "Record Fatch Successfully";
+            }
+            else
+            {
+                result.IsSuccess = false;
+                result.Message = "Record Not Found";
+            }
+            return result;
 
         }
         public async Task<QuestionViewModelAdmin> GetQuestionById(int QuestionId)
@@ -86,7 +124,7 @@ namespace QuickCampus_Core.Services
 
             return sections;
         }
-        public  async Task<List<GroupViewModelAdmin>> GetAllGroups()
+        public async Task<List<GroupViewModelAdmin>> GetAllGroups()
         {
             var Groups = await _context.Groupdls.Select(x => new GroupViewModelAdmin()
             {
@@ -103,6 +141,35 @@ namespace QuickCampus_Core.Services
             }
         }
 
-      
+        public async Task<IGeneralResult<string>> ActiveInactiveQuestion(int questionId)
+        {
+            IGeneralResult<string> result = new GeneralResult<string>();
+            var question  = _context.Questions.Where(x => x.QuestionId == questionId).FirstOrDefault();
+
+            if (question != null)
+            {
+                if (question.IsActive == true)
+                {
+                    question.IsActive = false;
+                }
+                else
+                {
+                    question.IsActive = true;
+                }
+                _context.Questions.Update(question);
+                _context.SaveChanges();
+
+
+                result.IsSuccess = true;
+                result.Message = "Question status has been changed sucessfully.";
+                
+            }
+            else
+            {
+                result.IsSuccess = false;
+                result.Message = "Question status not changed. Please try again.";
+            }
+            return result;
+        }
     }
 }
