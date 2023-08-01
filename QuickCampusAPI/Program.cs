@@ -38,6 +38,7 @@ builder.Services.AddScoped<IValidator<ClientUpdateRequest>, ClientValidatorReque
 builder.Services.AddScoped<IValidator<CollegeVM>, CollegeValidator>();
 
 
+
 builder.Services.AddControllers()
                 .AddFluentValidation(options =>
                 {
@@ -85,6 +86,7 @@ builder.Services.AddScoped<IRoleRepo, RoleRepo>();
 builder.Services.AddScoped<IAccount, AccountService>();
 builder.Services.AddScoped<IClientRepo, ClientRepo>();
 builder.Services.AddScoped<IStateRepo, StateServices>();
+builder.Services.AddScoped<IQuestion,QuestionService>();
 
 
 

@@ -92,6 +92,7 @@ namespace QuickCampus_Core.ViewModel
 
     public class CampusWalkInModel
     {
+        public int CampusId { get; set; }
         [Required]
         public int CollegeId { get; set; }
 

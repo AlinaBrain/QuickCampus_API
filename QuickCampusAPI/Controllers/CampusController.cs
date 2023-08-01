@@ -74,14 +74,23 @@ namespace QuickCampusAPI.Controllers
         [HttpPost]
         [Route("AddCampus")]
 
-        public async Task<IActionResult> AddCampus(CampusGridRequestVM dto)
+        public async Task<IActionResult> AddCampus(CampusGridRequestVM dto,int clientid)
         {
+            int clientId = 0;
             var _jwtSecretKey = _config["Jwt:Key"];
-            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var cId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            
-            var response = await _campusrepo.AddCampus(dto, string.IsNullOrEmpty(clientId)?0:Convert.ToInt32(clientId), string.IsNullOrEmpty(userId)?0:Convert.ToInt32(userId));
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
 
+            if (isSuperAdmin)
+            {
+                clientId = clientid;
+            }
+            else
+            {
+                clientId = string.IsNullOrEmpty(cId)? 0 : Convert.ToInt32(cId);
+            }
+            var response = await _campusrepo.AddCampus(dto, clientId, string.IsNullOrEmpty(userId)?0:Convert.ToInt32(userId));
             return Ok(response);
         }
 
@@ -96,7 +105,6 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
     }
-
 
 }
 

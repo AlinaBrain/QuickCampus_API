@@ -24,6 +24,7 @@ namespace QuickCampus_Core.ViewModel
         public int? StateID { get; set; }
         [Required]
         public int? CountryID { get; set; }
+        [Required(ErrorMessage = "Title is required.")]
         public string Title { get; set; } = String.Empty;
 
         public List<CampusWalkInModel>? Colleges { get; set; }
