@@ -26,7 +26,7 @@ namespace QuickCampusAPI.Controllers
         public async Task<IActionResult> AddUser(UserModel vm)
         {
             vm.Password = EncodePasswordToBase64(vm.Password);
-            IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
+            IGeneralResult<UserResponseVm> result = new GeneralResult<UserResponseVm>();
             var _jwtSecretKey = config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.IsDelete == false))
@@ -50,10 +50,10 @@ namespace QuickCampusAPI.Controllers
                                 Password = vm.Password,
                                 ClientId = parsedClientId
                             };
-                            await userRepo.Add(userVm.ToUserDbModel());
+                          var dataWithClientId = await userRepo.Add(userVm.ToUserDbModel());
                             result.IsSuccess = true;
                             result.Message = "User added successfully.";
-                            result.Data = userVm;
+                            result.Data = (UserResponseVm)dataWithClientId;
                             return Ok(result);
                         }
                         else
@@ -69,15 +69,16 @@ namespace QuickCampusAPI.Controllers
                             Email = vm.Email,
                             Mobile = vm.Mobile,
                             Password = vm.Password,
-                            ClientId = 0, 
+                            ClientId = null, 
                             IsActive = true,
                             IsDelete = false
                         };
 
-                        await userRepo.Add(userVm.ToUserDbModel());
+                      var userData = await userRepo.Add(userVm.ToUserDbModel());
+
                         result.IsSuccess = true;
                         result.Message = "User added successfully.";
-                        result.Data = userVm;
+                        result.Data = (UserResponseVm)userData;
                         return Ok(result);
                     }
 
@@ -107,7 +108,7 @@ namespace QuickCampusAPI.Controllers
                 {
                   var response =  categoryList.Select(x => ((UserResponseVm)x)).Where(x =>x.ClientId ==Convert.ToInt32(clientId)).ToList();
                     result.IsSuccess = true;
-                    result.Message = "ClientList";
+                    result.Message = "User list get successfully!!";
                     result.Data = response;
                     return Ok(result);
                 }
@@ -115,12 +116,12 @@ namespace QuickCampusAPI.Controllers
                 if (res != null)
                 {
                     result.IsSuccess = true;
-                    result.Message = "ClientList";
+                    result.Message = "User list get successfully!!";
                     result.Data = res;
                 }
                 else
                 {
-                    result.Message = "Client List Not Found";
+                    result.Message = "User List Not Found";
                 }
             }
             catch (Exception ex)
@@ -182,17 +183,12 @@ namespace QuickCampusAPI.Controllers
                 if (ModelState.IsValid && vm.Id > 0 && res.IsDelete == false)
                 {
 
-
-                    EditUserResponseVm userVm = new EditUserResponseVm
-                    {
-                        Id = vm.Id,
-                        Email = vm.Email,
-                        Mobile = vm.Mobile,
-                        ClientId= Convert.ToInt32(clientId),
-                    };
+                    res.Id = vm.Id;
+                    res.Email = vm.Email;
+                    res.Mobile = vm.Mobile;
                     try
                     {  
-                        result.Data = (EditUserResponseVm)await userRepo.Update(userVm.ToUpdateDbModel());
+                        result.Data = (EditUserResponseVm)await userRepo.Update(res);
                         result.Message = "User updated successfully";
                         result.IsSuccess = true;
                     }
@@ -215,7 +211,7 @@ namespace QuickCampusAPI.Controllers
         [Route("activeAndInactive")]
         public async Task<IActionResult> ActiveAndInactive(bool isActive, int id)
         {
-            IGeneralResult<dynamic> result = new GeneralResult<dynamic>();
+            IGeneralResult<UserResponseVm> result = new GeneralResult<UserResponseVm>();
             if (id > 0)
             {
                 var res = await userRepo.GetById(id);
@@ -225,7 +221,7 @@ namespace QuickCampusAPI.Controllers
                     await userRepo.Update(res);
                     result.IsSuccess = true;
                     result.Message = "Your status is changed successfully";
-                    result.Data = res;
+                    result.Data = (UserResponseVm)res;
                     return Ok(result);
                 }
                 else

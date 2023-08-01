@@ -11,8 +11,7 @@ namespace QuickCampus_Core.ViewModel
             {
                 Id = item.Id,   
                 Email = item.Email,
-                Mobile=item.Mobile,
-                ClientId = item.ClientId
+                Mobile=item.Mobile
             };
         }
        
@@ -23,15 +22,13 @@ namespace QuickCampus_Core.ViewModel
         [Required]
         [RegularExpression(@"^[1-9][0-9]{9}$", ErrorMessage = "Please enter a valid 10-digit mobile number that does not start with 0.")]
         public string? Mobile { get; set; }
-        public int? ClientId { get; set; }
         public TblUser ToUpdateDbModel()
         {
             return new TblUser
             {
                 Id = Id,
                 Email = Email,
-                Mobile = Mobile, 
-                ClientId = ClientId
+                Mobile = Mobile,
             };
         }
 

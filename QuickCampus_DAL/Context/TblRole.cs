@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
+﻿
 namespace QuickCampus_DAL.Context;
 
 public partial class TblRole

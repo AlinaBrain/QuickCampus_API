@@ -8,6 +8,7 @@ namespace QuickCampus_Core.ViewModel
         {
             return new UserResponseVm
             {
+                Id = items.Id,
                 Name = items.Name,
                 Email = items.Email,
                 ClientId = items.ClientId, 
