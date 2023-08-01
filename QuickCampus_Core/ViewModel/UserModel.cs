@@ -23,7 +23,5 @@ namespace QuickCampus_Core.ViewModel
         [Required]
         [RegularExpression(@"^[1-9][0-9]{9}$", ErrorMessage = "Please enter a valid 10-digit mobile number that does not start with 0.")]
         public string Mobile { get; set; }
-
-        public string UserName { get; set; }
     }
 }

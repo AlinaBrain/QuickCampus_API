@@ -48,9 +48,7 @@ namespace QuickCampusAPI.Controllers
                                 Email = vm.Email,
                                 Mobile = vm.Mobile,
                                 Password = vm.Password,
-                                ClientId = parsedClientId,
-                                IsActive = true,
-                                IsDelete = false
+                                ClientId = parsedClientId
                             };
                             await userRepo.Add(userVm.ToUserDbModel());
                             result.IsSuccess = true;
