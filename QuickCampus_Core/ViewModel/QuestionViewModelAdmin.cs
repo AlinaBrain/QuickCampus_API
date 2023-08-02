@@ -33,11 +33,12 @@ namespace QuickCampus_Core.ViewModel
         public IEnumerable<SelectListItem> QuestionTypes { get; set; }
         public IEnumerable<SelectListItem> Sections { get; set; }
         public IEnumerable<SelectListItem> Groups { get; set; }
+        public int ClientId { get; set; }
     }
     public class OptionViewModelAdmin
     {
         [DataType(DataType.Upload)]
-       // public HttpPostedFileBase ImageUpload { get; set; }
+        //public i ImageUpload { get; set; }
         public int OptionId { get; set; }
         public int QuestionId { get; set; }
         [RequiredIf("ImageUpload", "OptionId", ErrorMessage = "Options is required.")]

@@ -257,5 +257,76 @@ namespace QuickCampus_Core.Services
             result.IsSuccess = true;
             return result;
         }
+
+
+
+        public async Task<IGeneralResult<CampusGridViewModel>> UpdateCampusStatus(int id, int clientId,bool status)
+        {
+            IGeneralResult<CampusGridViewModel> result = new GeneralResult<CampusGridViewModel>();
+            result.Data = new CampusGridViewModel();
+            WalkIn campus = new WalkIn();
+            if (clientId == 0)
+                campus = _context.WalkIns.Where(x => x.WalkInId == id && x.IsActive == true && x.IsDeleted == false).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
+            else
+                campus = _context.WalkIns.Where(x => x.WalkInId == id && x.IsActive == true && x.IsDeleted == false && x.ClientId == clientId).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
+
+            if (campus == null)
+            {
+                result.IsSuccess = false;
+                result.Message = "Record Not Found";
+                return result;
+            }
+            campus.IsActive = status;
+
+            _context.WalkIns.Update(campus);
+            int st =  _context.SaveChanges();
+
+            if (st > 0)
+            {
+                result.Message = "Campus Upadte Successfully";
+                result.IsSuccess = true;
+            }
+            else
+            {
+                result.Message = "Something went wrong";
+                result.IsSuccess = false;
+            }
+            return result;
+        }
+
+
+        public async Task<IGeneralResult<CampusGridViewModel>> DeleteCampus(int id, int clientId, bool isDelete)
+        {
+            IGeneralResult<CampusGridViewModel> result = new GeneralResult<CampusGridViewModel>();
+            result.Data = new CampusGridViewModel();
+            WalkIn campus = new WalkIn();
+            if (clientId == 0)
+                campus = _context.WalkIns.Where(x => x.WalkInId == id && x.IsActive == true && x.IsDeleted == false).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
+            else
+                campus = _context.WalkIns.Where(x => x.WalkInId == id && x.IsActive == true && x.IsDeleted == false && x.ClientId == clientId).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
+
+            if (campus == null)
+            {
+                result.IsSuccess = false;
+                result.Message = "Record Not Found";
+                return result;
+            }
+            campus.IsDeleted = isDelete;
+
+            _context.WalkIns.Update(campus);
+            int st = _context.SaveChanges();
+
+            if (st > 0)
+            {
+                result.Message = "Campus delete Successfully";
+                result.IsSuccess = true;
+            }
+            else
+            {
+                result.Message = "Something went wrong";
+                result.IsSuccess = false;
+            }
+            return result;
+        }
     }
 }
