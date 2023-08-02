@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting.Internal;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
+using Microsoft.AspNetCore.Http;
+
+
 
 namespace QuickCampusAPI.Controllers
 {
@@ -14,11 +18,15 @@ namespace QuickCampusAPI.Controllers
         private readonly ICollegeRepo _collegeRepo;
         private IConfiguration _config;
         private readonly Microsoft.AspNetCore.Hosting.IHostingEnvironment _hostingEnvironment;
+        private readonly string basepath;
+        private string baseUrl;
         public CollegeController(ICollegeRepo collegeRepo, IConfiguration config, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment)
         {
             _collegeRepo = collegeRepo;
             _config = config;
-            _hostingEnvironment = hostingEnvironment;   
+            _hostingEnvironment=hostingEnvironment;
+            basepath = config["APISitePath"];
+
         }
 
         [Authorize(Roles = "GetAllCollege")]
@@ -76,7 +84,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "AddCollege")]
         [HttpPost]
         [Route("AddCollege")]
-        public async Task<IActionResult> AddCollege([FromBody] CollegeVM vm)
+        public async Task<IActionResult> AddCollege([FromForm] CollegeLogoVm vm)
         {
             IGeneralResult<CollegeVM> result = new GeneralResult<CollegeVM>();
             var _jwtSecretKey = _config["Jwt:Key"];
@@ -86,10 +94,11 @@ namespace QuickCampusAPI.Controllers
                 if (ModelState.IsValid)
                 {
 
+                    
                     CollegeVM collegeVM = new CollegeVM
                     {
                         CollegeName = vm.CollegeName,
-                        Logo = vm.Logo,
+                        Logo= ProcessUploadFile(vm),
                         Address1 = vm.Address1,
                         Address2 = vm.Address2,
                         CreatedBy = Convert.ToInt32(userId),
@@ -238,21 +247,21 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-        //private string ProcessUploadFile(CollegeVM model)
-        //{
-        //    string uniqueFileName = null;
-        //    if (model.file!= null)
-        //    {
-        //        string photoUoload = Path.Combine(_hostingEnvironment.WebRootPath, "Image");
-        //        uniqueFileName = Guid.NewGuid().ToString() + "_" + model.file.FileName;
-        //        string filepath = Path.Combine(photoUoload, uniqueFileName);
-        //        using (var filename = new FileStream(filepath, FileMode.Create))
-        //        {
-        //            model.file.CopyTo(filename);
-        //        }
-        //    }
-        //    return uniqueFileName;
-        //}
-
+        private string ProcessUploadFile([FromForm] CollegeLogoVm model)
+        {
+            string uniqueFileName = null;
+            if (model.ImagePath != null)
+            {
+                string photoUoload = Path.Combine(_hostingEnvironment.WebRootPath, "Image");
+                uniqueFileName = Guid.NewGuid().ToString() + "_" + model.ImagePath.FileName;
+                string filepath = Path.Combine(photoUoload, uniqueFileName);
+                using (var filename = new FileStream(filepath, FileMode.Create))
+                {
+                    model.ImagePath.CopyTo(filename);
+                }
+            }
+            return uniqueFileName;
+        }
     }
-}
+    }
+

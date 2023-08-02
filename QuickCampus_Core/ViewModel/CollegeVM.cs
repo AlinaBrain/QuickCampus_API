@@ -30,7 +30,7 @@ namespace QuickCampus_Core.ViewModel
         public int CollegeId { get; set; }
         [Required(ErrorMessage = "College Name is required.")]
         public string? CollegeName { get; set; }
-        public string? Logo { get; set; }
+        public string ? Logo { get; set; }
         [Required(ErrorMessage = "Address1 is required.")]
         public string? Address1 { get; set; }
         public string? Address2 { get; set; }
