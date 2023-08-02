@@ -27,6 +27,9 @@ namespace QuickCampus_Core.ViewModel
         public DateTime CreatedDate { get; set; }
 
         public DateTime ModofiedDate { get; set; }
+        public bool? IsDeleted { get; set; }
+
+        public bool? IsActive { get; set; }
 
         public TblRole ToRoleDBModel()
         {
@@ -39,15 +42,17 @@ namespace QuickCampus_Core.ViewModel
                 ModifiedBy = ModifiedBy,
                 CreatedDate = DateTime.Now,
                 ModofiedDate = DateTime.Now,
+                IsActive = true,
+                IsDeleted = false
             };
         }
     }
 
-    public class RoleResponseList
+    public class RoleResponse
     {
-        public static explicit operator RoleResponseList(TblRole item)
+        public static explicit operator RoleResponse(TblRole item)
         {
-            return new RoleResponseList
+            return new RoleResponse
             {
                 Id = item.Id,
                 ClientId = item.ClientId,
@@ -55,7 +60,9 @@ namespace QuickCampus_Core.ViewModel
                 CreatedBy = item.CreatedBy,
                 ModifiedBy = item.ModifiedBy,
                 CreatedDate = item.CreatedDate,
-                ModofiedDate = item.ModofiedDate
+                ModofiedDate = item.ModofiedDate,
+                IsDeleted = item.IsDeleted,
+                IsActive = item.IsActive
             };
 
         }
@@ -70,5 +77,9 @@ namespace QuickCampus_Core.ViewModel
         public DateTime CreatedDate { get; set; }
 
         public DateTime ModofiedDate { get; set; }
+        public bool? IsDeleted { get; set; }
+
+        public bool? IsActive { get; set; }
+
     }
 }

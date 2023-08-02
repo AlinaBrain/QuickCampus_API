@@ -13,22 +13,20 @@ namespace QuickCampusAPI.Controllers
     {
         private readonly IRoleRepo roleRepo;
         private readonly IUserRepo userRepo;
-        private readonly IClientRepo clientRepo;
         private IConfiguration config;
-        public RoleController(IRoleRepo roleRepo, IUserRepo userRepo, IClientRepo clientRepo, IConfiguration config)
+        public RoleController(IRoleRepo roleRepo, IUserRepo userRepo, IConfiguration config)
         {
             this.roleRepo = roleRepo;
             this.userRepo = userRepo;
-            this.clientRepo = clientRepo;
             this.config = config;
         }
 
         [Authorize(Roles = "AddRole")]
         [HttpPost]
-        [Route("roleAdd")]
-        public async Task<IActionResult> roleAdd([FromBody] RoleModel vm)
+        [Route("AddRole")]
+        public async Task<IActionResult> AddRole([FromBody] RoleModel vm)
         {
-            IGeneralResult<RoleVm> result = new GeneralResult<RoleVm>();
+            IGeneralResult<RoleResponse> result = new GeneralResult<RoleResponse>();
             var _jwtSecretKey = config["Jwt:Key"];
             if (roleRepo.Any(x => x.Name == vm.RoleName))
             {
@@ -66,10 +64,10 @@ namespace QuickCampusAPI.Controllers
                                     CreatedDate = DateTime.Now,
                                     ModofiedDate = DateTime.Now
                                 };
-                                await roleRepo.Add(roleVm.ToRoleDBModel());
+                             var roleData = await roleRepo.Add(roleVm.ToRoleDBModel());
                                 result.Message = "Role added successfully";
                                 result.IsSuccess = true;
-                                result.Data = roleVm;
+                                result.Data = (RoleResponse)roleData;
                                 return Ok(result);
                             }
                             else
@@ -89,10 +87,10 @@ namespace QuickCampusAPI.Controllers
                                 CreatedDate = DateTime.Now,
                                 ModofiedDate = DateTime.Now
                             };
-                            await roleRepo.Add(roleVm.ToRoleDBModel());
+                          var roleDataWithClientId = await roleRepo.Add(roleVm.ToRoleDBModel());
                             result.Message = "Role added successfully";
                             result.IsSuccess = true;
-                            result.Data = roleVm;
+                            result.Data = (RoleResponse)roleDataWithClientId;
                             return Ok(result);
                         }
                     }
@@ -112,48 +110,44 @@ namespace QuickCampusAPI.Controllers
 
         [Authorize(Roles = "GetAllRole")]
         [HttpGet]
-        [Route("roleList")]
-        public async Task<IActionResult> roleList()
+        [Route("RoleList")]
+        public async Task<IActionResult> RoleList()
         {
             var _jwtSecretKey = config["Jwt:Key"];
             var  clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey); 
-            List<RoleResponseList> roleVm = new List<RoleResponseList>();
+            List<RoleResponse> roleVm = new List<RoleResponse>();
             var rolelist = (await roleRepo.GetAll()).ToList();
 
             if (string.IsNullOrEmpty(clientId))
             {
-                roleVm = rolelist.Select(x => (RoleResponseList)x).Where(w=>w.ClientId==null).ToList();
+                roleVm = rolelist.Select(x => (RoleResponse)x).Where(w=>w.ClientId==null).ToList();
             }
             else
             {
-                roleVm = rolelist.Select(x => (RoleResponseList)x).Where(w => w.ClientId == Convert.ToInt32(clientId)).ToList();
+                roleVm = rolelist.Select(x => (RoleResponse)x).Where(w => w.ClientId == Convert.ToInt32(clientId)).ToList();
             }
             return Ok(roleVm);
         }
 
         [Authorize(Roles = "UpdateRole")]
         [HttpPost]
-        [Route("roleEdit")]
-        public async Task<IActionResult> Edit(int roleId, RoleModel vm)
+        [Route("EditRole")]
+        public async Task<IActionResult> EditRole(RoleModel vm)
         {
-            IGeneralResult<RoleVm> result = new GeneralResult<RoleVm>();
+            IGeneralResult<RoleResponse> result = new GeneralResult<RoleResponse>();
             var _jwtSecretKey = config["Jwt:Key"];
-            if (roleRepo.Any(x => x.Name == vm.RoleName && x.Id != roleId))
+            if (roleRepo.Any(x => x.Name == vm.RoleName && x.Id != vm.Id))
             {
                 result.Message = "RoleName Already Registerd!";
             }
             else
             {
-                var uId = await userRepo.GetById(vm.userId);
-                var check = (uId != null && uId.IsDelete == true) ? uId : null;
-                if (uId != null)
-                {
-                    var res = await roleRepo.GetById(roleId);
+                    var res = await roleRepo.GetById(vm.Id);
                     var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
 
                     if (clientId != null || clientId == "")
                     {
-                        res.Id = roleId;
+                        res.Id = vm.Id;
                         if (clientId == "")
                         {
                             res.ClientId = null; // Assign null to ClientId property
@@ -165,12 +159,11 @@ namespace QuickCampusAPI.Controllers
                         if (res != null)
                         {
                             res.Name = vm.RoleName;
-                            res.ModifiedBy = vm.userId;
                             res.ModofiedDate = DateTime.Now;
-                            await roleRepo.Update(res);
+                            var roleData = await roleRepo.Update(res);
                             result.Message = "Role data is updated successfully";
                             result.IsSuccess = true;
-                            result.Data = (RoleVm)res;
+                            result.Data = (RoleResponse)roleData;
                             return Ok(result);
                         }
                         else
@@ -181,66 +174,65 @@ namespace QuickCampusAPI.Controllers
                     else
                     {
                         result.Message = "ClientId not found. ";
-                    }
-                }
-                else
-                {
-                    result.Message = "User Id is not valid.";
-                }
+                    }        
                 return Ok(result);
 
             }
             return Ok(result);
         }
 
-        [Authorize(Roles = "EditRole")]
-        [HttpGet]
-        [Route("GetRoleByRoleId")]
-        public async Task<IActionResult> GetRoleByRoleId(int roleId)
+       
+        [Authorize(Roles = "DeleteRole")]
+        [HttpDelete]
+        [Route("DeleteRole")]
+        public async Task<IActionResult> DeleteRole(int id  )
         {
-            int cId = 0;
             var _jwtSecretKey = config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            IGeneralResult<GetRoleId> roleRecord = new GeneralResult<GetRoleId>();
-
-            if (string.IsNullOrEmpty(clientId))
+            IGeneralResult<RoleResponse> result = new GeneralResult<RoleResponse>();
+            var res = await roleRepo.GetById(id);
+            if (res != null)
             {
-                 roleRecord.Data = (await roleRepo.GetAll()).Where(w => w.Id == roleId && w.ClientId==null).Select(s => new GetRoleId()
-                {
-                    Id = roleId,
-                    RoleName = s.Name
-                }).FirstOrDefault();
+                res.IsDeleted = true;
+                res.IsActive = false;
+
+              var userDataDeleted = await roleRepo.Update(res);
+                result.IsSuccess = true;
+                result.Data = (RoleResponse)userDataDeleted;
+                result.Message = "Role Deleted Succesfully";
             }
             else
             {
-                cId= Convert.ToInt32(clientId);
-                 roleRecord.Data = (await roleRepo.GetAll()).Where(w => w.Id == roleId && w.ClientId==cId).Select(s => new GetRoleId()
-                {
-                    Id = roleId,
-                    RoleName = s.Name
-                }).FirstOrDefault();
+                result.Message = "Role does Not exist";
             }
-
-            if (roleRecord.Data == null)
-            {
-                roleRecord.IsSuccess = false;
-                roleRecord.Message = "No Record Found";
-            }
-            else
-            {
-                roleRecord.IsSuccess = true;
-                roleRecord.Message = "Role Record of Id "+roleId;
-            }
-            return Ok(roleRecord);
+            return Ok(result);
         }
 
-
-        [HttpPost]
-        [Route("SetRolePermissions")]
-        public async Task<IActionResult> SetRolePermissions(RoleMappingRequest roleMappingRequest)
+        [Authorize(Roles = "ActiveRole")]
+        [HttpGet]
+        [Route("activeAndInactive")]
+        public async Task<IActionResult> ActiveAndInactive(bool isActive, int id)
         {
-            var response = await roleRepo.SetRolePermission(roleMappingRequest);
-            return Ok(response);
+            IGeneralResult<RoleResponse> result = new GeneralResult<RoleResponse>();
+            if (id > 0)
+            {
+                var res = await roleRepo.GetById(id);
+                if (res != null && res.IsDeleted == false)
+                {
+                    res.IsActive = isActive;
+                    await roleRepo.Update(res);
+                    result.IsSuccess = true;
+                    result.Message = "Your status is changed successfully";
+                    result.Data = (RoleResponse)res;
+                    return Ok(result);
+                }
+                else
+                {
+                    result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
+                }
+            }
+            return Ok(result);
         }
+
     }
 }

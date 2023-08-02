@@ -294,10 +294,6 @@ public partial class QuikCampusDevContext : DbContext
         {
             entity.ToTable("Question");
 
-            entity.HasOne(d => d.Clent).WithMany(p => p.Questions)
-                .HasForeignKey(d => d.ClentId)
-                .HasConstraintName("FK__Question__ClentI__4D5F7D71");
-
             entity.HasOne(d => d.Group).WithMany(p => p.Questions)
                 .HasForeignKey(d => d.GroupId)
                 .HasConstraintName("FK_Question_Group");

@@ -6,7 +6,7 @@ using QuickCampus_Core.ViewModel;
 
 namespace QuickCampusAPI.Controllers
 {
-    [Authorize]
+   // [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class CollegeController : ControllerBase
@@ -73,7 +73,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = "AddCollege")]
+      //  [Authorize(Roles = "AddCollege")]
         [HttpPost]
         [Route("AddCollege")]
         public async Task<IActionResult> AddCollege([FromBody] CollegeVM vm)
@@ -85,6 +85,17 @@ namespace QuickCampusAPI.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    if (vm.Image == null || vm.Image.Length <= 0)
+                        return BadRequest("Invalid file.");
+                    string uniqueFileName = Path.GetRandomFileName() + Path.GetExtension(vm.Image.FileName);  
+                    string uploadPath = Path.Combine("wwwroot", "UploadFiles", uniqueFileName);
+                    using (var stream = new FileStream(uploadPath, FileMode.Create))
+                    {
+                        await vm.Image.CopyToAsync(stream);
+                    }
+
+                    // Update the 'Logo' property in your model with the file path
+                    vm.Logo = $"/UploadFiles/{uniqueFileName}";
 
                     CollegeVM collegeVM = new CollegeVM
                     {
@@ -124,6 +135,15 @@ namespace QuickCampusAPI.Controllers
 
             }
             return Ok(result);
+        }
+
+        public static string GetUniqueFileName(string fileName)
+        {
+            fileName = Path.GetFileName(fileName);
+            return string.Concat(Path.GetFileNameWithoutExtension(fileName)
+                                , "_"
+                                , Guid.NewGuid().ToString().AsSpan(0, 4)
+                                , Path.GetExtension(fileName));
         }
 
         [Authorize(Roles = "EditCollege")]
