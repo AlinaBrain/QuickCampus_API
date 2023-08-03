@@ -30,14 +30,13 @@ namespace QuickCampus_Core.ViewModel
         public bool IsActive { get; set; }
         public bool IsDeleted { get; set; }
         public List<OptionViewModelAdmin> options { get; set; }
-        public IEnumerable<SelectListItem> QuestionTypes { get; set; }
-        public IEnumerable<SelectListItem> Sections { get; set; }
-        public IEnumerable<SelectListItem> Groups { get; set; }
+      
+        public int ClientId { get; set; }
     }
     public class OptionViewModelAdmin
     {
         [DataType(DataType.Upload)]
-       // public HttpPostedFileBase ImageUpload { get; set; }
+        //public i ImageUpload { get; set; }
         public int OptionId { get; set; }
         public int QuestionId { get; set; }
         [RequiredIf("ImageUpload", "OptionId", ErrorMessage = "Options is required.")]
@@ -83,25 +82,25 @@ namespace QuickCampus_Core.ViewModel
 
         }
 
-        protected override ValidationResult IsValid(object value, ValidationContext context)
-        {
-            Object instance = context.ObjectInstance;
-            Type type = instance.GetType();
-            Object proprtyvalue = type.GetProperty(FirstPropertyName).GetValue(instance, null);
-            Object proprtyvalue2 = type.GetProperty(SecondPropertyName).GetValue(instance, null);
-            if (proprtyvalue != null)
-            {
-                return ValidationResult.Success;
-            }
-            else
-            {
-                if ((int)proprtyvalue2 == 0)
-                {
-                    ValidationResult result = base.IsValid(value, context);
-                    return result;
-                }
-                else { return ValidationResult.Success; }
-            }
-        }
+        //protected override ValidationResult IsValid(object value, ValidationContext context)
+        //{
+        //    Object instance = context.ObjectInstance;
+        //    Type type = instance.GetType();
+        //    Object proprtyvalue = type.GetProperty(FirstPropertyName).GetValue(instance, null);
+        //    Object proprtyvalue2 = type.GetProperty(SecondPropertyName).GetValue(instance, null);
+        //    if (proprtyvalue != null)
+        //    {
+        //        return ValidationResult.Success;
+        //    }
+        //    else
+        //    {
+        //        if ((int)proprtyvalue2 == 0)
+        //        {
+        //            ValidationResult result = base.IsValid(value, context);
+        //            return result;
+        //        }
+        //        else { return ValidationResult.Success; }
+        //    }
+        //}
     }
 }

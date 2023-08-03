@@ -11,6 +11,7 @@ namespace QuickCampus_Core.Interfaces
         Task<IEnumerable<CampusGridViewModel>> Add(CampusGridViewModel campusGridViewModel);
         Task<IGeneralResult<string>> AddCampus(CampusGridRequestVM vm, int clientId, int userId);
 
-
+        Task<IGeneralResult<CampusGridViewModel>> UpdateCampusStatus(int id, int clientId, bool status);
+        Task<IGeneralResult<CampusGridViewModel>> DeleteCampus(int id, int clientId, bool isDelete);
     }
 }
