@@ -369,6 +369,7 @@ namespace QuickCampus_Core.Services
             {
                 result.IsSuccess = false;
                 result.Message = "ClientId Not Found.";
+                return result;
             }
 
             question = _context.Questions.Where(x => x.QuestionId == questionId && x.IsDeleted == false && (clientId == 0 ? true : x.ClentId == clientId)).FirstOrDefault();
@@ -376,6 +377,7 @@ namespace QuickCampus_Core.Services
             {
                 result.IsSuccess = false;
                 result.Message = "Question not found.";
+                return result;
             }
             if (question.IsDeleted == true)
             {
