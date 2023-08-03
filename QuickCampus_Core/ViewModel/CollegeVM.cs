@@ -56,8 +56,9 @@ namespace QuickCampus_Core.ViewModel
 
         public DateTime? ModifiedDate { get; set; }
         public bool? IsDeleted { get; set; }
+        public int? ClientId { get; set; }
 
-       // public IFormFile file { get; set; }
+        // public IFormFile file { get; set; }
 
         public College ToCollegeDbModel()
         {
