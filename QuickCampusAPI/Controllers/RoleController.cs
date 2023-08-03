@@ -119,12 +119,12 @@ namespace QuickCampusAPI.Controllers
             List<TblRole> rolelist = new List<TblRole>();
             if (isSuperAdmin)
             {
-                rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted == false && (cid == 0 ? true : x.ClientId == cid)).ToList();
+                rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).ToList();
 
             }
             else
             {
-                rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted == false && x.ClientId == cid).ToList();
+                rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).ToList();
             }
             return Ok(rolelist);
         }
