@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace QuickCampusAPI.Controllers
 {
-    [Authorize]
+   // [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class CollegeController : ControllerBase
@@ -85,7 +85,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
-       // [Authorize(Roles = "AddCollege")]
+        [Authorize(Roles = "AddCollege")]
         [HttpPost]
         [Route("AddCollege")]
         public async Task<IActionResult> AddCollege([FromForm] CollegeLogoVm vm)
@@ -99,20 +99,6 @@ namespace QuickCampusAPI.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    bool FindCountry=_countryRepo.Any(x=>x.CountryId == vm.CountryId);
-                    bool FindState = _stateRepo.Any(x=>x.StateId==vm.StateId);
-                    if (!FindCountry)
-                    {
-                        result.Message = "This Country is not listed for this College!";
-                        return Ok(result);
-                    }
-                    if (!FindState)
-                    {
-                        result.Message = "This State is not Listed for this State!";
-                        return Ok(result);
-                    }
-
-
 
                     CollegeVM collegeVM = new CollegeVM
                     {
@@ -155,7 +141,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
-       // [Authorize(Roles = "EditCollege")]
+        [Authorize(Roles = "EditCollege")]
         [HttpPost]
         [Route("EditCollege")]
         public async Task<IActionResult> EditCollege([FromBody] CollegeLogoVm vm)
