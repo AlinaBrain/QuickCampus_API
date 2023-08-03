@@ -447,7 +447,14 @@ namespace QuickCampus_Core.Services
                 res.Message = "invalid section";
                 return res;
             }
+            bool isExist = _context.Questions.Any(w => w.IsDeleted != true && w.QuestionTypeId == model.QuestionTypeId && w.SectionId == model.SectionId && w.GroupId == model.GroupId);
 
+            if (isExist)
+            {
+                res.IsSuccess = false;
+                res.Message = "Question Already Exist";
+                return res;
+            }
 
             int? marks = (int)_context.QuestionTypes.Where(y => y.QuestionTypeId == model.QuestionTypeId).SingleOrDefault().Marks;
             Question question = new Question()
@@ -554,6 +561,15 @@ namespace QuickCampus_Core.Services
             {
                 res.IsSuccess = false;
                 res.Message = "Question not found";
+                return res;
+            }
+
+            bool isExist = _context.Questions.Any(w => w.IsDeleted != true && w.QuestionTypeId == model.QuestionTypeId && w.SectionId == model.SectionId && w.GroupId == model.GroupId && w.QuestionId != model.QuestionId);
+
+            if (isExist)
+            {
+                res.IsSuccess = false;
+                res.Message = "Question Already Exist";
                 return res;
             }
 
