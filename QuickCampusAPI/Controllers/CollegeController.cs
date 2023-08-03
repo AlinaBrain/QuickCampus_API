@@ -19,13 +19,17 @@ namespace QuickCampusAPI.Controllers
         private IConfiguration _config;
         private readonly Microsoft.AspNetCore.Hosting.IHostingEnvironment _hostingEnvironment;
         private readonly string basepath;
+        private readonly ICountryRepo _countryRepo;
+        private readonly IStateRepo _stateRepo;
         private string baseUrl;
-        public CollegeController(ICollegeRepo collegeRepo, IConfiguration config, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment)
+        public CollegeController(ICollegeRepo collegeRepo, IConfiguration config, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment,ICountryRepo countryRepo,IStateRepo stateRepo)
         {
             _collegeRepo = collegeRepo;
             _config = config;
             _hostingEnvironment=hostingEnvironment;
             basepath = config["APISitePath"];
+            _countryRepo = countryRepo;
+            _stateRepo=stateRepo;
 
         }
 
@@ -93,8 +97,21 @@ namespace QuickCampusAPI.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    bool FindCountry=_countryRepo.Any(x=>x.CountryId == vm.CountryId);
+                    bool FindState = _stateRepo.Any(x=>x.StateId==vm.StateId);
+                    if (!FindCountry)
+                    {
+                        result.Message = "This Country is not listed for this College!";
+                        return Ok(result);
+                    }
+                    if (!FindState)
+                    {
+                        result.Message = "This State is not Listed for this State!";
+                        return Ok(result);
+                    }
 
-                    
+
+
                     CollegeVM collegeVM = new CollegeVM
                     {
                         CollegeName = vm.CollegeName,
@@ -252,7 +269,7 @@ namespace QuickCampusAPI.Controllers
             string uniqueFileName = null;
             if (model.ImagePath != null)
             {
-                string photoUoload = Path.Combine(_hostingEnvironment.WebRootPath, "Image");
+                string photoUoload = Path.Combine(_hostingEnvironment.WebRootPath, "UploadFiles");
                 uniqueFileName = Guid.NewGuid().ToString() + "_" + model.ImagePath.FileName;
                 string filepath = Path.Combine(photoUoload, uniqueFileName);
                 using (var filename = new FileStream(filepath, FileMode.Create))
