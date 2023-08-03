@@ -106,7 +106,7 @@ namespace QuickCampusAPI.Controllers
                 cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
             }
             model.ClientId = cid;
-            var res = model.QuestionId == 0 ? await _questionrepo.UpdateQuestion(model, isSuperAdmin) : await _questionrepo.AddQuestion(model, isSuperAdmin);
+            var res = model.QuestionId > 0 ? await _questionrepo.UpdateQuestion(model, isSuperAdmin) : await _questionrepo.AddQuestion(model, isSuperAdmin);
             return Ok(res);
         }
 

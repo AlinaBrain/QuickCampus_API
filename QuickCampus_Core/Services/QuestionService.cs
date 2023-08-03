@@ -401,15 +401,21 @@ namespace QuickCampus_Core.Services
 
         public async Task<IGeneralResult<string>> AddQuestion(QuestionViewModelAdmin model, bool isSuperAdmin)
         {
-            List<Question> allQuestions = new List<Question>();
+            List<QuestionType> allQuestions = new List<QuestionType>();
+            List<Section> allSections = new List<Section>();
+            List<Groupdl> allGroups= new List<Groupdl>();
             IGeneralResult<string> res = new GeneralResult<string>();
             if (isSuperAdmin)
             {
-                allQuestions = _context.Questions.Include(x => x.QuestionOptions).Where(x => x.QuestionId == model.QuestionId && x.IsDeleted == false && (model.ClientId == 0 ? true : x.ClentId == model.ClientId)).ToList();
+                allQuestions = _context.QuestionTypes.Where(x => (model.ClientId == 0 ? true : x.ClentId == model.ClientId)).ToList();
+                allSections=_context.Sections.Where(x => (model.ClientId == 0 ? true : x.ClentId == model.ClientId)).ToList();
+                allGroups= _context.Groupdls.Where(x => (model.ClientId == 0 ? true : x.ClentId == model.ClientId)).ToList();
             }
             else
             {
-                allQuestions = _context.Questions.Include(x => x.QuestionOptions).Where(x => x.QuestionId == model.QuestionId && x.ClentId == model.ClientId && x.IsDeleted == false).ToList();
+                allQuestions = _context.QuestionTypes.Where(x => x.ClentId == model.ClientId).ToList();
+                allSections = _context.Sections.Where(x => x.ClentId == model.ClientId).ToList();
+                allGroups = _context.Groupdls.Where(x => x.ClentId == model.ClientId).ToList();
 
                 if (model.ClientId == 0)
                 {
@@ -419,7 +425,30 @@ namespace QuickCampus_Core.Services
                 }
             }
 
-            
+            bool isExistQuestionType= allQuestions.Any(a=>a.QuestionTypeId==model.QuestionTypeId);
+            bool isExistGroup = allGroups.Any(a => a.GroupId == model.GroupId);
+            bool isExistSection = allSections.Any(a => a.SectionId == model.SectionId);
+
+            if (!isExistQuestionType)
+            {
+                res.IsSuccess = false;
+                res.Message = "invalid questiontype";
+                return res;
+            } 
+            else if (!isExistGroup)
+            {
+                res.IsSuccess = false;
+                res.Message = "invalid group";
+                return res;
+            }
+            else if (!isExistSection)
+            {
+                res.IsSuccess = false;
+                res.Message = "invalid section";
+                return res;
+            }
+
+
             int? marks = (int)_context.QuestionTypes.Where(y => y.QuestionTypeId == model.QuestionTypeId).SingleOrDefault().Marks;
             Question question = new Question()
             {
