@@ -6,6 +6,8 @@ using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
 using Microsoft.AspNetCore.Http;
 using QuickCampus_DAL.Context;
+using QuickCampus_Core.Services;
+using Azure;
 
 namespace QuickCampusAPI.Controllers
 {
@@ -35,25 +37,52 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "GetAllCollege")]
         [HttpGet]
         [Route("GetAllCollege")]
-        public async Task<IActionResult> GetAllCollege()
+        public async Task<IActionResult> GetAllCollege(int clientid)
         {
-            var _jwtSecretKey = _config["Jwt:Key"];
-            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             IGeneralResult<List<CollegeVM>> result = new GeneralResult<List<CollegeVM>>();
+            var _jwtSecretKey = _config["Jwt:Key"];
+
+            int cid = 0;
+            var jwtSecretKey = _config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            if (isSuperAdmin)
+            {
+                cid = clientid;
+            }
+            else
+            {
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
+            }
+            List<College> collegeList = new List<College>();
             try
             {
-                var collegeList = (await _collegeRepo.GetAll()).Where(x => x.IsDeleted == false || x.IsDeleted == null).ToList();
-                var res = collegeList.Select(x => ((CollegeVM)x)).ToList();
-                if (res != null)
+
+                if (isSuperAdmin)
                 {
-                    result.IsSuccess = true;
-                    result.Message = "College get successfully";
-                    result.Data = res;
+                    collegeList = (await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).ToList();
+
                 }
                 else
                 {
-                    result.Message = "College List Not Found";
+                    collegeList = (await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).ToList();
                 }
+
+               var response = collegeList.Select(x => (CollegeVM)x).ToList();
+
+
+                if (collegeList.Count > 0)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "College get successfully";
+                    result.Data = response;
+                }
+                else
+                {
+                    result.IsSuccess = true;
+                    result.Message = "College list not found!";
+                    result.Data = null;
+                }              
             }
             catch (Exception ex)
             {

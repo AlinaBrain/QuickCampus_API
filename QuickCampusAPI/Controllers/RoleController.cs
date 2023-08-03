@@ -115,7 +115,7 @@ namespace QuickCampusAPI.Controllers
                 cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
             }
 
-            List<RoleResponse> roleVm = new List<RoleResponse>();
+           // List<RoleResponse> roleVm = new List<RoleResponse>();
             List<TblRole> rolelist = new List<TblRole>();
             if (isSuperAdmin)
             {
