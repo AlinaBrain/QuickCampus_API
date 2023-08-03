@@ -3,6 +3,7 @@ using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
+using System.Collections;
 
 namespace QuickCampus_Core.Services
 {
@@ -16,12 +17,10 @@ namespace QuickCampus_Core.Services
         public async Task<IGeneralResult<List<QuestionViewModelAdmin>>> GetAllQuestion(int clientid, bool issuperadmin)
         {
             IGeneralResult<List<QuestionViewModelAdmin>> result = new GeneralResult<List<QuestionViewModelAdmin>>();
-
             List<QuestionViewModelAdmin> record = new List<QuestionViewModelAdmin>();
-
             if (issuperadmin)
             {
-                result.Data = _context.Questions.Where(x => x.IsDeleted == false && x.IsActive == true && (clientid == 0 ? true : x.ClentId == clientid)).Select(x => new QuestionViewModelAdmin()
+                result.Data = _context.Questions.Where(x => x.IsDeleted == false  && (clientid == 0 ? true : x.ClentId == clientid)).Select(x => new QuestionViewModelAdmin()
                 {
                     QuestionId = x.QuestionId,
                     QuestionTypeName = x.QuestionType.QuestionType1,
@@ -42,7 +41,14 @@ namespace QuickCampus_Core.Services
                 }
                 return result;
             }
-            result.Data = _context.Questions.Where(x => x.IsDeleted == false && x.IsActive == true && x.ClentId == clientid).Select(x => new QuestionViewModelAdmin()
+            if (clientid > 0)
+            {
+                result.IsSuccess = false;
+                result.Message = "Invalid ClientId";
+                return result;
+            }
+
+            result.Data = _context.Questions.Where(x => x.IsDeleted == false  && x.ClentId == clientid).Select(x => new QuestionViewModelAdmin()
             {
                 QuestionId = x.QuestionId,
                 QuestionTypeName = x.QuestionType.QuestionType1,
@@ -65,9 +71,56 @@ namespace QuickCampus_Core.Services
             return result;
 
         }
-        public async Task<QuestionViewModelAdmin> GetQuestionById(int QuestionId)
+        public async Task<IGeneralResult<QuestionViewModelAdmin>> GetQuestionById(int QuestionId, int clientid, bool issuperadmin)
         {
-            var questions = await _context.Questions.Where(x => x.IsDeleted == false && x.IsActive == true && x.QuestionId == QuestionId).Select(x => new QuestionViewModelAdmin()
+            IGeneralResult<QuestionViewModelAdmin> res = new GeneralResult<QuestionViewModelAdmin>();
+            res.Data = new QuestionViewModelAdmin();
+            if (issuperadmin)
+            {
+
+                var question = _context.Questions.Include(x=>x.QuestionOptions).Where(x => x.IsDeleted == false && x.IsActive == true && x.QuestionId == QuestionId && (clientid == 0 ? true : x.ClentId == clientid)).Select(x => new QuestionViewModelAdmin()
+                {
+                    QuestionId = x.QuestionId,
+                    QuestionTypeName = x.QuestionType.QuestionType1,
+                    QuestionTypeId = x.QuestionTypeId ?? 0,
+                    SectionId = x.SectionId ?? 0,
+                    GroupId = x.GroupId ?? 0,
+                    QuestionSection = x.Section.Section1,
+                    Question = x.Text,
+                    Marks = x.Marks ?? 0,
+                    options = x.QuestionOptions.Select(y => new OptionViewModelAdmin()
+                    {
+                        OptionId = y.OptionId,
+                        OptionText = y.OptionText,
+                        OptionImage = y.OptionImage,
+                        IsCorrect = y.IsCorrect ?? false,
+                        IsNew = false
+                    }).ToList()
+
+                }).FirstOrDefault();
+
+                if (question == null)
+                {
+                    res.IsSuccess = false;
+                    res.Message = "Question not Succefully";
+                    res.Data = null;
+                    return res;
+                }
+
+                res.IsSuccess = true;
+                res.Message = "Question fatch Successfully";
+                res.Data = question;
+                return res;
+            }
+            if (clientid == 0)
+            {
+                res.IsSuccess = false;
+                res.Message = "Invalid Client";
+                res.Data = null;
+                return res;
+            }
+
+            var question1 = _context.Questions.Include(x=>x.QuestionOptions).Where(x => x.IsDeleted == false && x.IsActive == true && x.QuestionId == QuestionId && x.ClentId == clientid).Select(x => new QuestionViewModelAdmin()
             {
                 QuestionId = x.QuestionId,
                 QuestionTypeName = x.QuestionType.QuestionType1,
@@ -85,84 +138,189 @@ namespace QuickCampus_Core.Services
                     IsCorrect = y.IsCorrect ?? false,
                     IsNew = false
                 }).ToList()
-
-            }).FirstOrDefaultAsync();
-            if (questions != null)
+            }).FirstOrDefault();
+            if (question1 == null)
             {
-                return questions;
+                res.IsSuccess = false;
+                res.Message = "question not found";
+                res.Data = null;
+                return res;
             }
-            else
-            {
-                return null;
-            }
+            res.IsSuccess = true;
+            res.Message = "Question fetch successfully";
+            res.Data = question1;
+            return res;
         }
-        public async Task<List<QuestionTypeViewModelAdmin>> GetAllQuestionType()
+        public async Task<List<GroupViewModelAdmin>> GetAllGroups(bool isSuperAdmin, int clientId)
         {
-            var questionsType = await _context.QuestionTypes.Select(x => new QuestionTypeViewModelAdmin()
+            List<GroupViewModelAdmin> groupViewModelAdmin = new List<GroupViewModelAdmin>();
+            if (isSuperAdmin)
             {
-                Questiontype = x.QuestionType1,
-                QuestionTypeId = x.QuestionTypeId
+                groupViewModelAdmin = _context.Groupdls.Where(w => (clientId == 0 ? true : w.ClentId == clientId)).Select(x => new GroupViewModelAdmin()
+                {
+                    GroupName = x.GroupName,
+                    GroupId = x.GroupId
+                }).ToList();
 
-            }).ToListAsync();
-            if (questionsType.Any())
-            {
-                return questionsType.ToList();
+                if (groupViewModelAdmin.Count > 0)
+                {
+                    return groupViewModelAdmin;
+                }
+                else
+                {
+                    return new List<GroupViewModelAdmin>();
+                }
             }
-            else
+
+            if(clientId == 0)
             {
-                return new List<QuestionTypeViewModelAdmin>();
+                return new List<GroupViewModelAdmin>();
             }
-        }
-        public async Task<List<SectionViewModelAdmin>> GetAllSection()
-        {
-            var sections = await _context.Sections.Select(x => new SectionViewModelAdmin()
-            {
-                SectionName = x.Section1,
-                SectionId = x.SectionId
-
-            }).ToListAsync();
-
-            return sections;
-        }
-        public async Task<List<GroupViewModelAdmin>> GetAllGroups()
-        {
-            var Groups = await _context.Groupdls.Select(x => new GroupViewModelAdmin()
+            groupViewModelAdmin = _context.Groupdls.Where(w => w.ClentId == clientId).Select(x => new GroupViewModelAdmin()
             {
                 GroupName = x.GroupName,
                 GroupId = x.GroupId
-            }).ToListAsync();
-            if (Groups.Any())
+            }).ToList();
+
+            if (groupViewModelAdmin.Count > 0)
             {
-                return Groups;
+                return groupViewModelAdmin;
             }
             else
             {
                 return new List<GroupViewModelAdmin>();
             }
         }
-
-        public async Task<IGeneralResult<string>> ActiveInactiveQuestion(int questionId)
+        public async Task<List<QuestionTypeViewModelAdmin>> GetAllQuestionTypes(bool isSuperAdmin, int clientId)
         {
-            IGeneralResult<string> result = new GeneralResult<string>();
-            var question  = _context.Questions.Where(x => x.QuestionId == questionId).FirstOrDefault();
-
-            if (question != null)
+            List<QuestionTypeViewModelAdmin> questionViewModelAdmin = new List<QuestionTypeViewModelAdmin>();
+            if (isSuperAdmin)
             {
-                if (question.IsActive == true)
+                questionViewModelAdmin = _context.QuestionTypes.Where(w => (clientId == 0 ? true : w.ClentId == clientId)).Select(x => new QuestionTypeViewModelAdmin()
                 {
-                    question.IsActive = false;
+                    Questiontype = x.QuestionType1,
+                    QuestionTypeId = x.QuestionTypeId
+                }).ToList();
+
+                if (questionViewModelAdmin.Count > 0)
+                {
+                    return questionViewModelAdmin;
                 }
                 else
                 {
-                    question.IsActive = true;
+                    return new List<QuestionTypeViewModelAdmin>();
                 }
+            }
+            if (clientId == 0)
+            {
+                return new List<QuestionTypeViewModelAdmin>();
+            }
+            questionViewModelAdmin = _context.QuestionTypes.Where(w => w.ClentId == clientId).Select(x => new QuestionTypeViewModelAdmin()
+            {
+                Questiontype = x.QuestionType1,
+                QuestionTypeId = x.QuestionTypeId
+            }).ToList();
+
+
+            if (questionViewModelAdmin.Count > 0)
+            {
+                return questionViewModelAdmin;
+            }
+            else
+            {
+                return new List<QuestionTypeViewModelAdmin>();
+            }
+        }
+        public async Task<List<SectionViewModelAdmin>> GetAllSectionList(bool isSuperAdmin, int clientId)
+        {
+            List<SectionViewModelAdmin> sectionViewModelAdmin = new List<SectionViewModelAdmin>();
+            if (isSuperAdmin)
+            {
+                sectionViewModelAdmin = _context.Sections.Where(w => (clientId == 0 ? true : w.ClentId == clientId)).Select(x => new SectionViewModelAdmin()
+                {
+                    SectionName = x.Section1,
+                    SectionId = x.SectionId
+                }).ToList();
+
+                if (sectionViewModelAdmin.Count > 0)
+                {
+                    return sectionViewModelAdmin;
+                }
+                else
+                {
+                    return new List<SectionViewModelAdmin>();
+                }
+            }
+            if (clientId == 0)
+            {
+                return new List<SectionViewModelAdmin>();
+            }
+            sectionViewModelAdmin = _context.Sections.Where(w => w.ClentId == clientId).Select(x => new SectionViewModelAdmin()
+            {
+                SectionName = x.Section1,
+                SectionId = x.SectionId
+            }).ToList();
+
+
+            if (sectionViewModelAdmin.Count > 0)
+            {
+                return sectionViewModelAdmin;
+            }
+            else
+            {
+                return new List<SectionViewModelAdmin>();
+            }
+        }
+        public async Task<IGeneralResult<string>> ActiveInactiveQuestion(int questionId, int clientId, bool isSuperAdmin, bool isActive)
+        {
+            IGeneralResult<string> result = new GeneralResult<string>();
+            Question question = new Question();
+            int status = 0;
+            if (isSuperAdmin)
+            {
+                question = _context.Questions.Where(x => x.QuestionId == questionId && x.IsDeleted == false && (clientId == 0 ? true : x.ClentId == clientId)).FirstOrDefault();
+                if (question == null)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Question not found.";
+                }
+                question.IsActive = isActive;
+
                 _context.Questions.Update(question);
-                _context.SaveChanges();
+                status = _context.SaveChanges();
+                if (status > 0)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Question status has been changed sucessfully.";
+                }
+                else
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Question status not changed. Please try again.";
+                }
+                return result;
+            }
+            if (clientId == 0)
+            {
+                result.IsSuccess = false;
+                result.Message = "ClientId Not Found.";
+                return result;
+            }
 
-
+            question = _context.Questions.Where(x => x.QuestionId == questionId && x.IsDeleted == false && (clientId == 0 ? true : x.ClentId == clientId)).FirstOrDefault();
+            if (question == null)
+            {
+                result.IsSuccess = false;
+                result.Message = "Question not found.";
+                return result;
+            }
+            question.IsActive = isActive;
+            _context.Questions.Update(question);
+            status = _context.SaveChanges();
+            if (status > 0)
+            {
                 result.IsSuccess = true;
                 result.Message = "Question status has been changed sucessfully.";
-                
             }
             else
             {
@@ -170,6 +328,224 @@ namespace QuickCampus_Core.Services
                 result.Message = "Question status not changed. Please try again.";
             }
             return result;
+        }
+        public async Task<IGeneralResult<string>> DeleteQuestion(int questionId, int clientId, bool isSuperAdmin, bool isDelete)
+        {
+            IGeneralResult<string> result = new GeneralResult<string>();
+            Question question = new Question();
+            int status = 0;
+            if (isSuperAdmin)
+            {
+                question = _context.Questions.Where(x => x.QuestionId == questionId && x.IsDeleted==false && (clientId == 0 ? true : x.ClentId == clientId)).FirstOrDefault();
+                if (question == null)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Question not found.";
+                    return result;
+                }
+                if (question.IsDeleted == true)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Question  has been already deleted.";
+                    return result;
+                }
+
+                question.IsDeleted = isDelete;
+                _context.Questions.Update(question);
+                status = _context.SaveChanges();
+                if (status > 0)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Question has been deleted sucessfully.";
+                }
+                else
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Question not deleted. Please try again.";
+                }
+                return result;
+            }
+            if (clientId == 0)
+            {
+                result.IsSuccess = false;
+                result.Message = "ClientId Not Found.";
+            }
+
+            question = _context.Questions.Where(x => x.QuestionId == questionId && x.IsDeleted == false && (clientId == 0 ? true : x.ClentId == clientId)).FirstOrDefault();
+            if (question == null)
+            {
+                result.IsSuccess = false;
+                result.Message = "Question not found.";
+            }
+            if (question.IsDeleted == true)
+            {
+                result.IsSuccess = true;
+                result.Message = "Question  has been already deleted.";
+                return result;
+            }
+            question.IsDeleted = isDelete;
+            _context.Questions.Update(question);
+            status = _context.SaveChanges();
+            if (status > 0)
+            {
+                result.IsSuccess = true;
+                result.Message = "Question deleted sucessfully.";
+            }
+            else
+            {
+                result.IsSuccess = false;
+                result.Message = "Question not deleted.";
+            }
+            return result;
+        }
+
+        public async Task<IGeneralResult<string>> AddQuestion(QuestionViewModelAdmin model, bool isSuperAdmin)
+        {
+            IGeneralResult<string> res = new GeneralResult<string>();
+
+            int? marks = (int)_context.QuestionTypes.Where(y => y.QuestionTypeId == model.QuestionTypeId).SingleOrDefault().Marks;
+            Question question = new Question()
+            {
+                QuestionTypeId = model.QuestionTypeId,
+                SectionId = model.SectionId,
+                GroupId = model.GroupId,
+                Text = model.Question,
+                Marks = marks,
+                IsActive = true,
+                IsDeleted = false
+            };
+            var result = _context.Questions.Add(question);
+            foreach (var item in model.options)
+            {
+                var fileName = string.Empty;
+                byte[] file = null;
+                #region -- Initialize Image Path and Image Byte Array --
+                //if (item.ImageUpload != null && item.ImageUpload.ContentLength > 0)
+                //{
+                //    string Ext = Path.GetExtension(item.ImageUpload.FileName);
+                //    fileName = Guid.NewGuid().ToString() + Ext;
+                //    var uploadDir = "~/Upload/Admin";
+                //    var imagePath = Path.Combine(HttpContext.Current.Server.MapPath(uploadDir), fileName);
+                //    item.ImageUpload.SaveAs(imagePath);
+                //    file = Infrastructure.Utility.Common.ConvertToByte(item.ImageUpload);
+                //}
+                #endregion
+                QuestionOption questionoption = new QuestionOption()
+                {
+                    QuestionId = question.QuestionId,
+                    OptionText = item.OptionText,
+                    IsCorrect = item.IsCorrect,
+                    OptionImage = fileName,
+                    Image = file
+                };
+                question.QuestionOptions.Add(questionoption);
+            }
+            int status = _context.SaveChanges();
+            if (status > 0)
+            {
+                res.IsSuccess = true;
+                res.Message = "Question has been added successfully.";
+            }
+            else
+            {
+                res.IsSuccess = false;
+                res.Message = "Question has not been created.";
+                res.Data = null;
+            }
+
+            return res;
+        }
+
+        public async Task<IGeneralResult<string>> UpdateQuestion(QuestionViewModelAdmin model,bool isSuperAdmin)
+        {
+            IGeneralResult<string> res = new GeneralResult<string>();
+            Question question = new Question();
+            if (isSuperAdmin)
+            {
+                question = _context.Questions.Include(x => x.QuestionOptions).FirstOrDefault(x => x.QuestionId == model.QuestionId && x.IsDeleted == false && (model.ClientId == 0 ? true : x.ClentId == model.ClientId));
+            }
+            else
+            {
+                if (model.ClientId == 0)
+                {
+                    res.Message = "Invalid User";
+                    res.IsSuccess = false;
+                    return res;
+                }
+
+                question = _context.Questions.Include(x => x.QuestionOptions).FirstOrDefault(x => x.QuestionId == model.QuestionId &&  x.ClentId == model.ClientId && x.IsDeleted == false);
+
+            }
+            if (question == null)
+            {
+                res.IsSuccess = false;
+                res.Message = "Question not found";
+                return res;
+            }
+
+            question.QuestionTypeId = model.QuestionTypeId;
+            question.Text = model.Question;
+            question.GroupId = model.GroupId;
+            question.SectionId = model.SectionId;
+            question.Marks = _context.QuestionTypes.Where(y => y.QuestionTypeId == model.QuestionTypeId).SingleOrDefault().Marks;
+            ArrayList itemIdToBeNotRemoved = new ArrayList();
+            foreach (var item in model.options)
+            {
+                itemIdToBeNotRemoved.Add(item.OptionId);
+                //var fileName = string.Empty;
+                //byte[] file = null;
+                //#region -- Initialize Image Path and Image Byte Array --
+                //if (item.ImageUpload != null && item.ImageUpload.ContentLength > 0)
+                //{
+                //    string Ext = Path.GetExtension(item.ImageUpload.FileName);
+                //    fileName = Guid.NewGuid().ToString() + Ext;
+                //    var uploadDir = "~/Upload/Admin";
+                //    var imagePath = Path.Combine(HttpContext.Current.Server.MapPath(uploadDir), fileName);
+                //    item.ImageUpload.SaveAs(imagePath);
+                //    file = Infrastructure.Utility.Common.ConvertToByte(item.ImageUpload);
+                //}
+                //#endregion
+                if (item.OptionId > 0)
+                {
+                    var options = question.QuestionOptions.SingleOrDefault(y => y.OptionId == item.OptionId);
+                    //fileName = string.IsNullOrEmpty(fileName) ? options.OptionImage : fileName;
+                    options.OptionText = item.OptionText;
+                    options.IsCorrect = item.IsCorrect;
+                    //options.OptionImage = fileName;
+                    //options.Image = file;
+                }
+                else
+                {
+                    QuestionOption questionoption = new QuestionOption()
+                    {
+                        QuestionId = question.QuestionId,
+                        OptionText = item.OptionText,
+                        IsCorrect = item.IsCorrect,
+                        // OptionImage = fileName,
+                        //Image = file
+                    };
+                    question.QuestionOptions.Add(questionoption);
+
+                }
+
+
+            }
+            foreach (var op in question.QuestionOptions.ToList())
+            {
+                if (!itemIdToBeNotRemoved.Contains(op.OptionId)) { question.QuestionOptions.Remove(op); }
+            }
+            int result = _context.SaveChanges();
+            if (result > 0)
+            {
+                res.IsSuccess = true;
+                res.Message = "Question has been updated successfully.";
+            }
+            else
+            {
+                res.IsSuccess = false;
+                res.Message = "something went worng.";
+            }
+            return res;
         }
     }
 }

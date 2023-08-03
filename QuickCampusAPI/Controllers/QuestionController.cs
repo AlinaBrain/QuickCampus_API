@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
 
@@ -20,10 +21,10 @@ namespace QuickCampusAPI.Controllers
             _config = configuration;
         }
 
-
+        [Authorize(Roles = "QuestionManage")]
         [HttpGet]
         [Route("QuestionManage")]
-        public async Task<ActionResult> QuestionManage(int clientid)
+        public async Task<ActionResult> QuestionManage(int clientid )
         {
             int cid = 0;
             var _jwtSecretKey = _config["Jwt:Key"];
@@ -35,47 +36,99 @@ namespace QuickCampusAPI.Controllers
             }
             else
             {
-                cid = string.IsNullOrEmpty(clientId)?0:Convert.ToInt32(clientId);
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
             }
 
-            var result = await _questionrepo.GetAllQuestion(cid,isSuperAdmin);
+            var result = await _questionrepo.GetAllQuestion(cid, isSuperAdmin);
             return Ok(result);
         }
 
-        [HttpGet]
-        [Route("GetQuestion")]
-        public async Task<ActionResult> GetQuestion()
-        {
-            var model = new QuestionViewModelAdmin()
-            {
-                QuestionTypes = (await _questionrepo.GetAllQuestionType()).Select(x => new SelectListItem() { Value = x.QuestionTypeId.ToString(), Text = x.Questiontype }),
-                Sections = (await _questionrepo.GetAllSection()).Select(x => new SelectListItem() { Value = x.SectionId.ToString(), Text = x.SectionName }),
-                Groups = (await _questionrepo.GetAllGroups()).Select(x => new SelectListItem() { Value = x.GroupId.ToString(), Text = x.GroupName }),
-                options = new List<OptionViewModelAdmin>() { new OptionViewModelAdmin(), new OptionViewModelAdmin() }
-            };
-            return Ok(model);
-        }
-
-
-        [HttpGet]
-        [Route("QuestionEdit")]
-        public async Task<ActionResult> QuestionAdd(int id)
-        {
-            var model = await _questionrepo.GetQuestionById(id);
-            model.Groups = (await _questionrepo.GetAllGroups()).Select(x => new SelectListItem() { Value = x.GroupId.ToString(), Text = x.GroupName });
-            model.QuestionTypes = (await _questionrepo.GetAllQuestionType()).Select(x => new SelectListItem() { Value = x.QuestionTypeId.ToString(), Text = x.Questiontype });
-            model.Sections = (await _questionrepo.GetAllSection()).Select(x => new SelectListItem() { Value = x.SectionId.ToString(), Text = x.SectionName });
-            return Ok(model);
-        }
-
-
+        [Authorize(Roles = "QuestionActiveInactive")]
         [HttpGet]
         [Route("QuestionActiveInactive")]
-        public async Task<ActionResult> QuestionActiveInactive(int id)
+        public async Task<ActionResult> QuestionActiveInactive(bool isActive, int questionId, int clientid )
         {
-            var result = await _questionrepo.ActiveInactiveQuestion(id);
+            int cid = 0;
+            var _jwtSecretKey = _config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            if (isSuperAdmin)
+            {
+                cid = clientid;
+            }
+            else
+            {
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
+            }
+            var result = await _questionrepo.ActiveInactiveQuestion(questionId, cid, isSuperAdmin, isActive);
 
             return Ok(result);
+        }
+
+        [Authorize(Roles = "DeleteQuestion")]
+        [HttpGet]
+        [Route("deletequestion")]
+        public async Task<ActionResult> DeleteQuestion(bool isdelete, int questionId, int clientid )
+        {
+            int cid = 0;
+            var _jwtSecretKey = _config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            if (isSuperAdmin)
+            {
+                cid = clientid;
+            }
+            else
+            {
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
+            }
+            var result = await _questionrepo.DeleteQuestion(questionId, cid, isSuperAdmin, isdelete);
+
+            return Ok(result);
+        }
+
+
+        [Authorize(Roles = "AddOrUpdateQuestion")]
+        [HttpPost]
+        [Route("addorupdatequestion")]
+        public async Task<ActionResult> AddOrUpdateQuestion(QuestionViewModelAdmin model, int clientid )
+        {
+            int cid = 0;
+            var _jwtSecretKey = _config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            if (isSuperAdmin)
+            {
+                cid = clientid;
+            }
+            else
+            {
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
+            }
+            model.ClientId = cid;
+            var res = model.QuestionId == 0 ? await _questionrepo.UpdateQuestion(model, isSuperAdmin) : await _questionrepo.AddQuestion(model, isSuperAdmin);
+            return Ok(res);
+        }
+
+        [Authorize(Roles = "AddOrUpdateQuestion")]
+        [HttpPost]
+        [Route("getquestionbyid")]
+        public async Task<ActionResult> GetQuestionByid(int questionId, int clientid )
+        {
+            int cid = 0;
+            var _jwtSecretKey = _config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            if (isSuperAdmin)
+            {
+                cid = clientid;
+            }
+            else
+            {
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
+            }
+            var res = await _questionrepo.GetQuestionById(questionId, cid, isSuperAdmin);
+            return Ok(res);
         }
     }
 }

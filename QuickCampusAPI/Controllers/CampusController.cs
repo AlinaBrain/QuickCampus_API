@@ -104,6 +104,29 @@ namespace QuickCampusAPI.Controllers
             var result = await _campusrepo.GetCampusByID(campusId, string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId));
             return Ok(result);
         }
+
+
+        [Authorize(Roles = "CampusAction")]
+        [HttpGet]
+        [Route("UpdateCampusStaus")]
+        public async Task<IActionResult> UpdateCampusStaus(int campusId,bool status)
+        {
+            var _jwtSecretKey = _config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var result = await _campusrepo.UpdateCampusStatus(campusId, string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId),status);
+            return Ok(result);
+        }
+
+        [Authorize(Roles = "DeleteCampus")]
+        [HttpGet]
+        [Route("DeleteCampus")]
+        public async Task<IActionResult> DeleteCampus(int campusId, bool status)
+        {
+            var _jwtSecretKey = _config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var result = await _campusrepo.DeleteCampus(campusId, string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId), status);
+            return Ok(result);
+        }
     }
 
 }
