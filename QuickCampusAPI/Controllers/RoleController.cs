@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
+using QuickCampus_DAL.Context;
 
 namespace QuickCampusAPI.Controllers
 {
@@ -24,10 +25,25 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "AddRole")]
         [HttpPost]
         [Route("AddRole")]
-        public async Task<IActionResult> AddRole([FromBody] RoleModel vm)
+        public async Task<IActionResult> AddRole([FromBody] RoleModel vm, int clientid)
         {
             IGeneralResult<RoleResponse> result = new GeneralResult<RoleResponse>();
             var _jwtSecretKey = config["Jwt:Key"];
+
+
+            int cid = 0;
+            var jwtSecretKey = config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            if (isSuperAdmin)
+            {
+                cid = clientid;
+            }
+            else
+            {
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
+            }
+
             if (roleRepo.Any(x => x.Name == vm.RoleName))
             {
                 result.Message = "RoleName Already Registerd!";
@@ -38,61 +54,32 @@ namespace QuickCampusAPI.Controllers
                 if (ModelState.IsValid)
                 {
                     var userId = JwtHelper.GetuIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-                    if(string.IsNullOrEmpty(userId))
+                    if (string.IsNullOrEmpty(userId))
                     {
                         result.Message = "User Not Found";
                         result.IsSuccess = false;
                         return Ok(result);
                     }
-                    var user = await userRepo.GetById( Convert.ToInt32(userId));
+                    var user = await userRepo.GetById(Convert.ToInt32(userId));
                     var res = (user != null && user.IsDelete == true) ? user : null;
                     if (user != null)
                     {
-                        var clientId = JwtHelper.GetUserIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
 
-                        if (!string.IsNullOrEmpty(clientId))
-                        {
-                            int parsedClientId;
-                            if (int.TryParse(clientId, out parsedClientId))
-                            {
-                                RoleVm roleVm = new RoleVm
-                                {
-                                    Name = vm.RoleName,
-                                    ClientId = parsedClientId,
-                                    CreatedBy = user.Id,
-                                    ModifiedBy = user.Id,
-                                    CreatedDate = DateTime.Now,
-                                    ModofiedDate = DateTime.Now
-                                };
-                             var roleData = await roleRepo.Add(roleVm.ToRoleDBModel());
-                                result.Message = "Role added successfully";
-                                result.IsSuccess = true;
-                                result.Data = (RoleResponse)roleData;
-                                return Ok(result);
-                            }
-                            else
-                            {
-                                result.Message = "Invalid Client ID format.";
-                            }
 
-                        }
-                        else
+                        RoleVm roleVm = new RoleVm
                         {
-                            RoleVm roleVm = new RoleVm
-                            {
-                                Name = vm.RoleName,
-                                ClientId = null,
-                                CreatedBy = user.Id,
-                                ModifiedBy = user.Id,
-                                CreatedDate = DateTime.Now,
-                                ModofiedDate = DateTime.Now
-                            };
-                          var roleDataWithClientId = await roleRepo.Add(roleVm.ToRoleDBModel());
-                            result.Message = "Role added successfully";
-                            result.IsSuccess = true;
-                            result.Data = (RoleResponse)roleDataWithClientId;
-                            return Ok(result);
-                        }
+                            Name = vm.RoleName,
+                            ClientId = cid,
+                            CreatedBy = user.Id,
+                            ModifiedBy = user.Id,
+                            CreatedDate = DateTime.Now,
+                            ModofiedDate = DateTime.Now
+                        };
+                        var roleData = await roleRepo.Add(roleVm.ToRoleDBModel());
+                        result.Message = "Role added successfully";
+                        result.IsSuccess = true;
+                        result.Data = (RoleResponse)roleData;
+
                     }
                     else
                     {
@@ -111,128 +98,161 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "GetAllRole")]
         [HttpGet]
         [Route("RoleList")]
-        public async Task<IActionResult> RoleList()
+        public async Task<IActionResult> RoleList(int clientid)
         {
             var _jwtSecretKey = config["Jwt:Key"];
-            var  clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey); 
-            List<RoleResponse> roleVm = new List<RoleResponse>();
-            var rolelist = (await roleRepo.GetAll()).ToList();
 
-            if (string.IsNullOrEmpty(clientId))
+            int cid = 0;
+            var jwtSecretKey = config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            if (isSuperAdmin)
             {
-                roleVm = rolelist.Select(x => (RoleResponse)x).Where(w=>w.ClientId==null).ToList();
+                cid = clientid;
             }
             else
             {
-                roleVm = rolelist.Select(x => (RoleResponse)x).Where(w => w.ClientId == Convert.ToInt32(clientId)).ToList();
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
             }
-            return Ok(roleVm);
+
+            List<RoleResponse> roleVm = new List<RoleResponse>();
+            List<TblRole> rolelist = new List<TblRole>();
+            if (isSuperAdmin)
+            {
+                rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted == false && (cid == 0 ? true : x.ClientId == cid)).ToList();
+
+            }
+            else
+            {
+                rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted == false && x.ClientId == cid).ToList();
+            }
+            return Ok(rolelist);
         }
 
         [Authorize(Roles = "UpdateRole")]
         [HttpPost]
         [Route("EditRole")]
-        public async Task<IActionResult> EditRole(RoleModel vm)
+        public async Task<IActionResult> EditRole(RoleModel vm, int clientid)
         {
+
             IGeneralResult<RoleResponse> result = new GeneralResult<RoleResponse>();
-            var _jwtSecretKey = config["Jwt:Key"];
-            if (roleRepo.Any(x => x.Name == vm.RoleName && x.Id != vm.Id))
+
+            int cid = 0;
+            var jwtSecretKey = config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], jwtSecretKey);
+            if (isSuperAdmin)
             {
-                result.Message = "RoleName Already Registerd!";
+                cid = clientid;
             }
             else
             {
-                    var res = await roleRepo.GetById(vm.Id);
-                    var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
 
-                    if (clientId != null || clientId == "")
-                    {
-                        res.Id = vm.Id;
-                        if (clientId == "")
-                        {
-                            res.ClientId = null; // Assign null to ClientId property
-                        }
-                        else
-                        {
-                            res.ClientId = Convert.ToInt32(clientId);
-                        }
-                        if (res != null)
-                        {
-                            res.Name = vm.RoleName;
-                            res.ModofiedDate = DateTime.Now;
-                            var roleData = await roleRepo.Update(res);
-                            result.Message = "Role data is updated successfully";
-                            result.IsSuccess = true;
-                            result.Data = (RoleResponse)roleData;
-                            return Ok(result);
-                        }
-                        else
-                        {
-                            result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
-                        }
-                    }
-                    else
-                    {
-                        result.Message = "ClientId not found. ";
-                    }        
-                return Ok(result);
-
+                if (cid == 0)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Invalid Client";
+                    return Ok(result);
+                }
             }
-            return Ok(result);
+            var res = roleRepo.UpdateRole(vm, cid, isSuperAdmin);
+            return Ok(res);
         }
 
-       
+
         [Authorize(Roles = "DeleteRole")]
         [HttpDelete]
         [Route("DeleteRole")]
-        public async Task<IActionResult> DeleteRole(int id  )
+        public async Task<IActionResult> DeleteRole(int id, int clientid, bool isDeleted)
         {
-            var _jwtSecretKey = config["Jwt:Key"];
-            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             IGeneralResult<RoleResponse> result = new GeneralResult<RoleResponse>();
-            var res = await roleRepo.GetById(id);
-            if (res != null)
-            {
-                res.IsDeleted = true;
-                res.IsActive = false;
 
-              var userDataDeleted = await roleRepo.Update(res);
-                result.IsSuccess = true;
-                result.Data = (RoleResponse)userDataDeleted;
-                result.Message = "Role Deleted Succesfully";
+            int cid = 0;
+            var jwtSecretKey = config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], jwtSecretKey);
+            if (isSuperAdmin)
+            {
+                cid = clientid;
             }
             else
             {
-                result.Message = "Role does Not exist";
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
+
+                if (cid == 0)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Invalid Client";
+                    return Ok(result);
+                }
             }
-            return Ok(result);
+            var res = roleRepo.DeleteRole(isDeleted, id, cid, isSuperAdmin);
+            return Ok(res);
         }
 
         [Authorize(Roles = "ActiveRole")]
         [HttpGet]
         [Route("activeAndInactive")]
-        public async Task<IActionResult> ActiveAndInactive(bool isActive, int id)
+        public async Task<IActionResult> ActiveAndInactive(bool isActive, int id, int clientid)
         {
+
             IGeneralResult<RoleResponse> result = new GeneralResult<RoleResponse>();
-            if (id > 0)
+
+            int cid = 0;
+            var jwtSecretKey = config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], jwtSecretKey);
+            if (isSuperAdmin)
             {
-                var res = await roleRepo.GetById(id);
-                if (res != null && res.IsDeleted == false)
+                cid = clientid;
+            }
+            else
+            {
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
+
+                if (cid == 0)
                 {
-                    res.IsActive = isActive;
-                    await roleRepo.Update(res);
-                    result.IsSuccess = true;
-                    result.Message = "Your status is changed successfully";
-                    result.Data = (RoleResponse)res;
+                    result.IsSuccess = false;
+                    result.Message = "Invalid Client";
                     return Ok(result);
                 }
-                else
-                {
-                    result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
-                }
             }
-            return Ok(result);
+
+            var res = roleRepo.ActiveInActiveRole(isActive, id, cid, isSuperAdmin);
+            return Ok(res);
         }
 
+
+        [Authorize(Roles = "GetRole")]
+        [HttpPost]
+        [Route("GetRoleById")]
+        public async Task<IActionResult> GetRoleBiIdRole(int rId, int clientid)
+        {
+
+            IGeneralResult<RoleResponse> result = new GeneralResult<RoleResponse>();
+
+            int cid = 0;
+            var jwtSecretKey = config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], jwtSecretKey);
+            if (isSuperAdmin)
+            {
+                cid = clientid;
+            }
+            else
+            {
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
+
+                if (cid == 0)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Invalid Client";
+                    return Ok(result);
+                }
+            }
+            var res = roleRepo.GetRoleById(rId, cid, isSuperAdmin);
+            return Ok(res);
+        }
     }
 }
