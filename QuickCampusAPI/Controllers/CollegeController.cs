@@ -11,7 +11,7 @@ using Azure;
 
 namespace QuickCampusAPI.Controllers
 {
-   // [Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class CollegeController : ControllerBase
