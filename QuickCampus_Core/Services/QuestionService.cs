@@ -20,7 +20,7 @@ namespace QuickCampus_Core.Services
             List<QuestionViewModelAdmin> record = new List<QuestionViewModelAdmin>();
             if (issuperadmin)
             {
-                result.Data = _context.Questions.Where(x => x.IsDeleted == false  && (clientid == 0 ? true : x.ClentId == clientid)).Select(x => new QuestionViewModelAdmin()
+                result.Data = _context.Questions.Where(x => x.IsDeleted == false && (clientid == 0 ? true : x.ClentId == clientid)).Select(x => new QuestionViewModelAdmin()
                 {
                     QuestionId = x.QuestionId,
                     QuestionTypeName = x.QuestionType.QuestionType1,
@@ -48,7 +48,7 @@ namespace QuickCampus_Core.Services
                 return result;
             }
 
-            result.Data = _context.Questions.Where(x => x.IsDeleted == false  && x.ClentId == clientid).Select(x => new QuestionViewModelAdmin()
+            result.Data = _context.Questions.Where(x => x.IsDeleted == false && x.ClentId == clientid).Select(x => new QuestionViewModelAdmin()
             {
                 QuestionId = x.QuestionId,
                 QuestionTypeName = x.QuestionType.QuestionType1,
@@ -78,7 +78,7 @@ namespace QuickCampus_Core.Services
             if (issuperadmin)
             {
 
-                var question = _context.Questions.Include(x=>x.QuestionOptions).Where(x => x.IsDeleted == false && x.IsActive == true && x.QuestionId == QuestionId && (clientid == 0 ? true : x.ClentId == clientid)).Select(x => new QuestionViewModelAdmin()
+                var question = _context.Questions.Include(x => x.QuestionOptions).Where(x => x.IsDeleted == false && x.IsActive == true && x.QuestionId == QuestionId && (clientid == 0 ? true : x.ClentId == clientid)).Select(x => new QuestionViewModelAdmin()
                 {
                     QuestionId = x.QuestionId,
                     QuestionTypeName = x.QuestionType.QuestionType1,
@@ -120,7 +120,7 @@ namespace QuickCampus_Core.Services
                 return res;
             }
 
-            var question1 = _context.Questions.Include(x=>x.QuestionOptions).Where(x => x.IsDeleted == false && x.IsActive == true && x.QuestionId == QuestionId && x.ClentId == clientid).Select(x => new QuestionViewModelAdmin()
+            var question1 = _context.Questions.Include(x => x.QuestionOptions).Where(x => x.IsDeleted == false && x.IsActive == true && x.QuestionId == QuestionId && x.ClentId == clientid).Select(x => new QuestionViewModelAdmin()
             {
                 QuestionId = x.QuestionId,
                 QuestionTypeName = x.QuestionType.QuestionType1,
@@ -172,7 +172,7 @@ namespace QuickCampus_Core.Services
                 }
             }
 
-            if(clientId == 0)
+            if (clientId == 0)
             {
                 return new List<GroupViewModelAdmin>();
             }
@@ -336,7 +336,7 @@ namespace QuickCampus_Core.Services
             int status = 0;
             if (isSuperAdmin)
             {
-                question = _context.Questions.Where(x => x.QuestionId == questionId && x.IsDeleted==false && (clientId == 0 ? true : x.ClentId == clientId)).FirstOrDefault();
+                question = _context.Questions.Where(x => x.QuestionId == questionId && x.IsDeleted == false && (clientId == 0 ? true : x.ClentId == clientId)).FirstOrDefault();
                 if (question == null)
                 {
                     result.IsSuccess = false;
@@ -401,8 +401,25 @@ namespace QuickCampus_Core.Services
 
         public async Task<IGeneralResult<string>> AddQuestion(QuestionViewModelAdmin model, bool isSuperAdmin)
         {
+            List<Question> allQuestions = new List<Question>();
             IGeneralResult<string> res = new GeneralResult<string>();
+            if (isSuperAdmin)
+            {
+                allQuestions = _context.Questions.Include(x => x.QuestionOptions).Where(x => x.QuestionId == model.QuestionId && x.IsDeleted == false && (model.ClientId == 0 ? true : x.ClentId == model.ClientId)).ToList();
+            }
+            else
+            {
+                allQuestions = _context.Questions.Include(x => x.QuestionOptions).Where(x => x.QuestionId == model.QuestionId && x.ClentId == model.ClientId && x.IsDeleted == false).ToList();
 
+                if (model.ClientId == 0)
+                {
+                    res.IsSuccess = false;
+                    res.Message = "invalid client Id";
+                    return res;
+                }
+            }
+
+            
             int? marks = (int)_context.QuestionTypes.Where(y => y.QuestionTypeId == model.QuestionTypeId).SingleOrDefault().Marks;
             Question question = new Question()
             {
@@ -456,7 +473,7 @@ namespace QuickCampus_Core.Services
             return res;
         }
 
-        public async Task<IGeneralResult<string>> UpdateQuestion(QuestionViewModelAdmin model,bool isSuperAdmin)
+        public async Task<IGeneralResult<string>> UpdateQuestion(QuestionViewModelAdmin model, bool isSuperAdmin)
         {
             IGeneralResult<string> res = new GeneralResult<string>();
             Question question = new Question();
@@ -468,12 +485,12 @@ namespace QuickCampus_Core.Services
             {
                 if (model.ClientId == 0)
                 {
-                    res.Message = "Invalid User";
+                    res.Message = "Invalid clientId ";
                     res.IsSuccess = false;
                     return res;
                 }
 
-                question = _context.Questions.Include(x => x.QuestionOptions).FirstOrDefault(x => x.QuestionId == model.QuestionId &&  x.ClentId == model.ClientId && x.IsDeleted == false);
+                question = _context.Questions.Include(x => x.QuestionOptions).FirstOrDefault(x => x.QuestionId == model.QuestionId && x.ClentId == model.ClientId && x.IsDeleted == false);
 
             }
             if (question == null)
