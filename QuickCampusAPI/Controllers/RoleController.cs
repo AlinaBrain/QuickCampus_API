@@ -115,7 +115,7 @@ namespace QuickCampusAPI.Controllers
                 cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
             }
 
-            List<RoleResponse> roleVm = new List<RoleResponse>();
+           // List<RoleResponse> roleVm = new List<RoleResponse>();
             List<TblRole> rolelist = new List<TblRole>();
             if (isSuperAdmin)
             {
@@ -196,9 +196,6 @@ namespace QuickCampusAPI.Controllers
         [Route("activeAndInactive")]
         public async Task<IActionResult> ActiveAndInactive(bool isActive, int id, int clientid)
         {
-
-            IGeneralResult<RoleResponse> result = new GeneralResult<RoleResponse>();
-
             int cid = 0;
             var jwtSecretKey = config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], jwtSecretKey);
@@ -213,6 +210,8 @@ namespace QuickCampusAPI.Controllers
 
                 if (cid == 0)
                 {
+
+                    IGeneralResult<RoleResponse> result = new GeneralResult<RoleResponse>();
                     result.IsSuccess = false;
                     result.Message = "Invalid Client";
                     return Ok(result);

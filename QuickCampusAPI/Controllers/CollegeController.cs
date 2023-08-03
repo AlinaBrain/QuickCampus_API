@@ -5,8 +5,9 @@ using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
 using Microsoft.AspNetCore.Http;
-
-
+using QuickCampus_DAL.Context;
+using QuickCampus_Core.Services;
+using Azure;
 
 namespace QuickCampusAPI.Controllers
 {
@@ -36,25 +37,52 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "GetAllCollege")]
         [HttpGet]
         [Route("GetAllCollege")]
-        public async Task<IActionResult> GetAllCollege()
+        public async Task<IActionResult> GetAllCollege(int clientid)
         {
-            var _jwtSecretKey = _config["Jwt:Key"];
-            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             IGeneralResult<List<CollegeVM>> result = new GeneralResult<List<CollegeVM>>();
+            var _jwtSecretKey = _config["Jwt:Key"];
+
+            int cid = 0;
+            var jwtSecretKey = _config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            if (isSuperAdmin)
+            {
+                cid = clientid;
+            }
+            else
+            {
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
+            }
+            List<College> collegeList = new List<College>();
             try
             {
-                var collegeList = (await _collegeRepo.GetAll()).Where(x => x.IsDeleted == false || x.IsDeleted == null).ToList();
-                var res = collegeList.Select(x => ((CollegeVM)x)).ToList();
-                if (res != null)
+
+                if (isSuperAdmin)
                 {
-                    result.IsSuccess = true;
-                    result.Message = "College get successfully";
-                    result.Data = res;
+                    collegeList = (await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).ToList();
+
                 }
                 else
                 {
-                    result.Message = "College List Not Found";
+                    collegeList = (await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).ToList();
                 }
+
+               var response = collegeList.Select(x => (CollegeVM)x).ToList();
+
+
+                if (collegeList.Count > 0)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "College get successfully";
+                    result.Data = response;
+                }
+                else
+                {
+                    result.IsSuccess = true;
+                    result.Message = "College list not found!";
+                    result.Data = null;
+                }              
             }
             catch (Exception ex)
             {
@@ -85,34 +113,32 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
-       // [Authorize(Roles = "AddCollege")]
+        [Authorize(Roles = "AddCollege")]
         [HttpPost]
         [Route("AddCollege")]
-        public async Task<IActionResult> AddCollege([FromForm] CollegeLogoVm vm)
+        public async Task<IActionResult> AddCollege([FromForm] CollegeLogoVm vm, int clientid)
         {
             IGeneralResult<CollegeVM> result = new GeneralResult<CollegeVM>();
             var _jwtSecretKey = _config["Jwt:Key"];
-            var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            int cid = 0;
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            if (isSuperAdmin)
+            {
+                cid = clientid;
+            }
+            else
+            {
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
+            }
+
+           
+            var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
 
             if (vm != null)
             {
                 if (ModelState.IsValid)
                 {
-                    bool FindCountry=_countryRepo.Any(x=>x.CountryId == vm.CountryId);
-                    bool FindState = _stateRepo.Any(x=>x.StateId==vm.StateId);
-                    if (!FindCountry)
-                    {
-                        result.Message = "This Country is not listed for this College!";
-                        return Ok(result);
-                    }
-                    if (!FindState)
-                    {
-                        result.Message = "This State is not Listed for this State!";
-                        return Ok(result);
-                    }
-
-
 
                     CollegeVM collegeVM = new CollegeVM
                     {
@@ -129,7 +155,7 @@ namespace QuickCampusAPI.Controllers
                         ContectPerson = vm.ContectPerson,
                         ContectEmail = vm.ContectEmail,
                         ContectPhone = vm.ContectPhone,
-                        ClientId =clientId==""?null: Convert.ToInt32(clientId), 
+                        ClientId =cid, 
                     };
                     try
                     {
@@ -155,52 +181,79 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
-       // [Authorize(Roles = "EditCollege")]
+        [Authorize(Roles = "EditCollege")]
         [HttpPost]
         [Route("EditCollege")]
-        public async Task<IActionResult> EditCollege([FromBody] CollegeLogoVm vm)
+        public async Task<IActionResult> EditCollege([FromBody] CollegeLogoVm vm, int clientid)
         {
             IGeneralResult<CollegeVM> result = new GeneralResult<CollegeVM>();
             var _jwtSecretKey = _config["Jwt:Key"];
             var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            var clientId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+
+            int cid = 0;
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            if (isSuperAdmin)
+            {
+                cid = clientid;
+            }
+            else
+            {
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
+                if (cid == 0)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Invalid Client";
+                    return Ok(result);
+                }
+            }
+
+
             if (vm != null)
             {
-                var res = await _collegeRepo.GetById(vm.CollegeId);
+                College clg = new College();
 
-                if (res == null)
+                if (isSuperAdmin)
                 {
+                    clg = (await _collegeRepo.GetAll()).Where(w => w.IsDeleted == false && w.IsActive == true && cid==0?true:w.ClientId==cid).FirstOrDefault();
+                }
+                else
+                {
+                    clg = (await _collegeRepo.GetAll()).Where(w => w.IsDeleted == false && w.IsActive == true && w.ClientId == cid).FirstOrDefault();
+                }
+                if (clg == null)
+                {
+                    result.IsSuccess = false;
                     result.Message = " College does Not Exist";
                     return Ok(result);
                 }
-                bool isDeleted = (bool)res.IsDeleted ? true : false;
+                bool isDeleted = (bool)clg.IsDeleted ? true : false;
                 if (isDeleted)
                 {
+                    result.IsSuccess = false;
                     result.Message = " College does Not Exist";
                     return Ok(result);
                 }
 
-                if (ModelState.IsValid && vm.CollegeId > 0 && res.IsDeleted == false)
+                if (ModelState.IsValid && vm.CollegeId > 0 && clg.IsDeleted == false)
                 {
-                    res.CollegeName = vm.CollegeName;
-                    res.Logo = ProcessUploadFile(vm);
-                    res.Address1 = vm.Address1;
-                    res.Address2 = vm.Address2;
-                    res.CreatedBy = Convert.ToInt32(userId);
-                    res.ModifiedBy = Convert.ToInt32(userId);
-                    res.City = vm.City;
-                    res.StateId = vm.StateId;
-                    res.CountryId = vm.CountryId;
-                    res.CollegeCode = vm.CollegeCode;
-                    res.ContectPerson = vm.ContectPerson;
-                    res.ContectEmail = vm.ContectEmail;
-                    res.ContectPhone = vm.ContectPhone;
-                  
-                    res.ClientId = clientId == "" ? null : Convert.ToInt32(clientId);
+                    clg.CollegeName = vm.CollegeName;
+                    clg.Logo = ProcessUploadFile(vm);
+                    clg.Address1 = vm.Address1;
+                    clg.Address2 = vm.Address2;
+                    clg.CreatedBy = Convert.ToInt32(userId);
+                    clg.ModifiedBy = Convert.ToInt32(userId);
+                    clg .City = vm.City;
+                    clg.StateId = vm.StateId;
+                    clg.CountryId = vm.CountryId;
+                    clg.CollegeCode = vm.CollegeCode;
+                    clg.ContectPerson = vm.ContectPerson;
+                    clg.ContectEmail = vm.ContectEmail;
+                    clg.ContectPhone = vm.ContectPhone;
 
                     try
                     {
-                        result.Data = (CollegeVM)await _collegeRepo.Update(res);
+                        result.Data = (CollegeVM)await _collegeRepo.Update(clg);
                         result.Message = "College updated successfully";
                         result.IsSuccess = true;
                     }
