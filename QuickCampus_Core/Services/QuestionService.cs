@@ -41,7 +41,7 @@ namespace QuickCampus_Core.Services
                 }
                 return result;
             }
-            if (clientid > 0)
+            if (clientid == 0)
             {
                 result.IsSuccess = false;
                 result.Message = "Invalid ClientId";
@@ -465,17 +465,7 @@ namespace QuickCampus_Core.Services
             {
                 var fileName = string.Empty;
                 byte[] file = null;
-                #region -- Initialize Image Path and Image Byte Array --
-                //if (item.ImageUpload != null && item.ImageUpload.ContentLength > 0)
-                //{
-                //    string Ext = Path.GetExtension(item.ImageUpload.FileName);
-                //    fileName = Guid.NewGuid().ToString() + Ext;
-                //    var uploadDir = "~/Upload/Admin";
-                //    var imagePath = Path.Combine(HttpContext.Current.Server.MapPath(uploadDir), fileName);
-                //    item.ImageUpload.SaveAs(imagePath);
-                //    file = Infrastructure.Utility.Common.ConvertToByte(item.ImageUpload);
-                //}
-                #endregion
+               
                 QuestionOption questionoption = new QuestionOption()
                 {
                     QuestionId = question.QuestionId,
