@@ -85,7 +85,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = "AddCollege")]
+       // [Authorize(Roles = "AddCollege")]
         [HttpPost]
         [Route("AddCollege")]
         public async Task<IActionResult> AddCollege([FromForm] CollegeLogoVm vm)
@@ -93,6 +93,8 @@ namespace QuickCampusAPI.Controllers
             IGeneralResult<CollegeVM> result = new GeneralResult<CollegeVM>();
             var _jwtSecretKey = _config["Jwt:Key"];
             var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+
             if (vm != null)
             {
                 if (ModelState.IsValid)
@@ -127,6 +129,7 @@ namespace QuickCampusAPI.Controllers
                         ContectPerson = vm.ContectPerson,
                         ContectEmail = vm.ContectEmail,
                         ContectPhone = vm.ContectPhone,
+                        ClientId =clientId==""?null: Convert.ToInt32(clientId), 
                     };
                     try
                     {
@@ -152,15 +155,15 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = "EditCollege")]
+       // [Authorize(Roles = "EditCollege")]
         [HttpPost]
         [Route("EditCollege")]
-        public async Task<IActionResult> EditCollege([FromBody] CollegeVM vm)
+        public async Task<IActionResult> EditCollege([FromBody] CollegeLogoVm vm)
         {
             IGeneralResult<CollegeVM> result = new GeneralResult<CollegeVM>();
             var _jwtSecretKey = _config["Jwt:Key"];
             var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-
+            var clientId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             if (vm != null)
             {
                 var res = await _collegeRepo.GetById(vm.CollegeId);
@@ -180,7 +183,7 @@ namespace QuickCampusAPI.Controllers
                 if (ModelState.IsValid && vm.CollegeId > 0 && res.IsDeleted == false)
                 {
                     res.CollegeName = vm.CollegeName;
-                    res.Logo = vm.Logo;
+                    res.Logo = ProcessUploadFile(vm);
                     res.Address1 = vm.Address1;
                     res.Address2 = vm.Address2;
                     res.CreatedBy = Convert.ToInt32(userId);
@@ -192,7 +195,8 @@ namespace QuickCampusAPI.Controllers
                     res.ContectPerson = vm.ContectPerson;
                     res.ContectEmail = vm.ContectEmail;
                     res.ContectPhone = vm.ContectPhone;
-                    res.ModifiedDate = DateTime.Now;
+                  
+                    res.ClientId = clientId == "" ? null : Convert.ToInt32(clientId);
 
                     try
                     {

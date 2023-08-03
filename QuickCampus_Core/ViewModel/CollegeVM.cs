@@ -25,6 +25,7 @@ namespace QuickCampus_Core.ViewModel
                 ContectEmail = items.ContectEmail,
                 ModifiedBy = items.ModifiedBy,
                 ModifiedDate = items.ModifiedDate,
+                ClientId = items.ClientId
             };
         }
         public int CollegeId { get; set; }
@@ -55,8 +56,7 @@ namespace QuickCampus_Core.ViewModel
 
         public DateTime? ModifiedDate { get; set; }
         public bool? IsDeleted { get; set; }
-
-       // public IFormFile file { get; set; }
+        public int? ClientId { get; set; }
 
         public College ToCollegeDbModel()
         {
@@ -79,6 +79,8 @@ namespace QuickCampus_Core.ViewModel
                 CreatedDate = DateTime.UtcNow,
                 ModifiedBy = ModifiedBy,
                 ModifiedDate = CollegeId > 0 ? DateTime.UtcNow : null,
+                ClientId = ClientId,
+
             };
         }
 
@@ -100,7 +102,8 @@ namespace QuickCampus_Core.ViewModel
                 ContectEmail = ContectEmail,
                 CreatedBy = CreatedBy, 
                 ModifiedBy = ModifiedBy,
-                ModifiedDate = DateTime.Now
+                ModifiedDate = DateTime.Now,
+                ClientId= ClientId,
             };
         }
 

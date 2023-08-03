@@ -40,6 +40,7 @@ namespace QuickCampus_Core.ViewModel
 
         public DateTime? ModifiedDate { get; set; }
         public bool? IsDeleted { get; set; }
+        public int? ClientId { get; set; }
 
         // public IFormFile file { get; set; }
         public College ToCollegeDbModel()
@@ -63,6 +64,7 @@ namespace QuickCampus_Core.ViewModel
                 CreatedDate = DateTime.UtcNow,
                 ModifiedBy = ModifiedBy,
                 ModifiedDate = CollegeId > 0 ? DateTime.UtcNow : null,
+                ClientId = ClientId,
             };
         }
     }

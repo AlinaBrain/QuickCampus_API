@@ -25,8 +25,6 @@ public partial class Question
 
     public virtual ICollection<ApplicantTestSummary> ApplicantTestSummaries { get; set; } = new List<ApplicantTestSummary>();
 
-    public virtual TblClient? Clent { get; set; }
-
     public virtual Groupdl? Group { get; set; }
 
     public virtual ICollection<QuestionOption> QuestionOptions { get; set; } = new List<QuestionOption>();
