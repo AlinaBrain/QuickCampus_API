@@ -41,6 +41,8 @@ public partial class College
 
     public DateTime? ModifiedDate { get; set; }
 
+    public int? ClientId { get; set; }
+
     public virtual ICollection<CampusWalkInCollege> CampusWalkInColleges { get; set; } = new List<CampusWalkInCollege>();
 
     public virtual Country? Country { get; set; }

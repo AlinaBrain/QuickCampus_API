@@ -238,7 +238,9 @@ public partial class QuikCampusDevContext : DbContext
             entity.Property(e => e.ContectPerson).HasMaxLength(100);
             entity.Property(e => e.ContectPhone).HasMaxLength(100);
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
-            entity.Property(e => e.Logo).HasMaxLength(50);
+            entity.Property(e => e.Logo)
+                .HasMaxLength(250)
+                .IsUnicode(false);
             entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
             entity.HasOne(d => d.Country).WithMany(p => p.Colleges)

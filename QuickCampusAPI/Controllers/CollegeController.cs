@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting.Internal;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
+using Microsoft.AspNetCore.Http;
+
+
 
 namespace QuickCampusAPI.Controllers
 {
@@ -14,11 +18,19 @@ namespace QuickCampusAPI.Controllers
         private readonly ICollegeRepo _collegeRepo;
         private IConfiguration _config;
         private readonly Microsoft.AspNetCore.Hosting.IHostingEnvironment _hostingEnvironment;
-        public CollegeController(ICollegeRepo collegeRepo, IConfiguration config, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment)
+        private readonly string basepath;
+        private readonly ICountryRepo _countryRepo;
+        private readonly IStateRepo _stateRepo;
+        private string baseUrl;
+        public CollegeController(ICollegeRepo collegeRepo, IConfiguration config, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment,ICountryRepo countryRepo,IStateRepo stateRepo)
         {
             _collegeRepo = collegeRepo;
             _config = config;
-            _hostingEnvironment = hostingEnvironment;   
+            _hostingEnvironment=hostingEnvironment;
+            basepath = config["APISitePath"];
+            _countryRepo = countryRepo;
+            _stateRepo=stateRepo;
+
         }
 
         [Authorize(Roles = "GetAllCollege")]
@@ -73,34 +85,39 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
-      //  [Authorize(Roles = "AddCollege")]
+       // [Authorize(Roles = "AddCollege")]
         [HttpPost]
         [Route("AddCollege")]
-        public async Task<IActionResult> AddCollege([FromBody] CollegeVM vm)
+        public async Task<IActionResult> AddCollege([FromForm] CollegeLogoVm vm)
         {
             IGeneralResult<CollegeVM> result = new GeneralResult<CollegeVM>();
             var _jwtSecretKey = _config["Jwt:Key"];
             var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+
             if (vm != null)
             {
                 if (ModelState.IsValid)
                 {
-                    if (vm.Image == null || vm.Image.Length <= 0)
-                        return BadRequest("Invalid file.");
-                    string uniqueFileName = Path.GetRandomFileName() + Path.GetExtension(vm.Image.FileName);  
-                    string uploadPath = Path.Combine("wwwroot", "UploadFiles", uniqueFileName);
-                    using (var stream = new FileStream(uploadPath, FileMode.Create))
+                    bool FindCountry=_countryRepo.Any(x=>x.CountryId == vm.CountryId);
+                    bool FindState = _stateRepo.Any(x=>x.StateId==vm.StateId);
+                    if (!FindCountry)
                     {
-                        await vm.Image.CopyToAsync(stream);
+                        result.Message = "This Country is not listed for this College!";
+                        return Ok(result);
+                    }
+                    if (!FindState)
+                    {
+                        result.Message = "This State is not Listed for this State!";
+                        return Ok(result);
                     }
 
-                    // Update the 'Logo' property in your model with the file path
-                    vm.Logo = $"/UploadFiles/{uniqueFileName}";
+
 
                     CollegeVM collegeVM = new CollegeVM
                     {
                         CollegeName = vm.CollegeName,
-                        Logo = vm.Logo,
+                        Logo= ProcessUploadFile(vm),
                         Address1 = vm.Address1,
                         Address2 = vm.Address2,
                         CreatedBy = Convert.ToInt32(userId),
@@ -112,6 +129,7 @@ namespace QuickCampusAPI.Controllers
                         ContectPerson = vm.ContectPerson,
                         ContectEmail = vm.ContectEmail,
                         ContectPhone = vm.ContectPhone,
+                        ClientId =clientId==""?null: Convert.ToInt32(clientId), 
                     };
                     try
                     {
@@ -137,24 +155,15 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
-        public static string GetUniqueFileName(string fileName)
-        {
-            fileName = Path.GetFileName(fileName);
-            return string.Concat(Path.GetFileNameWithoutExtension(fileName)
-                                , "_"
-                                , Guid.NewGuid().ToString().AsSpan(0, 4)
-                                , Path.GetExtension(fileName));
-        }
-
-        [Authorize(Roles = "EditCollege")]
+       // [Authorize(Roles = "EditCollege")]
         [HttpPost]
         [Route("EditCollege")]
-        public async Task<IActionResult> EditCollege([FromBody] CollegeVM vm)
+        public async Task<IActionResult> EditCollege([FromBody] CollegeLogoVm vm)
         {
             IGeneralResult<CollegeVM> result = new GeneralResult<CollegeVM>();
             var _jwtSecretKey = _config["Jwt:Key"];
             var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-
+            var clientId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             if (vm != null)
             {
                 var res = await _collegeRepo.GetById(vm.CollegeId);
@@ -174,7 +183,7 @@ namespace QuickCampusAPI.Controllers
                 if (ModelState.IsValid && vm.CollegeId > 0 && res.IsDeleted == false)
                 {
                     res.CollegeName = vm.CollegeName;
-                    res.Logo = vm.Logo;
+                    res.Logo = ProcessUploadFile(vm);
                     res.Address1 = vm.Address1;
                     res.Address2 = vm.Address2;
                     res.CreatedBy = Convert.ToInt32(userId);
@@ -186,7 +195,8 @@ namespace QuickCampusAPI.Controllers
                     res.ContectPerson = vm.ContectPerson;
                     res.ContectEmail = vm.ContectEmail;
                     res.ContectPhone = vm.ContectPhone;
-                    res.ModifiedDate = DateTime.Now;
+                  
+                    res.ClientId = clientId == "" ? null : Convert.ToInt32(clientId);
 
                     try
                     {
@@ -258,21 +268,21 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-        //private string ProcessUploadFile(CollegeVM model)
-        //{
-        //    string uniqueFileName = null;
-        //    if (model.file!= null)
-        //    {
-        //        string photoUoload = Path.Combine(_hostingEnvironment.WebRootPath, "Image");
-        //        uniqueFileName = Guid.NewGuid().ToString() + "_" + model.file.FileName;
-        //        string filepath = Path.Combine(photoUoload, uniqueFileName);
-        //        using (var filename = new FileStream(filepath, FileMode.Create))
-        //        {
-        //            model.file.CopyTo(filename);
-        //        }
-        //    }
-        //    return uniqueFileName;
-        //}
-
+        private string ProcessUploadFile([FromForm] CollegeLogoVm model)
+        {
+            string uniqueFileName = null;
+            if (model.ImagePath != null)
+            {
+                string photoUoload = Path.Combine(_hostingEnvironment.WebRootPath, "UploadFiles");
+                uniqueFileName = Guid.NewGuid().ToString() + "_" + model.ImagePath.FileName;
+                string filepath = Path.Combine(photoUoload, uniqueFileName);
+                using (var filename = new FileStream(filepath, FileMode.Create))
+                {
+                    model.ImagePath.CopyTo(filename);
+                }
+            }
+            return uniqueFileName;
+        }
     }
-}
+    }
+
