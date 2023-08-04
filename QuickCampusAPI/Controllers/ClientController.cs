@@ -14,11 +14,13 @@ namespace QuickCampusAPI.Controllers
         private readonly IClientRepo _clientRepo;
         private readonly IUserRepo _userRepo;
         private IConfiguration _config;
-        public ClientController(IClientRepo clientRepo, IConfiguration config, IUserRepo userRepo)
+        private readonly IUserRoleRepo _roleRepo;
+        public ClientController(IClientRepo clientRepo, IConfiguration config, IUserRepo userRepo, IUserRoleRepo userRoleRepo)
         {
             _clientRepo = clientRepo;
             _config = config;
             _userRepo = userRepo;
+            _roleRepo = userRoleRepo;
         }
 
         [Authorize(Roles = "AddClient")]
@@ -77,10 +79,18 @@ namespace QuickCampusAPI.Controllers
                             Mobile = clientdata.Phone,
                         };
 
-                        var userdetails = _userRepo.Add(userVm.ToUserDbModel());
+                        var userdetails = await _userRepo.Add(userVm.ToUserDbModel());
+
+                        
+                            var res = await _roleRepo.SetClientAdminRole(userdetails.Id);
+                        
+
                         result.Data = (ClientResponseVm)clientdata;
                         result.Message = "Client added successfully";
                         result.IsSuccess = true;
+
+
+
 
                     }
                     catch (Exception ex)

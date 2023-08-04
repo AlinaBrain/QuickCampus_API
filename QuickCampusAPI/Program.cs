@@ -114,6 +114,7 @@ builder.Services.AddScoped<IAccount, AccountService>();
 builder.Services.AddScoped<IClientRepo, ClientRepo>();
 builder.Services.AddScoped<IStateRepo, StateServices>();
 builder.Services.AddScoped<IQuestion,QuestionService>();
+builder.Services.AddScoped<IUserRoleRepo,UserRoleService>();
 
 
 
