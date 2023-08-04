@@ -98,14 +98,15 @@ namespace QuickCampus_Core.Services
             int a = dbContext.SaveChanges();
             if (a > 0)
             {
-                result.IsSuccess = false ;
-                result.Message = "something went wrong";
+                result.IsSuccess = true;
+                result.Message = "status update successfully";
                 return result;
+               
             }
             else
             {
-                result.IsSuccess = true;
-                result.Message = "status update successfully";
+                result.IsSuccess = false;
+                result.Message = "something went wrong";
                 return result;
             }
         }
