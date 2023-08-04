@@ -174,6 +174,13 @@ namespace QuickCampus_Core.Services
             return result;
         }
 
+
+        private CampusWalkInCollege getWalkin(int id)
+        {
+            CampusWalkInCollege res = new CampusWalkInCollege();
+            res = _context.CampusWalkInColleges.Include(i => i.College).Where(w => w.CampusId == id).FirstOrDefault();
+            return res;
+        }
         public async Task<IEnumerable<CampusGridViewModel>> GetAllCampus(int clientId, bool isSuperAdmin)
         {
 
@@ -262,11 +269,11 @@ namespace QuickCampus_Core.Services
             WalkIn campus = new WalkIn();
             if (isSuperAdmin)
             {
-                campus = _context.WalkIns.Where(x => x.WalkInId == id && x.IsActive == true && x.IsDeleted == false && (clientId==0?true:x.ClientId==clientId)).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
+                campus = _context.WalkIns.Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).Where(x => x.WalkInId == id && x.IsActive == true && x.IsDeleted == false && (clientId==0?true:x.ClientId==clientId)).FirstOrDefault();
             }
             else
             {
-                campus = _context.WalkIns.Where(x => x.WalkInId == id && x.IsActive == true && x.IsDeleted == false && x.ClientId == clientId).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
+                campus = _context.WalkIns.Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).Where(x => x.WalkInId == id && x.IsActive == true && x.IsDeleted == false && x.ClientId == clientId).FirstOrDefault();
             }
             if (campus == null)
             {
@@ -293,7 +300,7 @@ namespace QuickCampus_Core.Services
                 {
                     CollegeCode = y.CollegeCode,
                     CollegeId = y.CollegeId ?? 0,
-                    CollegeName = y.College.CollegeName,
+                    //CollegeName = y.College.CollegeName,
                     ExamEndTime = y.ExamEndTime.Value.ToString(),
                     ExamStartTime = y.ExamStartTime.Value.ToString()
                 }).ToList()
@@ -314,11 +321,11 @@ namespace QuickCampus_Core.Services
             WalkIn campus = new WalkIn();
             if (isSuperAdmin)
             {
-                campus = _context.WalkIns.Where(x => x.WalkInId == id && x.IsActive == true && x.IsDeleted == false && (clientId==0?true:x.ClientId==clientId)).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
+                campus = _context.WalkIns.Where(x => x.WalkInId == id  && x.IsDeleted == false && (clientId==0?true:x.ClientId==clientId)).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
             }
             else
             {
-                campus = _context.WalkIns.Where(x => x.WalkInId == id && x.IsActive == true && x.IsDeleted == false && x.ClientId == clientId).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
+                campus = _context.WalkIns.Where(x => x.WalkInId == id  && x.IsDeleted == false && x.ClientId == clientId).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
             }
             if (campus == null)
             {
