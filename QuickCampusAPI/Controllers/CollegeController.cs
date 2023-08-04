@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using QuickCampus_DAL.Context;
 using QuickCampus_Core.Services;
 using Azure;
+using System.Runtime.InteropServices;
 
 namespace QuickCampusAPI.Controllers
 {
@@ -91,14 +92,25 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = "CollegeDetails")]
+        [Authorize(Roles = "GetCollegeDetailsById")]
         [HttpGet]
-        [Route("CollegeDetails")]
-        public async Task<IActionResult> CollegeDetails(int Id)
+        [Route("GetCollegeDetailsById")]
+        public async Task<IActionResult> GetCollegeDetailsById(int Id, int clientid)
         {
-            var _jwtSecretKey = _config["Jwt:Key"];
-            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             IGeneralResult<CollegeVM> result = new GeneralResult<CollegeVM>();
+            var _jwtSecretKey = _config["Jwt:Key"];
+            int cid = 0;
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            if (isSuperAdmin)
+            {
+                cid = clientid;
+            }
+            else
+            {
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
+            }
+
             var res = await _collegeRepo.GetById(Id);
             if (res.IsDeleted == false && res.IsActive == true)
             {
@@ -116,7 +128,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "AddCollege")]
         [HttpPost]
         [Route("AddCollege")]
-        public async Task<IActionResult> AddCollege([FromForm] CollegeLogoVm vm, int clientid)
+        public async Task<IActionResult> AddCollege([FromForm] CollegeLogoVm vm,int clientid)
         {
             IGeneralResult<CollegeVM> result = new GeneralResult<CollegeVM>();
             var _jwtSecretKey = _config["Jwt:Key"];
@@ -184,7 +196,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "EditCollege")]
         [HttpPost]
         [Route("EditCollege")]
-        public async Task<IActionResult> EditCollege([FromBody] CollegeLogoVm vm, int clientid)
+        public async Task<IActionResult> EditCollege([FromBody] CollegeLogoVm vm, [Optional]int clientid)
         {
             IGeneralResult<CollegeVM> result = new GeneralResult<CollegeVM>();
             var _jwtSecretKey = _config["Jwt:Key"];
