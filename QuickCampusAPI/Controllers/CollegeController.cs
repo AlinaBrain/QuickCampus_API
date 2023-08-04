@@ -1,13 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting.Internal;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
-using Microsoft.AspNetCore.Http;
 using QuickCampus_DAL.Context;
-using QuickCampus_Core.Services;
-using Azure;
 
 namespace QuickCampusAPI.Controllers
 {
@@ -184,7 +180,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "EditCollege")]
         [HttpPost]
         [Route("EditCollege")]
-        public async Task<IActionResult> EditCollege([FromBody] CollegeLogoVm vm, int clientid)
+        public async Task<IActionResult> EditCollege([FromForm] CollegeLogoVm vm, int clientid)
         {
             IGeneralResult<CollegeVM> result = new GeneralResult<CollegeVM>();
             var _jwtSecretKey = _config["Jwt:Key"];
