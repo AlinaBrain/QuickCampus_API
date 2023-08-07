@@ -143,55 +143,66 @@ namespace QuickCampusAPI.Controllers
             {
                 cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
             }
-
-           
             var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-
             if (vm != null)
             {
+
                 if (ModelState.IsValid)
                 {
-
-                    CollegeVM collegeVM = new CollegeVM
+                    bool isExits = _collegeRepo.Any(x => x.CollegeName == vm.CollegeName && x.IsDeleted == false);
+                    if (isExits)
                     {
-                        CollegeName = vm.CollegeName,
-                        Logo= ProcessUploadFile(vm),
-                        Address1 = vm.Address1,
-                        Address2 = vm.Address2,
-                        CreatedBy = Convert.ToInt32(userId),
-                        ModifiedBy = Convert.ToInt32(userId),
-                        City = vm.City,
-                        StateId = vm.StateId,
-                        CountryId = vm.CountryId,
-                        CollegeCode = vm.CollegeCode,
-                        ContectPerson = vm.ContectPerson,
-                        ContectEmail = vm.ContectEmail,
-                        ContectPhone = vm.ContectPhone,
-                        ClientId =cid, 
-                    };
-                    try
-                    {
-                        var collegedata = await _collegeRepo.Add(collegeVM.ToCollegeDbModel());
-                        result.Data = (CollegeVM)collegedata;
-                        result.Message = "College added successfully";
-                        result.IsSuccess = true;
-
+                        result.Message = " CollegeName is already exists";
                     }
-                    catch (Exception ex)
+                    bool isexist = _collegeRepo.Any(x => x.CollegeCode == vm.CollegeCode && x.IsDeleted==false);
+                    if (isexist)
                     {
-                        result.Message = ex.Message;
+                        result.Message = "CollegeCode is alredy exist";
                     }
 
-                    return Ok(result);
+                    else
+                    {
+                        {
+                            CollegeVM college = new CollegeVM
+                            {
+                                CollegeName = vm.CollegeName.Trim(),
+                                Logo = ProcessUploadFile(vm),
+                                Address1 = vm.Address1.Trim(),
+                                Address2 = vm.Address2.Trim(),
+                                CreatedBy = Convert.ToInt32(userId),
+                                ModifiedBy = Convert.ToInt32(userId),
+                                City = vm.City.Trim(),
+                                StateId = vm.StateId,
+                                CountryId = vm.CountryId,
+                                CollegeCode=vm.CollegeCode,
+                                ContectPerson = vm.ContectPerson.Trim(),
+                                ContectEmail = vm.ContectEmail.Trim(),
+                                ContectPhone = vm.ContectPhone.Trim(),
+                                ClientId = cid,
+                            };
+                            try
+                            {
+                                var collegedata = await _collegeRepo.Add(college.ToCollegeDbModel());
+                                result.Data = (CollegeVM)collegedata;
+                                result.Message = "College added successfully";
+                                result.IsSuccess = true;
+                            }
+
+                            catch (Exception ex)
+                            {
+                                result.Message = ex.Message;
+                            }
+                            return Ok(result);
+                        }
+                    }
                 }
                 else
                 {
                     result.Message = "something Went Wrong";
                 }
-
             }
             return Ok(result);
-        }
+           }
 
         [Authorize(Roles = "EditCollege")]
         [HttpPost]
@@ -246,40 +257,51 @@ namespace QuickCampusAPI.Controllers
                     result.Message = " College does Not Exist";
                     return Ok(result);
                 }
-
-                if (ModelState.IsValid && vm.CollegeId > 0 && clg.IsDeleted == false)
+                bool isExits = _collegeRepo.Any(x => x.CollegeName == vm.CollegeName && x.IsDeleted == false);
+                if (isExits)
                 {
-                    clg.CollegeName = vm.CollegeName;
-                    clg.Logo = ProcessUploadFile(vm);
-                    clg.Address1 = vm.Address1;
-                    clg.Address2 = vm.Address2;
-                    clg.CreatedBy = Convert.ToInt32(userId);
-                    clg.ModifiedBy = Convert.ToInt32(userId);
-                    clg .City = vm.City;
-                    clg.StateId = vm.StateId;
-                    clg.CountryId = vm.CountryId;
-                    clg.CollegeCode = vm.CollegeCode;
-                    clg.ContectPerson = vm.ContectPerson;
-                    clg.ContectEmail = vm.ContectEmail;
-                    clg.ContectPhone = vm.ContectPhone;
-
-                    try
-                    {
-                        result.Data = (CollegeVM)await _collegeRepo.Update(clg);
-                        result.Message = "College updated successfully";
-                        result.IsSuccess = true;
-                    }
-                    catch (Exception ex)
-                    {
-                        result.Message = ex.Message;
-                    }
-                    return Ok(result);
+                    result.Message = " CollegeName is already exists";
+                }
+                bool isexist = _collegeRepo.Any(x => x.CollegeCode == vm.CollegeCode && x.IsDeleted==false);
+                if (isexist)
+                {
+                    result.Message = "CollegeCode is alredy exist";
                 }
                 else
                 {
-                    result.Message = "something Went Wrong";
-                }
+                    if (ModelState.IsValid && vm.CollegeId > 0 && clg.IsDeleted == false)
+                    {
+                        clg.CollegeName = vm.CollegeName.Trim();
+                        clg.Logo = ProcessUploadFile(vm);
+                        clg.Address1 = vm.Address1.Trim();
+                        clg.Address2 = vm.Address2.Trim();
+                        clg.CreatedBy = Convert.ToInt32(userId);
+                        clg.ModifiedBy = Convert.ToInt32(userId);
+                        clg.City = vm.City.Trim();
+                        clg.StateId = vm.StateId;
+                        clg.CountryId = vm.CountryId;
+                        clg.CollegeCode = vm.CollegeCode.Trim();
+                        clg.ContectPerson = vm.ContectPerson.Trim();
+                        clg.ContectEmail = vm.ContectEmail.Trim();
+                        clg.ContectPhone = vm.ContectPhone.Trim();
 
+                        try
+                        {
+                            result.Data = (CollegeVM)await _collegeRepo.Update(clg);
+                            result.Message = "College updated successfully";
+                            result.IsSuccess = true;
+                        }
+                        catch (Exception ex)
+                        {
+                            result.Message = ex.Message;
+                        }
+                        return Ok(result);
+                    }
+                    else
+                    {
+                        result.Message = "something Went Wrong";
+                    }
+                }
             }
             return Ok(result);
         }

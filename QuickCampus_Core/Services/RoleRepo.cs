@@ -185,8 +185,6 @@ namespace QuickCampus_Core.Services
                 return result;
             }
         }
-
-
         public async Task<IGeneralResult<RoleModel>> GetRoleById(int rId, int clientid, bool isSuperAdmin)
         {
             IGeneralResult<RoleModel> result = new GeneralResult<RoleModel>();

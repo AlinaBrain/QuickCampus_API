@@ -37,17 +37,11 @@ public partial class TblClient
 
     public string? Password { get; set; }
 
-    public virtual TblUser? CraetedByNavigation { get; set; }
-
     public virtual ICollection<Groupdl> Groupdls { get; set; } = new List<Groupdl>();
-
-    public virtual TblUser? ModifiedByNavigation { get; set; }
 
     public virtual ICollection<QuestionType> QuestionTypes { get; set; } = new List<QuestionType>();
 
     public virtual ICollection<Section> Sections { get; set; } = new List<Section>();
-
-    public virtual ICollection<TblRole> TblRoles { get; set; } = new List<TblRole>();
 
     public virtual ICollection<TblUser> TblUsers { get; set; } = new List<TblUser>();
 }

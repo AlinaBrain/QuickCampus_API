@@ -15,6 +15,8 @@ public partial class State
 
     public bool? IsDeleted { get; set; }
 
+    public int? ClientId { get; set; }
+
     public virtual ICollection<College> Colleges { get; set; } = new List<College>();
 
     public virtual Country? Country { get; set; }

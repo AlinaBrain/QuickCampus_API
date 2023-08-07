@@ -387,14 +387,6 @@ public partial class QuikCampusDevContext : DbContext
             entity.Property(e => e.Name).HasMaxLength(100);
             entity.Property(e => e.Password).HasMaxLength(100);
             entity.Property(e => e.UserName).HasMaxLength(100);
-
-            entity.HasOne(d => d.CraetedByNavigation).WithMany(p => p.TblClientCraetedByNavigations)
-                .HasForeignKey(d => d.CraetedBy)
-                .HasConstraintName("FK__tbl_Clien__Craet__19DFD96B");
-
-            entity.HasOne(d => d.ModifiedByNavigation).WithMany(p => p.TblClientModifiedByNavigations)
-                .HasForeignKey(d => d.ModifiedBy)
-                .HasConstraintName("FK__tbl_Clien__Modif__1AD3FDA4");
         });
 
         modelBuilder.Entity<TblPermission>(entity =>
@@ -417,10 +409,6 @@ public partial class QuikCampusDevContext : DbContext
             entity.Property(e => e.ModifiedBy).HasColumnName("modifiedBy");
             entity.Property(e => e.ModofiedDate).HasColumnType("datetime");
             entity.Property(e => e.Name).HasMaxLength(50);
-
-            entity.HasOne(d => d.Client).WithMany(p => p.TblRoles)
-                .HasForeignKey(d => d.ClientId)
-                .HasConstraintName("FK__tbl_Role__Client__3B40CD36");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.TblRoleCreatedByNavigations)
                 .HasForeignKey(d => d.CreatedBy)

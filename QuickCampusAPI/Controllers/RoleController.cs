@@ -29,8 +29,6 @@ namespace QuickCampusAPI.Controllers
         {
             IGeneralResult<RoleResponse> result = new GeneralResult<RoleResponse>();
             var _jwtSecretKey = config["Jwt:Key"];
-
-
             int cid = 0;
             var jwtSecretKey = config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
