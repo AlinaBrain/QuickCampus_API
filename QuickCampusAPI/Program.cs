@@ -56,7 +56,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddSwaggerGen(option =>
 {
-    option.SwaggerDoc("v1", new OpenApiInfo { Title = "Demo API", Version = "v1" });
+    option.SwaggerDoc("v1", new OpenApiInfo { Title = "Quick Campus API", Version = "v1" });
     option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
@@ -114,6 +114,7 @@ builder.Services.AddScoped<IAccount, AccountService>();
 builder.Services.AddScoped<IClientRepo, ClientRepo>();
 builder.Services.AddScoped<IStateRepo, StateServices>();
 builder.Services.AddScoped<IQuestion,QuestionService>();
+builder.Services.AddScoped<IUserRoleRepo,UserRoleService>();
 
 
 

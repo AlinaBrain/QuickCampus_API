@@ -137,22 +137,22 @@ namespace QuickCampus_Core.ViewModel
            
             [Required(ErrorMessage = "Name is required"), MaxLength(20)]
             [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "Only characters allowed.")]
-            public string FirstName { get; set; }
+            public string? FirstName { get; set; }
 
             [Required(ErrorMessage = "Name is required"), MaxLength(20)]
             [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "Only characters allowed.")]
-            public string LastName { get; set; }
+            public string? LastName { get; set; }
 
             [Display(Name = "College Name")]
             [Required(ErrorMessage = "You must select one college.")]
             public int? CollegeId { get; set; }
-            public List<SelectListItem> Colleges { get; set; }
+            public List<SelectListItem>? Colleges { get; set; }
 
             [Display(Name = "Email Address")]
             [Required(ErrorMessage = "You must provide an email address.")]
             [MaxLength(100, ErrorMessage = "can't exceed more than 100 characters.")]
             [EmailAddress(ErrorMessage = "Not a valid email address.")]
-            public string EmailAddress { get; set; }
+            public string? EmailAddress { get; set; }
 
             [MaxLength(25, ErrorMessage = "can't exceed more than 25 characters.")]
             [Required(ErrorMessage = "You must provide a Contact Number")]
@@ -162,11 +162,11 @@ namespace QuickCampus_Core.ViewModel
             [Display(Name = "Higest Qualification")]
             [Required(ErrorMessage = "You must provide your highest qualification.")]
             [MaxLength(100, ErrorMessage = "can't exceed more than 100 characters.")]
-            public string HigestQualification { get; set; }
+            public string? HigestQualification { get; set; }
 
             [Display(Name = "Best 3 Skills")]
             [MaxLength(100, ErrorMessage = "can't exceed more than 100 characters.")]
-            public string Skills { get; set; }
+            public string? Skills { get; set; }
 
             [Display(Name = "Higest Qualification %")]
             [Required(ErrorMessage = "You must provide %.")]
@@ -184,30 +184,29 @@ namespace QuickCampus_Core.ViewModel
             public decimal? IntermediatePercentage { get; set; }
             public int StatusID { get; set; }
             public int CompanyId { get; set; }
-            public string Company { get; set; }
-            public string Comment { get; set; }
+            public string? Company { get; set; }
+            public string? Comment { get; set; }
             public DateTime? CreatedDate { get; set; }
             public string? CollegeName { get; set; }
             public string RegisteredDate { get { return CreatedDate.HasValue ? CreatedDate.Value.ToShortDateString() : ""; } set { } }
-            //public CollegeGridViewModel College { get; set; }
         }
 
         public class ApplicantDetails
         {
-            public string FirstName { get; set; }
-            public string LastName { get; set; }
-            public string EmailAddress { get; set; }
-            public string PhoneNumber { get; set; }
-            public string HigestQualification { get; set; }
-            public string HigestQualificationPercentage { get; set; }
-            public string MatricPercentage { get; set; }
-            public string IntermediatePercentage { get; set; }
-            public string Skills { get; set; }
+            public string? FirstName { get; set; }
+            public string? LastName { get; set; }
+            public string? EmailAddress { get; set; }
+            public string? PhoneNumber { get; set; }
+            public string? HigestQualification { get; set; }
+            public string? HigestQualificationPercentage { get; set; }
+            public string? MatricPercentage { get; set; }
+            public string? IntermediatePercentage { get; set; }
+            public string? Skills { get; set; }
         }
 
         public class ApplicantFilter
         {
-            public string Name { get; set; }
+            public string? Name { get; set; }
 
         }
     }

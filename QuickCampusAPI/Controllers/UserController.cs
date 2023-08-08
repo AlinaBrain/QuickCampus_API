@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
+using QuickCampus_DAL.Context;
 
 namespace QuickCampusAPI.Controllers
 {
@@ -21,14 +22,29 @@ namespace QuickCampusAPI.Controllers
             this.config = config;
         }
 
+        [Authorize(Roles = "AddUser")]
         [HttpPost]
         [Route("AddUser")]
-        public async Task<IActionResult> AddUser(UserModel vm)
+        public async Task<IActionResult> AddUser(UserModel vm, int clientid)
         {
             vm.Password = EncodePasswordToBase64(vm.Password);
             IGeneralResult<UserResponseVm> result = new GeneralResult<UserResponseVm>();
             var _jwtSecretKey = config["Jwt:Key"];
+
+
+            int cid = 0;
+            var jwtSecretKey = config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            if (isSuperAdmin)
+            {
+                cid = clientid;
+            }
+            else
+            {
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
+            }
+
             if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.IsDelete == false))
             {
                 result.Message = "Email Already Registered!";
@@ -37,51 +53,20 @@ namespace QuickCampusAPI.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    if (!string.IsNullOrEmpty(clientId))
+
+                    UserVm userVm = new UserVm
                     {
-                        int parsedClientId;
-                        if (int.TryParse(clientId, out parsedClientId))
-                        {
-                            UserVm userVm = new UserVm
-                            {
-                                Name = vm.Name,
-                                Email = vm.Email,
-                                Mobile = vm.Mobile,
-                                Password = vm.Password,
-                                ClientId = parsedClientId
-                            };
-                          var dataWithClientId = await userRepo.Add(userVm.ToUserDbModel());
-                            result.IsSuccess = true;
-                            result.Message = "User added successfully.";
-                            result.Data = (UserResponseVm)dataWithClientId;
-                            return Ok(result);
-                        }
-                        else
-                        {
-                            result.Message = "Invalid Client ID format.";
-                        }
-                    }
-                    else
-                    {
-                        UserVm userVm = new UserVm
-                        {
-                            Name = vm.Name,
-                            Email = vm.Email,
-                            Mobile = vm.Mobile,
-                            Password = vm.Password,
-                            ClientId = null, 
-                            IsActive = true,
-                            IsDelete = false
-                        };
-
-                      var userData = await userRepo.Add(userVm.ToUserDbModel());
-
-                        result.IsSuccess = true;
-                        result.Message = "User added successfully.";
-                        result.Data = (UserResponseVm)userData;
-                        return Ok(result);
-                    }
-
+                        Name = vm.Name.Trim(),
+                        Email = vm.Email.Trim(),
+                        Mobile = vm.Mobile.Trim(),
+                        Password = vm.Password.Trim(),
+                        ClientId = cid == 0 ? null : cid
+                    };
+                    var dataWithClientId = await userRepo.Add(userVm.ToUserDbModel());
+                    result.IsSuccess = true;
+                    result.Message = "User added successfully.";
+                    result.Data = (UserResponseVm)dataWithClientId;
+                    return Ok(result);
                 }
                 else
                 {
@@ -90,79 +75,29 @@ namespace QuickCampusAPI.Controllers
             }
 
             return Ok(result);
-        
-    }
 
-        [HttpGet]
-        [Route("UserList")]
-        public async Task<IActionResult> UserList()
-        {
-
-            var _jwtSecretKey = config["Jwt:Key"];
-            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            IGeneralResult<List<UserResponseVm>> result = new GeneralResult<List<UserResponseVm>>();
-            try
-            {
-                var categoryList = (await userRepo.GetAll()).Where(x => x.IsDelete == false || x.IsDelete == null).ToList();
-                if(clientId != null && clientId != "")
-                {
-                  var response =  categoryList.Select(x => ((UserResponseVm)x)).Where(x =>x.ClientId ==Convert.ToInt32(clientId)).ToList();
-                    result.IsSuccess = true;
-                    result.Message = "User list get successfully!!";
-                    result.Data = response;
-                    return Ok(result);
-                }
-                var res = categoryList.Select(x => ((UserResponseVm)x)).ToList();
-                if (res != null)
-                {
-                    result.IsSuccess = true;
-                    result.Message = "User list get successfully!!";
-                    result.Data = res;
-                }
-                else
-                {
-                    result.Message = "User List Not Found";
-                }
-            }
-            catch (Exception ex)
-            {
-                result.Message = ex.Message;
-            }
-            return Ok(result);
         }
 
-        [HttpDelete]
-        [Route("DeleteUser")]
-        public async Task<IActionResult> DeleteUser(int id)
+        [Authorize(Roles = "EditRole")]
+        [HttpPost]
+        [Route("EditUser")]
+        public async Task<IActionResult> EditUser(EditUserResponseVm vm, int clientid)
         {
+            IGeneralResult<EditUserResponseVm> result = new GeneralResult<EditUserResponseVm>();
+            int cid = 0;
             var _jwtSecretKey = config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
-            var res = await userRepo.GetById(id);
-            if (res.IsDelete == false)
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            if (isSuperAdmin)
             {
-
-                res.IsActive = false;
-                res.IsDelete = true;
-                await userRepo.Update(res);
-                result.IsSuccess = true;
-                result.Message = "USer Deleted Succesfully";
+                cid = clientid;
             }
             else
             {
-                result.Message = "User does Not exist";
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
             }
-            return Ok(result);
-        }
-        [HttpPost]
-        [Route("EditUser")]
-        public async Task<IActionResult> EditUser(EditUserResponseVm vm)
-        {
-            IGeneralResult<EditUserResponseVm> result = new GeneralResult<EditUserResponseVm>();
-            var _jwtSecretKey = config["Jwt:Key"];
-            var clientId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
 
-            if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.Id != vm.Id))
+            if (userRepo.Any(x => x.Email == vm.Email.Trim() && x.IsActive == true && x.Id != vm.Id))
             {
                 result.Message = "Email Already Registered!";
             }
@@ -172,7 +107,16 @@ namespace QuickCampusAPI.Controllers
             }
             else
             {
-                var res = await userRepo.GetById(vm.Id);
+                TblUser res = new TblUser();
+
+                if (isSuperAdmin)
+                {
+                    res = (await userRepo.GetAll()).Where(w=> w.Id== vm.Id && w.IsDelete==false && w.IsActive==true && (cid==0?true:w.ClientId==cid)).FirstOrDefault();
+                }
+                else
+                {
+                    res = (await userRepo.GetAll()).Where(w => w.Id == vm.Id && w.IsDelete == false && w.IsActive == true && w.ClientId == cid).FirstOrDefault();
+                }
                 bool isDeleted = (bool)res.IsDelete ? true : false;
                 if (isDeleted)
                 {
@@ -182,12 +126,10 @@ namespace QuickCampusAPI.Controllers
 
                 if (ModelState.IsValid && vm.Id > 0 && res.IsDelete == false)
                 {
-
-                    res.Id = vm.Id;
-                    res.Email = vm.Email;
-                    res.Mobile = vm.Mobile;
+                    res.Email = vm.Email.Trim();
+                    res.Mobile = vm.Mobile.Trim();
                     try
-                    {  
+                    {
                         result.Data = (EditUserResponseVm)await userRepo.Update(res);
                         result.Message = "User updated successfully";
                         result.IsSuccess = true;
@@ -207,29 +149,119 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "UserList")]
         [HttpGet]
-        [Route("activeAndInactive")]
-        public async Task<IActionResult> ActiveAndInactive(bool isActive, int id)
+        [Route("UserList")]
+        public async Task<IActionResult> UserList(int clientid)
         {
-            IGeneralResult<UserResponseVm> result = new GeneralResult<UserResponseVm>();
-            if (id > 0)
+
+            IGeneralResult<List<UserResponseVm>> result = new GeneralResult<List<UserResponseVm>>();
+            int cid = 0;
+            var _jwtSecretKey = config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            if (isSuperAdmin)
             {
-                var res = await userRepo.GetById(id);
-                if (res != null && res.IsDelete == false)
+                cid = clientid;
+            }
+            else
+            {
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
+            }
+
+            try
+            {
+                List<TblUser> userlist = new List<TblUser>();
+                if (isSuperAdmin)
                 {
-                    res.IsActive = isActive;
-                    await userRepo.Update(res);
+                    userlist =(await userRepo.GetAll()).ToList();
+                    userlist = userlist.Where(x =>( x.IsDelete == false || x.IsDelete == null) && (cid == 0 ? true : x.ClientId == cid)).ToList();
+                }
+                else
+                {
+                    userlist = (await userRepo.GetAll()).Where(x => x.IsDelete == false && x.ClientId == cid).ToList();
+                }
+                if (userlist.Count > 0)
+                {
+                    var response = userlist.Select(x => (UserResponseVm)x).ToList();
                     result.IsSuccess = true;
-                    result.Message = "Your status is changed successfully";
-                    result.Data = (UserResponseVm)res;
+                    result.Message = "User list get successfully!!";
+                    result.Data = response;
                     return Ok(result);
                 }
                 else
                 {
-                    result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
+                    result.IsSuccess = true;
+                    result.Message = "User list not found";
+                    result.Data = null;
+                    return Ok(result);
                 }
+                  
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
             }
             return Ok(result);
+        }
+
+        [Authorize(Roles = "DeleteUser")]
+        [HttpDelete]
+        [Route("DeleteUser")]
+        public async Task<IActionResult> DeleteUser(int id, int clientid, bool isDeleted)
+        {
+            IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
+            int cid = 0;
+            var jwtSecretKey = config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], jwtSecretKey);
+            if (isSuperAdmin)
+            {
+                cid = clientid;
+            }
+            else
+            {
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
+
+                if (cid == 0)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Invalid Client";
+                    return Ok(result);
+                }
+            }
+            var res = userRepo.DeleteRole(isDeleted, id, cid, isSuperAdmin);
+            return Ok(res);
+        }
+
+        [Authorize(Roles = "activeAndInActiveUser")]
+        [HttpGet]
+        [Route("activeAndInactive")]
+        public async Task<IActionResult> ActiveAndInactive(bool isActive, int id, int clientid)
+        {
+            IGeneralResult<UserResponseVm> result = new GeneralResult<UserResponseVm>();
+            int cid = 0;
+            var jwtSecretKey = config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], jwtSecretKey);
+            if (isSuperAdmin)
+            {
+                cid = clientid;
+            }
+            else
+            {
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
+
+                if (cid == 0)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Invalid User";
+                    return Ok(result);
+                }
+            }
+
+            var res = userRepo.ActiveInActiveRole(isActive, id, cid, isSuperAdmin);
+            return Ok(res);
         }
         private string EncodePasswordToBase64(string password)
         {

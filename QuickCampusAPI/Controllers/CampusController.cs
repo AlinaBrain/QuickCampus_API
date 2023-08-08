@@ -28,7 +28,7 @@ namespace QuickCampusAPI.Controllers
         [HttpGet]
         [Route("ManageCampus")]
        
-        public async Task<IActionResult> ManageCampus(int WalkInId,int clientid=0 )
+        public async Task<IActionResult> ManageCampus(int WalkInId,int clientid )
         {
             IGeneralResult<List<CampusGridViewModel>> result = new GeneralResult<List<CampusGridViewModel>>();
             var _jwtSecretKey = _config["Jwt:Key"];
@@ -49,9 +49,9 @@ namespace QuickCampusAPI.Controllers
             }
             else
             {
-                getClientId = Convert.ToInt32(clientId);
+                getClientId = string.IsNullOrEmpty(clientId)==true?0:Convert.ToInt32(clientId);
             }
-            var rec = await _campusrepo.GetAllCampus(getClientId);
+            var rec = await _campusrepo.GetAllCampus(getClientId,isSuperAdmin);
             var CampusList = rec.Where(x => x.WalkInID != null).ToList();
             var res = CampusList.Select(x => ((CampusGridViewModel)x)).ToList();
 
@@ -95,40 +95,99 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "GetCampusByCampusId")]
         [HttpGet]
         [Route("getCampusByCampusId")]
-        public async Task<IActionResult> getcampusbyid(int campusId)
+        public async Task<IActionResult> getcampusbyid(int campusId, int clientid)
         {
+          
+
+            IGeneralResult<List<CampusGridViewModel>> result = new GeneralResult<List<CampusGridViewModel>>();
             var _jwtSecretKey = _config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            var result = await _campusrepo.GetCampusByID(campusId, string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId));
-            return Ok(result);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            int getClientId = 0;
+
+            if (!isSuperAdmin && clientId == "0")
+            {
+                result.Data = null;
+                result.IsSuccess = false;
+                result.Message = "Please enter clientID";
+            }
+
+            if (isSuperAdmin)
+            {
+                getClientId = (int)clientid;
+            }
+            else
+            {
+                getClientId = string.IsNullOrEmpty(clientId) == true ? 0 : Convert.ToInt32(clientId);
+            }
+
+            var res  = await _campusrepo.GetCampusByID(campusId, getClientId,isSuperAdmin);
+            return Ok(res);
         }
 
 
         [Authorize(Roles = "CampusAction")]
         [HttpGet]
         [Route("UpdateCampusStaus")]
-        public async Task<IActionResult> UpdateCampusStaus(int campusId,bool status)
+        public async Task<IActionResult> UpdateCampusStaus(int campusId,bool status, int clientid)
         {
-            var _jwtSecretKey = _config["Jwt:Key"];
-            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            var result = await _campusrepo.UpdateCampusStatus(campusId, string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId),status);
-            return Ok(result);
+            IGeneralResult<string> result = new GeneralResult<string>();
+            int cid = 0;
+            var jwtSecretKey = _config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], jwtSecretKey);
+            if (isSuperAdmin)
+            {
+                cid = clientid;
+            }
+            else
+            {
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
+
+                if (cid == 0)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Invalid Client";
+                    return Ok(result);
+                }
+            }
+
+            var res = await _campusrepo.UpdateCampusStatus(campusId, cid,status, isSuperAdmin);
+            return Ok(res);
         }
 
         [Authorize(Roles = "DeleteCampus")]
         [HttpGet]
         [Route("DeleteCampus")]
-        public async Task<IActionResult> DeleteCampus(int campusId, bool status)
+        public async Task<IActionResult> DeleteCampus(int campusId, bool status, int clientid)
         {
-            var _jwtSecretKey = _config["Jwt:Key"];
-            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            var result = await _campusrepo.DeleteCampus(campusId, string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId), status);
-            return Ok(result);
+            IGeneralResult<string> result = new GeneralResult<string>();
+            int cid = 0;
+            var jwtSecretKey = _config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], jwtSecretKey);
+            if (isSuperAdmin)
+            {
+                cid = clientid;
+            }
+            else
+            {
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
+
+                if (cid == 0)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Invalid Client";
+                    return Ok(result);
+                }
+            }
+
+            var res = await _campusrepo.DeleteCampus(campusId, cid, status,isSuperAdmin);
+            return Ok(res);
         }
     }
 
 }
-
 
 
 

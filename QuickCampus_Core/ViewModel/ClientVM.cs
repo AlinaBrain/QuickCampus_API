@@ -146,4 +146,54 @@ namespace QuickCampus_Core.ViewModel
 
 
     }
+
+    public class ClientReponse
+    {
+        public static explicit operator ClientReponse(TblClient items)
+        {
+            return new ClientReponse
+            {
+                Id = items.Id,
+                Name = items.Name,
+                Address = items.Address,
+                Phone = items.Phone,
+                Email = items.Email,
+                SubscriptionPlan = items.SubscriptionPlan,
+                Latitude = items.Latitude,
+                Longitude = items.Longitude,
+                CreatedDate =items.CreatedDate,
+                ModofiedDate = items.ModofiedDate,
+                CraetedBy = items.CraetedBy,
+                ModifiedBy = items.ModifiedBy,
+                IsActive = items.IsActive,
+                IsDeleted = items.IsDeleted
+            };
+        }
+        public int Id { get; set; }
+
+        [Remote("IsAlreadyExist", "Client", HttpMethod = "POST", ErrorMessage = "Name already exists in database.")]
+        public string? Name { get; set; }
+
+        public int? CraetedBy { get; set; }
+
+        public DateTime? CreatedDate { get; set; }
+
+        public int? ModifiedBy { get; set; }
+
+        public DateTime? ModofiedDate { get; set; }
+        public string? Address { get; set; }
+        [Required]
+        [RegularExpression(@"^[1-9][0-9]{9}$", ErrorMessage = "Please enter a valid 10-digit mobile number that does not start with 0.")]
+        public string? Phone { get; set; }
+
+        public string? Email { get; set; }
+
+        public string? SubscriptionPlan { get; set; }
+
+        public bool? IsActive { get; set; }
+        public decimal? Longitude { get; set; }
+
+        public decimal? Latitude { get; set; }
+        public bool? IsDeleted { get; set; }
+    }
 }

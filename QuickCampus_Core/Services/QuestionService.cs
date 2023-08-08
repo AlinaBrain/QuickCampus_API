@@ -42,7 +42,7 @@ namespace QuickCampus_Core.Services
                 }
                 return result;
             }
-            if (clientid > 0)
+            if (clientid == 0)
             {
                 result.IsSuccess = false;
                 result.Message = "Invalid ClientId";
@@ -370,6 +370,7 @@ namespace QuickCampus_Core.Services
             {
                 result.IsSuccess = false;
                 result.Message = "ClientId Not Found.";
+                return result;
             }
 
             question = _context.Questions.Where(x => x.QuestionId == questionId && x.IsDeleted == false && (clientId == 0 ? true : x.ClentId == clientId)).FirstOrDefault();
@@ -377,6 +378,7 @@ namespace QuickCampus_Core.Services
             {
                 result.IsSuccess = false;
                 result.Message = "Question not found.";
+                return result;
             }
             if (question.IsDeleted == true)
             {
@@ -448,7 +450,14 @@ namespace QuickCampus_Core.Services
                 res.Message = "invalid section";
                 return res;
             }
+            bool isExist = _context.Questions.Any(w => w.IsDeleted != true && w.QuestionTypeId == model.QuestionTypeId && w.SectionId == model.SectionId && w.GroupId == model.GroupId);
 
+            if (isExist)
+            {
+                res.IsSuccess = false;
+                res.Message = "Question Already Exist";
+                return res;
+            }
 
             int? marks = (int)_context.QuestionTypes.Where(y => y.QuestionTypeId == model.QuestionTypeId).SingleOrDefault().Marks;
             Question question = new Question()
@@ -466,17 +475,7 @@ namespace QuickCampus_Core.Services
             {
                 var fileName = string.Empty;
                 byte[] file = null;
-                #region -- Initialize Image Path and Image Byte Array --
-                //if (item.ImageUpload != null && item.ImageUpload.ContentLength > 0)
-                //{
-                //    string Ext = Path.GetExtension(item.ImageUpload.FileName);
-                //    fileName = Guid.NewGuid().ToString() + Ext;
-                //    var uploadDir = "~/Upload/Admin";
-                //    var imagePath = Path.Combine(HttpContext.Current.Server.MapPath(uploadDir), fileName);
-                //    item.ImageUpload.SaveAs(imagePath);
-                //    file = Infrastructure.Utility.Common.ConvertToByte(item.ImageUpload);
-                //}
-                #endregion
+               
                 QuestionOption questionoption = new QuestionOption()
                 {
                     QuestionId = question.QuestionId,
@@ -507,15 +506,28 @@ namespace QuickCampus_Core.Services
         {
             IGeneralResult<string> res = new GeneralResult<string>();
             Question question = new Question();
+
+
+            List<QuestionType> allQuestions = new List<QuestionType>();
+            List<Section> allSections = new List<Section>();
+            List<Groupdl> allGroups = new List<Groupdl>();
+
             if (isSuperAdmin)
             {
+                allQuestions = _context.QuestionTypes.Where(x => (model.ClientId == 0 ? true : x.ClentId == model.ClientId)).ToList();
+                allSections = _context.Sections.Where(x => (model.ClientId == 0 ? true : x.ClentId == model.ClientId)).ToList();
+                allGroups = _context.Groupdls.Where(x => (model.ClientId == 0 ? true : x.ClentId == model.ClientId)).ToList();
                 question = _context.Questions.Include(x => x.QuestionOptions).FirstOrDefault(x => x.QuestionId == model.QuestionId && x.IsDeleted == false && (model.ClientId == 0 ? true : x.ClentId == model.ClientId));
             }
             else
             {
+
+                allQuestions = _context.QuestionTypes.Where(x => x.ClentId == model.ClientId).ToList();
+                allSections = _context.Sections.Where(x => x.ClentId == model.ClientId).ToList();
+                allGroups = _context.Groupdls.Where(x => x.ClentId == model.ClientId).ToList();
                 if (model.ClientId == 0)
                 {
-                    res.Message = "Invalid clientId ";
+                    res.Message = "Invalid client ";
                     res.IsSuccess = false;
                     return res;
                 }
@@ -523,10 +535,44 @@ namespace QuickCampus_Core.Services
                 question = _context.Questions.Include(x => x.QuestionOptions).FirstOrDefault(x => x.QuestionId == model.QuestionId && x.ClentId == model.ClientId && x.IsDeleted == false);
 
             }
+
+            bool isExistQuestionType = allQuestions.Any(a => a.QuestionTypeId == model.QuestionTypeId);
+            bool isExistGroup = allGroups.Any(a => a.GroupId == model.GroupId);
+            bool isExistSection = allSections.Any(a => a.SectionId == model.SectionId);
+
+            if (!isExistQuestionType)
+            {
+                res.IsSuccess = false;
+                res.Message = "invalid questiontype";
+                return res;
+            }
+            else if (!isExistGroup)
+            {
+                res.IsSuccess = false;
+                res.Message = "invalid group";
+                return res;
+            }
+            else if (!isExistSection)
+            {
+                res.IsSuccess = false;
+                res.Message = "invalid section";
+                return res;
+            }
+
+
             if (question == null)
             {
                 res.IsSuccess = false;
                 res.Message = "Question not found";
+                return res;
+            }
+
+            bool isExist = _context.Questions.Any(w => w.IsDeleted != true && w.QuestionTypeId == model.QuestionTypeId && w.SectionId == model.SectionId && w.GroupId == model.GroupId && w.QuestionId != model.QuestionId);
+
+            if (isExist)
+            {
+                res.IsSuccess = false;
+                res.Message = "Question Already Exist";
                 return res;
             }
 
@@ -539,27 +585,13 @@ namespace QuickCampus_Core.Services
             foreach (var item in model.options)
             {
                 itemIdToBeNotRemoved.Add(item.OptionId);
-                //var fileName = string.Empty;
-                //byte[] file = null;
-                //#region -- Initialize Image Path and Image Byte Array --
-                //if (item.ImageUpload != null && item.ImageUpload.ContentLength > 0)
-                //{
-                //    string Ext = Path.GetExtension(item.ImageUpload.FileName);
-                //    fileName = Guid.NewGuid().ToString() + Ext;
-                //    var uploadDir = "~/Upload/Admin";
-                //    var imagePath = Path.Combine(HttpContext.Current.Server.MapPath(uploadDir), fileName);
-                //    item.ImageUpload.SaveAs(imagePath);
-                //    file = Infrastructure.Utility.Common.ConvertToByte(item.ImageUpload);
-                //}
-                //#endregion
+               
                 if (item.OptionId > 0)
                 {
                     var options = question.QuestionOptions.SingleOrDefault(y => y.OptionId == item.OptionId);
-                    //fileName = string.IsNullOrEmpty(fileName) ? options.OptionImage : fileName;
                     options.OptionText = item.OptionText;
                     options.IsCorrect = item.IsCorrect;
-                    //options.OptionImage = fileName;
-                    //options.Image = file;
+                   
                 }
                 else
                 {
@@ -568,8 +600,7 @@ namespace QuickCampus_Core.Services
                         QuestionId = question.QuestionId,
                         OptionText = item.OptionText,
                         IsCorrect = item.IsCorrect,
-                        // OptionImage = fileName,
-                        //Image = file
+                        
                     };
                     question.QuestionOptions.Add(questionoption);
 

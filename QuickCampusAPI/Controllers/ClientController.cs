@@ -14,11 +14,13 @@ namespace QuickCampusAPI.Controllers
         private readonly IClientRepo _clientRepo;
         private readonly IUserRepo _userRepo;
         private IConfiguration _config;
-        public ClientController(IClientRepo clientRepo, IConfiguration config, IUserRepo userRepo)
+        private readonly IUserRoleRepo _roleRepo;
+        public ClientController(IClientRepo clientRepo, IConfiguration config, IUserRepo userRepo, IUserRoleRepo userRoleRepo)
         {
             _clientRepo = clientRepo;
             _config = config;
             _userRepo = userRepo;
+            _roleRepo = userRoleRepo;
         }
 
         [Authorize(Roles = "AddClient")]
@@ -52,17 +54,17 @@ namespace QuickCampusAPI.Controllers
 
                     ClientVM clientVM = new ClientVM
                     {
-                        Name = vm.Name,
-                        Email = vm.Email,
-                        Phone = vm.Phone,
-                        Address = vm.Address,
+                        Name = vm.Name.Trim(),
+                        Email = vm.Email.Trim(),
+                        Phone = vm.Phone.Trim(),
+                        Address = vm.Address.Trim(),
                         CraetedBy = Convert.ToInt32(userId),
                         ModifiedBy = Convert.ToInt32(userId),
-                        SubscriptionPlan = vm.SubscriptionPlan,
+                        SubscriptionPlan = vm.SubscriptionPlan.Trim(),
                         Latitude = vm.Latitude,
                         Longitude = vm.Longitude,
-                        UserName = vm.UserName,
-                        Password = vm.Password,
+                        UserName = vm.UserName.Trim(),
+                        Password = vm.Password.Trim(),
                     };
                     try
                     {
@@ -77,10 +79,18 @@ namespace QuickCampusAPI.Controllers
                             Mobile = clientdata.Phone,
                         };
 
-                        var userdetails = _userRepo.Add(userVm.ToUserDbModel());
+                        var userdetails = await _userRepo.Add(userVm.ToUserDbModel());
+
+                        
+                            var res = await _roleRepo.SetClientAdminRole(userdetails.Id);
+                        
+
                         result.Data = (ClientResponseVm)clientdata;
                         result.Message = "Client added successfully";
                         result.IsSuccess = true;
+
+
+
 
                     }
                     catch (Exception ex)
@@ -107,7 +117,9 @@ namespace QuickCampusAPI.Controllers
             IGeneralResult<ClientResponseVm> result = new GeneralResult<ClientResponseVm>();
             var _jwtSecretKey = _config["Jwt:Key"];
             var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            if (_clientRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.Id != vm.Id))
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var cid = clientId == ""? 0: Convert.ToInt32(clientId);
+            if (_clientRepo.Any(x => x.Email == vm.Email.Trim() && x.IsDeleted != true && vm.Id == cid))
             {
                 result.Message = "Email Already Registered!";
             } 
@@ -120,13 +132,36 @@ namespace QuickCampusAPI.Controllers
                     result.Message = " Client does Not Exist";
                     return Ok(result);
                 }
+                var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
 
-                if (ModelState.IsValid && vm.Id > 0 && res.IsDeleted == false)
+                if (ModelState.IsValid && vm.Id > 0 && res.IsDeleted == false && vm.Id == cid)
                 {
-                   res.Email = vm.Email;
-                    res.Phone = vm.Phone;
-                    res.Address = vm.Address;
-                    res.SubscriptionPlan = vm.SubscriptionPlan;
+                   res.Email = vm.Email.Trim();
+                    res.Phone = vm.Phone.Trim();
+                    res.Address = vm.Address.Trim();
+                    res.SubscriptionPlan = vm.SubscriptionPlan.Trim();
+                    res.CraetedBy = Convert.ToInt32(userId);
+                    res.ModifiedBy = Convert.ToInt32(userId);
+                    res.Longitude = vm.Longitude;
+                    res.Latitude = vm.Latitude;
+                    res.ModofiedDate = DateTime.Now;
+                    try
+                    {
+                        result.Data = (ClientResponseVm)await _clientRepo.Update(res);
+                        result.Message = "Client updated successfully";
+                        result.IsSuccess = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        result.Message = ex.Message;
+                    }
+                    return Ok(result);
+                }else if (isSuperAdmin)
+                {
+                    res.Email = vm.Email.Trim();
+                    res.Phone = vm.Phone.Trim();
+                    res.Address = vm.Address.Trim();
+                    res.SubscriptionPlan = vm.SubscriptionPlan.Trim();
                     res.CraetedBy = Convert.ToInt32(userId);
                     res.ModifiedBy = Convert.ToInt32(userId);
                     res.Longitude = vm.Longitude;
@@ -146,7 +181,7 @@ namespace QuickCampusAPI.Controllers
                 }
                 else
                 {
-                    result.Message = "something Went Wrong";
+                    result.Message = "You don't have a permission to update client";
                 }
 
             }
@@ -156,15 +191,25 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "GetAllClient")]
         [HttpGet]
         [Route("GetAllClient")]
-        public async Task<IActionResult> GetAllClient()
+        public async Task<IActionResult> GetAllClient(int clientid)
         {
+            IGeneralResult<List<ClientResponseVm>> result = new GeneralResult<List<ClientResponseVm>>();
+            int cid = 0;
             var _jwtSecretKey = _config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            IGeneralResult<List<ClientResponseVm>> result = new GeneralResult<List<ClientResponseVm>>();
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            if (isSuperAdmin)
+            {
+                cid = clientid;
+            }
+            else
+            {
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
+            }
             try
             {
-                var categoryList = (await _clientRepo.GetAll()).Where(x => x.IsDeleted == false || x.IsDeleted == null).ToList();
-                var res = categoryList.Select(x => ((ClientResponseVm)x)).ToList();
+                var clientList = (await _clientRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.Id == cid)).ToList();
+                var res = clientList.Select(x => ((ClientResponseVm)x)).ToList();
                 if (res != null)
                 {
                     result.IsSuccess = true;
@@ -241,11 +286,11 @@ namespace QuickCampusAPI.Controllers
         {
             var _jwtSecretKey = _config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            IGeneralResult<ClientVM> result = new GeneralResult<ClientVM>();
+            IGeneralResult<ClientReponse> result = new GeneralResult<ClientReponse>();
             var res = await _clientRepo.GetById(Id);
             if (res.IsDeleted == false && res.IsActive == true)
             {
-                result.Data = (ClientVM)res;
+                result.Data = (ClientReponse)res;
                 result.IsSuccess = true;
                 result.Message = "Client details getting succesfully";
             }

@@ -117,12 +117,12 @@ namespace QuickCampusAPI.Controllers
             List<TblRole> rolelist = new List<TblRole>();
             if (isSuperAdmin)
             {
-                rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted == false && (cid == 0 ? true : x.ClientId == cid)).ToList();
+                rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).ToList();
 
             }
             else
             {
-                rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted == false && x.ClientId == cid).ToList();
+                rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).ToList();
             }
             return Ok(rolelist);
         }
@@ -154,7 +154,12 @@ namespace QuickCampusAPI.Controllers
                     return Ok(result);
                 }
             }
-            var res = roleRepo.UpdateRole(vm, cid, isSuperAdmin);
+            if (roleRepo.Any(x => x.Name == vm.RoleName))
+            {
+                result.Message = "RoleName Already Registerd!";
+                return Ok(result);
+            }
+            var res = await roleRepo.UpdateRole(vm, cid, isSuperAdmin);
             return Ok(res);
         }
 
@@ -185,7 +190,7 @@ namespace QuickCampusAPI.Controllers
                     return Ok(result);
                 }
             }
-            var res = roleRepo.DeleteRole(isDeleted, id, cid, isSuperAdmin);
+            var res = await roleRepo.DeleteRole(isDeleted, id, cid, isSuperAdmin);
             return Ok(res);
         }
 
@@ -216,7 +221,7 @@ namespace QuickCampusAPI.Controllers
                 }
             }
 
-            var res = roleRepo.ActiveInActiveRole(isActive, id, cid, isSuperAdmin);
+            var res = await roleRepo.ActiveInActiveRole(isActive, id, cid, isSuperAdmin);
             return Ok(res);
         }
 
@@ -248,8 +253,18 @@ namespace QuickCampusAPI.Controllers
                     return Ok(result);
                 }
             }
-            var res = roleRepo.GetRoleById(rId, cid, isSuperAdmin);
+            var res = await roleRepo.GetRoleById(rId, cid, isSuperAdmin);
             return Ok(res);
+        }
+
+
+
+        [HttpPost]
+        [Route("SetRolePermissions")]
+        public async Task<IActionResult> SetRolePermissions(RoleMappingRequest roleMappingRequest)
+        {
+            var response = await roleRepo.SetRolePermission(roleMappingRequest);
+            return Ok(response);
         }
     }
 }

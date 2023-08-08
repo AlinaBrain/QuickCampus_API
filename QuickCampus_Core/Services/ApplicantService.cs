@@ -1,23 +1,22 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Extensions.Configuration;
+using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
-using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
-using static QuickCampus_Core.ViewModel.ApplicantViewModel;
+
 
 namespace QuickCampus_Core.Services
 {
     public class ApplicantRepoServices : BaseRepository<QuikCampusDevContext, Applicant>, IApplicantRepo
     {
-       
-        public async Task<IEnumerable<Applicant>> GetApplicant()
+        private readonly QuikCampusDevContext _context;
+        private IConfiguration _config;
+
+        public ApplicantRepoServices(QuikCampusDevContext context, IConfiguration config)
         {
-
-            var a = await (from f in dbContext.Applicants.AsQueryable() select f).ToListAsync();
-            return await (from f in dbContext.Applicants.AsQueryable() select f).ToListAsync();
+            _config = config;
+            _context = context;
         }
-
-       
-        public Task Update(IEnumerable<Applicant> applicantdetail)
+        public async Task<IGeneralResult<string>> ActiveInActiveRole(bool isActive, int id, int clientid, bool isSuperAdmin)
         {
             throw new NotImplementedException();
         }

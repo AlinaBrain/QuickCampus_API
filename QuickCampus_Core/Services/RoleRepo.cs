@@ -80,11 +80,11 @@ namespace QuickCampus_Core.Services
             TblRole rl = new TblRole();
             if (isSuperAdmin)
             {
-                rl = _context.TblRoles.Where(w => w.IsDeleted == false && clientid == 0 ? true : w.ClientId == clientid).FirstOrDefault();
+                rl = _context.TblRoles.Where(w => w.IsDeleted != true && (clientid == 0 ? true : w.ClientId == clientid)).FirstOrDefault();
             }
             else
             {
-                rl = _context.TblRoles.Where(w => w.IsDeleted == false && w.ClientId == clientid).FirstOrDefault();
+                rl = _context.TblRoles.Where(w => w.IsDeleted != true && w.ClientId == clientid).FirstOrDefault();
             }
             if (rl == null)
             {
@@ -92,20 +92,21 @@ namespace QuickCampus_Core.Services
                 result.Message = "Role not found";
                 return result;
             }
-
+            rl.Id = id;
             rl.IsActive = isActive;
             dbContext.TblRoles.Update(rl);
             int a = dbContext.SaveChanges();
             if (a > 0)
             {
-                result.IsSuccess = false ;
-                result.Message = "something went wrong";
+                result.IsSuccess = true;
+                result.Message = "Status update successfully";
                 return result;
+               
             }
             else
             {
-                result.IsSuccess = true;
-                result.Message = "status update successfully";
+                result.IsSuccess = false;
+                result.Message = "something went wrong";
                 return result;
             }
         }
@@ -117,11 +118,11 @@ namespace QuickCampus_Core.Services
             TblRole rl = new TblRole();
             if (isSuperAdmin)
             {
-                rl = _context.TblRoles.Where(w => w.IsDeleted == false && clientid == 0 ? true : w.ClientId == clientid).FirstOrDefault();
+                rl = _context.TblRoles.Where(w => w.IsDeleted != true && (clientid == 0 ? true : w.ClientId == clientid)).FirstOrDefault();
             }
             else
             {
-                rl = _context.TblRoles.Where(w => w.IsDeleted == false && w.ClientId == clientid).FirstOrDefault();
+                rl = _context.TblRoles.Where(w => w.IsDeleted != true && w.ClientId == clientid).FirstOrDefault();
             }
             if (rl == null)
             {
@@ -129,8 +130,9 @@ namespace QuickCampus_Core.Services
                 result.Message = "Role not found";
                 return result;
             }
-
+            rl.Id = id;
             rl.IsDeleted = isDeleted;
+            rl.IsActive = false;
             dbContext.TblRoles.Update(rl);
             int a = dbContext.SaveChanges();
             if (a > 0)
@@ -154,11 +156,11 @@ namespace QuickCampus_Core.Services
             TblRole rl = new TblRole();
             if (isSuperAdmin)
             {
-                rl = _context.TblRoles.Where(w => w.IsDeleted == false && w.Id==roleModel.Id && clientid == 0 ? true : w.ClientId == clientid).FirstOrDefault();
+                rl = _context.TblRoles.Where(w => w.IsDeleted != true && w.Id==roleModel.Id && (clientid == 0 ? true : w.ClientId == clientid)).FirstOrDefault();
             }
             else
             {
-                rl = _context.TblRoles.Where(w => w.IsDeleted == false && w.Id == roleModel.Id && w.ClientId == clientid).FirstOrDefault();
+                rl = _context.TblRoles.Where(w => w.IsDeleted != true && w.Id == roleModel.Id && w.ClientId == clientid).FirstOrDefault();
             }
             if (rl == null)
             {
@@ -166,11 +168,11 @@ namespace QuickCampus_Core.Services
                 result.Message = "Role not found";
                 return result;
             }
-
-            rl.Name = roleModel.RoleName;
+            rl.Id = roleModel.Id;
+            rl.Name = roleModel.RoleName.Trim();
             rl.ModofiedDate = DateTime.Now;
-            dbContext.TblRoles.Update(rl);
-            int a = dbContext.SaveChanges();
+           var data = dbContext.TblRoles.Update(rl);
+            int a =await dbContext.SaveChangesAsync();
             if (a > 0)
             {
                 result.IsSuccess = true;
@@ -192,13 +194,13 @@ namespace QuickCampus_Core.Services
             TblRole rl = new TblRole();
             if (isSuperAdmin)
             {
-                rl = _context.TblRoles.Where(w => w.IsDeleted == false && w.Id == rId && clientid == 0 ? true : w.ClientId == clientid).FirstOrDefault();
+                rl = _context.TblRoles.Where(w => w.IsDeleted != true && w.Id == rId && (clientid == 0 ? true : w.ClientId == clientid)).FirstOrDefault();
             }
             else
             {
-                rl = _context.TblRoles.Where(w => w.IsDeleted == false && w.Id == rId && w.ClientId == clientid).FirstOrDefault();
+                rl = _context.TblRoles.Where(w => w.IsDeleted != true && w.Id == rId && w.ClientId == clientid).FirstOrDefault();
             }
-            if (rl == null)
+            if (rl != null)
             {
                 RoleModel rlm = new RoleModel()
                 {
