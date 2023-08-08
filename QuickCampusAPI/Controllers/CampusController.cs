@@ -28,7 +28,7 @@ namespace QuickCampusAPI.Controllers
         [HttpGet]
         [Route("ManageCampus")]
        
-        public async Task<IActionResult> ManageCampus(int WalkInId,int clientid )
+        public async Task<IActionResult> ManageCampus(int clientid )
         {
             IGeneralResult<List<CampusGridViewModel>> result = new GeneralResult<List<CampusGridViewModel>>();
             var _jwtSecretKey = _config["Jwt:Key"];

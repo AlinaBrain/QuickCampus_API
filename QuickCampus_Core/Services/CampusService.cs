@@ -72,7 +72,7 @@ namespace QuickCampus_Core.Services
             {
                 if (vm.WalkInID > 0)
                 {
-                    WalkIn campus = _context.WalkIns.Where(x => x.WalkInId == vm.WalkInID && (clientId==0?true:x.ClientId == clientId)).Include(x=>x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
+                    WalkIn campus = _context.WalkIns.Where(x => x.WalkInId == vm.WalkInID && (clientId==0?true:x.ClientId == clientId)).Include(x => x.State).Include(x=>x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
                     if (campus != null)
                     {
                         campus.WalkInDate = vm.WalkInDate;
@@ -236,15 +236,15 @@ namespace QuickCampus_Core.Services
                 var campuses = _context.WalkIns.Where(x => x.IsDeleted == false && x.ClientId == clientId).Include(x => x.CampusWalkInColleges).Include(x => x.State).Include(x => x.Country).OrderByDescending(x => x.WalkInDate).Select(x => new CampusGridViewModel()
                 {
                     WalkInID = x.WalkInId,
-                    Address1 = x.Address1,
-                    Address2 = x.Address2,
-                    City = x.City,
+                    Address1 = x.Address1.Trim(),
+                    Address2 = x.Address2.Trim(),
+                    City = x.City.Trim(),
                     StateID = x.StateId,
                     StateName = x.StateId > 0 ? x.State.StateName : "",
                     CountryID = x.CountryId,
                     CountryName = x.CountryId > 0 ? x.Country.CountryName : "",
                     CreatedDate = x.CreatedDate,
-                    JobDescription = x.JobDescription,
+                    JobDescription = x.JobDescription.Trim(),
                     WalkInDate = x.WalkInDate,
                     IsActive = x.IsActive ?? false,
                     Title = x.Title,
@@ -252,7 +252,7 @@ namespace QuickCampus_Core.Services
                     {
                         CollegeCode = y.CollegeCode,
                         CollegeId = y.CollegeId ?? 0,
-                        CollegeName = y.College.CollegeName,
+                        CollegeName = y.College.CollegeName.Trim(),
                         ExamEndTime = y.ExamEndTime.Value.ToString(),
                         ExamStartTime = y.ExamStartTime.Value.ToString()
 
