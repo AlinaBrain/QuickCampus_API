@@ -118,7 +118,8 @@ namespace QuickCampusAPI.Controllers
             var _jwtSecretKey = _config["Jwt:Key"];
             var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            if (_clientRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.Id != vm.Id && x.Id == Convert.ToInt32(clientId)))
+            var cid = clientId == ""? 0: Convert.ToInt32(clientId);
+            if (_clientRepo.Any(x => x.Email == vm.Email.Trim() && x.IsDeleted != true && vm.Id == cid))
             {
                 result.Message = "Email Already Registered!";
             } 
@@ -131,10 +132,33 @@ namespace QuickCampusAPI.Controllers
                     result.Message = " Client does Not Exist";
                     return Ok(result);
                 }
+                var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
 
-                if (ModelState.IsValid && vm.Id > 0 && res.IsDeleted == false && vm.Id == Convert.ToInt32(clientId))
+                if (ModelState.IsValid && vm.Id > 0 && res.IsDeleted == false && vm.Id == cid)
                 {
                    res.Email = vm.Email.Trim();
+                    res.Phone = vm.Phone.Trim();
+                    res.Address = vm.Address.Trim();
+                    res.SubscriptionPlan = vm.SubscriptionPlan.Trim();
+                    res.CraetedBy = Convert.ToInt32(userId);
+                    res.ModifiedBy = Convert.ToInt32(userId);
+                    res.Longitude = vm.Longitude;
+                    res.Latitude = vm.Latitude;
+                    res.ModofiedDate = DateTime.Now;
+                    try
+                    {
+                        result.Data = (ClientResponseVm)await _clientRepo.Update(res);
+                        result.Message = "Client updated successfully";
+                        result.IsSuccess = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        result.Message = ex.Message;
+                    }
+                    return Ok(result);
+                }else if (isSuperAdmin)
+                {
+                    res.Email = vm.Email.Trim();
                     res.Phone = vm.Phone.Trim();
                     res.Address = vm.Address.Trim();
                     res.SubscriptionPlan = vm.SubscriptionPlan.Trim();
@@ -262,11 +286,11 @@ namespace QuickCampusAPI.Controllers
         {
             var _jwtSecretKey = _config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            IGeneralResult<ClientVM> result = new GeneralResult<ClientVM>();
+            IGeneralResult<ClientReponse> result = new GeneralResult<ClientReponse>();
             var res = await _clientRepo.GetById(Id);
             if (res.IsDeleted == false && res.IsActive == true)
             {
-                result.Data = (ClientVM)res;
+                result.Data = (ClientReponse)res;
                 result.IsSuccess = true;
                 result.Message = "Client details getting succesfully";
             }

@@ -26,7 +26,7 @@ namespace QuickCampus_Core.Services
             TblUser rl = new TblUser();
             if (isSuperAdmin)
             {
-                rl = _context.TblUsers.Where(w => w.IsDelete == false && clientid == 0 ? true : w.ClientId == clientid).FirstOrDefault();
+                rl = _context.TblUsers.Where(w => w.IsDelete == false && (clientid == 0 ? true : w.ClientId == clientid)).FirstOrDefault();
             }
             else
             {
@@ -40,6 +40,7 @@ namespace QuickCampus_Core.Services
             }
 
             rl.IsDelete = isDeleted;
+            rl.IsActive = false;
             dbContext.TblUsers.Update(rl);
             int a = dbContext.SaveChanges();
             if (a > 0)
@@ -63,7 +64,7 @@ namespace QuickCampus_Core.Services
             TblUser rl = new TblUser();
             if (isSuperAdmin)
             {
-                rl = _context.TblUsers.Where(w => w.IsDelete == false && clientid == 0 ? true : w.ClientId == clientid).FirstOrDefault();
+                rl = _context.TblUsers.Where(w => w.IsDelete == false && (clientid == 0 ? true : w.ClientId == clientid)).FirstOrDefault();
             }
             else
             {

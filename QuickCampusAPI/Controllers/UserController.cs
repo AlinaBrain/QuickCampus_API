@@ -56,11 +56,11 @@ namespace QuickCampusAPI.Controllers
 
                     UserVm userVm = new UserVm
                     {
-                        Name = vm.Name,
-                        Email = vm.Email,
-                        Mobile = vm.Mobile,
-                        Password = vm.Password,
-                        ClientId = cid
+                        Name = vm.Name.Trim(),
+                        Email = vm.Email.Trim(),
+                        Mobile = vm.Mobile.Trim(),
+                        Password = vm.Password.Trim(),
+                        ClientId = cid == 0 ? null : cid
                     };
                     var dataWithClientId = await userRepo.Add(userVm.ToUserDbModel());
                     result.IsSuccess = true;
@@ -97,7 +97,7 @@ namespace QuickCampusAPI.Controllers
                 cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
             }
 
-            if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.Id != vm.Id))
+            if (userRepo.Any(x => x.Email == vm.Email.Trim() && x.IsActive == true && x.Id != vm.Id))
             {
                 result.Message = "Email Already Registered!";
             }
@@ -126,8 +126,8 @@ namespace QuickCampusAPI.Controllers
 
                 if (ModelState.IsValid && vm.Id > 0 && res.IsDelete == false)
                 {
-                    res.Email = vm.Email;
-                    res.Mobile = vm.Mobile;
+                    res.Email = vm.Email.Trim();
+                    res.Mobile = vm.Mobile.Trim();
                     try
                     {
                         result.Data = (EditUserResponseVm)await userRepo.Update(res);

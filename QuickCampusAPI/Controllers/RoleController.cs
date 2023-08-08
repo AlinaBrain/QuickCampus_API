@@ -156,6 +156,11 @@ namespace QuickCampusAPI.Controllers
                     return Ok(result);
                 }
             }
+            if (roleRepo.Any(x => x.Name == vm.RoleName))
+            {
+                result.Message = "RoleName Already Registerd!";
+                return Ok(result);
+            }
             var res = await roleRepo.UpdateRole(vm, cid, isSuperAdmin);
             return Ok(res);
         }

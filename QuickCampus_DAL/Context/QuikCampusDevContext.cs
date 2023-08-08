@@ -387,14 +387,6 @@ public partial class QuikCampusDevContext : DbContext
             entity.Property(e => e.Name).HasMaxLength(100);
             entity.Property(e => e.Password).HasMaxLength(100);
             entity.Property(e => e.UserName).HasMaxLength(100);
-
-            entity.HasOne(d => d.CraetedByNavigation).WithMany(p => p.TblClientCraetedByNavigations)
-                .HasForeignKey(d => d.CraetedBy)
-                .HasConstraintName("FK__tbl_Clien__Craet__19DFD96B");
-
-            entity.HasOne(d => d.ModifiedByNavigation).WithMany(p => p.TblClientModifiedByNavigations)
-                .HasForeignKey(d => d.ModifiedBy)
-                .HasConstraintName("FK__tbl_Clien__Modif__1AD3FDA4");
         });
 
         modelBuilder.Entity<TblPermission>(entity =>
