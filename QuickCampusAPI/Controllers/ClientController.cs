@@ -265,8 +265,8 @@ namespace QuickCampusAPI.Controllers
             if (res.IsDeleted == false)
             {
 
-                res.IsActive = false;
-                res.IsDeleted = true;
+                res.IsActive = isActive;
+                res.IsDeleted = false;
                 var data = await _clientRepo.Update(res);
                 result.Data = (ClientVM)data;
                 result.IsSuccess = true;

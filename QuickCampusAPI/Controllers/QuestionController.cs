@@ -24,7 +24,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "QuestionManage")]
         [HttpGet]
         [Route("QuestionManage")]
-        public async Task<ActionResult> QuestionManage(int clientid )
+        public async Task<ActionResult> GetAllQuestion(int clientid )
         {
             int cid = 0;
             var _jwtSecretKey = _config["Jwt:Key"];
@@ -40,6 +40,72 @@ namespace QuickCampusAPI.Controllers
             }
 
             var result = await _questionrepo.GetAllQuestion(cid, isSuperAdmin);
+            return Ok(result);
+        }
+
+        [Authorize(Roles = "GetAllGroups")]
+        [HttpGet]
+        [Route("GetAllGroups")]
+        public async Task<ActionResult> GetAllGroups(int clientid)
+        {
+            int cid = 0;
+            var _jwtSecretKey = _config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            if (isSuperAdmin)
+            {
+                cid = clientid;
+            }
+            else
+            {
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
+            }
+
+            var result = await _questionrepo.GetAllGroups(isSuperAdmin, cid);
+            return Ok(result);
+        }
+
+        [Authorize(Roles = "GetAllQuestionTypes")]
+        [HttpGet]
+        [Route("GetAllQuestionTypes")]
+        public async Task<ActionResult> GetAllQuestionTypes(int clientid)
+        {
+            int cid = 0;
+            var _jwtSecretKey = _config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            if (isSuperAdmin)
+            {
+                cid = clientid;
+            }
+            else
+            {
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
+            }
+
+            var result = await _questionrepo.GetAllQuestionTypes(isSuperAdmin, cid);
+            return Ok(result);
+        }
+
+        [Authorize(Roles = "GetAllSectionList")]
+        [HttpGet]
+        [Route("GetAllSectionList")]
+        public async Task<ActionResult> GetAllSectionList(int clientid)
+        {
+            int cid = 0;
+            var _jwtSecretKey = _config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            if (isSuperAdmin)
+            {
+                cid = clientid;
+            }
+            else
+            {
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
+            }
+
+            var result = await _questionrepo.GetAllSectionList(isSuperAdmin, cid);
             return Ok(result);
         }
 
@@ -66,7 +132,7 @@ namespace QuickCampusAPI.Controllers
         }
 
         [Authorize(Roles = "DeleteQuestion")]
-        [HttpGet]
+        [HttpDelete]
         [Route("deletequestion")]
         public async Task<ActionResult> DeleteQuestion(bool isdelete, int questionId, int clientid )
         {
@@ -111,7 +177,7 @@ namespace QuickCampusAPI.Controllers
         }
 
         [Authorize(Roles = "AddOrUpdateQuestion")]
-        [HttpPost]
+        [HttpGet]
         [Route("getquestionbyid")]
         public async Task<ActionResult> GetQuestionByid(int questionId, int clientid )
         {
