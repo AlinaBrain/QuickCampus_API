@@ -157,7 +157,17 @@ namespace QuickCampusAPI.Controllers
                     {
                         result.Message = "CollegeCode is alredy exist";
                     }
-
+                    bool  iscontactemail= _collegeRepo.Any(x => x.ContectEmail == vm.ContectEmail && x.IsDeleted == false);
+                    if (iscontactemail)
+                    {
+                        result.Message = "Contact Email is Already Exist";
+                    }
+                    bool iscontactperson = _collegeRepo.Any(x => x.ContectPerson == vm.ContectPerson && x.IsDeleted == false);
+                    if (iscontactperson)
+                    {
+                        result.Message = "Contact Person is Already Exist";
+                    }
+                    
                     else
                     {
                         {
@@ -228,8 +238,6 @@ namespace QuickCampusAPI.Controllers
                     return Ok(result);
                 }
             }
-
-
             if (vm != null)
             {
                 College clg = new College();
@@ -264,6 +272,16 @@ namespace QuickCampusAPI.Controllers
                 if (isexist)
                 {
                     result.Message = "CollegeCode is alredy exist";
+                }
+                bool iscontactemail = _collegeRepo.Any(x => x.ContectEmail == vm.ContectEmail && x.IsDeleted == false);
+                if (iscontactemail)
+                {
+                    result.Message = "Contact Email is Already Exist";
+                }
+                bool iscontactperson = _collegeRepo.Any(x => x.ContectPerson == vm.ContectPerson && x.IsDeleted == false);
+                if (iscontactperson)
+                {
+                    result.Message = "Contact Person is Already Exist";
                 }
                 else
                 {

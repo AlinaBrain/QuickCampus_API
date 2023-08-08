@@ -1,5 +1,8 @@
 ﻿
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace QuickCampus_Core.Common
 {
@@ -20,5 +23,6 @@ namespace QuickCampus_Core.Common
 
             return ValidationResult.Success;
         }
+
     }
 }
