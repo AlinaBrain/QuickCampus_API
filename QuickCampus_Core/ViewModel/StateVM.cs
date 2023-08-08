@@ -9,6 +9,18 @@ namespace QuickCampus_Core.ViewModel
 {
     public class StateVM
     {
+        public static explicit operator StateVM(State items)
+        {
+            return new StateVM
+            {
+                StateId = items.StateId,
+                StateName = items.StateName,
+                CountryId = items.CountryId,
+                IsActive = items.IsActive,
+                IsDeleted   = items.IsDeleted,
+                ClientId = items.ClientId,
+            };
+        }
         public int StateId { get; set; }
 
         public string? StateName { get; set; }
@@ -18,11 +30,32 @@ namespace QuickCampus_Core.ViewModel
         public bool? IsActive { get; set; }
 
         public bool? IsDeleted { get; set; }
+        public int? ClientId { get; set; }
 
-        public virtual ICollection<College> Colleges { get; set; } = new List<College>();
 
-        public virtual Country? Country { get; set; }
-
-        public virtual ICollection<WalkIn> WalkIns { get; set; } = new List<WalkIn>();
+        public State ToStateDbModel()
+        {
+            return new State
+            {
+                StateName = StateName,
+                CountryId = CountryId,
+                IsDeleted = false,
+                IsActive=true,
+                ClientId= ClientId,
+            };
+        }
+        public State ToUpdateDbModel()
+        {
+            return new State
+            {
+                StateId = StateId,
+                StateName = StateName,
+                IsActive = true,
+                IsDeleted = false,
+                CountryId = CountryId,
+                ClientId=ClientId
+                
+            };
+        }
     }
 }

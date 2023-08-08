@@ -23,8 +23,6 @@ public partial class TblRole
 
     public bool? IsActive { get; set; }
 
-    public virtual TblClient? Client { get; set; }
-
     public virtual TblUser? CreatedByNavigation { get; set; }
 
     public virtual TblUser? ModifiedByNavigation { get; set; }

@@ -410,10 +410,6 @@ public partial class QuikCampusDevContext : DbContext
             entity.Property(e => e.ModofiedDate).HasColumnType("datetime");
             entity.Property(e => e.Name).HasMaxLength(50);
 
-            entity.HasOne(d => d.Client).WithMany(p => p.TblRoles)
-                .HasForeignKey(d => d.ClientId)
-                .HasConstraintName("FK__tbl_Role__Client__3B40CD36");
-
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.TblRoleCreatedByNavigations)
                 .HasForeignKey(d => d.CreatedBy)
                 .HasConstraintName("FK__tbl_Role__Create__1CBC4616");

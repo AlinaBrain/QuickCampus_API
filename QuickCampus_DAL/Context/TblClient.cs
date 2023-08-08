@@ -43,7 +43,5 @@ public partial class TblClient
 
     public virtual ICollection<Section> Sections { get; set; } = new List<Section>();
 
-    public virtual ICollection<TblRole> TblRoles { get; set; } = new List<TblRole>();
-
     public virtual ICollection<TblUser> TblUsers { get; set; } = new List<TblUser>();
 }
