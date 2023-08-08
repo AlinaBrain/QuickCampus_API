@@ -27,7 +27,7 @@ namespace QuickCampus_Core.Services
             }
             else
             {
-                rl = _context.Applicants.Where(w => w.IsDeleted == false && w.ClientId == clientid).FirstOrDefault();
+                rl = _context.Applicants.Where(w => w.IsDeleted == false && (w.ClientId == clientid)).FirstOrDefault();
             }
             if (rl == null)
             {
