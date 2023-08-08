@@ -209,11 +209,11 @@ namespace QuickCampusAPI.Controllers
             {
                 result.Data = (ApplicantViewModel)res;
                 result.IsSuccess = true;
-                result.Message = "College details getting succesfully";
+                result.Message = "Applicant details getting succesfully";
             }
             else
             {
-                result.Message = "College does Not exist";
+                result.Message = "Applicant does Not exist";
             }
             return Ok(result);
         }
