@@ -7,8 +7,6 @@ public partial class Applicant
 {
     public int ApplicantId { get; set; }
 
-    public string? ApplicantToken { get; set; }
-
     public string? FirstName { get; set; }
 
     public string? LastName { get; set; }
@@ -31,13 +29,21 @@ public partial class Applicant
 
     public string? Comment { get; set; }
 
-    public DateTime? RegisteredDate { get; set; }
-
     public int? AssignedToCompany { get; set; }
 
     public int? CollegeId { get; set; }
 
     public string? CollegeName { get; set; }
+
+    public int? ClientId { get; set; }
+
+    public bool? IsDeleted { get; set; }
+
+    public bool? IsActive { get; set; }
+
+    public DateTime? CreatedDate { get; set; }
+
+    public DateTime? ModifiedDate { get; set; }
 
     public virtual ICollection<ApplicantComment> ApplicantComments { get; set; } = new List<ApplicantComment>();
 
