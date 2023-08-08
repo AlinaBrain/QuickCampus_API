@@ -30,10 +30,10 @@ namespace QuickCampus_Core.ViewModel
             };
         }
 
-        public ApplicantFilter filter { get; set; }
+       // public ApplicantFilter filter { get; set; }
         //public bool IsActive { get; set; }
         //public bool IsDeleted { get; set; }
-        public IEnumerable<ApplicantGridViewModel> ApplicantList { get; set; }
+       // public IEnumerable<ApplicantGridViewModel> ApplicantList { get; set; }
         
         public int ApplicantID { get;  set; }
         
@@ -65,6 +65,7 @@ namespace QuickCampus_Core.ViewModel
         public decimal? IntermediatePercentage { get;  set; }
         [Required(ErrorMessage = "You must provide a HighestQualification")]
         public string? Skills { get;  set; }
+        [Required(ErrorMessage = "You must provide a StatusId")]
         public int? StatusId { get; set; }
         public string? Comment { get;  set; }
         public DateTime? CreatedDate  { get; set; }
@@ -73,6 +74,7 @@ namespace QuickCampus_Core.ViewModel
         public int? ClientId { get; set; }
 
         public bool? IsDeleted { get; set; }
+        [Required(ErrorMessage = "You must provide a AssignedToCompany")]
         public int? AssignedToCompany { get; set; }
         public bool? IsActive { get; set; }
         public DateTime? ModifiedDate { get; set; }
