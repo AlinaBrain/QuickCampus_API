@@ -79,8 +79,9 @@ public partial class QuikCampusDevContext : DbContext
         {
             entity.ToTable("Applicant");
 
-            entity.Property(e => e.ApplicantToken).HasMaxLength(50);
+            entity.Property(e => e.ClientId).HasColumnName("ClientID");
             entity.Property(e => e.CollegeName).HasMaxLength(255);
+            entity.Property(e => e.CreatedDate).HasColumnType("datetime");
             entity.Property(e => e.EmailAddress).HasMaxLength(100);
             entity.Property(e => e.FirstName).HasMaxLength(100);
             entity.Property(e => e.HigestQualification).HasMaxLength(100);
@@ -88,8 +89,8 @@ public partial class QuikCampusDevContext : DbContext
             entity.Property(e => e.IntermediatePercentage).HasColumnType("decimal(18, 0)");
             entity.Property(e => e.LastName).HasMaxLength(100);
             entity.Property(e => e.MatricPercentage).HasColumnType("decimal(18, 0)");
+            entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
             entity.Property(e => e.PhoneNumber).HasMaxLength(25);
-            entity.Property(e => e.RegisteredDate).HasColumnType("datetime");
             entity.Property(e => e.Skills).HasMaxLength(500);
 
             entity.HasOne(d => d.AssignedToCompanyNavigation).WithMany(p => p.Applicants)

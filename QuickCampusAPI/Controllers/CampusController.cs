@@ -22,8 +22,6 @@ namespace QuickCampusAPI.Controllers
             _country = countryRepo;
             _staterepo = stateRepo;
             _config = configuration;
-
-
         }
 
         [Authorize(Roles = "ManageCampus")]

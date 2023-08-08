@@ -27,7 +27,7 @@ namespace QuickCampus_Core.Services
             return applicant != null ? new ApplicantGridViewModel()
             {
                 ApplicantID = applicant.ApplicantId,
-                ApplicantToken = applicant.ApplicantToken,
+              
                 FirstName = applicant.FirstName,
                 LastName = applicant.LastName,
                 EmailAddress = applicant.EmailAddress,
@@ -39,7 +39,7 @@ namespace QuickCampus_Core.Services
                 Skills = applicant.Skills,
                 StatusID = applicant.StatusId ?? 0,
                 Comment = applicant.Comment,
-                RegisteredDate = applicant.RegisteredDate != null ? applicant.RegisteredDate.Value.ToShortDateString() : "",
+               
             } : new ApplicantGridViewModel();
 
         }
@@ -50,7 +50,7 @@ namespace QuickCampus_Core.Services
                 Applicant applicant = dbContext.Applicants.Where(x => x.ApplicantId == model.ApplicantID).FirstOrDefault();
                 if (applicant != null)
                 {
-                    applicant.ApplicantToken = model.ApplicantToken;
+                   
                     applicant.FirstName = model.FirstName;
                     applicant.LastName = model.LastName;
                     applicant.EmailAddress = model.EmailAddress;
@@ -150,7 +150,7 @@ namespace QuickCampus_Core.Services
             Applicant applicant = dbContext.Applicants.Where(x => x.ApplicantId == model.ApplicantID).FirstOrDefault();
             if (applicant != null)
             {
-                applicant.ApplicantToken = model.ApplicantToken;
+                
                 applicant.FirstName = model.FirstName;
                 applicant.LastName = model.LastName;
                 applicant.EmailAddress = model.EmailAddress;
