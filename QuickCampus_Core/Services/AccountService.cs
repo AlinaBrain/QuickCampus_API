@@ -75,7 +75,6 @@ namespace QuickCampus_Core.Services
                 response.Data.UserName = re.Email;
                 response.Data.UserId = re.Id;
                 response.Data.CilentId = re.ClientId;
-               // response.Data.Createdby = re.Createdby;
             }
             else
             {
