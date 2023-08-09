@@ -227,9 +227,9 @@ namespace QuickCampusAPI.Controllers
 
 
         [Authorize(Roles = "GetRole")]
-        [HttpPost]
+        [HttpGet]
         [Route("GetRoleById")]
-        public async Task<IActionResult> GetRoleBiIdRole(int rId, int clientid)
+        public async Task<IActionResult> GetRoleById(int rId, int clientid)
         {
 
             IGeneralResult<RoleResponse> result = new GeneralResult<RoleResponse>();
