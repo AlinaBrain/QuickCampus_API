@@ -208,13 +208,15 @@ namespace QuickCampusAPI.Controllers
             }
             try
             {
-                var clientList = (await _clientRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.Id == cid)).ToList();
+                var clientList = (await _clientRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.Id == cid)).ToList().OrderByDescending(x=>x.Id);
+
                 var res = clientList.Select(x => ((ClientResponseVm)x)).ToList();
-                if (res != null)
+                if (res != null && res.Count()>0)
                 {
                     result.IsSuccess = true;
                     result.Message = "ClientList";
                     result.Data = res;
+                    result.TotalRecordCount = res.Count();
                 }
                 else
                 {
@@ -265,7 +267,7 @@ namespace QuickCampusAPI.Controllers
             if (res.IsDeleted == false)
             {
 
-                res.IsActive = isActive;
+                res.IsActive = true;
                 res.IsDeleted = false;
                 var data = await _clientRepo.Update(res);
                 result.Data = (ClientVM)data;
@@ -282,7 +284,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "DetailsClient")]
         [HttpGet]
         [Route("DetailsClient")]
-        public async Task<IActionResult> DetailsClient(int Id)
+        public async Task<IActionResult> DetailsClient(int Id,int clientid)
         {
             var _jwtSecretKey = _config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
