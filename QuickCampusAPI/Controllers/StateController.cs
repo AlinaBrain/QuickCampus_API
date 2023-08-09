@@ -26,7 +26,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "GetAllState")]
         [HttpGet]
         [Route("GetAllState")]
-        public async Task<IActionResult> GetAllState(int clientid)
+        public async Task<IActionResult> GetAllState(int clientid,int countryID)
         {
             IGeneralResult<List<StateVM>> result = new GeneralResult<List<StateVM>>();
             var _jwtSecretKey = _config["Jwt:Key"];
@@ -48,7 +48,7 @@ namespace QuickCampusAPI.Controllers
             {
                 if (isSuperAdmin)
                 {
-                    statelist = (await _stateRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).ToList();
+                    statelist = (await _stateRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid ) && x.CountryId== countryID).ToList();
                 }
                 else
                 {

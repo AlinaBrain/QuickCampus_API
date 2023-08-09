@@ -176,7 +176,7 @@ namespace QuickCampusAPI.Controllers
                                 CollegeName = vm.CollegeName.Trim(),
                                 Logo = ProcessUploadFile(vm),
                                 Address1 = vm.Address1.Trim(),
-                                Address2 = vm.Address2.Trim(),
+                                Address2 = vm.Address2,
                                 CreatedBy = Convert.ToInt32(userId),
                                 ModifiedBy = Convert.ToInt32(userId),
                                 City = vm.City.Trim(),
@@ -287,6 +287,7 @@ namespace QuickCampusAPI.Controllers
                 {
                     if (ModelState.IsValid && vm.CollegeId > 0 && clg.IsDeleted == false)
                     {
+                        clg.CollegeId = vm.CollegeId;
                         clg.CollegeName = vm.CollegeName.Trim();
                         clg.Logo = ProcessUploadFile(vm);
                         clg.Address1 = vm.Address1.Trim();
@@ -300,6 +301,7 @@ namespace QuickCampusAPI.Controllers
                         clg.ContectPerson = vm.ContectPerson.Trim();
                         clg.ContectEmail = vm.ContectEmail.Trim();
                         clg.ContectPhone = vm.ContectPhone.Trim();
+                        clg.ModifiedDate = DateTime.Now;
 
                         try
                         {
@@ -325,7 +327,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "DeleteCollege")]
         [HttpDelete]
         [Route("DeleteCollege")]
-        public async Task<IActionResult> DeleteCollege(int Id)
+        public async Task<IActionResult> DeleteCollege(int Id,int clientid)
         {
             var _jwtSecretKey = _config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
@@ -358,7 +360,7 @@ namespace QuickCampusAPI.Controllers
             if (res.IsDeleted == false)
             {
 
-                res.IsActive = false;
+                res.IsActive = isActive;
                 res.IsDeleted = true;
                 var data = await _collegeRepo.Update(res);
                 result.Data = (CollegeVM)data;
