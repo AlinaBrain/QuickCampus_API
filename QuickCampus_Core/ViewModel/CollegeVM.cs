@@ -61,6 +61,8 @@ namespace QuickCampus_Core.ViewModel
         public int? ClientId { get; set; }
 
         // public IFormFile file { get; set; }
+        public List<CountryVM>countryvm { get; set; }
+        public List<StateVM> statevm { get; set; }
 
         public College ToCollegeDbModel()
         {

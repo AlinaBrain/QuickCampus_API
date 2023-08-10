@@ -169,9 +169,9 @@ namespace QuickCampusAPI.Controllers
                     {
                         result.Message = "Contact Person is Already Exist";
                     }
-
                     else
                     {
+                        var Countrylist = await _countryRepo.GetAll(x => x.CountryId == vm.CountryId);
                         {
                           
                             CollegeVM college = new CollegeVM
@@ -394,7 +394,30 @@ namespace QuickCampusAPI.Controllers
             string basepath = baseUrl + uniqueFileName;
             return basepath;
         }
+
+        private CountryVM GetCountryDetails(int countryId)
+        {
+            CountryVM countryVm = new CountryVM();
+
+            var countryDetails = _countryRepo.GetById(countryId).Result;
+            countryVm.CountryId = countryDetails.CountryId;
+            countryVm.CountryName = countryDetails.CountryName;
+            return countryVm;
         }
+
+        private StateVM GetstateDetails(int stateId)
+        {
+            StateVM statevm= new StateVM();
+
+            var stateDetails =_stateRepo.GetById(stateId).Result;
+            statevm.CountryId = stateDetails.CountryId;
+            statevm.StateName = stateDetails.StateName;
+            statevm.StateId = stateDetails.StateId; 
+            return statevm;
+        }
+
+
     }
+}
 
 
