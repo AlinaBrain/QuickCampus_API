@@ -6,7 +6,7 @@ namespace QuickCampus_Core.ViewModel
 {
     public class CollegeLogoVm
     {
-        public IFormFile ImagePath { get; set; }
+        public IFormFile? ImagePath { get; set; }
         public int CollegeId { get; set; }
         [Required(ErrorMessage = "College Name is required.")]
         public string? CollegeName { get; set; }

@@ -2,6 +2,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using QuickCampus_Core.Interfaces;
@@ -119,6 +120,27 @@ builder.Services.AddScoped<IUserRoleRepo,UserRoleService>();
 
 
 var app = builder.Build();
+if (app.Environment.IsDevelopment())
+{
+
+    app.UseFileServer(new FileServerOptions
+    {
+        //FileProvider = new PhysicalFileProvider(@"D:\Client\Complant Management\ComplainManagement.API\wwwroot\UploadFiles"),
+        FileProvider = new PhysicalFileProvider(@"D:\QuickCampus\Quick_Campus\QuickCampusAPI\wwwroot\UploadFiles\\"),
+        RequestPath = new PathString("/UploadFiles"),
+        EnableDirectoryBrowsing = false
+    });
+}
+else
+{
+    app.UseFileServer(new FileServerOptions
+    {
+
+        FileProvider = new PhysicalFileProvider(@"C:\WWW\QuikCampusDev\wwwroot\UploadFiles\"),
+        RequestPath = new PathString("/UploadFiles"),
+        EnableDirectoryBrowsing = false
+    });
+}
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseAuthentication();

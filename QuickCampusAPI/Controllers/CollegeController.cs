@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Http;
 using QuickCampus_DAL.Context;
 using QuickCampus_Core.Services;
 using Azure;
+using Microsoft.Extensions.Hosting.Internal;
+using Microsoft.Extensions.Configuration;
 
 namespace QuickCampusAPI.Controllers
 {
@@ -22,14 +24,14 @@ namespace QuickCampusAPI.Controllers
         private readonly ICountryRepo _countryRepo;
         private readonly IStateRepo _stateRepo;
         private string baseUrl;
-        public CollegeController(ICollegeRepo collegeRepo, IConfiguration config, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment,ICountryRepo countryRepo,IStateRepo stateRepo)
+        public CollegeController(ICollegeRepo collegeRepo, IConfiguration config, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, ICountryRepo countryRepo, IStateRepo stateRepo)
         {
             _collegeRepo = collegeRepo;
             _config = config;
-            _hostingEnvironment=hostingEnvironment;
-            basepath = config["APISitePath"];
+            _hostingEnvironment = hostingEnvironment;
+            baseUrl = _config.GetSection("BasePath").Value;
             _countryRepo = countryRepo;
-            _stateRepo=stateRepo;
+            _stateRepo = stateRepo;
 
         }
 
@@ -85,7 +87,7 @@ namespace QuickCampusAPI.Controllers
                     result.IsSuccess = true;
                     result.Message = "College list not found!";
                     result.Data = null;
-                }              
+                }
             }
             catch (Exception ex)
             {
@@ -130,7 +132,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "AddCollege")]
         [HttpPost]
         [Route("AddCollege")]
-        public async Task<IActionResult> AddCollege([FromForm] CollegeLogoVm vm,int clientid)
+        public async Task<IActionResult> AddCollege([FromForm] CollegeLogoVm vm, int clientid)
         {
             IGeneralResult<CollegeVM> result = new GeneralResult<CollegeVM>();
             var _jwtSecretKey = _config["Jwt:Key"];
@@ -156,12 +158,12 @@ namespace QuickCampusAPI.Controllers
                     {
                         result.Message = " CollegeName is already exists";
                     }
-                    bool isexist = _collegeRepo.Any(x => x.CollegeCode == vm.CollegeCode && x.IsDeleted==false);
+                    bool isexist = _collegeRepo.Any(x => x.CollegeCode == vm.CollegeCode && x.IsDeleted == false);
                     if (isexist)
                     {
                         result.Message = "CollegeCode is alredy exist";
                     }
-                    bool  iscontactemail= _collegeRepo.Any(x => x.ContectEmail == vm.ContectEmail && x.IsDeleted == false);
+                    bool iscontactemail = _collegeRepo.Any(x => x.ContectEmail == vm.ContectEmail && x.IsDeleted == false);
                     if (iscontactemail)
                     {
                         result.Message = "Contact Email is Already Exist";
@@ -171,10 +173,11 @@ namespace QuickCampusAPI.Controllers
                     {
                         result.Message = "Contact Person is Already Exist";
                     }
-                    
                     else
                     {
+                        var Countrylist = await _countryRepo.GetAll(x => x.CountryId == vm.CountryId);
                         {
+                          
                             CollegeVM college = new CollegeVM
                             {
                                 CollegeName = vm.CollegeName.Trim(),
@@ -186,7 +189,7 @@ namespace QuickCampusAPI.Controllers
                                 City = vm.City.Trim(),
                                 StateId = vm.StateId,
                                 CountryId = vm.CountryId,
-                                CollegeCode=vm.CollegeCode,
+                                CollegeCode = vm.CollegeCode,
                                 ContectPerson = vm.ContectPerson.Trim(),
                                 ContectEmail = vm.ContectEmail.Trim(),
                                 ContectPhone = vm.ContectPhone.Trim(),
@@ -214,7 +217,7 @@ namespace QuickCampusAPI.Controllers
                 }
             }
             return Ok(result);
-           }
+        }
 
         [Authorize(Roles = "EditCollege")]
         [HttpPost]
@@ -248,7 +251,7 @@ namespace QuickCampusAPI.Controllers
 
                 if (isSuperAdmin)
                 {
-                    clg = (await _collegeRepo.GetAll()).Where(w => w.IsDeleted == false && w.IsActive == true && cid==0?true:w.ClientId==cid).FirstOrDefault();
+                    clg = (await _collegeRepo.GetAll()).Where(w => w.IsDeleted == false && w.IsActive == true && cid == 0 ? true : w.ClientId == cid).FirstOrDefault();
                 }
                 else
                 {
@@ -272,7 +275,7 @@ namespace QuickCampusAPI.Controllers
                 {
                     result.Message = " CollegeName is already exists";
                 }
-                bool isexist = _collegeRepo.Any(x => x.CollegeCode == vm.CollegeCode && x.IsDeleted==false);
+                bool isexist = _collegeRepo.Any(x => x.CollegeCode == vm.CollegeCode && x.IsDeleted == false);
                 if (isexist)
                 {
                     result.Message = "CollegeCode is alredy exist";
@@ -289,8 +292,10 @@ namespace QuickCampusAPI.Controllers
                 }
                 else
                 {
+                    vm.Logo = ProcessUploadFile((CollegeLogoVm)vm.ImagePath);
                     if (ModelState.IsValid && vm.CollegeId > 0 && clg.IsDeleted == false)
                     {
+                       
                         clg.CollegeId = vm.CollegeId;
                         clg.CollegeName = vm.CollegeName.Trim();
                         clg.Logo = ProcessUploadFile(vm);
@@ -331,7 +336,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "DeleteCollege")]
         [HttpDelete]
         [Route("DeleteCollege")]
-        public async Task<IActionResult> DeleteCollege(int Id,int clientid)
+        public async Task<IActionResult> DeleteCollege(int Id, int clientid)
         {
             var _jwtSecretKey = _config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
@@ -390,8 +395,33 @@ namespace QuickCampusAPI.Controllers
                     model.ImagePath.CopyTo(filename);
                 }
             }
-            return uniqueFileName;
+            string basepath = baseUrl + uniqueFileName;
+            return basepath;
         }
+
+        private CountryVM GetCountryDetails(int countryId)
+        {
+            CountryVM countryVm = new CountryVM();
+
+            var countryDetails = _countryRepo.GetById(countryId).Result;
+            countryVm.CountryId = countryDetails.CountryId;
+            countryVm.CountryName = countryDetails.CountryName;
+            return countryVm;
+        }
+
+        private StateVM GetstateDetails(int stateId)
+        {
+            StateVM statevm= new StateVM();
+
+            var stateDetails =_stateRepo.GetById(stateId).Result;
+            statevm.CountryId = stateDetails.CountryId;
+            statevm.StateName = stateDetails.StateName;
+            statevm.StateId = stateDetails.StateId; 
+            return statevm;
+        }
+
+
     }
-    }
+}
+
 

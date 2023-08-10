@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
+using QuickCampus_Core.Services;
 using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
 
@@ -156,8 +157,10 @@ namespace QuickCampusAPI.Controllers
         {
 
             IGeneralResult<List<UserResponseVm>> result = new GeneralResult<List<UserResponseVm>>();
-            int cid = 0;
             var _jwtSecretKey = config["Jwt:Key"];
+
+            int cid = 0;
+            var jwtSecretKey = config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
             if (isSuperAdmin)
@@ -168,39 +171,35 @@ namespace QuickCampusAPI.Controllers
             {
                 cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
             }
-
+            List<TblUser> collegeList = new List<TblUser>();
             try
             {
-                List<TblUser> userlist = new List<TblUser>();
-                var userListCount = 0;
+
                 if (isSuperAdmin)
                 {
-                    userListCount = (await userRepo.GetAll()).Count();
-                    userlist =(await userRepo.GetAll()).Skip(pageStart).Take(pageSize).ToList();
-                    userlist = userlist.Where(x =>( x.IsDelete == false || x.IsDelete == null) && (cid == 0 ? true : x.ClientId == cid)).ToList();
+                    collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete != true && (cid == 0 ? true : x.ClientId == cid)).ToList();
+
                 }
                 else
                 {
-                    userListCount = (await userRepo.GetAll()).Count();
-                    userlist = (await userRepo.GetAll()).Where(x => x.IsDelete == false && x.ClientId == cid).Skip(pageStart).Take(pageSize).ToList();
+                    collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete != true && x.ClientId == cid).ToList();
                 }
-                if (userlist.Count > 0)
+
+                var response = collegeList.Select(x => (UserResponseVm)x).ToList();
+
+
+                if (collegeList.Count > 0)
                 {
-                    var response = userlist.Select(x => (UserResponseVm)x).ToList();
                     result.IsSuccess = true;
-                    result.Message = "User list get successfully!!";
+                    result.Message = "College get successfully";
                     result.Data = response;
-                    result.TotalRecordCount = userListCount;
-                    return Ok(result);
                 }
                 else
                 {
-                    result.IsSuccess = false;
-                    result.Message = "User list not found";
+                    result.IsSuccess = true;
+                    result.Message = "College list not found!";
                     result.Data = null;
-                    return Ok(result);
                 }
-                  
             }
             catch (Exception ex)
             {
@@ -230,7 +229,7 @@ namespace QuickCampusAPI.Controllers
                 if (cid == 0)
                 {
                     result.IsSuccess = false;
-                    result.Message = "Invalid Client";
+                    result.Message = "Invalid User";
                     return Ok(result);
                 }
             }
@@ -281,5 +280,6 @@ namespace QuickCampusAPI.Controllers
                 throw new Exception("Error in base64Encode" + ex.Message);
             }
         }
+        
     }
 }

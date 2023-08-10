@@ -25,7 +25,9 @@ namespace QuickCampus_Core.ViewModel
                 ContectEmail = items.ContectEmail,
                 ModifiedBy = items.ModifiedBy,
                 ModifiedDate = items.ModifiedDate,
-                ClientId = items.ClientId
+                ClientId = items.ClientId,
+                IsActive=items.IsActive,
+                IsDeleted=items.IsDeleted
             };
         }
         public int CollegeId { get; set; }
@@ -41,7 +43,7 @@ namespace QuickCampus_Core.ViewModel
         public int? StateId { get; set; }
         [Required(ErrorMessage = "Country is required.")]
         public int? CountryId { get; set; }
-        public bool IsActive { get; set; }
+        public bool? IsActive { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int CreatedBy { get; set; }
         public string? CollegeCode { get; set; }
@@ -59,6 +61,8 @@ namespace QuickCampus_Core.ViewModel
         public int? ClientId { get; set; }
 
         // public IFormFile file { get; set; }
+        public List<CountryVM>countryvm { get; set; }
+        public List<StateVM> statevm { get; set; }
 
         public College ToCollegeDbModel()
         {

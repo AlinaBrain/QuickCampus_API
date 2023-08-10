@@ -29,10 +29,8 @@ namespace QuickCampusAPI.Controllers
         public async Task<IActionResult> GetAllCountry(int clientid)
         {
             IGeneralResult<List<CountryVM>> result = new GeneralResult<List<CountryVM>>();
-            var _jwtSecretKey = _config["Jwt:Key"];
-
             int cid = 0;
-            var jwtSecretKey = _config["Jwt:Key"];
+            var _jwtSecretKey = _config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
             if (isSuperAdmin)
@@ -43,29 +41,21 @@ namespace QuickCampusAPI.Controllers
             {
                 cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
             }
-            List<Country> countrylist = new List<Country>();
             try
             {
-                if (isSuperAdmin)
+                var clientList = (await _countryrepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.CountryId == cid)).ToList().OrderByDescending(x => x.CountryId);
+
+                var res = clientList.Select(x => ((CountryVM)x)).ToList();
+                if (res != null && res.Count() > 0)
                 {
-                    countrylist = (await _countryrepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).ToList();
+                    result.IsSuccess = true;
+                    result.Message = "CountryList";
+                    result.Data = res;
+                    result.TotalRecordCount = res.Count();
                 }
                 else
                 {
-                    countrylist = (await _countryrepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).ToList();
-                }
-                var response = countrylist.Select(x => (CountryVM)x).ToList();
-                if (countrylist.Count > 0)
-                {
-                    result.IsSuccess = true;
-                    result.Message = "Country get successfully";
-                    result.Data = response;
-                }
-                else
-                {
-                    result.IsSuccess = true;
-                    result.Message = "Country list not found!";
-                    result.Data = null;
+                    result.Message = "Country List Not Found";
                 }
             }
             catch (Exception ex)
