@@ -28,7 +28,7 @@ namespace QuickCampusAPI.Controllers
         //[AllowAnonymous]
         [HttpGet]
         [Route("GetAllApplicant")]
-        public async Task<ActionResult> GetAllApplicant(int clientid)
+        public async Task<ActionResult> GetAllApplicant(int clientid, int pageStart,int pageSize)
         {
             IGeneralResult<List<ApplicantViewModel>> result = new GeneralResult<List<ApplicantViewModel>>();
             int cid = 0;
@@ -44,15 +44,18 @@ namespace QuickCampusAPI.Controllers
                 cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
             }
             List<Applicant> countrylist = new List<Applicant>();
+            var applicantTotalCount = 0;
             try
             {
                 if (isSuperAdmin)
                 {
-                    countrylist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).ToList();
+                    applicantTotalCount = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Count();
+                    countrylist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Skip(pageStart).Take(pageSize).ToList();
                 }
                 else
                 {
-                    countrylist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).ToList();
+                    applicantTotalCount = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).Count();
+                    countrylist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).Skip(pageStart).Take(pageSize).ToList();
                 }
                 var response = countrylist.Select(x => (ApplicantViewModel)x).ToList();
                 if (countrylist.Count > 0)
@@ -60,6 +63,7 @@ namespace QuickCampusAPI.Controllers
                     result.IsSuccess = true;
                     result.Message = "Applicant get successfully";
                     result.Data = response;
+                    result.TotalRecordCount = applicantTotalCount;
                 }
                 else
                 {

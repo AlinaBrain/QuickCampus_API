@@ -24,7 +24,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "QuestionManage")]
         [HttpGet]
         [Route("QuestionManage")]
-        public async Task<ActionResult> GetAllQuestion(int clientid )
+        public async Task<ActionResult> GetAllQuestion(int clientid , int pageStart, int pageSize)
         {
             int cid = 0;
             var _jwtSecretKey = _config["Jwt:Key"];
@@ -39,7 +39,7 @@ namespace QuickCampusAPI.Controllers
                 cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
             }
 
-            var result = await _questionrepo.GetAllQuestion(cid, isSuperAdmin);
+            var result = await _questionrepo.GetAllQuestion(cid, isSuperAdmin,pageStart,pageSize);
             return Ok(result);
         }
 

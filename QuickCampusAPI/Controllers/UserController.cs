@@ -152,7 +152,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "UserList")]
         [HttpGet]
         [Route("UserList")]
-        public async Task<IActionResult> UserList(int clientid)
+        public async Task<IActionResult> UserList(int clientid, int pageStart, int pageSize)
         {
 
             IGeneralResult<List<UserResponseVm>> result = new GeneralResult<List<UserResponseVm>>();
@@ -172,14 +172,17 @@ namespace QuickCampusAPI.Controllers
             try
             {
                 List<TblUser> userlist = new List<TblUser>();
+                var userListCount = 0;
                 if (isSuperAdmin)
                 {
-                    userlist =(await userRepo.GetAll()).ToList();
+                    userListCount = (await userRepo.GetAll()).Count();
+                    userlist =(await userRepo.GetAll()).Skip(pageStart).Take(pageSize).ToList();
                     userlist = userlist.Where(x =>( x.IsDelete == false || x.IsDelete == null) && (cid == 0 ? true : x.ClientId == cid)).ToList();
                 }
                 else
                 {
-                    userlist = (await userRepo.GetAll()).Where(x => x.IsDelete == false && x.ClientId == cid).ToList();
+                    userListCount = (await userRepo.GetAll()).Count();
+                    userlist = (await userRepo.GetAll()).Where(x => x.IsDelete == false && x.ClientId == cid).Skip(pageStart).Take(pageSize).ToList();
                 }
                 if (userlist.Count > 0)
                 {
@@ -187,11 +190,12 @@ namespace QuickCampusAPI.Controllers
                     result.IsSuccess = true;
                     result.Message = "User list get successfully!!";
                     result.Data = response;
+                    result.TotalRecordCount = userListCount;
                     return Ok(result);
                 }
                 else
                 {
-                    result.IsSuccess = true;
+                    result.IsSuccess = false;
                     result.Message = "User list not found";
                     result.Data = null;
                     return Ok(result);

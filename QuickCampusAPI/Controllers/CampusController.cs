@@ -28,7 +28,7 @@ namespace QuickCampusAPI.Controllers
         [HttpGet]
         [Route("ManageCampus")]
        
-        public async Task<IActionResult> ManageCampus(int clientid )
+        public async Task<IActionResult> ManageCampus(int clientid ,int pageStart,int pageSize)
         {
             IGeneralResult<List<CampusGridViewModel>> result = new GeneralResult<List<CampusGridViewModel>>();
             var _jwtSecretKey = _config["Jwt:Key"];
@@ -51,7 +51,7 @@ namespace QuickCampusAPI.Controllers
             {
                 getClientId = string.IsNullOrEmpty(clientId)==true?0:Convert.ToInt32(clientId);
             }
-            var rec = await _campusrepo.GetAllCampus(getClientId,isSuperAdmin);
+            var rec = await _campusrepo.GetAllCampus(getClientId,isSuperAdmin,pageStart,pageSize);
             var CampusList = rec.Where(x => x.WalkInID != null).ToList();
             var res = CampusList.Select(x => ((CampusGridViewModel)x)).ToList();
 

@@ -191,7 +191,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "GetAllClient")]
         [HttpGet]
         [Route("GetAllClient")]
-        public async Task<IActionResult> GetAllClient(int clientid)
+        public async Task<IActionResult> GetAllClient(int clientid,int pageStart,int pageSize)
         {
             IGeneralResult<List<ClientResponseVm>> result = new GeneralResult<List<ClientResponseVm>>();
             int cid = 0;
@@ -208,7 +208,9 @@ namespace QuickCampusAPI.Controllers
             }
             try
             {
-                var clientList = (await _clientRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.Id == cid)).ToList().OrderByDescending(x=>x.Id);
+
+                var clientListCount = (await _clientRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.Id == cid)).Count();
+                var clientList = (await _clientRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.Id == cid)).ToList().Skip(pageStart).Take(pageSize).OrderByDescending(x=>x.Id);
 
                 var res = clientList.Select(x => ((ClientResponseVm)x)).ToList();
                 if (res != null && res.Count()>0)
@@ -216,7 +218,7 @@ namespace QuickCampusAPI.Controllers
                     result.IsSuccess = true;
                     result.Message = "ClientList";
                     result.Data = res;
-                    result.TotalRecordCount = res.Count();
+                    result.TotalRecordCount = clientListCount;
                 }
                 else
                 {

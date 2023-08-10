@@ -36,7 +36,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "GetAllCollege")]
         [HttpGet]
         [Route("GetAllCollege")]
-        public async Task<IActionResult> GetAllCollege(int clientid)
+        public async Task<IActionResult> GetAllCollege(int clientid,int pageStart,int pageSize)
         {
             IGeneralResult<List<CollegeVM>> result = new GeneralResult<List<CollegeVM>>();
             var _jwtSecretKey = _config["Jwt:Key"];
@@ -56,18 +56,21 @@ namespace QuickCampusAPI.Controllers
             List<College> collegeList = new List<College>();
             try
             {
+                var collegeListCount=0;
 
                 if (isSuperAdmin)
                 {
-                    collegeList = (await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).ToList();
+                   collegeListCount = (await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Count();
+                   collegeList = (List<College>)(await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Skip(pageStart).Take(pageSize).ToList();
 
                 }
                 else
                 {
-                    collegeList = (await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).ToList();
+                    collegeListCount = (await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).Count();
+                    collegeList = (List<College>)(await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).Skip(pageStart).Take(pageSize).ToList();
                 }
 
-               var response = collegeList.Select(x => (CollegeVM)x).ToList();
+                var response = collegeList.Select(x => (CollegeVM)x).ToList();
 
 
                 if (collegeList.Count > 0)
@@ -75,6 +78,7 @@ namespace QuickCampusAPI.Controllers
                     result.IsSuccess = true;
                     result.Message = "College get successfully";
                     result.Data = response;
+                    result.TotalRecordCount = collegeListCount;
                 }
                 else
                 {

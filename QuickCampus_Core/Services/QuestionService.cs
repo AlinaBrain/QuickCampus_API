@@ -15,7 +15,7 @@ namespace QuickCampus_Core.Services
         {
             _context = context;
         }
-        public async Task<IGeneralResult<List<QuestionViewModelAdmin>>> GetAllQuestion(int clientid, bool issuperadmin)
+        public async Task<IGeneralResult<List<QuestionViewModelAdmin>>> GetAllQuestion(int clientid, bool issuperadmin, int pageStart, int pageSize)
         {
             IGeneralResult<List<QuestionViewModelAdmin>> result = new GeneralResult<List<QuestionViewModelAdmin>>();
             List<QuestionViewModelAdmin> record = new List<QuestionViewModelAdmin>();
@@ -29,7 +29,7 @@ namespace QuickCampus_Core.Services
                     QuestionGroup = x.Group.GroupName,
                     Question = x.Text,
                     IsActive = x.IsActive ?? false
-                }).ToList();
+                }).Skip(pageStart).Take(pageSize).ToList();
                 if (result.Data.Count > 0)
                 {
                     result.IsSuccess = true;
@@ -57,7 +57,7 @@ namespace QuickCampus_Core.Services
                 QuestionGroup = x.Group.GroupName,
                 Question = x.Text,
                 IsActive = x.IsActive ?? false
-            }).ToList();
+            }).Skip(pageStart).Take(pageSize).ToList();
 
             if (result.Data.Count > 0)
             {

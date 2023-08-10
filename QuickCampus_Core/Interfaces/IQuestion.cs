@@ -5,7 +5,7 @@ namespace QuickCampus_Core.Interfaces
 {
     public interface IQuestion
     {
-        Task<IGeneralResult<List<QuestionViewModelAdmin>>> GetAllQuestion(int clientId, bool isSuperAdmin);
+        Task<IGeneralResult<List<QuestionViewModelAdmin>>> GetAllQuestion(int clientId, bool isSuperAdmin,int pageStart,int pageSize);
         Task<IGeneralResult<QuestionViewModelAdmin>> GetQuestionById(int QuestionId, int clientid, bool issuperadmin);
         Task<List<GroupViewModelAdmin>> GetAllGroups(bool isSuperAdmin, int clientId);
         Task<IGeneralResult<string>> ActiveInactiveQuestion(int questionId, int clientId, bool isSuperAdmin, bool isActive);

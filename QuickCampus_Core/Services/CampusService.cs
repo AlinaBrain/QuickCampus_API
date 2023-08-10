@@ -188,7 +188,7 @@ namespace QuickCampus_Core.Services
             res = _context.CampusWalkInColleges.Include(i => i.College).Where(w => w.CampusId == id).FirstOrDefault();
             return res;
         }
-        public async Task<IEnumerable<CampusGridViewModel>> GetAllCampus(int clientId, bool isSuperAdmin)
+        public async Task<IEnumerable<CampusGridViewModel>> GetAllCampus(int clientId, bool isSuperAdmin,int pageStart,int pageSize)
         {
 
             if (isSuperAdmin)
@@ -218,7 +218,7 @@ namespace QuickCampus_Core.Services
                         ExamEndTime = y.ExamEndTime.Value.ToString(),
                         ExamStartTime = y.ExamStartTime.Value.ToString()
 
-                    }).ToList()
+                    }).Skip(pageStart).Take(pageSize).ToList()
                 });
                 if (campuse.Any())
                 {
@@ -256,7 +256,7 @@ namespace QuickCampus_Core.Services
                         ExamEndTime = y.ExamEndTime.Value.ToString(),
                         ExamStartTime = y.ExamStartTime.Value.ToString()
 
-                    }).ToList()
+                    }).Skip(pageStart).Take(pageSize).ToList()
                 });
                 if (campuses.Any())
                 {
