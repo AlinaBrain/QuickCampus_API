@@ -22,6 +22,9 @@ namespace QuickCampus_Core.ViewModel
         [Required]
         [RegularExpression(@"^[1-9][0-9]{9}$", ErrorMessage = "Please enter a valid 10-digit mobile number that does not start with 0.")]
         public string? Mobile { get; set; }
+        public DateTime? CreateDate { get; set; }
+
+        public DateTime? ModifiedDate { get; set; }
         public TblUser ToUpdateDbModel()
         {
             return new TblUser
@@ -29,6 +32,8 @@ namespace QuickCampus_Core.ViewModel
                 Id = Id,
                 Email = Email,
                 Mobile = Mobile,
+                CreateDate = Id > 0 ? null : DateTime.UtcNow,
+                ModifiedDate = DateTime.Now
             };
         }
 

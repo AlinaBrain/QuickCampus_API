@@ -13,6 +13,8 @@ namespace QuickCampus_Core.ViewModel
                 Email = items.Email,
                 ClientId = items.ClientId, 
                 Mobile = items.Mobile,
+                CreateDate = items.CreateDate,
+                ModifiedDate = items.ModifiedDate
             };
             }
         public int Id { get; set; }
@@ -24,6 +26,10 @@ namespace QuickCampus_Core.ViewModel
         public string? Mobile { get; set; }
 
         public int? ClientId { get; set; }
+        public DateTime? CreateDate { get; set; }
+
+        public DateTime? ModifiedDate { get; set; }
+
 
     }
 }

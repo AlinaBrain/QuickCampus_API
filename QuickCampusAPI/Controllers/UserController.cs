@@ -61,7 +61,8 @@ namespace QuickCampusAPI.Controllers
                         Email = vm.Email.Trim(),
                         Mobile = vm.Mobile.Trim(),
                         Password = vm.Password.Trim(),
-                        ClientId = cid == 0 ? null : cid
+                        ClientId = cid == 0 ? null : cid,
+
                     };
                     var dataWithClientId = await userRepo.Add(userVm.ToUserDbModel());
                     result.IsSuccess = true;

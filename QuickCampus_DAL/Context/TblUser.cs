@@ -21,6 +21,10 @@ public partial class TblUser
 
     public int? ClientId { get; set; }
 
+    public DateTime? CreateDate { get; set; }
+
+    public DateTime? ModifiedDate { get; set; }
+
     public virtual TblClient? Client { get; set; }
 
     public virtual ICollection<TblRole> TblRoleCreatedByNavigations { get; set; } = new List<TblRole>();

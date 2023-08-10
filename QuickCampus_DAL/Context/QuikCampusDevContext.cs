@@ -444,10 +444,12 @@ public partial class QuikCampusDevContext : DbContext
 
             entity.ToTable("tbl_User");
 
+            entity.Property(e => e.CreateDate).HasColumnType("datetime");
             entity.Property(e => e.Email).HasMaxLength(100);
             entity.Property(e => e.IsActive).HasDefaultValueSql("('true')");
             entity.Property(e => e.IsDelete).HasDefaultValueSql("('false')");
             entity.Property(e => e.Mobile).HasMaxLength(15);
+            entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
             entity.Property(e => e.Name).HasMaxLength(100);
             entity.Property(e => e.Password).HasMaxLength(500);
 

@@ -61,6 +61,8 @@ namespace QuickCampus_Core.ViewModel
                 Mobile = Mobile,
                 IsDelete = false,
                 IsActive = true,
+                CreateDate =DateTime.Now,
+                ModifiedDate = Id > 0 ? DateTime.UtcNow : null,
             };
         }
 
@@ -73,6 +75,8 @@ namespace QuickCampus_Core.ViewModel
                 Password = Password,
                 Email = Email,
                 Mobile = Mobile,
+                CreateDate = Id > 0 ?  null: DateTime.UtcNow,
+                ModifiedDate = DateTime.Now
             };
         }
 
