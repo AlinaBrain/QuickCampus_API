@@ -210,7 +210,7 @@ namespace QuickCampusAPI.Controllers
             {
 
                 var clientListCount = (await _clientRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.Id == cid)).Count();
-                var clientList = (await _clientRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.Id == cid)).ToList().Skip(pageStart).Take(pageSize).OrderByDescending(x=>x.Id);
+                var clientList = (await _clientRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.Id == cid)).OrderByDescending(x => x.Id).Skip(pageStart).Take(pageSize).ToList();
 
                 var res = clientList.Select(x => ((ClientResponseVm)x)).ToList();
                 if (res != null && res.Count()>0)

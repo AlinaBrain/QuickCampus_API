@@ -27,7 +27,13 @@ namespace QuickCampus_Core.ViewModel
                 ModifiedDate = items.ModifiedDate,
                 ClientId = items.ClientId,
                 IsActive=items.IsActive,
-                IsDeleted=items.IsDeleted
+                IsDeleted=items.IsDeleted,
+                
+
+
+
+
+              
             };
         }
         public int CollegeId { get; set; }

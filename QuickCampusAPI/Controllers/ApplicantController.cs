@@ -43,22 +43,22 @@ namespace QuickCampusAPI.Controllers
             {
                 cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
             }
-            List<Applicant> countrylist = new List<Applicant>();
+            List<Applicant> apllicantlist = new List<Applicant>();
             var applicantTotalCount = 0;
             try
             {
                 if (isSuperAdmin)
                 {
                     applicantTotalCount = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Count();
-                    countrylist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Skip(pageStart).Take(pageSize).ToList();
+                    apllicantlist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Skip(pageStart).Take(pageSize).ToList();
                 }
                 else
                 {
                     applicantTotalCount = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).Count();
-                    countrylist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).Skip(pageStart).Take(pageSize).ToList();
+                    apllicantlist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).OrderByDescending(x=>x.ApplicantId).Skip(pageStart).Take(pageSize).ToList();
                 }
-                var response = countrylist.Select(x => (ApplicantViewModel)x).ToList();
-                if (countrylist.Count > 0)
+                var response = apllicantlist.Select(x => (ApplicantViewModel)x).ToList();
+                if (apllicantlist.Count > 0)
                 {
                     result.IsSuccess = true;
                     result.Message = "Applicant get successfully";
