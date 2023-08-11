@@ -191,7 +191,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "GetAllClient")]
         [HttpGet]
         [Route("GetAllClient")]
-        public async Task<IActionResult> GetAllClient(int clientid,int pageStart,int pageSize)
+        public async Task<IActionResult> GetAllClient(int clientid,int pageStart=0,int pageSize=10)
         {
             IGeneralResult<List<ClientResponseVm>> result = new GeneralResult<List<ClientResponseVm>>();
             int cid = 0;

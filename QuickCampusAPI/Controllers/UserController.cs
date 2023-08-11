@@ -154,7 +154,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "UserList")]
         [HttpGet]
         [Route("UserList")]
-        public async Task<IActionResult> UserList(int clientid, int pageStart, int pageSize)
+        public async Task<IActionResult> UserList(int clientid, int pageStart=0, int pageSize=10)
         {
 
             IGeneralResult<List<UserResponseVm>> result = new GeneralResult<List<UserResponseVm>>();
@@ -178,7 +178,7 @@ namespace QuickCampusAPI.Controllers
 
                 if (isSuperAdmin)
                 {
-                    collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete != true && (cid == 0 ? true : x.ClientId == cid)).ToList();
+                    collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete != true && (cid == 0 ? true : x.ClientId == cid)).OrderByDescending(o => o.Id).Skip(pageStart).Take(pageSize).ToList();
 
                 }
                 else
@@ -281,6 +281,37 @@ namespace QuickCampusAPI.Controllers
                 throw new Exception("Error in base64Encode" + ex.Message);
             }
         }
-        
+        [HttpGet]
+        [Route("GetUserDetailsById")]
+        public async Task<IActionResult> GetUserDetailsById(int Id, int clientid)
+        {
+            IGeneralResult<UserResponseVm> result = new GeneralResult<UserResponseVm>();
+            var _jwtSecretKey = config["Jwt:Key"];
+            int cid = 0;
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            if (isSuperAdmin)
+            {
+                cid = clientid;
+            }
+            else
+            {
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
+            }
+
+            var res = await userRepo.GetById(Id);
+            if (res.IsDelete == false && res.IsActive == true)
+            {
+                result.Data = (UserResponseVm)res;
+                result.IsSuccess = true;
+                result.Message = "User details getting succesfully";
+            }
+            else
+            {
+                result.Message = "User does Not exist";
+            }
+            return Ok(result);
+        }
+
     }
 }

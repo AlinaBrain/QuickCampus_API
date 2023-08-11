@@ -28,7 +28,7 @@ namespace QuickCampusAPI.Controllers
         //[AllowAnonymous]
         [HttpGet]
         [Route("GetAllApplicant")]
-        public async Task<ActionResult> GetAllApplicant(int clientid, int pageStart,int pageSize)
+        public async Task<ActionResult> GetAllApplicant(int clientid, int pageStart=0,int pageSize=10)
         {
             IGeneralResult<List<ApplicantViewModel>> result = new GeneralResult<List<ApplicantViewModel>>();
             int cid = 0;

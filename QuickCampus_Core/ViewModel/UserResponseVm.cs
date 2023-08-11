@@ -14,7 +14,9 @@ namespace QuickCampus_Core.ViewModel
                 ClientId = items.ClientId, 
                 Mobile = items.Mobile,
                 CreateDate = items.CreateDate,
-                ModifiedDate = items.ModifiedDate
+                ModifiedDate = items.ModifiedDate,
+                IsActive = items.IsActive,
+                
             };
             }
         public int Id { get; set; }
@@ -29,6 +31,7 @@ namespace QuickCampus_Core.ViewModel
         public DateTime? CreateDate { get; set; }
 
         public DateTime? ModifiedDate { get; set; }
+         public bool? IsActive { get; set; }
 
 
     }

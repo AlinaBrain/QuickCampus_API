@@ -218,8 +218,8 @@ namespace QuickCampus_Core.Services
                         ExamEndTime = y.ExamEndTime.Value.ToString(),
                         ExamStartTime = y.ExamStartTime.Value.ToString()
 
-                    }).Skip(pageStart).Take(pageSize).ToList()
-                });
+                    }).ToList(),
+                }).Skip(pageStart).Take(pageSize).ToList();
                 if (campuse.Any())
                 {
                     return campuse.ToList();

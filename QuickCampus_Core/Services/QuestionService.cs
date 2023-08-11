@@ -29,7 +29,7 @@ namespace QuickCampus_Core.Services
                     QuestionGroup = x.Group.GroupName,
                     Question = x.Text,
                     IsActive = x.IsActive ?? false
-                }).Skip(pageStart).Take(pageSize).ToList();
+                }).OrderByDescending(x=>x.QuestionId).Skip(pageStart).Take(pageSize).ToList();
                 if (result.Data.Count > 0)
                 {
                     result.IsSuccess = true;

@@ -38,7 +38,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "GetAllCollege")]
         [HttpGet]
         [Route("GetAllCollege")]
-        public async Task<IActionResult> GetAllCollege(int clientid,int pageStart,int pageSize)
+        public async Task<IActionResult> GetAllCollege(int clientid,int pageStart=0,int pageSize=10)
         {
             IGeneralResult<List<CollegeVM>> result = new GeneralResult<List<CollegeVM>>();
             var _jwtSecretKey = _config["Jwt:Key"];
