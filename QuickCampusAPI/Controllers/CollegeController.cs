@@ -421,7 +421,7 @@ namespace QuickCampusAPI.Controllers
             statevm.StateId = stateDetails.StateId; 
             return statevm;
         }
-
+        [HttpPost]
         public List<string> ProcessUploadFile(List<CollegeLogoVm> Files)
         {
             List<string> url = new List<string>();
