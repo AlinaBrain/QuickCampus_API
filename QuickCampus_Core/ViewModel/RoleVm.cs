@@ -11,6 +11,7 @@ namespace QuickCampus_Core.ViewModel
             {  
                 ClientId = item.ClientId,
                 Name = item.Name,
+                
             };
 
         }

@@ -28,11 +28,8 @@ namespace QuickCampus_Core.ViewModel
                 ClientId = items.ClientId,
                 IsActive=items.IsActive,
                 IsDeleted=items.IsDeleted,
-                
-
-
-
-
+               CreatedDate=items.CreatedDate,
+               CreatedBy=items.CreatedBy
               
             };
         }
@@ -42,17 +39,20 @@ namespace QuickCampus_Core.ViewModel
         public string ? Logo { get; set; }
         [Required(ErrorMessage = "Address1 is required.")]
         public string? Address1 { get; set; }
+        [Required(ErrorMessage = "Address2 is required.")]
         public string? Address2 { get; set; }
         [Required(ErrorMessage = "City is required.")]
         public string? City { get; set; }
-        [Required(ErrorMessage = "State is required.")]
+        [Required(ErrorMessage = "StateId is required.")]
         public int? StateId { get; set; }
         [Required(ErrorMessage = "Country is required.")]
         public int? CountryId { get; set; }
         public bool? IsActive { get; set; }
         public DateTime? CreatedDate { get; set; }
-        public int CreatedBy { get; set; }
+        public int ?CreatedBy { get; set; }
+        [Required(ErrorMessage = "CollegeCode is required.")]
         public string? CollegeCode { get; set; }
+        [EmailAddress(ErrorMessage = "Enter a valid contact person email.")]
         public string? ContectPerson { get; set; }
 
         [RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Not a valid phone number.")]
@@ -65,10 +65,6 @@ namespace QuickCampus_Core.ViewModel
         public DateTime? ModifiedDate { get; set; }
         public bool? IsDeleted { get; set; }
         public int? ClientId { get; set; }
-
-        // public IFormFile file { get; set; }
-        public List<CountryVM>countryvm { get; set; }
-        public List<StateVM> statevm { get; set; }
 
         public College ToCollegeDbModel()
         {
@@ -149,7 +145,7 @@ namespace QuickCampus_Core.ViewModel
                 RuleFor(x => x.ContectEmail)
                   .Cascade(CascadeMode.StopOnFirstFailure).EmailAddress().NotNull().WithMessage("Contect Email could not be null")
                   .NotEmpty().WithMessage("Contect Email could not be empty")
-                  .Length(5, 50).WithMessage("Contect Email lengh could not be greater than 50");
+                  .Length(5, 50).WithMessage("Contect Email length could not be greater than 50");
 
                 RuleFor(x => x.ContectPhone)
                .Cascade(CascadeMode.StopOnFirstFailure)

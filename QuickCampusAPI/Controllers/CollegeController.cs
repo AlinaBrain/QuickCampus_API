@@ -9,6 +9,7 @@ using QuickCampus_Core.Services;
 using Azure;
 using Microsoft.Extensions.Hosting.Internal;
 using Microsoft.Extensions.Configuration;
+using System;
 
 namespace QuickCampusAPI.Controllers
 {
@@ -74,7 +75,7 @@ namespace QuickCampusAPI.Controllers
 
                 var response = collegeList.Select(x => (CollegeVM)x).ToList();
 
-
+                
                 if (collegeList.Count > 0)
                 {
                     result.IsSuccess = true;
@@ -395,7 +396,8 @@ namespace QuickCampusAPI.Controllers
                     model.ImagePath.CopyTo(filename);
                 }
             }
-            string basepath = baseUrl + uniqueFileName;
+            
+            string basepath=(Path.Combine(baseUrl + uniqueFileName));
             return basepath;
         }
 
@@ -420,7 +422,31 @@ namespace QuickCampusAPI.Controllers
             return statevm;
         }
 
-
+        public List<string> ProcessUploadFile(List<CollegeLogoVm> Files)
+        {
+            List<string> url = new List<string>();
+            if (Files.Count > 0)
+            {
+                foreach (IFormFile file in Files)
+                {
+                    string uniqueFileName = null;
+                    string photoUpload = Path.Combine(_hostingEnvironment.WebRootPath, "UploadFiles");
+                    uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileName;
+                    string filepath = Path.Combine(photoUpload, uniqueFileName);
+                    using (var filename = new FileStream(filepath, FileMode.Create))
+                    {
+                        file.CopyTo(filename);
+                    }
+                    url.Add(Path.Combine(basepath, uniqueFileName));
+                }
+                return url;
+            }
+            else
+            {
+                url.Add("Please add atleast one file.");
+                return url;
+            }
+        }
     }
 }
 

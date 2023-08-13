@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
+using QuickCampus_Core.Services;
 using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
 
@@ -117,12 +118,12 @@ namespace QuickCampusAPI.Controllers
             List<TblRole> rolelist = new List<TblRole>();
             if (isSuperAdmin)
             {
-                rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).ToList();
+                rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted == false && x.IsActive==true && (cid == 0 ? true : x.ClientId == cid)).ToList();
 
             }
             else
             {
-                rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).ToList();
+                rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted == false && x.ClientId == cid && x.IsActive==true ).ToList();
             }
             return Ok(rolelist);
         }
@@ -265,6 +266,48 @@ namespace QuickCampusAPI.Controllers
         {
             var response = await roleRepo.SetRolePermission(roleMappingRequest);
             return Ok(response);
+        }
+        [HttpGet]
+        [Route("GetAllActiveClient")]
+        public async Task<IActionResult> GetAllActiveRole(int clientid, int pageStart = 0, int pageSize = 10)
+        {
+            IGeneralResult<List<ActiveRoleVm>> result = new GeneralResult<List<ActiveRoleVm>>();
+            int cid = 0;
+            var _jwtSecretKey = config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            if (isSuperAdmin)
+            {
+                cid = clientid;
+            }
+            else
+            {
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
+            }
+            try
+            {
+
+                var roletListCount = (await roleRepo.GetAll()).Where(x => x.IsActive == true && (cid == 0 ? true : x.Id == cid)).Count();
+                var roleList = (await roleRepo.GetAll()).Where(x => x.IsActive == true && (cid == 0 ? true : x.Id == cid)).OrderByDescending(x => x.Id).Skip(pageStart).Take(pageSize).ToList();
+
+                var res = roleList.Select(x => ((ActiveRoleVm)x)).ToList();
+                if (res != null && res.Count() > 0)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "ActiveRoleList";
+                    result.Data = res;
+                    result.TotalRecordCount = roletListCount;
+                }
+                else
+                {
+                    result.Message = " Active Role List Not Found";
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+            return Ok(result);
         }
     }
 }

@@ -319,6 +319,50 @@ namespace QuickCampusAPI.Controllers
                 throw new Exception("Error in base64Encode" + ex.Message);
             }
         }
+
+        //[Authorize(Roles = "GetAllClient")]
+        [HttpGet]
+        [Route("GetAllActiveClient")]
+        public async Task<IActionResult> GetAllActiveClient(int clientid, int pageStart = 0, int pageSize = 10)
+        {
+            IGeneralResult<List<ClientResponseVm>> result = new GeneralResult<List<ClientResponseVm>>();
+            int cid = 0;
+            var _jwtSecretKey = _config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            if (isSuperAdmin)
+            {
+                cid = clientid;
+            }
+            else
+            {
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
+            }
+            try
+            {
+
+                var clientListCount = (await _clientRepo.GetAll()).Where(x => x.IsActive == true && (cid == 0 ? true : x.Id == cid)).Count();
+                var clientList = (await _clientRepo.GetAll()).Where(x => x.IsActive == true && (cid == 0 ? true : x.Id == cid)).OrderByDescending(x => x.Id).Skip(pageStart).Take(pageSize).ToList();
+
+                var res = clientList.Select(x => ((ClientResponseVm)x)).ToList();
+                if (res != null && res.Count() > 0)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "ActiveclientList";
+                    result.Data = res;
+                    result.TotalRecordCount = clientListCount;
+                }
+                else
+                {
+                    result.Message = " Active Client List Not Found";
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+            return Ok(result);
+        }
     }
 }
 
