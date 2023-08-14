@@ -22,6 +22,7 @@ namespace QuickCampus_Core.ViewModel
                 IsActive = items.IsActive,
                 IsDeleted = items.IsDeleted,
                 
+                
             };
         }
         public int Id { get; set; }
@@ -29,7 +30,7 @@ namespace QuickCampus_Core.ViewModel
         public string? Name { get; set; }
 
         public int? CreatedBy { get; set; }
-
+   
         public int? ModifiedBy { get; set; }
 
         public DateTime CreatedDate { get; set; }

@@ -385,6 +385,7 @@ namespace QuickCampusAPI.Controllers
         }
         private string ProcessUploadFile([FromForm] CollegeLogoVm model)
         {
+             List<string> url = new List<string>();
             string uniqueFileName = null;
             if (model.ImagePath != null)
             {
@@ -396,8 +397,8 @@ namespace QuickCampusAPI.Controllers
                     model.ImagePath.CopyTo(filename);
                 }
             }
-            
-            string basepath=(Path.Combine(baseUrl + uniqueFileName));
+
+            url.Add(Path.Combine(basepath, uniqueFileName));
             return basepath;
         }
 

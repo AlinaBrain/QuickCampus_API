@@ -99,6 +99,7 @@ namespace QuickCampusAPI.Controllers
         [Route("RoleList")]
         public async Task<IActionResult> RoleList(int clientid)
         {
+            IGeneralResult<List<ActiveRoleVm>> result = new GeneralResult<List<ActiveRoleVm>>();
             var _jwtSecretKey = config["Jwt:Key"];
 
             int cid = 0;
@@ -118,12 +119,12 @@ namespace QuickCampusAPI.Controllers
             List<TblRole> rolelist = new List<TblRole>();
             if (isSuperAdmin)
             {
-                rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted == false && x.IsActive==true && (cid == 0 ? true : x.ClientId == cid)).ToList();
+                rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted == false || x.IsActive == false && (cid == 0 ? true : x.ClientId == cid )).ToList();
 
             }
             else
             {
-                rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted == false && x.ClientId == cid && x.IsActive==true ).ToList();
+                rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted == false && x.ClientId == cid || x.IsActive==false ).ToList();
             }
             return Ok(rolelist);
         }

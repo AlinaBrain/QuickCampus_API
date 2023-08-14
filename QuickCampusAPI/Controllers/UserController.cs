@@ -178,22 +178,25 @@ namespace QuickCampusAPI.Controllers
 
                 if (isSuperAdmin)
                 {
+                    
                     collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete != true && (cid == 0 ? true : x.ClientId == cid)).OrderByDescending(o => o.Id).Skip(pageStart).Take(pageSize).ToList();
 
                 }
                 else
                 {
+                    
                     collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete != true && x.ClientId == cid).ToList();
                 }
-
+                var clientListCount = (await userRepo.GetAll()).Where(x => x.IsActive == true && (cid == 0 ? true : x.Id == cid)).Count();
                 var response = collegeList.Select(x => (UserResponseVm)x).ToList();
 
 
-                if (collegeList.Count > 0)
+                if (response.Count() > 0)
                 {
                     result.IsSuccess = true;
                     result.Message = "College get successfully";
                     result.Data = response;
+                    result.TotalRecordCount = clientListCount;
                 }
                 else
                 {

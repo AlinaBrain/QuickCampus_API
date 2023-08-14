@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
+using QuickCampus_Core.Services;
 using QuickCampus_Core.ViewModel;
+using System.Security.Cryptography;
 
 namespace QuickCampusAPI.Controllers
 {
@@ -52,6 +54,7 @@ namespace QuickCampusAPI.Controllers
                 getClientId = string.IsNullOrEmpty(clientId)==true?0:Convert.ToInt32(clientId);
             }
             var rec = await _campusrepo.GetAllCampus(getClientId,isSuperAdmin,pageStart,pageSize);
+            var CampusListCount = (await _campusrepo.GetAll()).Where(x => x.IsActive == true && (getClientId == 0 ? true : x.ClientId == getClientId)).Count();
             var CampusList = rec.Where(x => x.WalkInID != null).ToList();
             var res = CampusList.Select(x => ((CampusGridViewModel)x)).ToList();
 
@@ -60,6 +63,7 @@ namespace QuickCampusAPI.Controllers
                 result.IsSuccess = true;
                 result.Message = "List of Campus.";
                 result.Data = res;
+                result.TotalRecordCount = CampusListCount;
             }
             else
             {
