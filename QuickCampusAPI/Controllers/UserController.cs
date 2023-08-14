@@ -99,15 +99,7 @@ namespace QuickCampusAPI.Controllers
                 cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
             }
 
-            if (userRepo.Any(x => x.Email == vm.Email.Trim() && x.IsActive == true && x.Id != vm.Id))
-            {
-                result.Message = "Email Already Registered!";
-            }
-            else if (userRepo.Any(x => x.IsActive == true && x.Email == vm.Email.Trim()))
-            {
-                result.Message = "UserName Already Exist!";
-            }
-            else
+            
             {
                 TblUser res = new TblUser();
 
@@ -178,7 +170,7 @@ namespace QuickCampusAPI.Controllers
 
                 if (isSuperAdmin)
                 {
-                    
+                    var clientListCount = (await userRepo.GetAll()).Where(x => x.IsActive == true && (cid == 0 ? true : x.Id == cid)).Count();
                     collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete != true && (cid == 0 ? true : x.ClientId == cid)).OrderByDescending(o => o.Id).Skip(pageStart).Take(pageSize).ToList();
 
                 }
@@ -187,7 +179,7 @@ namespace QuickCampusAPI.Controllers
                     
                     collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete != true && x.ClientId == cid).ToList();
                 }
-                var clientListCount = (await userRepo.GetAll()).Where(x => x.IsActive == true && (cid == 0 ? true : x.Id == cid)).Count();
+
                 var response = collegeList.Select(x => (UserResponseVm)x).ToList();
 
 
@@ -196,7 +188,7 @@ namespace QuickCampusAPI.Controllers
                     result.IsSuccess = true;
                     result.Message = "College get successfully";
                     result.Data = response;
-                    result.TotalRecordCount = clientListCount;
+                    result.TotalRecordCount = response.Count;
                 }
                 else
                 {

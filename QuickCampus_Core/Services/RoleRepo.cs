@@ -80,11 +80,11 @@ namespace QuickCampus_Core.Services
             TblRole rl = new TblRole();
             if (isSuperAdmin)
             {
-                rl = _context.TblRoles.Where(w => w.IsDeleted != true && (clientid == 0 ? true : w.ClientId == clientid)).FirstOrDefault();
+                rl = _context.TblRoles.Where(w => w.IsDeleted != true && w.Id==id && (clientid == 0 ? true : w.ClientId == clientid)).FirstOrDefault();
             }
             else
             {
-                rl = _context.TblRoles.Where(w => w.IsDeleted != true && w.ClientId == clientid).FirstOrDefault();
+                rl = _context.TblRoles.Where(w => w.IsDeleted != true && w.Id == id && w.ClientId == clientid).FirstOrDefault();
             }
             if (rl == null)
             {
