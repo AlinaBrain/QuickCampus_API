@@ -126,7 +126,8 @@ if (app.Environment.IsDevelopment())
     app.UseFileServer(new FileServerOptions
     {
         //FileProvider = new PhysicalFileProvider(@"D:\Client\Complant Management\ComplainManagement.API\wwwroot\UploadFiles"),
-       FileProvider = new PhysicalFileProvider(@"D:\QuickCampus\Quick_Campus\QuickCampusAPI\wwwroot\UploadFiles\\"),
+       //FileProvider = new PhysicalFileProvider(@"D:\QuickCampus\Quick_Campus\QuickCampusAPI\wwwroot\UploadFiles\\"),
+       FileProvider = new PhysicalFileProvider(@"E:\\TestImage\\"),
        // FileProvider = new PhysicalFileProvider(@"F:\Quikcampus\QuickCampusAPI\wwwroot\UploadFiles\\"),
         RequestPath = new PathString("/UploadFiles"),
         EnableDirectoryBrowsing = false
