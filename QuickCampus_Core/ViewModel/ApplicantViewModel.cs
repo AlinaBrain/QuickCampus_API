@@ -27,6 +27,8 @@ namespace QuickCampus_Core.ViewModel
                 CollegeName = x.CollegeName,
                 ClientId = x.ClientId,
                 CollegeId = x.CollegeId,
+                IsActive = x.IsActive,
+                IsDeleted = x.IsDeleted,
             };
         }
 
