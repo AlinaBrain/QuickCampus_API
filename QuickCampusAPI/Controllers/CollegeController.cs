@@ -303,9 +303,9 @@ namespace QuickCampusAPI.Controllers
                        
                         clg.CollegeId = vm.CollegeId;
                         clg.CollegeName = vm.CollegeName.Trim();
-                        clg.Logo = ProcessUploadFile(vm);
+                        clg.Logo =  vm.ImagePath !=null? ProcessUploadFile(vm) : clg.Logo;
                         clg.Address1 = vm.Address1.Trim();
-                        clg.Address2 = vm.Address2.Trim();
+                        clg.Address2 = string.IsNullOrEmpty(vm.Address2)?clg.Address2.Trim():vm.Address2.Trim();
                         clg.CreatedBy = Convert.ToInt32(userId);
                         clg.ModifiedBy = Convert.ToInt32(userId);
                         clg.City = vm.City.Trim();

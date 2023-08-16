@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using QuickCampus_DAL.Context;
 using System.ComponentModel.DataAnnotations;
 
@@ -6,7 +7,8 @@ namespace QuickCampus_Core.ViewModel
 {
     public class CollegeLogoVm
     {
-        public IFormFile ImagePath { get; set; }
+      
+        public IFormFile? ImagePath { get; set; }=null;
         public int CollegeId { get; set; }
         [Required(ErrorMessage = "College Name is required.")]
         public string? CollegeName { get; set; }
@@ -33,7 +35,7 @@ namespace QuickCampus_Core.ViewModel
         public string? ContectEmail { get; set; }
         public int? ModifiedBy { get; set; }
 
-        public DateTime? ModifiedDate { get; set; }
+        public DateTime? ModifiedDate { get; set; } = null;
         public bool? IsDeleted { get; set; }
         public int? ClientId { get; set; }
 

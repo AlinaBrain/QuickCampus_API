@@ -39,7 +39,7 @@ public partial class College
 
     public int? ModifiedBy { get; set; }
 
-    public DateTime? ModifiedDate { get; set; }
+    public DateTime? ModifiedDate { get; set; } 
 
     public int? ClientId { get; set; }
 
