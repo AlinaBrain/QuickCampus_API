@@ -43,5 +43,19 @@ public partial class TblClient
 
     public virtual ICollection<Section> Sections { get; set; } = new List<Section>();
 
+    public virtual ICollection<TblContent> TblContents { get; set; } = new List<TblContent>();
+
+    public virtual ICollection<TblDepartment> TblDepartments { get; set; } = new List<TblDepartment>();
+
+    public virtual ICollection<TblGoal> TblGoals { get; set; } = new List<TblGoal>();
+
+    public virtual ICollection<TblParentSkill> TblParentSkills { get; set; } = new List<TblParentSkill>();
+
+    public virtual ICollection<TblTag> TblTags { get; set; } = new List<TblTag>();
+
+    public virtual ICollection<TblTopicPCChildSkill> TblTopicPCChildSkills { get; set; } = new List<TblTopicPCChildSkill>();
+
+    public virtual ICollection<TblTopicPChildSkill> TblTopicPChildSkills { get; set; } = new List<TblTopicPChildSkill>();
+
     public virtual ICollection<TblUser> TblUsers { get; set; } = new List<TblUser>();
 }

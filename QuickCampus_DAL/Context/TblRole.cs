@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace QuickCampus_DAL.Context;
 
-public  class TblRole
+public partial class TblRole
 {
     public int Id { get; set; }
 

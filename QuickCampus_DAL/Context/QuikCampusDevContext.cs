@@ -57,11 +57,25 @@ public partial class QuikCampusDevContext : DbContext
 
     public virtual DbSet<TblClient> TblClients { get; set; }
 
+    public virtual DbSet<TblContent> TblContents { get; set; }
+
+    public virtual DbSet<TblDepartment> TblDepartments { get; set; }
+
+    public virtual DbSet<TblGoal> TblGoals { get; set; }
+
+    public virtual DbSet<TblParentSkill> TblParentSkills { get; set; }
+
     public virtual DbSet<TblPermission> TblPermissions { get; set; }
 
     public virtual DbSet<TblRole> TblRoles { get; set; }
 
     public virtual DbSet<TblRolePermission> TblRolePermissions { get; set; }
+
+    public virtual DbSet<TblTag> TblTags { get; set; }
+
+    public virtual DbSet<TblTopicPCChildSkill> TblTopicPCChildSkills { get; set; }
+
+    public virtual DbSet<TblTopicPChildSkill> TblTopicPChildSkills { get; set; }
 
     public virtual DbSet<TblUser> TblUsers { get; set; }
 
@@ -71,7 +85,7 @@ public partial class QuikCampusDevContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=103.133.215.42,1434;Database=QuikCampusDev;TrustServerCertificate=true;user id=bt;password=Tech#90@428;Integrated Security=false;");
+        => optionsBuilder.UseSqlServer("Server=103.133.215.42,1434;Database=QuikCampusDev; user id=bt;password=Tech#90@428;Integrated Security=false;TrustServerCertificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -390,6 +404,131 @@ public partial class QuikCampusDevContext : DbContext
             entity.Property(e => e.UserName).HasMaxLength(100);
         });
 
+        modelBuilder.Entity<TblContent>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Tbl_Cont__3214EC07BE73DE67");
+
+            entity.ToTable("Tbl_Content");
+
+            entity.Property(e => e.CreatedOn).HasColumnType("datetime");
+            entity.Property(e => e.Description).IsUnicode(false);
+            entity.Property(e => e.ExternalLink)
+                .HasMaxLength(1000)
+                .IsUnicode(false)
+                .HasColumnName("External_link");
+            entity.Property(e => e.FileName)
+                .HasMaxLength(1000)
+                .IsUnicode(false)
+                .HasColumnName("File_name");
+            entity.Property(e => e.ModefiedOn).HasColumnType("datetime");
+            entity.Property(e => e.Name)
+                .HasMaxLength(200)
+                .IsUnicode(false);
+            entity.Property(e => e.TagId).HasColumnName("Tag_Id");
+            entity.Property(e => e.TopicId).HasColumnName("Topic_Id");
+            entity.Property(e => e.Type)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.Client).WithMany(p => p.TblContents)
+                .HasForeignKey(d => d.ClientId)
+                .HasConstraintName("FK__Tbl_Conte__Clien__2AD55B43");
+
+            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.TblContentCreatedByNavigations)
+                .HasForeignKey(d => d.CreatedBy)
+                .HasConstraintName("FK__Tbl_Conte__Creat__2BC97F7C");
+
+            entity.HasOne(d => d.Deparment).WithMany(p => p.TblContents)
+                .HasForeignKey(d => d.DeparmentId)
+                .HasConstraintName("FK__Tbl_Conte__Depar__29E1370A");
+
+            entity.HasOne(d => d.ModefiedByNavigation).WithMany(p => p.TblContentModefiedByNavigations)
+                .HasForeignKey(d => d.ModefiedBy)
+                .HasConstraintName("FK__Tbl_Conte__Modef__2CBDA3B5");
+
+            entity.HasOne(d => d.Tag).WithMany(p => p.TblContents)
+                .HasForeignKey(d => d.TagId)
+                .HasConstraintName("FK__Tbl_Conte__Tag_I__28ED12D1");
+
+            entity.HasOne(d => d.Topic).WithMany(p => p.TblContents)
+                .HasForeignKey(d => d.TopicId)
+                .HasConstraintName("FK__Tbl_Conte__Topic__27F8EE98");
+        });
+
+        modelBuilder.Entity<TblDepartment>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Tbl_Depa__3214EC0722A741B0");
+
+            entity.ToTable("Tbl_Department");
+
+            entity.Property(e => e.CreatedOn).HasColumnType("datetime");
+            entity.Property(e => e.DepartmentName).HasMaxLength(100);
+            entity.Property(e => e.Description).IsUnicode(false);
+            entity.Property(e => e.ModefiedOn).HasColumnType("datetime");
+
+            entity.HasOne(d => d.Client).WithMany(p => p.TblDepartments)
+                .HasForeignKey(d => d.ClientId)
+                .HasConstraintName("FK__Tbl_Depar__Clien__0880433F");
+
+            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.TblDepartmentCreatedByNavigations)
+                .HasForeignKey(d => d.CreatedBy)
+                .HasConstraintName("FK__Tbl_Depar__Creat__09746778");
+
+            entity.HasOne(d => d.ModefiedByNavigation).WithMany(p => p.TblDepartmentModefiedByNavigations)
+                .HasForeignKey(d => d.ModefiedBy)
+                .HasConstraintName("FK__Tbl_Depar__Modef__0A688BB1");
+        });
+
+        modelBuilder.Entity<TblGoal>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__tbl_Goal__3214EC07F7186BCD");
+
+            entity.ToTable("tbl_Goal");
+
+            entity.Property(e => e.CreatedOn).HasColumnType("datetime");
+            entity.Property(e => e.Goal).HasMaxLength(200);
+            entity.Property(e => e.ModefiedOn).HasColumnType("datetime");
+            entity.Property(e => e.TargetYear).HasMaxLength(10);
+
+            entity.HasOne(d => d.Client).WithMany(p => p.TblGoals)
+                .HasForeignKey(d => d.ClientId)
+                .HasConstraintName("FK__tbl_Goal__Client__0D44F85C");
+
+            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.TblGoalCreatedByNavigations)
+                .HasForeignKey(d => d.CreatedBy)
+                .HasConstraintName("FK__tbl_Goal__Create__0E391C95");
+
+            entity.HasOne(d => d.ModefiedByNavigation).WithMany(p => p.TblGoalModefiedByNavigations)
+                .HasForeignKey(d => d.ModefiedBy)
+                .HasConstraintName("FK__tbl_Goal__Modefi__0F2D40CE");
+        });
+
+        modelBuilder.Entity<TblParentSkill>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Tbl_Pare__3214EC07BD3F66C1");
+
+            entity.ToTable("Tbl_ParentSkill");
+
+            entity.Property(e => e.CreatedOn).HasColumnType("datetime");
+            entity.Property(e => e.Description).IsUnicode(false);
+            entity.Property(e => e.ModefiedOn).HasColumnType("datetime");
+            entity.Property(e => e.Name)
+                .HasMaxLength(200)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.Client).WithMany(p => p.TblParentSkills)
+                .HasForeignKey(d => d.ClientId)
+                .HasConstraintName("FK__Tbl_Paren__Clien__16CE6296");
+
+            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.TblParentSkillCreatedByNavigations)
+                .HasForeignKey(d => d.CreatedBy)
+                .HasConstraintName("FK__Tbl_Paren__Creat__17C286CF");
+
+            entity.HasOne(d => d.ModefiedByNavigation).WithMany(p => p.TblParentSkillModefiedByNavigations)
+                .HasForeignKey(d => d.ModefiedBy)
+                .HasConstraintName("FK__Tbl_Paren__Modef__18B6AB08");
+        });
+
         modelBuilder.Entity<TblPermission>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Tbl_perm__3214EC07E8B524C3");
@@ -436,6 +575,91 @@ public partial class QuikCampusDevContext : DbContext
             entity.HasOne(d => d.Role).WithMany(p => p.TblRolePermissions)
                 .HasForeignKey(d => d.RoleId)
                 .HasConstraintName("FK__RolePermi__RoleI__08B54D69");
+        });
+
+        modelBuilder.Entity<TblTag>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Tbl_Tags__3214EC07929A02C5");
+
+            entity.ToTable("Tbl_Tags");
+
+            entity.Property(e => e.CreatedOn).HasColumnType("datetime");
+            entity.Property(e => e.ModefiedOn).HasColumnType("datetime");
+            entity.Property(e => e.Tag)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.Client).WithMany(p => p.TblTags)
+                .HasForeignKey(d => d.ClientId)
+                .HasConstraintName("FK__Tbl_Tags__Client__1209AD79");
+
+            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.TblTagCreatedByNavigations)
+                .HasForeignKey(d => d.CreatedBy)
+                .HasConstraintName("FK__Tbl_Tags__Create__12FDD1B2");
+
+            entity.HasOne(d => d.ModefiedByNavigation).WithMany(p => p.TblTagModefiedByNavigations)
+                .HasForeignKey(d => d.ModefiedBy)
+                .HasConstraintName("FK__Tbl_Tags__Modefi__13F1F5EB");
+        });
+
+        modelBuilder.Entity<TblTopicPCChildSkill>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Tbl_Topi__3214EC076DAEA623");
+
+            entity.ToTable("Tbl_Topic_P_C_ChildSkill");
+
+            entity.Property(e => e.CreatedOn).HasColumnType("datetime");
+            entity.Property(e => e.Description).IsUnicode(false);
+            entity.Property(e => e.ModefiedOn).HasColumnType("datetime");
+            entity.Property(e => e.Name)
+                .HasMaxLength(200)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.Child).WithMany(p => p.TblTopicPCChildSkills)
+                .HasForeignKey(d => d.ChildId)
+                .HasConstraintName("FK__Tbl_Topic__Child__22401542");
+
+            entity.HasOne(d => d.Client).WithMany(p => p.TblTopicPCChildSkills)
+                .HasForeignKey(d => d.ClientId)
+                .HasConstraintName("FK__Tbl_Topic__Clien__2334397B");
+
+            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.TblTopicPCChildSkillCreatedByNavigations)
+                .HasForeignKey(d => d.CreatedBy)
+                .HasConstraintName("FK__Tbl_Topic__Creat__24285DB4");
+
+            entity.HasOne(d => d.ModefiedByNavigation).WithMany(p => p.TblTopicPCChildSkillModefiedByNavigations)
+                .HasForeignKey(d => d.ModefiedBy)
+                .HasConstraintName("FK__Tbl_Topic__Modef__251C81ED");
+        });
+
+        modelBuilder.Entity<TblTopicPChildSkill>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Tbl_Topi__3214EC074CD55139");
+
+            entity.ToTable("Tbl_Topic_P_ChildSkill");
+
+            entity.Property(e => e.CreatedOn).HasColumnType("datetime");
+            entity.Property(e => e.Description).IsUnicode(false);
+            entity.Property(e => e.ModefiedOn).HasColumnType("datetime");
+            entity.Property(e => e.Name)
+                .HasMaxLength(200)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.Client).WithMany(p => p.TblTopicPChildSkills)
+                .HasForeignKey(d => d.ClientId)
+                .HasConstraintName("FK__Tbl_Topic__Clien__1C873BEC");
+
+            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.TblTopicPChildSkillCreatedByNavigations)
+                .HasForeignKey(d => d.CreatedBy)
+                .HasConstraintName("FK__Tbl_Topic__Creat__1D7B6025");
+
+            entity.HasOne(d => d.ModefiedByNavigation).WithMany(p => p.TblTopicPChildSkillModefiedByNavigations)
+                .HasForeignKey(d => d.ModefiedBy)
+                .HasConstraintName("FK__Tbl_Topic__Modef__1E6F845E");
+
+            entity.HasOne(d => d.Parent).WithMany(p => p.TblTopicPChildSkills)
+                .HasForeignKey(d => d.ParentId)
+                .HasConstraintName("FK__Tbl_Topic__Paren__1B9317B3");
         });
 
         modelBuilder.Entity<TblUser>(entity =>
