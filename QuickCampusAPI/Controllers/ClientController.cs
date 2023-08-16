@@ -119,7 +119,7 @@ namespace QuickCampusAPI.Controllers
             var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             var cid = clientId == ""? 0: Convert.ToInt32(clientId);
-            if (_clientRepo.Any(x => x.Email == vm.Email.Trim() && x.IsDeleted != true && vm.Id == cid))
+            if (_clientRepo.Any(x => x.Email == vm.Email.Trim() && x.IsDeleted != true && x.Id != vm.Id))
             {
                 result.Message = "Email Already Registered!";
             } 

@@ -156,7 +156,7 @@ namespace QuickCampusAPI.Controllers
                     return Ok(result);
                 }
             }
-            if (roleRepo.Any(x => x.Name == vm.RoleName))
+            if (roleRepo.Any(x => x.Name == vm.RoleName && x.Id != vm.Id))
             {
                 result.Message = "RoleName Already Registerd!";
                 return Ok(result);

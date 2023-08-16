@@ -3,11 +3,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace QuickCampus_Core.ViewModel
 {
-    public class EditUserResponseVm
+    public class UserRequestVm
     {
-        public static explicit operator EditUserResponseVm(TblUser item)
+        public static explicit operator UserRequestVm(TblUser item)
         {
-            return new EditUserResponseVm
+            return new UserRequestVm
             {
                 Id = item.Id,   
                 Email = item.Email,
@@ -37,5 +37,28 @@ namespace QuickCampus_Core.ViewModel
             };
         }
 
+    }
+
+    public class UserResponseVM
+    {
+        public static explicit operator UserResponseVM(TblUser item)
+        {
+            return new UserResponseVM
+            {
+                Id = item.Id,
+                Email = item.Email,
+                Mobile = item.Mobile,
+                CreateDate =item.CreateDate,
+                ModifiedDate = item.ModifiedDate
+            };
+        }
+
+        public int Id { get; set; }
+        public string? Email { get; set; }
+
+        public string? Mobile { get; set; }
+        public DateTime? CreateDate { get; set; }
+
+        public DateTime? ModifiedDate { get; set; }
     }
 }

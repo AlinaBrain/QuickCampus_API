@@ -24,7 +24,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "QuestionManage")]
         [HttpGet]
         [Route("QuestionManage")]
-        public async Task<ActionResult> GetAllQuestion(int clientid , int pageStart, int pageSize)
+        public async Task<ActionResult> GetAllQuestion(int clientid , int pageStart=0, int pageSize=10)
         {
             int cid = 0;
             var _jwtSecretKey = _config["Jwt:Key"];

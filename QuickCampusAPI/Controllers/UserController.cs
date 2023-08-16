@@ -83,9 +83,9 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "EditRole")]
         [HttpPost]
         [Route("EditUser")]
-        public async Task<IActionResult> EditUser(EditUserResponseVm vm, int clientid)
+        public async Task<IActionResult> EditUser(UserRequestVm vm, int clientid)
         {
-            IGeneralResult<EditUserResponseVm> result = new GeneralResult<EditUserResponseVm>();
+            IGeneralResult<UserResponseVM> result = new GeneralResult<UserResponseVM>();
             int cid = 0;
             var _jwtSecretKey = config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
@@ -102,6 +102,11 @@ namespace QuickCampusAPI.Controllers
             
             {
                 TblUser res = new TblUser();
+                if ( userRepo.Any(x => x.Email == vm.Email.Trim() && x.IsDelete != true && x.Id != vm.Id))
+                {
+                    result.Message = "User Email Already Registered!";
+                    return Ok(result);
+                }
 
                 if (isSuperAdmin)
                 {
@@ -118,13 +123,13 @@ namespace QuickCampusAPI.Controllers
                     return Ok(result);
                 }
 
-                if (ModelState.IsValid && vm.Id > 0 && res.IsDelete == false)
+                if (ModelState.IsValid && vm.Id > 0)
                 {
                     res.Email = vm.Email.Trim();
                     res.Mobile = vm.Mobile.Trim();
                     try
                     {
-                        result.Data = (EditUserResponseVm)await userRepo.Update(res);
+                        result.Data = (UserResponseVM)await userRepo.Update(res);
                         result.Message = "User updated successfully";
                         result.IsSuccess = true;
                     }
