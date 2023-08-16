@@ -25,7 +25,7 @@ namespace QuickCampusAPI.Controllers
             _config = configuration;
         }
 
-        //[AllowAnonymous]
+        [Authorize(Roles = "GetAllApplicant")]
         [HttpGet]
         [Route("GetAllApplicant")]
         public async Task<ActionResult> GetAllApplicant(int clientid, int pageStart=0,int pageSize=10)
@@ -79,7 +79,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
-       //  [Authorize(Roles = "AddApplicant")]
+        [Authorize(Roles = "AddApplicant")]
         [HttpPost]
         [Route("AddApplicant")]
         public async Task<IActionResult> AddApplicant(ApplicantViewModel vm, int clientid)
@@ -157,9 +157,9 @@ namespace QuickCampusAPI.Controllers
 
         }
 
+        [Authorize(Roles = "EditApplicant")]
         [HttpPost]
         [Route("EditApplicant")]
-
         public async Task<IActionResult> EditApplicant(ApplicantViewModel vm, int clientid)
         {
             IGeneralResult<ApplicantViewModel> result = new GeneralResult<ApplicantViewModel>();
@@ -269,6 +269,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "GetApplicantById")]
         [HttpGet]
         [Route("GetApplicantById")]
         public async Task<ActionResult> GetApplicantById(int applicantId, int clientid)
@@ -301,31 +302,36 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
-
+        [Authorize(Roles = "DeleteApplicant")]
         [HttpDelete]
         [Route("DeleteApplicant")]
-        public async Task<IActionResult> DeleteApplicant(int ApplicantId)
+        public async Task<IActionResult> DeleteApplicant(int applicantId,int clientid, bool isDeleted)
         {
-            var _jwtSecretKey = _config["Jwt:Key"];
-            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            IGeneralResult<CollegeVM> result = new GeneralResult<CollegeVM>();
-            var res = await _applicantRepo.GetById(ApplicantId);
-            if (res.IsDeleted == false)
+            IGeneralResult<ApplicantViewModel> result = new GeneralResult<ApplicantViewModel>();
+            int cid = 0;
+            var jwtSecretKey = _config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], jwtSecretKey);
+            if (isSuperAdmin)
             {
-                res.IsActive = false;
-                res.IsDeleted = true;
-                await _applicantRepo.Update(res);
-                result.IsSuccess = true;
-                result.Message = "Applicant Deleted Succesfully";
+                cid = clientid;
             }
             else
             {
-                result.Message = "Applicant does Not exist";
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
+
+                if (cid == 0)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Invalid Applicant";
+                    return Ok(result);
+                }
             }
-            return Ok(result);
+            var res = _applicantRepo.DeleteApplicant(isDeleted, applicantId, cid, isSuperAdmin);
+            return Ok(res);
         }
 
-      //  [Authorize(Roles = "activeAndInActiveUser")]
+        [Authorize(Roles = "activeAndInActiveUser")]
         [HttpGet]
         [Route("activeAndInactive")]
         public async Task<IActionResult> ActiveAndInactive(bool isActive, int id, int clientid)

@@ -320,10 +320,10 @@ namespace QuickCampusAPI.Controllers
             }
         }
 
-        //[Authorize(Roles = "GetAllClient")]
+        [Authorize(Roles = "GetAllActiveClient")]
         [HttpGet]
         [Route("GetAllActiveClient")]
-        public async Task<IActionResult> GetAllActiveClient(int clientid, int pageStart = 0, int pageSize = 10)
+        public async Task<IActionResult> GetAllActiveClient(int clientid)
         {
             IGeneralResult<List<ClientResponseVm>> result = new GeneralResult<List<ClientResponseVm>>();
             int cid = 0;
@@ -342,7 +342,7 @@ namespace QuickCampusAPI.Controllers
             {
 
                 var clientListCount = (await _clientRepo.GetAll()).Where(x => x.IsActive == true && (cid == 0 ? true : x.Id == cid)).Count();
-                var clientList = (await _clientRepo.GetAll()).Where(x => x.IsActive == true && (cid == 0 ? true : x.Id == cid)).OrderByDescending(x => x.Id).Skip(pageStart).Take(pageSize).ToList();
+                var clientList = (await _clientRepo.GetAll()).Where(x => x.IsActive == true && (cid == 0 ? true : x.Id == cid)).OrderByDescending(x => x.Id).ToList();
 
                 var res = clientList.Select(x => ((ClientResponseVm)x)).ToList();
                 if (res != null && res.Count() > 0)

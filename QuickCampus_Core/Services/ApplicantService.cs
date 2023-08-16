@@ -122,6 +122,44 @@ namespace QuickCampus_Core.Services
                 }
             
         }
+        public async Task<IGeneralResult<string>> DeleteApplicant(bool isDeleted, int id, int clientid, bool isSuperAdmin)
+        {
+            IGeneralResult<string> result = new GeneralResult<string>();
+            Applicant applicant = new Applicant();
+            if (isSuperAdmin)
+            {
+                applicant = _context.Applicants.Where(w => w.IsDeleted == false && (clientid == 0 ? true : w.ClientId == clientid) && w.ApplicantId == id).FirstOrDefault();
+            }
+            else
+            {
+                applicant = _context.Applicants.Where(w => w.IsDeleted == false && w.ClientId == clientid && w.ApplicantId == id).FirstOrDefault();
+            }
+            if (applicant == null)
+            {
+                result.IsSuccess = false;
+                result.Message = "Role not found";
+                return result;
+            }
+
+            applicant.IsDeleted = isDeleted;
+            applicant.IsActive = false;
+            dbContext.Applicants.Update(applicant);
+            int a = dbContext.SaveChanges();
+            if (a > 0)
+            {
+                result.IsSuccess = true;
+                result.Message = "Applicant delete successfully";
+                return result;
+
+            }
+            else
+            {
+                result.IsSuccess = false;
+                result.Message = "something went wrong";
+                return result;
+            }
+        }
+
 
     }
 }

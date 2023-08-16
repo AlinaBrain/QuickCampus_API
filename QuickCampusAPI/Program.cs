@@ -138,7 +138,7 @@ else
 {
     app.UseFileServer(new FileServerOptions
     {
-        FileProvider = new PhysicalFileProvider(@"C:\WWW\QuikCampusDevLatest\wwwroot\UploadFiles"),
+        FileProvider = new PhysicalFileProvider(@"C:\WWW\QuikCampusDevLatest\wwwroot\UploadFiles\"),
         RequestPath = new PathString("/UploadFiles"),
         EnableDirectoryBrowsing = false
     });
