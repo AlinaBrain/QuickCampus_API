@@ -112,6 +112,7 @@ namespace QuickCampus_Core.ViewModel
                 ModifiedBy = ModifiedBy,
                 ModifiedDate = DateTime.Now,
                 ClientId= ClientId,
+                CreatedDate= CollegeId < 0 ? DateTime.UtcNow : null,
             };
         }
 

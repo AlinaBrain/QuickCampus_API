@@ -30,7 +30,7 @@ namespace QuickCampusAPI.Controllers
             _collegeRepo = collegeRepo;
             _config = config;
             _hostingEnvironment = hostingEnvironment;
-            baseUrl = _config.GetSection("BasePath").Value;
+            baseUrl = _config.GetSection("APISitePath").Value;
             _countryRepo = countryRepo;
             _stateRepo = stateRepo;
 
@@ -64,13 +64,13 @@ namespace QuickCampusAPI.Controllers
                 if (isSuperAdmin)
                 {
                    collegeListCount = (await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Count();
-                   collegeList = (List<College>)(await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Skip(pageStart).Take(pageSize).ToList();
+                   collegeList = (List<College>)(await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Skip(pageStart).Take(pageSize).OrderByDescending(x=>x.CollegeId).ToList();
 
                 }
                 else
                 {
                     collegeListCount = (await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).Count();
-                    collegeList = (List<College>)(await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).Skip(pageStart).Take(pageSize).ToList();
+                    collegeList = (List<College>)(await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).Skip(pageStart).Take(pageSize).OrderByDescending(x=>x.CollegeId).ToList();
                 }
 
                 var response = collegeList.Select(x => (CollegeVM)x).ToList();
@@ -252,7 +252,7 @@ namespace QuickCampusAPI.Controllers
 
                 if (isSuperAdmin)
                 {
-                    clg = (await _collegeRepo.GetAll()).Where(w => w.IsDeleted == false && w.IsActive == true && cid == 0 ? true : w.ClientId == cid).FirstOrDefault();
+                    clg = (await _collegeRepo.GetAll()).Where(w => w.IsDeleted == false && w.IsActive == true && (cid == 0 ? true : w.ClientId == cid )&& w.CollegeId == vm.CollegeId).FirstOrDefault();
                 }
                 else
                 {
@@ -271,29 +271,33 @@ namespace QuickCampusAPI.Controllers
                     result.Message = " College does Not Exist";
                     return Ok(result);
                 }
-                bool isExits = _collegeRepo.Any(x => x.CollegeName == vm.CollegeName && x.IsDeleted == false);
+                bool isExits = _collegeRepo.Any(x => x.CollegeName == vm.CollegeName && x.IsDeleted == false && x.CollegeId!=vm.CollegeId);
                 if (isExits)
                 {
                     result.Message = " CollegeName is already exists";
+                    return Ok(result);
                 }
-                bool isexist = _collegeRepo.Any(x => x.CollegeCode == vm.CollegeCode && x.IsDeleted == false);
+                bool isexist = _collegeRepo.Any(x => x.CollegeCode == vm.CollegeCode && x.IsDeleted == false && x.CollegeId != vm.CollegeId);
                 if (isexist)
                 {
                     result.Message = "CollegeCode is alredy exist";
+                    return Ok(result);
                 }
-                bool iscontactemail = _collegeRepo.Any(x => x.ContectEmail == vm.ContectEmail && x.IsDeleted == false);
+                bool iscontactemail = _collegeRepo.Any(x => x.ContectEmail == vm.ContectEmail && x.IsDeleted == false && x.CollegeId != vm.CollegeId);
                 if (iscontactemail)
                 {
                     result.Message = "Contact Email is Already Exist";
+                    return Ok(result);
                 }
-                bool iscontactperson = _collegeRepo.Any(x => x.ContectPerson == vm.ContectPerson && x.IsDeleted == false);
+                bool iscontactperson = _collegeRepo.Any(x => x.ContectPerson == vm.ContectPerson && x.IsDeleted == false && x.CollegeId != vm.CollegeId);
                 if (iscontactperson)
                 {
                     result.Message = "Contact Person is Already Exist";
+                    return Ok(result);
                 }
                 else
                 {
-                    vm.Logo = ProcessUploadFile((CollegeLogoVm)vm.ImagePath);
+                    
                     if (ModelState.IsValid && vm.CollegeId > 0 && clg.IsDeleted == false)
                     {
                        
@@ -337,25 +341,30 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "DeleteCollege")]
         [HttpDelete]
         [Route("DeleteCollege")]
-        public async Task<IActionResult> DeleteCollege(int Id, int clientid)
+        public async Task<IActionResult> DeleteCollege(int id, int clientid,bool isDeleted)
         {
-            var _jwtSecretKey = _config["Jwt:Key"];
-            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             IGeneralResult<CollegeVM> result = new GeneralResult<CollegeVM>();
-            var res = await _collegeRepo.GetById(Id);
-            if (res.IsDeleted == false)
+            int cid = 0;
+            var jwtSecretKey = _config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], jwtSecretKey);
+            if (isSuperAdmin)
             {
-                res.IsActive = false;
-                res.IsDeleted = true;
-                await _collegeRepo.Update(res);
-                result.IsSuccess = true;
-                result.Message = "College Deleted Succesfully";
+                cid = clientid;
             }
             else
             {
-                result.Message = "College does Not exist";
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
+
+                if (cid == 0)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Invalid College";
+                    return Ok(result);
+                }
             }
-            return Ok(result);
+            var res = _collegeRepo.DeleteCollege(isDeleted, id, cid, isSuperAdmin);
+            return Ok(res);
         }
 
         [Authorize(Roles = "ActiveAndInactive")]
@@ -398,8 +407,8 @@ namespace QuickCampusAPI.Controllers
                 }
             }
 
-            url.Add(Path.Combine(basepath, uniqueFileName));
-            return basepath;
+            url.Add(Path.Combine(baseUrl, uniqueFileName));
+            return url.FirstOrDefault();
         }
 
         private CountryVM GetCountryDetails(int countryId)
@@ -423,7 +432,7 @@ namespace QuickCampusAPI.Controllers
             return statevm;
         }
         [HttpPost]
-        public List<string> ProcessUploadFile(List<CollegeLogoVm> Files)
+        public List<string> ProcessUploadFile(List<IFormFile> Files)
         {
             List<string> url = new List<string>();
             if (Files.Count > 0)
@@ -447,6 +456,49 @@ namespace QuickCampusAPI.Controllers
                 url.Add("Please add atleast one file.");
                 return url;
             }
+        }
+        [Authorize(Roles = "GetAllActiveCollege")]
+        [HttpGet]
+        [Route("GetAllActiveCollege")]
+        public async Task<IActionResult> GetAllActiveCollege(int clientid)
+        {
+            IGeneralResult<List<CollegeVM>> result = new GeneralResult<List<CollegeVM>>();
+            int cid = 0;
+            var _jwtSecretKey = _config["Jwt:Key"];
+            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            if (isSuperAdmin)
+            {
+                cid = clientid;
+            }
+            else
+            {
+                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
+            }
+            try
+            {
+
+                var collegeListCount = (await _collegeRepo.GetAll()).Where(x => x.IsActive == true && (cid == 0 ? true : x.CollegeId== cid)).Count();
+                var collegetList = (await _collegeRepo.GetAll()).Where(x => x.IsActive == true && (cid == 0 ? true : x.CollegeId == cid)).OrderByDescending(x => x.CollegeId).ToList();
+
+                var res = collegetList.Select(x => ((CollegeVM)x)).ToList();
+                if (res != null && res.Count() > 0)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "ActiveCollegeList";
+                    result.Data = res;
+                    result.TotalRecordCount = collegeListCount;
+                }
+                else
+                {
+                    result.Message = " Active College List Not Found";
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+            return Ok(result);
         }
     }
 }
