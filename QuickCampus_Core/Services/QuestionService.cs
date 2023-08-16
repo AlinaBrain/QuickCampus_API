@@ -21,6 +21,15 @@ namespace QuickCampus_Core.Services
             List<QuestionViewModelAdmin> record = new List<QuestionViewModelAdmin>();
             if (issuperadmin)
             {
+                var totalCount = result.Data = _context.Questions.Where(x => x.IsDeleted == false && (clientid == 0 ? true : x.ClentId == clientid)).Select(x => new QuestionViewModelAdmin()
+                {
+                    QuestionId = x.QuestionId,
+                    QuestionTypeName = x.QuestionType.QuestionType1,
+                    QuestionSection = x.Section.Section1,
+                    QuestionGroup = x.Group.GroupName,
+                    Question = x.Text,
+                    IsActive = x.IsActive ?? false
+                }).ToList();
                 result.Data = _context.Questions.Where(x => x.IsDeleted == false && (clientid == 0 ? true : x.ClentId == clientid)).Select(x => new QuestionViewModelAdmin()
                 {
                     QuestionId = x.QuestionId,
@@ -34,6 +43,7 @@ namespace QuickCampus_Core.Services
                 {
                     result.IsSuccess = true;
                     result.Message = "Record Fetch Successfully";
+                    result.TotalRecordCount = totalCount.Count();
                 }
                 else
                 {
@@ -49,6 +59,15 @@ namespace QuickCampus_Core.Services
                 return result;
             }
 
+            var totalCountWithClientId = result.Data = _context.Questions.Where(x => x.IsDeleted == false && x.ClentId == clientid).Select(x => new QuestionViewModelAdmin()
+            {
+                QuestionId = x.QuestionId,
+                QuestionTypeName = x.QuestionType.QuestionType1,
+                QuestionSection = x.Section.Section1,
+                QuestionGroup = x.Group.GroupName,
+                Question = x.Text,
+                IsActive = x.IsActive ?? false
+            }).ToList();
             result.Data = _context.Questions.Where(x => x.IsDeleted == false && x.ClentId == clientid).Select(x => new QuestionViewModelAdmin()
             {
                 QuestionId = x.QuestionId,
@@ -63,6 +82,7 @@ namespace QuickCampus_Core.Services
             {
                 result.IsSuccess = true;
                 result.Message = "Record Fatch Successfully";
+                result.TotalRecordCount = totalCountWithClientId.Count();
             }
             else
             {
