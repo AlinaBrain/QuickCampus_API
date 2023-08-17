@@ -62,7 +62,7 @@ namespace QuickCampus_Core.ViewModel
         public string? ContectEmail { get; set; }
         public int? ModifiedBy { get; set; }
 
-        public DateTime? ModifiedDate { get; set; } = (DateTime?)null; 
+        public DateTime? ModifiedDate { get; set; } 
         public bool? IsDeleted { get; set; }
         public int? ClientId { get; set; }
 

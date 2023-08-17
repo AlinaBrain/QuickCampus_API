@@ -1,5 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Ini;
+using Microsoft.Extensions.Hosting.Internal;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
@@ -10,10 +14,17 @@ namespace QuickCampus_Core.Services
 {
     public class QuestionService : IQuestion
     {
+        private readonly IConfiguration _config;
         private readonly QuikCampusDevContext _context;
-        public QuestionService(QuikCampusDevContext context)
+        private readonly Microsoft.AspNetCore.Hosting.IHostingEnvironment _hostingEnvironment;
+        private readonly string basepath;
+        private string baseUrl;
+        public QuestionService(QuikCampusDevContext context, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, IConfiguration config)
         {
+            _config = config;
             _context = context;
+            _hostingEnvironment = hostingEnvironment;
+            baseUrl = _config.GetSection("APISitePath").Value;
         }
         public async Task<IGeneralResult<List<QuestionViewModelAdmin>>> GetAllQuestion(int clientid, bool issuperadmin, int pageStart, int pageSize)
         {
@@ -645,6 +656,37 @@ namespace QuickCampus_Core.Services
             }
             return res;
         }
-      
+
+
+
+
+
+
+        public List<string> ProcessUploadFile(List<IFormFile> Files)
+        {
+            List<string> url = new List<string>();
+            if (Files.Count > 0)
+            {
+                foreach (IFormFile file in Files)
+                {
+                    string uniqueFileName = null;
+                    string photoUpload = Path.Combine(_hostingEnvironment.WebRootPath, "UploadFiles");
+                    uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileName;
+                    string filepath = Path.Combine(photoUpload, uniqueFileName);
+                    using (var filename = new FileStream(filepath, FileMode.Create))
+                    {
+                        file.CopyTo(filename);
+                    }
+                    url.Add(Path.Combine(basepath, uniqueFileName));
+                }
+                return url;
+            }
+            else
+            {
+                url.Add("Please add atleast one file.");
+                return url;
+            }
+        }
+
     }
 }

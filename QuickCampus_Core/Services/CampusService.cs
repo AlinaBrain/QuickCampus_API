@@ -166,6 +166,7 @@ namespace QuickCampus_Core.Services
                 {
                     result.IsSuccess = true;
                     result.Message = "Record Saved Successfully";
+                    
                 }
                 else
                 {

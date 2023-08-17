@@ -38,7 +38,7 @@ namespace QuickCampus_Core.ViewModel
         public string? Title { get; private set; }
         public object Colleges { get; private set; }
         public object StateId { get; private set; }
-        public int WalkInId { get; set; }
+        
         public int CountryId { get; set; }
 
        
@@ -102,11 +102,11 @@ namespace QuickCampus_Core.ViewModel
         public string? CollegeName { get; set; }
 
         [Required(ErrorMessage = "Time is required.")]
-        [DisplayFormat(DataFormatString = "hh:mm tt")]
+        
         public string? ExamStartTime { get; set; }
 
         [Required(ErrorMessage = "Time is required.")]
-        [DisplayFormat(DataFormatString = "hh:mm tt")]
+       
         public string? ExamEndTime { get; set; }
 
         [Required(ErrorMessage = "Time is required.")]

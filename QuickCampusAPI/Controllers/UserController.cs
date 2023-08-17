@@ -234,7 +234,7 @@ namespace QuickCampusAPI.Controllers
                     return Ok(result);
                 }
             }
-            var res = userRepo.DeleteRole(isDeleted, id, cid, isSuperAdmin);
+            var res = await userRepo.DeleteRole(isDeleted, id, cid, isSuperAdmin);
             return Ok(res);
         }
 

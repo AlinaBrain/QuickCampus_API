@@ -73,7 +73,7 @@ namespace QuickCampusAPI.Controllers
                     collegeList = (List<College>)(await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).Skip(pageStart).Take(pageSize).OrderByDescending(x=>x.CollegeId).ToList();
                 }
 
-                var response = collegeList.Select(x => (CollegeVM)x).ToList();
+                var response = collegeList.Select(x => (CollegeVM)x).OrderByDescending(x => x.CollegeId).ToList();
 
                 
                 if (collegeList.Count > 0)
@@ -195,6 +195,7 @@ namespace QuickCampusAPI.Controllers
                                 ContectEmail = vm.ContectEmail.Trim(),
                                 ContectPhone = vm.ContectPhone.Trim(),
                                 ClientId = cid,
+
                             };
                             try
                             {
@@ -225,7 +226,7 @@ namespace QuickCampusAPI.Controllers
         [Route("EditCollege")]
         public async Task<IActionResult> EditCollege([FromForm] CollegeLogoVm vm, int clientid)
         {
-            IGeneralResult<CollegeVM> result = new GeneralResult<CollegeVM>();
+            IGeneralResult<CollegeLogoVm> result = new GeneralResult<CollegeLogoVm>();
             var _jwtSecretKey = _config["Jwt:Key"];
             var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
 
@@ -319,7 +320,7 @@ namespace QuickCampusAPI.Controllers
 
                         try
                         {
-                            result.Data = (CollegeVM)await _collegeRepo.Update(clg);
+                            result.Data = (CollegeLogoVm)await _collegeRepo.Update(clg);
                             result.Message = "College updated successfully";
                             result.IsSuccess = true;
                         }
@@ -363,7 +364,7 @@ namespace QuickCampusAPI.Controllers
                     return Ok(result);
                 }
             }
-            var res = _collegeRepo.DeleteCollege(isDeleted, id, cid, isSuperAdmin);
+            var res =await _collegeRepo.DeleteCollege(isDeleted, id, cid, isSuperAdmin);
             return Ok(res);
         }
 

@@ -327,7 +327,7 @@ namespace QuickCampusAPI.Controllers
                     return Ok(result);
                 }
             }
-            var res = _applicantRepo.DeleteApplicant(isDeleted, applicantId, cid, isSuperAdmin);
+            var res = await _applicantRepo.DeleteApplicant(isDeleted, applicantId, cid, isSuperAdmin);
             return Ok(res);
         }
 

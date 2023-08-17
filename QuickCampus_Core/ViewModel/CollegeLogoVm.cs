@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using QuickCampus_DAL.Context;
 using System.ComponentModel.DataAnnotations;
 
@@ -7,7 +6,26 @@ namespace QuickCampus_Core.ViewModel
 {
     public class CollegeLogoVm
     {
-      
+        public static explicit operator CollegeLogoVm(College items)
+        {
+            return new CollegeLogoVm
+            {
+                CollegeId = items.CollegeId,
+                CollegeName = items.CollegeName,
+                Address1 = items.Address2,
+                Logo = items.Logo,
+                Address2 = items.Address2,
+                City = items.City,
+                StateId = items.StateId,
+                CountryId = items.CountryId,
+                CollegeCode = items.CollegeCode,
+                ContectPerson = items.ContectPerson,
+                ContectPhone = items.ContectPhone,
+                ContectEmail = items.ContectEmail,
+                ClientId = items.ClientId,            
+            };
+        }
+
         public IFormFile? ImagePath { get; set; }=null;
         public int CollegeId { get; set; }
         [Required(ErrorMessage = "College Name is required.")]
@@ -35,34 +53,9 @@ namespace QuickCampus_Core.ViewModel
         public string? ContectEmail { get; set; }
         public int? ModifiedBy { get; set; }
 
-        public DateTime? ModifiedDate { get; set; } = null;
+        public DateTime? ModifiedDate { get; set; } 
         public bool? IsDeleted { get; set; }
         public int? ClientId { get; set; }
 
-        // public IFormFile file { get; set; }
-        public College ToCollegeDbModel()
-        {
-            return new College
-            {
-                CollegeName = CollegeName,
-                Logo = Logo,
-                Address1 = Address2,
-                Address2 = Address2,
-                City = City,
-                StateId = StateId,
-                CountryId = CountryId,
-                CollegeCode = CollegeCode,
-                ContectPerson = ContectPerson,
-                ContectPhone = ContectPhone,
-                ContectEmail = ContectEmail,
-                IsActive = true,
-                IsDeleted = false,
-                CreatedBy = CreatedBy,
-                CreatedDate = DateTime.UtcNow,
-                ModifiedBy = ModifiedBy,
-                ModifiedDate = CollegeId > 0 ? DateTime.UtcNow : null,
-                ClientId = ClientId,
-            };
-        }
     }
 }
