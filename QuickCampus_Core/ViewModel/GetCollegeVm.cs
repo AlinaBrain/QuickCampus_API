@@ -1,14 +1,18 @@
-﻿using Microsoft.AspNetCore.Http;
-using QuickCampus_DAL.Context;
+﻿using QuickCampus_DAL.Context;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace QuickCampus_Core.ViewModel
 {
-    public class CollegeLogoVm
+    public class GetCollegeVm
     {
-        public static explicit operator CollegeLogoVm(College items)
+        public static explicit operator GetCollegeVm(College items)
         {
-            return new CollegeLogoVm
+            return new GetCollegeVm
             {
                 CollegeId = items.CollegeId,
                 CollegeName = items.CollegeName,
@@ -22,32 +26,38 @@ namespace QuickCampus_Core.ViewModel
                 ContectPerson = items.ContectPerson,
                 ContectPhone = items.ContectPhone,
                 ContectEmail = items.ContectEmail,
+                ModifiedBy = items.ModifiedBy,
                 ClientId = items.ClientId,
-                ModifiedDate = items.ModifiedDate,
-               CreatedBy = items.CreatedBy,
-               ModifiedBy = items.ModifiedBy,
-               CreatedDate = items.CreatedDate
+                IsActive = items.IsActive,
+                IsDeleted = items.IsDeleted,
+                CreatedBy = items.CreatedBy
+
             };
         }
 
-        public IFormFile? ImagePath { get; set; }=null;
+
+
+
         public int CollegeId { get; set; }
         [Required(ErrorMessage = "College Name is required.")]
         public string? CollegeName { get; set; }
         public string? Logo { get; set; }
         [Required(ErrorMessage = "Address1 is required.")]
         public string? Address1 { get; set; }
+        [Required(ErrorMessage = "Address2 is required.")]
         public string? Address2 { get; set; }
         [Required(ErrorMessage = "City is required.")]
         public string? City { get; set; }
-        [Required(ErrorMessage = "State is required.")]
+        [Required(ErrorMessage = "StateId is required.")]
         public int? StateId { get; set; }
         [Required(ErrorMessage = "Country is required.")]
         public int? CountryId { get; set; }
-        public bool IsActive { get; set; }
-        public DateTime? CreatedDate { get; set; }
+        public bool? IsActive { get; set; }
+      
         public int? CreatedBy { get; set; }
+        [Required(ErrorMessage = "CollegeCode is required.")]
         public string? CollegeCode { get; set; }
+        [EmailAddress(ErrorMessage = "Enter a valid contact person email.")]
         public string? ContectPerson { get; set; }
 
         [RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Not a valid phone number.")]
@@ -57,9 +67,13 @@ namespace QuickCampus_Core.ViewModel
         public string? ContectEmail { get; set; }
         public int? ModifiedBy { get; set; }
 
-        public DateTime? ModifiedDate { get; set; } 
+       
         public bool? IsDeleted { get; set; }
         public int? ClientId { get; set; }
 
     }
+
+
+
+
 }

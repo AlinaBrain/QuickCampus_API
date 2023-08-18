@@ -278,11 +278,11 @@ namespace QuickCampus_Core.Services
             WalkIn campus = new WalkIn();
             if (isSuperAdmin)
             {
-                campus = _context.WalkIns.Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).Where(x => x.WalkInId == id && x.IsActive == true && x.IsDeleted == false && (clientId==0?true:x.ClientId==clientId)).FirstOrDefault();
+                campus = _context.WalkIns.Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).Where(x => x.WalkInId == id && x.IsActive == true && x.IsDeleted == false && (clientId==0?true:x.ClientId==clientId)).OrderByDescending(x=>x.WalkInId).FirstOrDefault();
             }
             else
             {
-                campus = _context.WalkIns.Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).Where(x => x.WalkInId == id && x.IsActive == true && x.IsDeleted == false && x.ClientId == clientId).FirstOrDefault();
+                campus = _context.WalkIns.Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).Where(x => x.WalkInId == id && x.IsActive == true && x.IsDeleted == false && x.ClientId == clientId).OrderByDescending(x => x.WalkInId).FirstOrDefault();
             }
             if (campus == null)
             {

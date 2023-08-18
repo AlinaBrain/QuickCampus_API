@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace QuickCampus_Core.ViewModel
 {
-    internal class CollegeCountryStateVm
+    public class CollegeCountryStateVm
     {
     }
 }

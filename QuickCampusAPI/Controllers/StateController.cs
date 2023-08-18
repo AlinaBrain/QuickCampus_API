@@ -161,11 +161,11 @@ namespace QuickCampusAPI.Controllers
             {
                 result.Data = (StateVM)res;
                 result.IsSuccess = true;
-                result.Message = "College details getting succesfully";
+                result.Message = "State details getting succesfully";
             }
             else
             {
-                result.Message = "College does Not exist";
+                result.Message = "State does Not exist";
             }
             return Ok(result);
         }

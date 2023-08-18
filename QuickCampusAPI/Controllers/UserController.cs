@@ -191,7 +191,7 @@ namespace QuickCampusAPI.Controllers
                 if (response.Count() > 0)
                 {
                     result.IsSuccess = true;
-                    result.Message = "College get successfully";
+                    result.Message = "User get successfully";
                     result.Data = response;
                     result.TotalRecordCount = response.Count;
                 }

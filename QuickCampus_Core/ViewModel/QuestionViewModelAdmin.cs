@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -32,6 +33,7 @@ namespace QuickCampus_Core.ViewModel
         public List<OptionViewModelAdmin> options { get; set; }
       
         public int ClientId { get; set; }
+
     }
     public class OptionViewModelAdmin
     {
@@ -44,6 +46,7 @@ namespace QuickCampus_Core.ViewModel
         //[AllowHtml]
         public string OptionText { get; set; }
         public string OptionImage { get; set; }
+        
         public bool IsCorrect { get; set; }
         public bool IsNew { get; set; }
 

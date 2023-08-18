@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using QuickCampus_DAL.Context;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace QuickCampus_Core.ViewModel
@@ -86,7 +87,7 @@ namespace QuickCampus_Core.ViewModel
                 CreatedBy = CreatedBy,
                 CreatedDate = DateTime.UtcNow,
                 ModifiedBy = ModifiedBy,
-                ModifiedDate = CollegeId > 0 ? DateTime.UtcNow : null,
+                ModifiedDate = DateTime.UtcNow,
                 ClientId = ClientId,
 
             };

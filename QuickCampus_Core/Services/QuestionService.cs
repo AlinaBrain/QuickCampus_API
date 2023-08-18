@@ -512,7 +512,7 @@ namespace QuickCampus_Core.Services
                     QuestionId = question.QuestionId,
                     OptionText = item.OptionText,
                     IsCorrect = item.IsCorrect,
-                    OptionImage = fileName,
+                    OptionImage =   fileName,
                     Image = file
                 };
                 question.QuestionOptions.Add(questionoption);
@@ -656,11 +656,6 @@ namespace QuickCampus_Core.Services
             }
             return res;
         }
-
-
-
-
-
 
         public List<string> ProcessUploadFile(List<IFormFile> Files)
         {

@@ -68,7 +68,7 @@ namespace QuickCampus_Core.Services
                 }
 
                 response.IsSuccess = true;
-                response.Message = "Login Successuflly";
+                response.Message = "Login Successfully";
                 List<string> record = new List<string>();
                 record = uRoles.Select(s => s.RoleName).ToList();
                 response.Data.Token = GenerateToken(adminLogin, record, re.ClientId == null ? 0 : re.ClientId, re.Id,response.Data.IsSuperAdmin);

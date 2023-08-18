@@ -41,7 +41,7 @@ namespace QuickCampusAPI.Controllers
         [Route("GetAllCollege")]
         public async Task<IActionResult> GetAllCollege(int clientid,int pageStart=0,int pageSize=10)
         {
-            IGeneralResult<List<CollegeVM>> result = new GeneralResult<List<CollegeVM>>();
+            IGeneralResult<List<GetCollegeVm>> result = new GeneralResult<List<GetCollegeVm>>();
             var _jwtSecretKey = _config["Jwt:Key"];
 
             int cid = 0;
@@ -73,7 +73,7 @@ namespace QuickCampusAPI.Controllers
                     collegeList = (List<College>)(await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).Skip(pageStart).Take(pageSize).OrderByDescending(x=>x.CollegeId).ToList();
                 }
 
-                var response = collegeList.Select(x => (CollegeVM)x).OrderByDescending(x => x.CollegeId).ToList();
+                var response = collegeList.Select(x => (GetCollegeVm)x).OrderByDescending(x => x.CollegeId).ToList();
 
                 
                 if (collegeList.Count > 0)
@@ -102,7 +102,7 @@ namespace QuickCampusAPI.Controllers
         [Route("GetCollegeDetailsById")]
         public async Task<IActionResult> GetCollegeDetailsById(int Id, int clientid)
         {
-            IGeneralResult<CollegeVM> result = new GeneralResult<CollegeVM>();
+            IGeneralResult<GetCollegeVm> result = new GeneralResult<GetCollegeVm>();
             var _jwtSecretKey = _config["Jwt:Key"];
             int cid = 0;
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
@@ -119,7 +119,7 @@ namespace QuickCampusAPI.Controllers
             var res = await _collegeRepo.GetById(Id);
             if (res.IsDeleted == false && res.IsActive == true)
             {
-                result.Data = (CollegeVM)res;
+                result.Data = (GetCollegeVm)res;
                 result.IsSuccess = true;
                 result.Message = "College details getting succesfully";
             }
@@ -299,7 +299,7 @@ namespace QuickCampusAPI.Controllers
                 else
                 {
                     
-                    if (ModelState.IsValid && vm.CollegeId > 0 && clg.IsDeleted == false)
+                    if (ModelState.IsValid && vm.CollegeId > 0)
                     {
                        
                         clg.CollegeId = vm.CollegeId;
@@ -433,7 +433,8 @@ namespace QuickCampusAPI.Controllers
             return statevm;
         }
         [HttpPost]
-        public List<string> ProcessUploadFile(List<IFormFile> Files)
+        [Route("ProcessUploadFile")]
+        public List<string>ProcessUploadFile(List<IFormFile> Files)
         {
             List<string> url = new List<string>();
             if (Files.Count > 0)

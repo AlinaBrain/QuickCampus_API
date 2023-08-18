@@ -157,7 +157,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "AddOrUpdateQuestion")]
         [HttpPost]
         [Route("addorupdatequestion")]
-        public async Task<ActionResult> AddOrUpdateQuestion(QuestionViewModelAdmin model, int clientid )
+        public async Task<ActionResult> AddOrUpdateQuestion( QuestionViewModelAdmin model, int clientid )
         {
             int cid = 0;
             var _jwtSecretKey = _config["Jwt:Key"];
