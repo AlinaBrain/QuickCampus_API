@@ -41,7 +41,7 @@ namespace QuickCampusAPI.Controllers
         [Route("GetAllCollege")]
         public async Task<IActionResult> GetAllCollege(int clientid,int pageStart=0,int pageSize=10)
         {
-            IGeneralResult<List<GetCollegeVm>> result = new GeneralResult<List<GetCollegeVm>>();
+            IGeneralResult<List<CollegeCountryStateVm>> result = new GeneralResult<List<CollegeCountryStateVm>>();
             var _jwtSecretKey = _config["Jwt:Key"];
 
             int cid = 0;
@@ -72,10 +72,8 @@ namespace QuickCampusAPI.Controllers
                     collegeListCount = (await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).Count();
                     collegeList = (List<College>)(await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).Skip(pageStart).Take(pageSize).OrderByDescending(x=>x.CollegeId).ToList();
                 }
+                var response = collegeList.Select(x => (CollegeCountryStateVm)x).OrderByDescending(x => x.CollegeId).ToList();
 
-                var response = collegeList.Select(x => (GetCollegeVm)x).OrderByDescending(x => x.CollegeId).ToList();
-
-                
                 if (collegeList.Count > 0)
                 {
                     result.IsSuccess = true;
@@ -102,7 +100,7 @@ namespace QuickCampusAPI.Controllers
         [Route("GetCollegeDetailsById")]
         public async Task<IActionResult> GetCollegeDetailsById(int Id, int clientid)
         {
-            IGeneralResult<GetCollegeVm> result = new GeneralResult<GetCollegeVm>();
+            IGeneralResult<CollegeCountryStateVm> result = new GeneralResult<CollegeCountryStateVm>();
             var _jwtSecretKey = _config["Jwt:Key"];
             int cid = 0;
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
@@ -116,10 +114,12 @@ namespace QuickCampusAPI.Controllers
                 cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
             }
 
+
             var res = await _collegeRepo.GetById(Id);
+ 
             if (res.IsDeleted == false && res.IsActive == true)
             {
-                result.Data = (GetCollegeVm)res;
+                result.Data = (CollegeCountryStateVm)res;
                 result.IsSuccess = true;
                 result.Message = "College details getting succesfully";
             }
@@ -169,11 +169,8 @@ namespace QuickCampusAPI.Controllers
                     {
                         result.Message = "Contact Email is Already Exist";
                     }
-                    bool iscontactperson = _collegeRepo.Any(x => x.ContectPerson == vm.ContectPerson && x.IsDeleted == false);
-                    if (iscontactperson)
-                    {
-                        result.Message = "Contact Person is Already Exist";
-                    }
+                    
+                    
                     else
                     {
                         var Countrylist = await _countryRepo.GetAll(x => x.CountryId == vm.CountryId);
@@ -459,6 +456,7 @@ namespace QuickCampusAPI.Controllers
                 return url;
             }
         }
+
         [Authorize(Roles = "GetAllActiveCollege")]
         [HttpGet]
         [Route("GetAllActiveCollege")]

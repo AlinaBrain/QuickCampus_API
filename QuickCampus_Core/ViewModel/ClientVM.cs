@@ -140,7 +140,7 @@ namespace QuickCampus_Core.ViewModel
                   .Cascade(CascadeMode.StopOnFirstFailure)
                   .NotNull().WithMessage("Password could not be null")
                   .NotEmpty().WithMessage("Password could not be empty")
-                  .Length(4, 50).WithMessage("Password lengh could not be greater than 500");
+                  .Length(4, 50).WithMessage("Password length could not be greater than 4 Character");
             }
         }
 

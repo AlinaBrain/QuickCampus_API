@@ -240,9 +240,9 @@ namespace QuickCampusAPI.Controllers
                         applicant.IntermediatePercentage = vm.MatricPercentage;
                         applicant.ClientId = cid;
                         applicant.HigestQualificationPercentage = vm.HigestQualificationPercentage;
-                        applicant.Skills = vm.Skills;
+                        applicant.Skills = vm.Skills.Trim();
                         applicant.MatricPercentage = vm.MatricPercentage;
-                        applicant.PhoneNumber = vm.PhoneNumber;
+                        applicant.PhoneNumber = vm.PhoneNumber.Trim();
                         applicant.StatusId = (int)(StatusEnum)vm.StatusId;
                         applicant.AssignedToCompany =(int)(CompanyEnum)vm.AssignedToCompany;
                         applicant.CollegeId = vm.CollegeId;

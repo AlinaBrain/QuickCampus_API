@@ -158,7 +158,7 @@ namespace QuickCampus_Core.Services
                 result.Message = "something went wrong";
                 return result;
             }
-            return result;
+           
         }
 
 

@@ -5,7 +5,7 @@ namespace QuickCampus_DAL.Context;
 
 public partial class State
 {
-    public int StateId { get; set; }
+    public int? StateId { get; set; }
 
     public string? StateName { get; set; }
 

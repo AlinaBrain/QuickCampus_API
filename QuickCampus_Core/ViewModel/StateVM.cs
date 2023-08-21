@@ -21,7 +21,7 @@ namespace QuickCampus_Core.ViewModel
                 ClientId = items.ClientId,
             };
         }
-        public int StateId { get; set; }
+        public int? StateId { get; set; }
 
         public string? StateName { get; set; }
 
