@@ -189,11 +189,11 @@ namespace QuickCampusAPI.Controllers
 
                 if (isSuperAdmin)
                 {
-                    applicant = (await _applicantRepo.GetAll()).Where(w => w.IsDeleted == false && w.IsActive == true && cid == 0 ? true : w.ClientId == cid).FirstOrDefault();
+                    applicant = (await _applicantRepo.GetAll()).Where(w => w.IsDeleted == false && w.IsActive == true && cid == 0 ? true : w.ClientId == cid && w.ApplicantId==vm.ApplicantID).FirstOrDefault();
                 }
                 else
                 {
-                    applicant = (await _applicantRepo.GetAll()).Where(w => w.IsDeleted == false && w.IsActive == true && w.ClientId == cid).FirstOrDefault();
+                    applicant = (await _applicantRepo.GetAll()).Where(w => w.IsDeleted == false && w.IsActive == true && w.ClientId == cid && w.ApplicantId == vm.ApplicantID).FirstOrDefault();
                 }
                 if (applicant == null)
                 {

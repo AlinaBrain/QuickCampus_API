@@ -549,6 +549,7 @@ namespace QuickCampus_Core.Services
                 allSections = _context.Sections.Where(x => (model.ClientId == 0 ? true : x.ClentId == model.ClientId)).ToList();
                 allGroups = _context.Groupdls.Where(x => (model.ClientId == 0 ? true : x.ClentId == model.ClientId)).ToList();
                 question = _context.Questions.Include(x => x.QuestionOptions).FirstOrDefault(x => x.QuestionId == model.QuestionId && x.IsDeleted == false && (model.ClientId == 0 ? true : x.ClentId == model.ClientId));
+
             }
             else
             {
