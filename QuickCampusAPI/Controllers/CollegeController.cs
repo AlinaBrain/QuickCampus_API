@@ -158,19 +158,21 @@ namespace QuickCampusAPI.Controllers
                     if (isExits)
                     {
                         result.Message = " CollegeName is already exists";
+                        return Ok(result);
                     }
                     bool isexist = _collegeRepo.Any(x => x.CollegeCode == vm.CollegeCode && x.IsDeleted == false);
                     if (isexist)
                     {
                         result.Message = "CollegeCode is alredy exist";
+                        return Ok(result);
                     }
                     bool iscontactemail = _collegeRepo.Any(x => x.ContectEmail == vm.ContectEmail && x.IsDeleted == false);
                     if (iscontactemail)
                     {
                         result.Message = "Contact Email is Already Exist";
+                        return Ok(result);
                     }
-                    
-                    
+
                     else
                     {
                         var Countrylist = await _countryRepo.GetAll(x => x.CountryId == vm.CountryId);
@@ -178,6 +180,7 @@ namespace QuickCampusAPI.Controllers
                           
                             CollegeVM college = new CollegeVM
                             {
+
                                 CollegeName = vm.CollegeName.Trim(),
                                 Logo = ProcessUploadFile(vm),
                                 Address1 = vm.Address1.Trim(),
