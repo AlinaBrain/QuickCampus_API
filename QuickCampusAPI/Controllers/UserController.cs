@@ -151,11 +151,18 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "UserList")]
         [HttpGet]
         [Route("UserList")]
-        public async Task<IActionResult> UserList(int clientid, int pageStart=0, int pageSize=10)
+        public async Task<IActionResult> UserList(int clientid, int pageStart=1, int pageSize=10)
         {
 
             IGeneralResult<List<UserResponseVm>> result = new GeneralResult<List<UserResponseVm>>();
             var _jwtSecretKey = config["Jwt:Key"];
+            if (pageStart > 0)
+            {
+                var startPage = 1;
+                pageStart = (pageStart - startPage) * pageSize;
+                pageSize = pageSize * pageStart;
+            }
+          
 
             int cid = 0;
             var jwtSecretKey = config["Jwt:Key"];
