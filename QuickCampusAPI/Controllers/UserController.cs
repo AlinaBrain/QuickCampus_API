@@ -156,10 +156,11 @@ namespace QuickCampusAPI.Controllers
 
             IGeneralResult<List<UserResponseVm>> result = new GeneralResult<List<UserResponseVm>>();
             var _jwtSecretKey = config["Jwt:Key"];
+            var newPageStart = 1;
             if (pageStart > 0)
             {
                 var startPage = 1;
-                pageStart = (pageStart - startPage) * pageSize;
+                newPageStart = (pageStart - startPage) * pageSize;
                 pageSize = pageSize * pageStart;
             }
           
@@ -183,7 +184,7 @@ namespace QuickCampusAPI.Controllers
                 if (isSuperAdmin)
                 {
                     var clientListCount = (await userRepo.GetAll()).Where(x => x.IsActive == true && (cid == 0 ? true : x.Id == cid)).Count();
-                    collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete != true && (cid == 0 ? true : x.ClientId == cid)).OrderByDescending(o => o.Id).Skip(pageStart).Take(pageSize).ToList();
+                    collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete != true && (cid == 0 ? true : x.ClientId == cid)).OrderByDescending(o => o.Id).Skip(pageStart>0? newPageStart:pageStart).Take(pageSize).ToList();
 
                 }
                 else
