@@ -105,19 +105,19 @@ namespace QuickCampusAPI.Controllers
                 cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
             }
 
-            if (_applicantRepo.Any(x => x.EmailAddress == vm.EmailAddress && x.IsActive == true && x.IsDeleted == false))
+            if (_applicantRepo.Any(x => x.EmailAddress == vm.EmailAddress && x.IsActive == true && x.IsDeleted == false && x.ApplicantId==vm.ApplicantID))
             {
                 result.Message = "Email Address Already Registered!";
                 return Ok(result);
             }
-            bool isExits = _applicantRepo.Any(x => x.FirstName == vm.FirstName && x.IsDeleted == false);
+            bool isExits = _applicantRepo.Any(x => x.FirstName == vm.FirstName && x.IsDeleted == false && x.ApplicantId == vm.ApplicantID);
             if (isExits)
             {
                 result.Message = " FirstName is already exists";
                 return Ok(result);
             }
 
-            bool isphonenumberexist = _applicantRepo.Any(x => x.PhoneNumber == vm.PhoneNumber && x.IsDeleted == false);
+            bool isphonenumberexist = _applicantRepo.Any(x => x.PhoneNumber == vm.PhoneNumber && x.IsDeleted == false && x.ApplicantId == vm.ApplicantID);
             if (isphonenumberexist)
             {
                 result.Message = "Phone Number  is Already Exist";
