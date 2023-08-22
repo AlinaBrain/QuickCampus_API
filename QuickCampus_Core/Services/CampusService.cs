@@ -361,6 +361,185 @@ namespace QuickCampus_Core.Services
         }
 
 
+        public async Task<IGeneralResult<string>> UpdateCampus(CampusGridRequestVM vm, int clientId, int userId)
+        {
+            IGeneralResult<string> result = new GeneralResult<string>();
+
+            var isCountryExist = _context.Countries.Where(w => w.IsDeleted == false).Any(a => a.CountryId == vm.CountryID);
+            var allCollages = _context.Colleges.Where(s => s.IsDeleted == false).Select(s => s.CollegeId).ToList();
+            var allStates = _context.States.Where(w => w.IsDeleted == false).Select(s => s.StateId).ToList();
+            var isStateExist = allStates.Any(a => a == vm.StateID);
+            bool isExits = _context.WalkIns.Any(x => x.Title == vm.Title && x.IsDeleted == false);
+            if (isExits)
+            {
+                result.Message = " Title is already exists";
+                return result;
+            }
+
+            foreach (var clg in vm.Colleges)
+            {
+                var checkclg = allCollages.Any(s => s == clg.CollegeId);
+                if (!checkclg)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "College id " + clg.CollegeId + " is not exist";
+                    return result;
+                }
+                var checkstate = allStates.Any(s => s == clg.StateId);
+                if (!checkstate)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "state id " + clg.StateId + " is not exist";
+                    return result;
+                }
+            }
+
+            if (!isCountryExist)
+            {
+                result.IsSuccess = false;
+                result.Message = "Country is not exist";
+                return result;
+            }
+            else if (!isStateExist)
+            {
+                result.IsSuccess = false;
+                result.Message = "State is not exist";
+                return result;
+            }
+
+            try
+            {
+                if (vm.WalkInID > 0)
+                {
+                    WalkIn campus = _context.WalkIns.Where(x => x.WalkInId == vm.WalkInID && (clientId == 0 ? true : x.ClientId == clientId)).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
+                    if (campus != null)
+                    {
+                        campus.WalkInId = vm.WalkInID;
+                        campus.WalkInDate = vm.WalkInDate;
+                        campus.JobDescription = vm.JobDescription;
+                        campus.Address1 = vm.Address1;
+                        campus.Address2 = vm.Address2;
+                        campus.City = vm.City;
+                        campus.StateId = vm.StateID;
+                        campus.CountryId = vm.CountryID;
+                        campus.Title = vm.Title;
+                        campus.CreatedDate = DateTime.Now;
+                        _context.Update(campus);
+
+                        if (campus.CampusWalkInColleges != null)
+                        {
+                            _context.CampusWalkInColleges.RemoveRange(campus.CampusWalkInColleges);
+                        }
+
+                        foreach (var rec in vm.Colleges)
+                        {
+                            if (rec.IsIncludeInWalkIn)
+                            {
+                                CampusWalkInCollege campusWalkInCollege = new CampusWalkInCollege()
+                                {
+                                    WalkInId = campus.WalkInId,
+                                    CollegeId = rec.CollegeId,
+                                    ExamStartTime = TimeSpan.Parse(rec.ExamStartTime),
+                                    ExamEndTime = TimeSpan.Parse(rec.ExamEndTime),
+                                    CollegeCode = rec.CollegeCode,
+                                    StartDateTime = rec.StartDateTime,
+                                    IsCompleted = null
+                                };
+                                _context.CampusWalkInColleges.Update(campusWalkInCollege);
+                            }
+                        }
+                    }
+                    var UpdateResult = _context.SaveChanges();
+                    if (UpdateResult > 0)
+                    {
+                        result.IsSuccess = true;
+                        result.Message = "Record Update Successfully";
+                    }
+                    else
+                    {
+                        result.IsSuccess = false;
+                        result.Message = "Something went wrong.";
+                    }
+                    return result;
+                }
+
+                var sv = new WalkIn()
+                {
+                    WalkInId=vm.WalkInID,
+                    WalkInDate = vm.WalkInDate,
+                    JobDescription = vm.JobDescription,
+                    Address1 = vm.Address1,
+                    Address2 = vm.Address2,
+                    City = vm.City,
+                    StateId = vm.StateID,
+                    CountryId = vm.CountryID,
+                    IsActive = true,
+                    IsDeleted = false,
+                    CreatedBy = userId,
+                    CreatedDate = DateTime.Now,
+                    Title = vm.Title,
+                    ClientId = clientId == 0 ? 0 : clientId
+                };
+                _context.WalkIns.Update(sv);
+                _context.SaveChanges();
+
+                foreach (var rec in vm.Colleges)
+                {
+                    if (rec.IsIncludeInWalkIn)
+                    {
+                        CampusWalkInCollege campusWalkInCollege = new CampusWalkInCollege()
+                        {
+                            WalkInId = sv.WalkInId,
+                            CollegeId = rec.CollegeId,
+                            ExamStartTime = TimeSpan.Parse(rec.ExamStartTime),
+                            ExamEndTime = TimeSpan.Parse(rec.ExamEndTime),
+                            CollegeCode = rec.CollegeCode,
+                            StartDateTime = rec.StartDateTime,
+                            IsCompleted = null
+                        };
+                        _context.CampusWalkInColleges.Update(campusWalkInCollege);
+                    }
+                }
+
+                int response = _context.SaveChanges();
+                if (response > 0)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Record Updated Successfully";
+
+                }
+                else
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Something went wrong.";
+                }
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = "Something went wrong";
+            }
+
+            return result;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         public async Task<IGeneralResult<CampusGridViewModel>> DeleteCampus(int id, int clientId, bool isDelete, bool isSuperAdmin)
         {
             IGeneralResult<CampusGridViewModel> result = new GeneralResult<CampusGridViewModel>();

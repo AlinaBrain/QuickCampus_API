@@ -296,12 +296,6 @@ namespace QuickCampusAPI.Controllers
                     result.Message = "Contact Email is Already Exist";
                     return Ok(result);
                 }
-                bool iscontactperson = _collegeRepo.Any(x => x.ContectPerson == vm.ContectPerson && x.IsDeleted == false && x.CollegeId != vm.CollegeId);
-                if (iscontactperson)
-                {
-                    result.Message = "Contact Person is Already Exist";
-                    return Ok(result);
-                }
                 else
                 {
                     

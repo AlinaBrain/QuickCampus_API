@@ -214,7 +214,7 @@ namespace QuickCampusAPI.Controllers
                     result.Message = " Applicant does Not Exist";
                     return Ok(result);
                 }
-                bool isExits = _applicantRepo.Any(x => x.FirstName == vm.FirstName && x.IsDeleted == false && x.ApplicantId==vm.ApplicantID);
+                bool isExits = _applicantRepo.Any(x => x.FirstName == vm.FirstName && x.IsDeleted == false && x.ApplicantId!=vm.ApplicantID);
                 if (isExits)
                 {
                     result.Message = " FirstName is already exists";
@@ -227,7 +227,7 @@ namespace QuickCampusAPI.Controllers
                 //    result.Message = "Phone Number  is Already Exist";
                 //    return Ok(result);
                 //}
-                bool isemailAddress = _applicantRepo.Any(x => x.EmailAddress == vm.EmailAddress && x.IsDeleted == false);
+                bool isemailAddress = _applicantRepo.Any(x => x.EmailAddress == vm.EmailAddress && x.IsDeleted == false && x.ApplicantId != vm.ApplicantID);
                 if (isemailAddress)
                 {
                     result.Message = "Email Address is Already Exist";

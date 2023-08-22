@@ -230,7 +230,7 @@ namespace QuickCampus_Core.ViewModel
                   .Cascade(CascadeMode.StopOnFirstFailure)
                   .NotNull().WithMessage("Skills could not be null")
                   .NotEmpty().WithMessage("Skills could not be empty")
-                  .Length(5, 100).WithMessage("Skills length could not be greater than 100");
+                  .Length(3, 200).WithMessage("Skills length 3 to 200 Characters");
 
                 RuleFor(x => x.Comment)
                   .Cascade(CascadeMode.StopOnFirstFailure)
@@ -241,7 +241,7 @@ namespace QuickCampus_Core.ViewModel
                  .Cascade(CascadeMode.StopOnFirstFailure)
                  .NotNull().WithMessage("FirstName could not be null")
                  .NotEmpty().WithMessage("FirstName could not be empty")
-                  .Length(5, 50).WithMessage("FirstName length could not be greater than 50");
+                  .Length(5, 50).WithMessage("FirstName length could 5 to 50 character");
 
                 RuleFor(x => x.LastName)
                  .Cascade(CascadeMode.StopOnFirstFailure)
