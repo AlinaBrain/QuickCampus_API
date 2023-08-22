@@ -151,11 +151,18 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "UserList")]
         [HttpGet]
         [Route("UserList")]
-        public async Task<IActionResult> UserList(int clientid, int pageStart=0, int pageSize=10)
+        public async Task<IActionResult> UserList(int clientid, int pageStart=1, int pageSize=10)
         {
 
             IGeneralResult<List<UserResponseVm>> result = new GeneralResult<List<UserResponseVm>>();
             var _jwtSecretKey = config["Jwt:Key"];
+            var newPageStart = 0;
+            if (pageStart > 0)
+            {
+                var startPage = 1;
+                newPageStart = (pageStart - startPage) * pageSize;
+            }
+          
 
             int cid = 0;
             var jwtSecretKey = config["Jwt:Key"];
@@ -172,17 +179,17 @@ namespace QuickCampusAPI.Controllers
             List<TblUser> collegeList = new List<TblUser>();
             try
             {
-
+                var clientListCount = 0;
                 if (isSuperAdmin)
                 {
-                    var clientListCount = (await userRepo.GetAll()).Where(x => x.IsActive == true && (cid == 0 ? true : x.Id == cid)).Count();
-                    collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete != true && (cid == 0 ? true : x.ClientId == cid)).OrderByDescending(o => o.Id).Skip(pageStart).Take(pageSize).ToList();
+                    clientListCount = (await userRepo.GetAll()).Where(x => x.IsDelete != true && (cid == 0 ? true : x.Id == cid)).Count();
+                    collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete == false && (cid == 0 ? true : x.ClientId == cid)).OrderByDescending(o => o.Id).Skip(newPageStart).Take(pageSize).ToList();
 
                 }
                 else
                 {
                     
-                    collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete != true && x.ClientId == cid).ToList();
+                    collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete != true && x.ClientId == cid).OrderByDescending(o => o.Id).Skip(newPageStart).Take(pageSize).ToList();
                 }
 
                 var response = collegeList.Select(x => (UserResponseVm)x).ToList();
@@ -193,7 +200,7 @@ namespace QuickCampusAPI.Controllers
                     result.IsSuccess = true;
                     result.Message = "User get successfully";
                     result.Data = response;
-                    result.TotalRecordCount = response.Count;
+                    result.TotalRecordCount = clientListCount;
                 }
                 else
                 {

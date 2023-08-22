@@ -30,14 +30,19 @@ namespace QuickCampusAPI.Controllers
         [HttpGet]
         [Route("ManageCampus")]
        
-        public async Task<IActionResult> ManageCampus(int clientid ,int pageStart=0,int pageSize = 10)
+        public async Task<IActionResult> ManageCampus(int clientid ,int pageStart=1,int pageSize = 10)
         {
             IGeneralResult<List<CampusGridViewModel>> result = new GeneralResult<List<CampusGridViewModel>>();
             var _jwtSecretKey = _config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             var isSuperAdmin  = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
             int getClientId = 0;
-            
+            var newPageStart = 0;
+            if (pageStart > 0)
+            {
+                var startPage = 1;
+                newPageStart = (pageStart - startPage) * pageSize;
+            }
             if (!isSuperAdmin && clientId=="0")
             {
                 result.Data = null;
@@ -53,7 +58,7 @@ namespace QuickCampusAPI.Controllers
             {
                 getClientId = string.IsNullOrEmpty(clientId)==true?0:Convert.ToInt32(clientId);
             }
-            var rec = await _campusrepo.GetAllCampus(getClientId,isSuperAdmin,pageStart,pageSize);
+            var rec = await _campusrepo.GetAllCampus(getClientId,isSuperAdmin,newPageStart,pageSize);
             var CampusListCount = (await _campusrepo.GetAll()).Where(x => x.IsActive == true && (getClientId == 0 ? true : x.ClientId == getClientId)).Count();
             var CampusList = rec.Where(x => x.WalkInID != null).ToList();
             var res = CampusList.Select(x => ((CampusGridViewModel)x)).ToList();
