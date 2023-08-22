@@ -100,6 +100,42 @@ namespace QuickCampusAPI.Controllers
             var response = await _campusrepo.AddCampus(dto, clientId, string.IsNullOrEmpty(userId)?0:Convert.ToInt32(userId));
             return Ok(response);
         }
+        [Authorize(Roles = "UpdateCampus")]
+        [HttpPost]
+        [Route("UpdateCampus")]
+        public async Task<IActionResult> UpdateCampus(CampusGridRequestVM dto, int clientid)
+        {
+            int clientId = 0;
+            var _jwtSecretKey = _config["Jwt:Key"];
+            var cId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
+
+            if (isSuperAdmin)
+            {
+                clientId = clientid;
+            }
+            else
+            {
+                clientId = string.IsNullOrEmpty(cId) ? 0 : Convert.ToInt32(cId);
+            }
+            var response = await _campusrepo.UpdateCampus(dto, clientId, string.IsNullOrEmpty(userId) ? 0 : Convert.ToInt32(userId));
+            return Ok(response);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         [Authorize(Roles = "GetCampusByCampusId")]
         [HttpGet]
@@ -164,6 +200,7 @@ namespace QuickCampusAPI.Controllers
             var res = await _campusrepo.UpdateCampusStatus(campusId, cid,status, isSuperAdmin);
             return Ok(res);
         }
+
 
         [Authorize(Roles = "DeleteCampus")]
         [HttpGet]

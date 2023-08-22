@@ -77,51 +77,51 @@ namespace QuickCampus_Core.Services
 
         }
 
-        public ApplicantGridViewModel UpdateApplicant(ApplicantGridViewModel model)
-        {
+        //public ApplicantGridViewModel UpdateApplicant(ApplicantGridViewModel model)
+        //{
            
-                Applicant applicant = dbContext.Applicants.Where(x => x.ApplicantId == model.ApplicantID).FirstOrDefault();
-                if (applicant != null)
-                {
+        //        Applicant applicant = dbContext.Applicants.Where(x => x.ApplicantId == model.ApplicantID).FirstOrDefault();
+        //        if (applicant != null)
+        //        {
                    
-                    applicant.FirstName = model.FirstName;
-                    applicant.LastName = model.LastName;
-                    applicant.EmailAddress = model.EmailAddress;
-                    applicant.PhoneNumber = model.PhoneNumber;
-                    applicant.HigestQualification = model.HigestQualification;
-                    applicant.HigestQualificationPercentage = model.HigestQualificationPercentage;
-                    applicant.MatricPercentage = model.MatricPercentage;
-                    applicant.IntermediatePercentage = model.IntermediatePercentage;
-                    applicant.Skills = model.Skills;
-                    applicant.StatusId = model.StatusID;
-                    applicant.Comment = model.Comment;
-                    if (model.CompanyId > 0)
-                    {
-                        applicant.AssignedToCompany = model.CompanyId;
-                    }
-                }
-                var result = dbContext.Entry(applicant).State = EntityState.Modified;
-                dbContext.SaveChanges();
-                if (result > 0)
-                {
-                    return new GeneralResult()
-                    {
-                        Successful = true,
-                        Message = "Applicant has been updated successfully.",
-                        Value = applicant.ApplicantId
-                    };
-                }
-                else
-                {
-                    return new GeneralResult()
-                    {
-                        Successful = false,
-                        Message = "Applicant has not been updated.",
+        //            applicant.FirstName = model.FirstName;
+        //            applicant.LastName = model.LastName;
+        //            applicant.EmailAddress = model.EmailAddress;
+        //            applicant.PhoneNumber = model.PhoneNumber;
+        //            applicant.HigestQualification = model.HigestQualification;
+        //            applicant.HigestQualificationPercentage = model.HigestQualificationPercentage;
+        //            applicant.MatricPercentage = model.MatricPercentage;
+        //            applicant.IntermediatePercentage = model.IntermediatePercentage;
+        //            applicant.Skills = model.Skills;
+        //            applicant.StatusId = model.StatusID;
+        //            applicant.Comment = model.Comment;
+        //            if (model.CompanyId > 0)
+        //            {
+        //                applicant.AssignedToCompany = model.CompanyId;
+        //            }
+        //        }
+        //        var result = dbContext.Entry(applicant).State = EntityState.Modified;
+        //        dbContext.SaveChanges();
+        //        if (result > 0)
+        //        {
+        //            return new GeneralResult()
+        //            {
+        //                Successful = true,
+        //                Message = "Applicant has been updated successfully.",
+        //                Value = applicant.ApplicantId
+        //            };
+        //        }
+        //        else
+        //        {
+        //            return new GeneralResult()
+        //            {
+        //                Successful = false,
+        //                Message = "Applicant has not been updated.",
                         
-                    };
-                }
+        //            };
+        //        }
             
-        }
+        //}
         public async Task<IGeneralResult<string>> DeleteApplicant(bool isDeleted, int id, int clientid, bool isSuperAdmin)
         {
             IGeneralResult<string> result = new GeneralResult<string>();

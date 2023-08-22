@@ -11,6 +11,7 @@ using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
 using System.Reflection;
 using System.Text;
+using static QuickCampus_Core.ViewModel.ApplicantViewModel;
 using static QuickCampus_Core.ViewModel.ClientVM;
 using static QuickCampus_Core.ViewModel.CollegeVM;
 using static QuickCampus_Core.ViewModel.UserVm;
@@ -37,6 +38,7 @@ builder.Services.AddScoped<IValidator<UserVm>, UserValidator>();
 builder.Services.AddScoped<IValidator<ClientVM>, ClientValidator>();
 builder.Services.AddScoped<IValidator<ClientUpdateRequest>, ClientValidatorRequest>();
 builder.Services.AddScoped<IValidator<CollegeVM>, CollegeValidator>();
+builder.Services.AddScoped<IValidator<ApplicantViewModel>, ApplicantValidator>();
 
 
 
@@ -125,8 +127,8 @@ if (app.Environment.IsDevelopment())
 
     app.UseFileServer(new FileServerOptions
     {
-        //FileProvider = new PhysicalFileProvider(@"D:\Client\Complant Management\ComplainManagement.API\wwwroot\UploadFiles"),
-       FileProvider = new PhysicalFileProvider(@"C:\Users\shrip\source\repos\AlinaBrain\QuickCampus_API\QuickCampusAPI\wwwroot\UploadFiles\\"),
+        FileProvider = new PhysicalFileProvider(@"D:\QuickCampus\Quick_Campus\QuickCampusAPI\wwwroot\UploadFiles"),
+      // FileProvider = new PhysicalFileProvider(@"C:\Users\shrip\source\repos\AlinaBrain\QuickCampus_API\QuickCampusAPI\wwwroot\UploadFiles\\"),
         // FileProvider = new PhysicalFileProvider(@"E:\\TestImage\\"),
         // FileProvider = new PhysicalFileProvider(@"F:\Quikcampus\QuickCampusAPI\wwwroot\UploadFiles\\"),
         RequestPath = new PathString("/UploadFiles"),
