@@ -28,13 +28,19 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "GetAllApplicant")]
         [HttpGet]
         [Route("GetAllApplicant")]
-        public async Task<ActionResult> GetAllApplicant(int clientid, int pageStart=0,int pageSize=10)
+        public async Task<ActionResult> GetAllApplicant(int clientid, int pageStart=1,int pageSize=10)
         {
             IGeneralResult<List<ApplicantViewModel>> result = new GeneralResult<List<ApplicantViewModel>>();
             int cid = 0;
             var _jwtSecretKey = _config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var newPageStart = 0;
+            if (pageStart > 0)
+            {
+                var startPage = 1;
+                newPageStart = (pageStart - startPage) * pageSize;
+            }
             if (isSuperAdmin)
             {
                 cid = clientid;
@@ -50,12 +56,12 @@ namespace QuickCampusAPI.Controllers
                 if (isSuperAdmin)
                 {
                     applicantTotalCount = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Count();
-                    apllicantlist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Skip(pageStart).Take(pageSize).ToList();
+                    apllicantlist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Skip(newPageStart).Take(pageSize).ToList();
                 }
                 else
                 {
                     applicantTotalCount = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).Count();
-                    apllicantlist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).OrderByDescending(x=>x.ApplicantId).Skip(pageStart).Take(pageSize).ToList();
+                    apllicantlist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).OrderByDescending(x=>x.ApplicantId).Skip(newPageStart).Take(pageSize).ToList();
                 }
                 var response = apllicantlist.Select(x => (ApplicantViewModel)x).ToList();
                 if (apllicantlist.Count > 0)

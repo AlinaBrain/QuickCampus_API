@@ -39,7 +39,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "GetAllCollege")]
         [HttpGet]
         [Route("GetAllCollege")]
-        public async Task<IActionResult> GetAllCollege(int clientid,int pageStart=0,int pageSize=10)
+        public async Task<IActionResult> GetAllCollege(int clientid,int pageStart=1,int pageSize=10)
         {
             IGeneralResult<List<CollegeCountryStateVm>> result = new GeneralResult<List<CollegeCountryStateVm>>();
             var _jwtSecretKey = _config["Jwt:Key"];
@@ -48,6 +48,12 @@ namespace QuickCampusAPI.Controllers
             var jwtSecretKey = _config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var newPageStart = 0;
+            if (pageStart > 0)
+            {
+                var startPage = 1;
+                newPageStart = (pageStart - startPage) * pageSize;
+            }
             if (isSuperAdmin)
             {
                 cid = clientid;
@@ -64,13 +70,13 @@ namespace QuickCampusAPI.Controllers
                 if (isSuperAdmin)
                 {
                    collegeListCount = (await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Count();
-                   collegeList = (List<College>)(await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Skip(pageStart).Take(pageSize).OrderByDescending(x=>x.CollegeId).ToList();
+                   collegeList = (List<College>)(await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Skip(newPageStart).Take(pageSize).OrderByDescending(x=>x.CollegeId).ToList();
 
                 }
                 else
                 {
                     collegeListCount = (await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).Count();
-                    collegeList = (List<College>)(await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).Skip(pageStart).Take(pageSize).OrderByDescending(x=>x.CollegeId).ToList();
+                    collegeList = (List<College>)(await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).Skip(newPageStart).Take(pageSize).OrderByDescending(x=>x.CollegeId).ToList();
                 }
                 var response = collegeList.Select(x => (CollegeCountryStateVm)x).OrderByDescending(x => x.CollegeId).ToList();
 
