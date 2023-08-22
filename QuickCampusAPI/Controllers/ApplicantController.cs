@@ -208,7 +208,7 @@ namespace QuickCampusAPI.Controllers
                     result.Message = " Applicant does Not Exist";
                     return Ok(result);
                 }
-                bool isExits = _applicantRepo.Any(x => x.FirstName == vm.FirstName && x.IsDeleted == false);
+                bool isExits = _applicantRepo.Any(x => x.FirstName == vm.FirstName && x.IsDeleted == false && x.ApplicantId==vm.ApplicantID);
                 if (isExits)
                 {
                     result.Message = " FirstName is already exists";
@@ -237,7 +237,7 @@ namespace QuickCampusAPI.Controllers
                         applicant.LastName = vm.LastName.Trim();
                         applicant.EmailAddress = vm.EmailAddress.Trim();
                         applicant.HigestQualification = vm.HigestQualification.Trim();
-                        applicant.IntermediatePercentage = vm.MatricPercentage;
+                        applicant.IntermediatePercentage = vm.IntermediatePercentage;
                         applicant.ClientId = cid;
                         applicant.HigestQualificationPercentage = vm.HigestQualificationPercentage;
                         applicant.Skills = vm.Skills.Trim();

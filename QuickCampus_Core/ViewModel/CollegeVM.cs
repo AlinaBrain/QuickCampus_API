@@ -153,7 +153,7 @@ namespace QuickCampus_Core.ViewModel
                .Cascade(CascadeMode.StopOnFirstFailure)
                .NotNull().WithMessage("Contect Phone could not be null")
                .NotEmpty().WithMessage("Contect Phone could not be empty")
-               .Length(10, 10).WithMessage("UserName lengh could not be greater than 100");
+               .Length(10, 10).WithMessage("Contact phone length could not be greater than 10");
             }
         }
 
