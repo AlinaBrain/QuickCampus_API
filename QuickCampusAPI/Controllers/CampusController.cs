@@ -60,8 +60,8 @@ namespace QuickCampusAPI.Controllers
             }
             var rec = await _campusrepo.GetAllCampus(getClientId,isSuperAdmin,newPageStart,pageSize);
             var CampusListCount = (await _campusrepo.GetAll()).Where(x => x.IsActive == true && (getClientId == 0 ? true : x.ClientId == getClientId)).Count();
-            var CampusList = rec.Where(x => x.WalkInID != null).ToList();
-            var res = CampusList.Select(x => ((CampusGridViewModel)x)).ToList();
+            var CampusList = rec.Where(x => x.WalkInID != null).OrderByDescending(x=>x.WalkInID).ToList();
+            var res = CampusList.Select(x => ((CampusGridViewModel)x)).OrderByDescending(x => x.WalkInID).ToList();
 
             if (res.Any())
             {
