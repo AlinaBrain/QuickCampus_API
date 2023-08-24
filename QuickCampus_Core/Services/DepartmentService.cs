@@ -13,41 +13,47 @@ namespace QuickCampus_Core.Services
     public class DepartmentService : IDepartmentRepo
     {
         private readonly QuikCampusDevContext _context;
-
         public DepartmentService(QuikCampusDevContext context)
         {
             _context = context;
         }
-
-
-        public async Task<List<DepartmentResponseVM>> GetAllDepartments(int clientid, bool isSuperAdmin,int pageStart,int pageSize)
+        public async Task<GeneralResult<List<DepartmentResponseVM>>> GetAllDepartments(int clientid, bool isSuperAdmin, int pageStart, int pageSize)
         {
-            List<DepartmentResponseVM> response = new List<DepartmentResponseVM>();
+            GeneralResult<List<DepartmentResponseVM>> response = new GeneralResult<List<DepartmentResponseVM>>();
 
             if (isSuperAdmin)
             {
-                var a = _context.TblDepartments.ToList();
-              response =  _context.TblDepartments.Where(w => w.IsDeleted != true && (clientid == 0 ? true : w.ClientId == clientid)).Select(s =>
-                new DepartmentResponseVM()
-                {
-                    Id = s.Id,
-                    DepartmentName = s.DepartmentName,
-                    Description = s.Description,
-                }).ToList();
+                response.Data = _context.TblDepartments.Where(w => w.IsDeleted != true && (clientid == 0 ? true : w.ClientId == clientid)).Select(s =>
+                  new DepartmentResponseVM()
+                  {
+                      Id = s.Id,
+                      DepartmentName = s.DepartmentName,
+                      Description = s.Description,
+                  }).ToList();
             }
             else
             {
-              response=  _context.TblDepartments.Where(w => w.IsDeleted != true && w.ClientId == clientid).Select(s =>
-                new DepartmentResponseVM()
-                {
-                    Id = s.Id,
-                    DepartmentName = s.DepartmentName,
-                    Description = s.Description,
-                }).ToList();
+                response.Data = _context.TblDepartments.Where(w => w.IsDeleted != true && w.ClientId == clientid).Select(s =>
+                 new DepartmentResponseVM()
+                 {
+                     Id = s.Id,
+                     DepartmentName = s.DepartmentName,
+                     Description = s.Description,
+                 }).ToList();
             }
+            if (response.Data.Count() == 0)
+            {
+                response.IsSuccess = true;
+                response.Message = "No Record Found";
+            }
+            else
+            {
+                response.IsSuccess = true;
+                response.Message = "Record Fatch Successfully";
+            }
+
             return response;
         }
-
         public async Task<IGeneralResult<DepartmentVM>> AddDepartments(int clientId, int userId, DepartmentVM vm)
         {
             IGeneralResult<DepartmentVM> result = new GeneralResult<DepartmentVM>();
@@ -94,8 +100,8 @@ namespace QuickCampus_Core.Services
         {
             IGeneralResult<DepartmentVM> result = new GeneralResult<DepartmentVM>();
 
-            var  rec = _context.TblDepartments.Where(s => s.DepartmentName == vm.DepartmentName && s.Id!= vm.Id).FirstOrDefault();
-            if (rec==null)
+            var rec = _context.TblDepartments.Where(s => s.DepartmentName == vm.DepartmentName && s.Id != vm.Id).FirstOrDefault();
+            if (rec == null)
             {
                 result.IsSuccess = false;
                 result.Message = "Department Already Exist";
@@ -164,7 +170,6 @@ namespace QuickCampus_Core.Services
             }
             return result;
         }
-
         public async Task<IGeneralResult<string>> DeleteDepartments(int clientId, bool isSuperAdmin, int id)
         {
             IGeneralResult<string> result = new GeneralResult<string>();
@@ -186,7 +191,7 @@ namespace QuickCampus_Core.Services
                 return result;
             }
 
-            dept.IsDeleted = true ;
+            dept.IsDeleted = true;
             _context.TblDepartments.Update(dept);
             int update = _context.SaveChanges();
 
@@ -204,26 +209,25 @@ namespace QuickCampus_Core.Services
             }
             return result;
         }
-
         public async Task<IGeneralResult<DepartmentResponseVM>> GetDepartmentsById(int clientId, bool isSuperAdmin, int id)
         {
             IGeneralResult<DepartmentResponseVM> response = new GeneralResult<DepartmentResponseVM>();
             TblDepartment? dept = new TblDepartment();
             if (isSuperAdmin)
             {
-                dept = _context.TblDepartments.Where(w => w.Id == id && w.IsDeleted != true && w.IsActive==true && (clientId == 0 ? true : w.ClientId == clientId)).FirstOrDefault();
+                dept = _context.TblDepartments.Where(w => w.Id == id && w.IsDeleted != true && w.IsActive == true && (clientId == 0 ? true : w.ClientId == clientId)).FirstOrDefault();
             }
             else
             {
-                dept = _context.TblDepartments.Where(w => w.Id == id && w.IsDeleted != true && w.IsActive==true && w.ClientId == clientId).FirstOrDefault();
+                dept = _context.TblDepartments.Where(w => w.Id == id && w.IsDeleted != true && w.IsActive == true && w.ClientId == clientId).FirstOrDefault();
             }
 
-            if(dept != null)
+            if (dept != null)
             {
                 response.Message = "No record found";
-                response.IsSuccess= false;
+                response.IsSuccess = false;
                 response.Data = null;
-                return response; 
+                return response;
             }
             DepartmentResponseVM vm = new DepartmentResponseVM()
             {
@@ -237,6 +241,5 @@ namespace QuickCampus_Core.Services
 
             return response;
         }
-       
     }
 }

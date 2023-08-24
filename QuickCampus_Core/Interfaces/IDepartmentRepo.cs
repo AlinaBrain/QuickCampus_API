@@ -10,7 +10,7 @@ namespace QuickCampus_Core.Interfaces
 {
     public interface IDepartmentRepo
     {
-        Task<List<DepartmentResponseVM>> GetAllDepartments(int clientid, bool isSuperAdmin, int pageStart,int pageSize);
+        Task<GeneralResult<List<DepartmentResponseVM>>> GetAllDepartments(int clientid, bool isSuperAdmin, int pageStart,int pageSize);
         Task<IGeneralResult<DepartmentVM>> AddDepartments(int clientId, int userId, DepartmentVM vm);
         Task<IGeneralResult<DepartmentVM>> UpdateDepartments(int clientId, int userId, DepartmentVM vm);
         Task<IGeneralResult<string>> ActiveInactiveDepartments(int clientId, bool isSuperAdmin, int id, bool status);
