@@ -68,9 +68,25 @@ namespace QuickCampus_Core.ViewModel
         public bool? IsDeleted { get; set; }
         public int? ClientId { get; set; }
 
-        public List<CountryVM> CountryList { get; set; }
-        public List<StateVM> StateList { get; set; }
+        public List<CountryTypeVm> CountryList { get; set; }
+        public List<StateTypeVm> StateList { get; set; }
        
     }
+
+    public class CountryTypeVm
+    {
+        public int CountryID { get; set; }
+        public string CountryName { get; set; }
+    }
+
+    public class StateTypeVm
+    {
+       
+        public int? StateId { get; set; }
+
+        public string StateName { get; set; }
+    }
+
+
 }
 

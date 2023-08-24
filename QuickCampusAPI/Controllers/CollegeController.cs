@@ -10,6 +10,7 @@ using Azure;
 using Microsoft.Extensions.Hosting.Internal;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Net.Mail;
 
 namespace QuickCampusAPI.Controllers
 {
@@ -120,12 +121,83 @@ namespace QuickCampusAPI.Controllers
                 cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
             }
 
+            CollegeCountryStateVm vml = new CollegeCountryStateVm();
+            List<CountryTypeVm> VmList = new List<CountryTypeVm>();
+            List<StateTypeVm> statelist = new List<StateTypeVm>();
 
+            
             var res = await _collegeRepo.GetById(Id);
- 
-            if (res.IsDeleted == false && res.IsActive == true)
+            if (res != null)
             {
-                result.Data = (CollegeCountryStateVm)res;
+                int UserId = res.CollegeId;
+
+
+                var countryList = _countryRepo.GetAll().Result.Where(x => x.CountryId ==res.CountryId).ToList();
+                var statelists = _stateRepo.GetAll().Result.Where(x => x.StateId==res.StateId).ToList();
+
+                if (countryList.Count() > 0)
+                {
+                    foreach (var product in countryList)
+                    {
+                        CountryTypeVm Vm = new CountryTypeVm();
+                        Vm = GetCountryDetails((int)product.CountryId, UserId);
+                        VmList.Add(Vm);
+                    }
+                }
+                else
+                {
+                    result.Message = "No Country found!";
+                }
+
+                if (statelists.Count() > 0)
+                {
+                    foreach (var c in statelists)
+                    {
+                        StateTypeVm Sm = new StateTypeVm();
+                        int? stateId = c.StateId;
+                        Sm = GetstateDetails((int)stateId, UserId);
+                        statelist.Add(Sm);
+
+                    }
+                }
+                else
+                {
+                    result.Message = "No State found!";
+                }
+
+            }
+                if (res.IsDeleted == false && res.IsActive == true)
+            {
+                vml.CountryList = VmList;
+                vml.StateList = statelist;
+                result.Data = vml;
+
+                vml.ContectPerson=res.ContectPerson;
+                vml.CollegeId = res.CollegeId;
+                vml.IsDeleted = res.IsDeleted;
+                vml.IsActive = res.IsActive;
+                vml.Logo=res.Logo;
+                vml.CollegeId=res.CollegeId;
+                vml.CollegeName=res.CollegeName;
+                vml.Address2=res.Address2;
+                vml.Address1=res.Address1;
+                vml.City=res.City;
+                vml.ContectEmail    =res.ContectEmail;
+                vml.ClientId = cid;
+                vml.ModifiedBy = res.ModifiedBy;
+                
+                vml.ContectPhone=res.ContectPhone;
+                vml.CollegeCode=res.CollegeCode;
+                vml.StateId = res.StateId;
+                vml.CountryId = res.CountryId;
+          
+
+
+
+
+                result.Data = vml;
+                
+
                 result.IsSuccess = true;
                 result.Message = "College details getting succesfully";
             }
@@ -412,24 +484,24 @@ namespace QuickCampusAPI.Controllers
             return url.FirstOrDefault();
         }
 
-        private CountryVM GetCountryDetails(int countryId)
+        private CountryTypeVm GetCountryDetails(int countryId,int userId)
         {
-            CountryVM countryVm = new CountryVM();
+            CountryTypeVm countryVm = new CountryTypeVm();
 
             var countryDetails = _countryRepo.GetById(countryId).Result;
-            countryVm.CountryId = countryDetails.CountryId;
+            countryVm.CountryID = countryDetails.CountryId;
             countryVm.CountryName = countryDetails.CountryName;
             return countryVm;
         }
 
-        private StateVM GetstateDetails(int stateId)
+        private StateTypeVm GetstateDetails(int stateId,int userid)
         {
-            StateVM statevm= new StateVM();
+            StateTypeVm statevm= new StateTypeVm();
 
             var stateDetails =_stateRepo.GetById(stateId).Result;
-            statevm.CountryId = stateDetails.CountryId;
+            statevm.StateId = stateDetails.StateId;
             statevm.StateName = stateDetails.StateName;
-            statevm.StateId = stateDetails.StateId; 
+            
             return statevm;
         }
         [HttpPost]
