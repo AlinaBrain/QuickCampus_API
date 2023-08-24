@@ -42,7 +42,7 @@ namespace QuickCampusAPI.Controllers
         [Route("GetAllCollege")]
         public async Task<IActionResult> GetAllCollege(int clientid,int pageStart=1,int pageSize=10)
         {
-            IGeneralResult<List<CollegeCountryStateVm>> result = new GeneralResult<List<CollegeCountryStateVm>>();
+            IGeneralResult<List<CollegeLogoVm>> result = new GeneralResult<List<CollegeLogoVm>>();
             var _jwtSecretKey = _config["Jwt:Key"];
 
             int cid = 0;
@@ -79,7 +79,7 @@ namespace QuickCampusAPI.Controllers
                     collegeListCount = (await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).Count();
                     collegeList = (List<College>)(await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).Skip(newPageStart).Take(pageSize).OrderByDescending(x=>x.CollegeId).ToList();
                 }
-                var response = collegeList.Select(x => (CollegeCountryStateVm)x).OrderByDescending(x => x.CollegeId).ToList();
+                var response = collegeList.Select(x => (CollegeLogoVm)x).OrderByDescending(x => x.CollegeId).ToList();
 
                 if (collegeList.Count > 0)
                 {
