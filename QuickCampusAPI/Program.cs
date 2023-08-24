@@ -116,6 +116,7 @@ builder.Services.AddScoped<IClientRepo, ClientRepo>();
 builder.Services.AddScoped<IStateRepo, StateServices>();
 builder.Services.AddScoped<IQuestion,QuestionService>();
 builder.Services.AddScoped<IUserRoleRepo,UserRoleService>();
+builder.Services.AddScoped<IDepartmentRepo, DepartmentService>();
 
 
 
@@ -127,7 +128,8 @@ if (app.Environment.IsDevelopment())
     {
         //FileProvider = new PhysicalFileProvider(@"D:\Client\Complant Management\ComplainManagement.API\wwwroot\UploadFiles"),
        //FileProvider = new PhysicalFileProvider(@"D:\QuickCampus\Quick_Campus\QuickCampusAPI\wwwroot\UploadFiles\\"),
-        FileProvider = new PhysicalFileProvider(@"E:\\TestImage\\"),
+        //FileProvider = new PhysicalFileProvider(@"E:\\TestImage\\"),
+        FileProvider = new PhysicalFileProvider(@"F:\\TestImage\\"),
         // FileProvider = new PhysicalFileProvider(@"F:\Quikcampus\QuickCampusAPI\wwwroot\UploadFiles\\"),
         RequestPath = new PathString("/UploadFiles"),
         EnableDirectoryBrowsing = false

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace QuickCampus_Core.ViewModel
 {
-    internal class DepartmentVM
+    public class DepartmentVM
     {
         public int Id { get; set; }
 
@@ -15,14 +15,13 @@ namespace QuickCampus_Core.ViewModel
         public string? Description { get; set; }
 
     }
-    internal class DepartmentResponseVM
+    public class DepartmentResponseVM
     {
         public int Id { get; set; }
 
         public string? DepartmentName { get; set; }
 
         public string? Description { get; set; }
-        public bool? IsActive { get; set; }
 
     }
 }
