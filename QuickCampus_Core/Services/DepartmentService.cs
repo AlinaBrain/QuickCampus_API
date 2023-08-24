@@ -29,6 +29,7 @@ namespace QuickCampus_Core.Services
                       Id = s.Id,
                       DepartmentName = s.DepartmentName,
                       Description = s.Description,
+                      IsActive=s.IsActive
                   }).ToList();
             }
             else
@@ -39,6 +40,7 @@ namespace QuickCampus_Core.Services
                      Id = s.Id,
                      DepartmentName = s.DepartmentName,
                      Description = s.Description,
+                     IsActive= s.IsActive
                  }).ToList();
             }
             if (response.Data.Count() == 0)
@@ -233,7 +235,8 @@ namespace QuickCampus_Core.Services
             {
                 Id = dept.Id,
                 DepartmentName = dept.DepartmentName,
-                Description = dept.Description
+                Description = dept.Description,
+                IsActive=dept.IsActive
             };
             response.Message = "Record fetch successfully";
             response.IsSuccess = true;

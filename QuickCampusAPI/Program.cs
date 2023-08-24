@@ -117,6 +117,7 @@ builder.Services.AddScoped<IStateRepo, StateServices>();
 builder.Services.AddScoped<IQuestion,QuestionService>();
 builder.Services.AddScoped<IUserRoleRepo,UserRoleService>();
 builder.Services.AddScoped<IDepartmentRepo, DepartmentService>();
+builder.Services.AddScoped<IGoalService, GoalService>();
 
 
 
