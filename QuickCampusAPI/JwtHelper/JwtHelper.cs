@@ -89,7 +89,6 @@ public class JwtHelper
         try
         {
 
-
             var claimsPrincipal = tokenHandler.ValidateToken(jwt, tokenValidationParameters, out var validatedToken);
             var jwtToken = (JwtSecurityToken)validatedToken;
 
@@ -106,7 +105,9 @@ public class JwtHelper
             // Handle any exceptions, such as token validation failure
             return null;
         }
-    }
+    
+    
+  }
     
 
 

@@ -164,6 +164,7 @@ namespace QuickCampus_Core.Services
                 int response = _context.SaveChanges();
                 if (response > 0)
                 {
+                    
                     result.IsSuccess = true;
                     result.Message = "Record Saved Successfully";
                     
@@ -256,8 +257,8 @@ namespace QuickCampus_Core.Services
                         CollegeId = y.CollegeId ?? 0,
                         CollegeName = y.College.CollegeName.Trim(),
                         ExamEndTime = y.ExamEndTime.Value.ToString(),
-                        ExamStartTime = y.ExamStartTime.Value.ToString()
-
+                        ExamStartTime = y.ExamStartTime.Value.ToString(),
+                        StartDateTime= y.StartDateTime,
                     }).Skip(pageStart).Take(pageSize).ToList()
                 });
                 if (campuses.Any())
@@ -305,12 +306,14 @@ namespace QuickCampus_Core.Services
                 WalkInDate = campus.WalkInDate,
                 IsActive = campus.IsActive ?? false,
                 Title = campus.Title,
+                
                 Colleges = campus.CampusWalkInColleges.Select(y => new CampusWalkInModel()
                 {
                     CollegeCode = y.CollegeCode,
                     CollegeId = y.CollegeId ?? 0,
-                    //CollegeName = y.College.CollegeName,
+                    CollegeName = y.CollegeId > 0 ? y.College.CollegeName : "",
                     ExamEndTime = y.ExamEndTime.Value.ToString(),
+                    StartDateTime = y.StartDateTime,
                     ExamStartTime = y.ExamStartTime.Value.ToString()
                 }).ToList()
             };
@@ -443,6 +446,7 @@ namespace QuickCampus_Core.Services
                                     ExamEndTime = TimeSpan.Parse(rec.ExamEndTime),
                                     CollegeCode = rec.CollegeCode,
                                     StartDateTime = rec.StartDateTime,
+                                    
                                     IsCompleted = null
                                 };
                                 _context.CampusWalkInColleges.Update(campusWalkInCollege);
