@@ -181,7 +181,7 @@ namespace QuickCampusAPI.Controllers
                 vml.CollegeName=res.CollegeName;
                 vml.Address2=res.Address2;
                 vml.Address1=res.Address1;
-                vml.City=res.City;
+                vml.CityId=res.CityId;
                 vml.ContectEmail    =res.ContectEmail;
                 vml.ClientId = cid;
                 vml.ModifiedBy = res.ModifiedBy;
@@ -265,7 +265,7 @@ namespace QuickCampusAPI.Controllers
                                 Address2 = vm.Address2,
                                 CreatedBy = Convert.ToInt32(userId),
                                 ModifiedBy = Convert.ToInt32(userId),
-                                City = vm.City.Trim(),
+                                CityId=vm.CityId,
                                 StateId = vm.StateId,
                                 CountryId = vm.CountryId,
                                 CollegeCode = vm.CollegeCode,
@@ -381,7 +381,7 @@ namespace QuickCampusAPI.Controllers
                         clg.Address2 = string.IsNullOrEmpty(vm.Address2)?clg.Address2.Trim():vm.Address2.Trim();
                         clg.CreatedBy = Convert.ToInt32(userId);
                         clg.ModifiedBy = Convert.ToInt32(userId);
-                        clg.City = vm.City.Trim();
+                        clg.CityId = vm.CityId;
                         clg.StateId = vm.StateId;
                         clg.CountryId = vm.CountryId;
                         clg.CollegeCode = vm.CollegeCode.Trim();

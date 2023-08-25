@@ -15,7 +15,7 @@ namespace QuickCampus_Core.ViewModel
                 Address1 = items.Address2,
                 Logo = items.Logo,
                 Address2 = items.Address2,
-                City = items.City,
+                CityId = items.CityId,
                 StateId = items.StateId,
                 CountryId = items.CountryId,
                 CollegeCode = items.CollegeCode,
@@ -39,7 +39,7 @@ namespace QuickCampus_Core.ViewModel
         public string? Address1 { get; set; }
         public string? Address2 { get; set; }
         [Required(ErrorMessage = "City is required.")]
-        public string? City { get; set; }
+        public int? CityId { get; set; }
         [Required(ErrorMessage = "State is required.")]
         public int? StateId { get; set; }
         [Required(ErrorMessage = "Country is required.")]
