@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
@@ -9,6 +10,7 @@ using System.Runtime.InteropServices;
 
 namespace QuickCampusAPI.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class CityController : ControllerBase
@@ -21,7 +23,7 @@ namespace QuickCampusAPI.Controllers
             _cityrepo = cityRepo;
             _config = configuration;
         }
-        
+        [Authorize(Roles = "GetAllCity")]
         [HttpGet]
         [Route("GetAllCity")]
         public async Task<IActionResult> GetAllCity(int clientid, int stateId)
@@ -79,6 +81,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "GetCityById")]
         [HttpGet]
         [Route("GetCityById")]
         public async Task<IActionResult> GetCityById(int id,int clientid)
@@ -112,7 +115,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
-
+        [Authorize(Roles = "AddCity")]
         [HttpPost]
         [Route("AddCity")]
         public async Task<IActionResult> AddCity(CityVm vm, int clientid)
@@ -175,6 +178,7 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
+        [Authorize(Roles = "EditCity")]
         [HttpPost]
         [Route("EditCity")]
         public async Task<IActionResult> EditCity(CityVm vm, [Optional] int clientid)
@@ -258,6 +262,7 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
+        [Authorize(Roles = "DeleteCity")]
         [HttpDelete]
         [Route("DeleteCity")]
         public async Task<IActionResult> DeleteCity(int id, int clientid, bool isDeleted)
