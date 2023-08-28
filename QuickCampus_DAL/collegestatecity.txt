@@ -1,4 +1,7 @@
-﻿IGeneralResult<CollegeCountryStateVm> result = new GeneralResult<CollegeCountryStateVm>();
+﻿public async Task<IActionResult> GetCollegeDetailsById(int Id, int clientid)
+        {
+
+IGeneralResult<CollegeCountryStateVm> result = new GeneralResult<CollegeCountryStateVm>();
             var _jwtSecretKey = _config["Jwt:Key"];
             int cid = 0;
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
