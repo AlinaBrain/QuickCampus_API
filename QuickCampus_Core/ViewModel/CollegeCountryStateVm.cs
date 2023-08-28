@@ -71,6 +71,7 @@ namespace QuickCampus_Core.ViewModel
         public List<CountryTypeVm> CountryList { get; set; }
         public List<StateTypeVm> StateList { get; set; }
        
+        public List<CityTypeVm> CityList { get; set; }
     }
 
     public class CountryTypeVm
@@ -87,6 +88,12 @@ namespace QuickCampus_Core.ViewModel
         public string StateName { get; set; }
     }
 
+    public class CityTypeVm
+    {
+        public int? CityId { get; set; }
+
+        public string CityName { get; set; }
+    }
 
 }
 
