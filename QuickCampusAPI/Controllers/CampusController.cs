@@ -123,20 +123,6 @@ namespace QuickCampusAPI.Controllers
             return Ok(response);
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         [Authorize(Roles = "GetCampusByCampusId")]
         [HttpGet]
         [Route("getCampusByCampusId")]
