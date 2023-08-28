@@ -15,8 +15,6 @@ public partial class Country
 
     public int? ClientId { get; set; }
 
-    public virtual ICollection<College> Colleges { get; set; } = new List<College>();
-
     public virtual ICollection<State> States { get; set; } = new List<State>();
 
     public virtual ICollection<WalkIn> WalkIns { get; set; } = new List<WalkIn>();

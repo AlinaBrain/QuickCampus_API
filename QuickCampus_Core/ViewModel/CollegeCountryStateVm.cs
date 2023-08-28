@@ -19,7 +19,7 @@ namespace QuickCampus_Core.ViewModel
                 Address1 = items.Address2,
                 Logo = items.Logo,
                 Address2 = items.Address2,
-                City = items.City,
+                CityId = items.CityId,
                 StateId = items.StateId,
                 CountryId = items.CountryId,
                 CollegeCode = items.CollegeCode,
@@ -44,7 +44,7 @@ namespace QuickCampus_Core.ViewModel
         [Required(ErrorMessage = "Address2 is required.")]
         public string? Address2 { get; set; }
         [Required(ErrorMessage = "City is required.")]
-        public string? City { get; set; }
+        public int? CityId { get; set; }
         [Required(ErrorMessage = "StateId is required.")]
         public int? StateId { get; set; }
         [Required(ErrorMessage = "Country is required.")]
@@ -71,6 +71,7 @@ namespace QuickCampus_Core.ViewModel
         public List<CountryTypeVm> CountryList { get; set; }
         public List<StateTypeVm> StateList { get; set; }
        
+        public List<CityTypeVm> CityList { get; set; }
     }
 
     public class CountryTypeVm
@@ -87,6 +88,12 @@ namespace QuickCampus_Core.ViewModel
         public string StateName { get; set; }
     }
 
+    public class CityTypeVm
+    {
+        public int? CityId { get; set; }
+
+        public string CityName { get; set; }
+    }
 
 }
 

@@ -118,6 +118,7 @@ builder.Services.AddScoped<IClientRepo, ClientRepo>();
 builder.Services.AddScoped<IStateRepo, StateServices>();
 builder.Services.AddScoped<IQuestion,QuestionService>();
 builder.Services.AddScoped<IUserRoleRepo,UserRoleService>();
+builder.Services.AddScoped<ICityRepo,CityServices>();   
 
 
 
@@ -133,6 +134,7 @@ if (app.Environment.IsDevelopment())
         // FileProvider = new PhysicalFileProvider(@"C:\Users\shrip\source\repos\AlinaBrain\QuickCampus_API\QuickCampusAPI\wwwroot\UploadFiles\\"),
         // FileProvider = new PhysicalFileProvider(@"E:\\TestImage\\"),
         // FileProvider = new PhysicalFileProvider(@"F:\Quikcampus\QuickCampusAPI\wwwroot\UploadFiles\\"),
+        FileProvider = new PhysicalFileProvider(@"F:\Quikcampus\QuickCampusAPI\wwwroot\UploadFiles\\"),
         RequestPath = new PathString("/UploadFiles"),
         EnableDirectoryBrowsing = false
     });

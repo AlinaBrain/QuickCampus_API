@@ -17,7 +17,7 @@ namespace QuickCampus_Core.ViewModel
                 Address1 = items.Address2,
                 Logo = items.Logo,
                 Address2 = items.Address2,
-                City = items.City,
+               CityId=items.CityId,
                 StateId = items.StateId,
                 CountryId = items.CountryId,
                 CollegeCode = items.CollegeCode,
@@ -43,7 +43,7 @@ namespace QuickCampus_Core.ViewModel
         [Required(ErrorMessage = "Address2 is required.")]
         public string? Address2 { get; set; }
         [Required(ErrorMessage = "City is required.")]
-        public string? City { get; set; }
+        public int? CityId { get; set; }
         [Required(ErrorMessage = "StateId is required.")]
         public int? StateId { get; set; }
         [Required(ErrorMessage = "Country is required.")]
@@ -75,7 +75,7 @@ namespace QuickCampus_Core.ViewModel
                 Logo = Logo,
                 Address1 = Address2,
                 Address2 = Address2,
-                City = City,
+                CityId = CityId,
                 StateId = StateId,
                 CountryId = CountryId,
                 CollegeCode = CollegeCode,
@@ -102,7 +102,7 @@ namespace QuickCampus_Core.ViewModel
                 Logo = Logo,
                 Address1 = Address1,
                 Address2 = Address2,
-                City = City,
+                CityId= CityId,
                 StateId = StateId,
                 CountryId = CountryId,
                 CollegeCode = CollegeCode,
@@ -133,7 +133,7 @@ namespace QuickCampus_Core.ViewModel
                   .NotEmpty().WithMessage("Address could not be empty")
                   .Length(5, 200).WithMessage("Address lengh could not be greater than 100");
 
-                RuleFor(x => x.City)
+                RuleFor(x => x.CityId)
                   .Cascade(CascadeMode.StopOnFirstFailure)
                   .NotNull().WithMessage("City could not be null")
                   .NotEmpty().WithMessage("City could not be empty");

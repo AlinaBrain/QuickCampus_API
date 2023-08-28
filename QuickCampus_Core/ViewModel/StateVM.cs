@@ -48,7 +48,7 @@ namespace QuickCampus_Core.ViewModel
         {
             return new State
             {
-                StateId = StateId,
+                StateId = (int)StateId,
                 StateName = StateName,
                 IsActive = true,
                 IsDeleted = false,

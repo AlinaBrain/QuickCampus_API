@@ -5,7 +5,7 @@ namespace QuickCampus_DAL.Context;
 
 public partial class State
 {
-    public int? StateId { get; set; }
+    public int StateId { get; set; }
 
     public string? StateName { get; set; }
 
@@ -17,7 +17,7 @@ public partial class State
 
     public int? ClientId { get; set; }
 
-    public virtual ICollection<College> Colleges { get; set; } = new List<College>();
+    public virtual ICollection<City> Cities { get; set; } = new List<City>();
 
     public virtual Country? Country { get; set; }
 

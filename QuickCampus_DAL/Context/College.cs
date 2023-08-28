@@ -15,8 +15,6 @@ public partial class College
 
     public string? Address2 { get; set; }
 
-    public string? City { get; set; }
-
     public int? StateId { get; set; }
 
     public int? CountryId { get; set; }
@@ -39,13 +37,13 @@ public partial class College
 
     public int? ModifiedBy { get; set; }
 
-    public DateTime? ModifiedDate { get; set; } 
+    public DateTime? ModifiedDate { get; set; }
 
     public int? ClientId { get; set; }
 
+    public int? CityId { get; set; }
+
     public virtual ICollection<CampusWalkInCollege> CampusWalkInColleges { get; set; } = new List<CampusWalkInCollege>();
 
-    public virtual Country? Country { get; set; }
-
-    public virtual State? State { get; set; }
+    public virtual City? City { get; set; }
 }

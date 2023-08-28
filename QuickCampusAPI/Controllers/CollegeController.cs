@@ -25,8 +25,9 @@ namespace QuickCampusAPI.Controllers
         private readonly string basepath;
         private readonly ICountryRepo _countryRepo;
         private readonly IStateRepo _stateRepo;
+        private readonly ICityRepo _cityrepo;
         private string baseUrl;
-        public CollegeController(ICollegeRepo collegeRepo, IConfiguration config, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, ICountryRepo countryRepo, IStateRepo stateRepo)
+        public CollegeController(ICollegeRepo collegeRepo, IConfiguration config, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, ICountryRepo countryRepo, IStateRepo stateRepo,ICityRepo cityRepo)
         {
             _collegeRepo = collegeRepo;
             _config = config;
@@ -34,7 +35,7 @@ namespace QuickCampusAPI.Controllers
             baseUrl = _config.GetSection("APISitePath").Value;
             _countryRepo = countryRepo;
             _stateRepo = stateRepo;
-
+            _cityrepo = cityRepo;
         }
 
         [Authorize(Roles = "GetAllCollege")]
@@ -124,17 +125,14 @@ namespace QuickCampusAPI.Controllers
             CollegeCountryStateVm vml = new CollegeCountryStateVm();
             List<CountryTypeVm> VmList = new List<CountryTypeVm>();
             List<StateTypeVm> statelist = new List<StateTypeVm>();
-
-            
+            List<CityTypeVm> citylist=new List<CityTypeVm>();
             var res = await _collegeRepo.GetById(Id);
             if (res != null)
             {
                 int UserId = res.CollegeId;
-
-
                 var countryList = _countryRepo.GetAll().Result.Where(x => x.CountryId ==res.CountryId).ToList();
                 var statelists = _stateRepo.GetAll().Result.Where(x => x.StateId==res.StateId).ToList();
-
+                var citylists=_cityrepo.GetAll().Result.Where(x => x.CityId==res.CityId).ToList();
                 if (countryList.Count() > 0)
                 {
                     foreach (var product in countryList)
@@ -165,6 +163,22 @@ namespace QuickCampusAPI.Controllers
                     result.Message = "No State found!";
                 }
 
+                if(citylists.Count() > 0)
+                {
+                    foreach(var city in citylists)
+                    {
+                        CityTypeVm Vm = new CityTypeVm();
+                        int? cityId= city.CityId;
+                        Vm = GetCityDetails((int)cityId, UserId);
+                        citylist.Add(Vm);
+                    }
+                }
+                else
+                {
+
+                    result.Message = "No State found!";
+
+                }
             }
                 if (res.IsDeleted == false && res.IsActive == true)
             {
@@ -181,7 +195,7 @@ namespace QuickCampusAPI.Controllers
                 vml.CollegeName=res.CollegeName;
                 vml.Address2=res.Address2;
                 vml.Address1=res.Address1;
-                vml.City=res.City;
+                vml.CityId=res.CityId;
                 vml.ContectEmail    =res.ContectEmail;
                 vml.ClientId = cid;
                 vml.ModifiedBy = res.ModifiedBy;
@@ -265,7 +279,7 @@ namespace QuickCampusAPI.Controllers
                                 Address2 = vm.Address2,
                                 CreatedBy = Convert.ToInt32(userId),
                                 ModifiedBy = Convert.ToInt32(userId),
-                                City = vm.City.Trim(),
+                                CityId=vm.CityId,
                                 StateId = vm.StateId,
                                 CountryId = vm.CountryId,
                                 CollegeCode = vm.CollegeCode,
@@ -381,7 +395,7 @@ namespace QuickCampusAPI.Controllers
                         clg.Address2 = string.IsNullOrEmpty(vm.Address2)?clg.Address2.Trim():vm.Address2.Trim();
                         clg.CreatedBy = Convert.ToInt32(userId);
                         clg.ModifiedBy = Convert.ToInt32(userId);
-                        clg.City = vm.City.Trim();
+                        clg.CityId = vm.CityId;
                         clg.StateId = vm.StateId;
                         clg.CountryId = vm.CountryId;
                         clg.CollegeCode = vm.CollegeCode.Trim();
@@ -504,6 +518,16 @@ namespace QuickCampusAPI.Controllers
             
             return statevm;
         }
+
+        private CityTypeVm GetCityDetails(int cityId,int userid)
+        {
+            CityTypeVm cityVm = new CityTypeVm();
+            var citydetails=_cityrepo.GetById(cityId).Result;
+            cityVm.CityId = citydetails.CityId;
+            cityVm.CityName = citydetails.CityName;
+            return cityVm;
+        }
+
         [HttpPost]
         [Route("ProcessUploadFile")]
         public List<string>ProcessUploadFile(List<IFormFile> Files)
