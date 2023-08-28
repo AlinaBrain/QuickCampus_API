@@ -172,7 +172,7 @@ namespace QuickCampusAPI.Controllers
         [Route("GetCollegeDetailsById")]
         public async Task<IActionResult> GetCollegeDetailsById(int Id, int clientid)
         {
-            IGeneralResult<CollegeCountryStateVm> result = new GeneralResult<CollegeCountryStateVm>();
+            IGeneralResult<CollegeCountryDetailsById> result = new GeneralResult<CollegeCountryDetailsById>();
             var _jwtSecretKey = _config["Jwt:Key"];
             int cid = 0;
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
@@ -186,90 +186,12 @@ namespace QuickCampusAPI.Controllers
                 cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
             }
 
-            CollegeCountryStateVm vml = new CollegeCountryStateVm();
-            List<CountryTypeVm> VmList = new List<CountryTypeVm>();
-            List<StateTypeVm> statelist = new List<StateTypeVm>();
-            List<CityTypeVm> citylist=new List<CityTypeVm>();
             var res = await _collegeRepo.GetById(Id);
-            if (res != null)
+            if (res.IsDeleted == false && res.IsActive == true)
             {
-                int UserId = res.CollegeId;
-                var countryList = _countryRepo.GetAll().Result.Where(x => x.CountryId ==res.CountryId).ToList();
-                var statelists = _stateRepo.GetAll().Result.Where(x => x.StateId==res.StateId).ToList();
-                var citylists=_cityrepo.GetAll().Result.Where(x => x.CityId==res.CityId).ToList();
-                if (countryList.Count() > 0)
-                {
-                    foreach (var product in countryList)
-                    {
-                        CountryTypeVm Vm = new CountryTypeVm();
-                        Vm = GetCountryDetails((int)product.CountryId, UserId);
-                        VmList.Add(Vm);
-                    }
-                }
-                else
-                {
-                    result.Message = "No Country found!";
-                }
-
-                if (statelists.Count() > 0)
-                {
-                    foreach (var c in statelists)
-                    {
-                        StateTypeVm Sm = new StateTypeVm();
-                        int? stateId = c.StateId;
-                        Sm = GetstateDetails((int)stateId, UserId);
-                        statelist.Add(Sm);
-
-                    }
-                }
-                else
-                {
-                    result.Message = "No State found!";
-                }
-
-                if(citylists.Count() > 0)
-                {
-                    foreach(var city in citylists)
-                    {
-                        CityTypeVm Vm = new CityTypeVm();
-                        int? cityId= city.CityId;
-                        Vm = GetCityDetails((int)cityId, UserId);
-                        citylist.Add(Vm);
-                    }
-                }
-                else
-                {
-
-                    result.Message = "No State found!";
-
-                }
-            }
-                if (res.IsDeleted == false && res.IsActive == true)
-            {
-                vml.CountryList = VmList;
-                vml.StateList = statelist;
-                result.Data = vml;
-                vml.ContectPerson=res.ContectPerson;
-                vml.CollegeId = res.CollegeId;
-                vml.IsDeleted = res.IsDeleted;
-                vml.IsActive = res.IsActive;
-                vml.Logo=res.Logo;
-                vml.CollegeId=res.CollegeId;
-                vml.CollegeName=res.CollegeName;
-                vml.Address2=res.Address2;
-                vml.Address1=res.Address1;
-                vml.CityId=res.CityId;
-                vml.ContectEmail    =res.ContectEmail;
-                vml.ClientId = cid;
-                vml.ModifiedBy = res.ModifiedBy;
-                vml.ContectPhone=res.ContectPhone;
-                vml.CollegeCode=res.CollegeCode;
-                vml.StateId = res.StateId;
-                vml.CountryId = res.CountryId;
-                result.Data = vml;
+                result.Data = (CollegeCountryDetailsById)res;
                 result.IsSuccess = true;
                 result.Message = "College details getting succesfully";
-
             }
             else
             {
