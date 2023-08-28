@@ -21,9 +21,10 @@ namespace QuickCampusAPI.Controllers
             _cityrepo = cityRepo;
             _config = configuration;
         }
+        
         [HttpGet]
         [Route("GetAllCity")]
-        public async Task<IActionResult> GetAllCity(int clientid, int stateId, int pageStart = 1, int pageSize = 10)
+        public async Task<IActionResult> GetAllCity(int clientid, int stateId)
         {
             IGeneralResult<List<CityVm>> result = new GeneralResult<List<CityVm>>();
             var _jwtSecretKey = _config["Jwt:Key"];
@@ -33,11 +34,7 @@ namespace QuickCampusAPI.Controllers
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
             var newPageStart = 0;
-            if (pageStart > 0)
-            {
-                var startPage = 1;
-                newPageStart = (pageStart - startPage) * pageSize;
-            }
+            
             if (isSuperAdmin)
             {
                 cid = clientid;
@@ -53,7 +50,7 @@ namespace QuickCampusAPI.Controllers
                 if (isSuperAdmin)
                 {
                     cityTotalCount = (await _cityrepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Count();
-                    citylist = (await _cityrepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid) && x.StateId ==stateId ).Skip(newPageStart).Take(pageSize).ToList();
+                    citylist = (await _cityrepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid) && x.StateId ==stateId ).ToList();
                 }
                 else
                 {
