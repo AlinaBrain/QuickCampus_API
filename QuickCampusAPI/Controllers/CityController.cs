@@ -1,12 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualBasic.FileIO;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.Services;
 using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
+using System.Linq;
 using System.Runtime.InteropServices;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace QuickCampusAPI.Controllers
 {
@@ -26,7 +29,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "GetAllCity")]
         [HttpGet]
         [Route("GetAllCity")]
-        public async Task<IActionResult> GetAllCity(int clientid, int stateId)
+        public async Task<IActionResult> GetAllCity(int clientid, int stateId, string cityName)
         {
             IGeneralResult<List<CityVm>> result = new GeneralResult<List<CityVm>>();
             var _jwtSecretKey = _config["Jwt:Key"];
@@ -48,11 +51,12 @@ namespace QuickCampusAPI.Controllers
             List<City> citylist = new List<City>();
             var cityTotalCount = 0;
             try
-            {
+            {      
                 if (isSuperAdmin)
                 {
                     cityTotalCount = (await _cityrepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Count();
-                    citylist = (await _cityrepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid) && x.StateId ==stateId ).ToList();
+                    citylist = (await _cityrepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid) && x.StateId ==stateId ).ToList();             
+                    citylist = (await _cityrepo.GetAll()).Where(x => x.IsDeleted != true && (cityName == "" ? true : x.CityName.Contains(cityName))).ToList();
                 }
                 else
                 {

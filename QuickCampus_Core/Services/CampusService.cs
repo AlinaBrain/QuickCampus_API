@@ -309,9 +309,11 @@ namespace QuickCampus_Core.Services
                 
                 Colleges = campus.CampusWalkInColleges.Select(y => new CampusWalkInModel()
                 {
+                    CampusId = y.CampusId,
                     CollegeCode = y.CollegeCode,
-                    CollegeId = y.CollegeId ?? 0,
-                    CollegeName = y.CollegeId > 0 ? y.College.CollegeName : "",
+                    //CollegeId = _context.CampusWalkInColleges.Include(y => y.)
+                    //CollegeId = y.CollegeId ?? 0,
+                    //CollegeName = y.CollegeId > 0 ? y.College.CollegeName : "",
                     ExamEndTime = y.ExamEndTime.Value.ToString(),
                     StartDateTime = y.StartDateTime,
                     ExamStartTime = y.ExamStartTime.Value.ToString()

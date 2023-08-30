@@ -28,7 +28,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "GetAllApplicant")]
         [HttpGet]
         [Route("GetAllApplicant")]
-        public async Task<ActionResult> GetAllApplicant(int clientid, int pageStart=1,int pageSize=10)
+        public async Task<ActionResult> GetAllApplicant(int clientid, string firstName ,int pageStart=1,int pageSize=10)
         {
             IGeneralResult<List<ApplicantViewModel>> result = new GeneralResult<List<ApplicantViewModel>>();
             int cid = 0;
@@ -55,8 +55,9 @@ namespace QuickCampusAPI.Controllers
             {
                 if (isSuperAdmin)
                 {
-                    applicantTotalCount = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Count();
-                    apllicantlist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Skip(newPageStart).Take(pageSize).ToList();
+                   applicantTotalCount = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Count();
+                   apllicantlist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Skip(newPageStart).Take(pageSize).ToList();
+                   apllicantlist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && x.FirstName.Contains(firstName)).Skip(newPageStart).Take(pageSize).ToList();
                 }
                 else
                 {
