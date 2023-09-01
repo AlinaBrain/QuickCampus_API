@@ -76,7 +76,7 @@ namespace QuickCampus_Core.ViewModel
 
     public class CountryTypeVm
     {
-        public int CountryID { get; set; }
+        public int ?CountryID { get; set; }
         public string CountryName { get; set; }
     }
 

@@ -112,7 +112,6 @@ namespace QuickCampusAPI.Controllers
                             int? stateId = c.StateId;
                             Sm = GetstateDetails((int)stateId, UserId);
                             statelist.Add(Sm);
-
                         }
                     }
                     else
@@ -132,20 +131,15 @@ namespace QuickCampusAPI.Controllers
                     }
                     else
                     {
-
                         result.Message = "No State found!";
-
                     }
-
-
                 }
                 
-                    vml.CountryList = VmList;
                     vml.StateList = statelist;
-                     vml.CityList = citylist;
+                vml.CityList = citylist;
+
                     result.IsSuccess = true;
                     result.Message = "College details getting succesfully";
-
                 if (collegeList.Count > 0)
                 {
                     result.IsSuccess = true;

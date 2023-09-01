@@ -58,6 +58,5 @@ namespace QuickCampus_Core.ViewModel
         public int? ModifiedBy { get; set; }
         public bool? IsDeleted { get; set; }
         public int? ClientId { get; set; }
-
     }
 }
