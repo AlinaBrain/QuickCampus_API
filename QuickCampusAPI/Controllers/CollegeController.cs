@@ -547,8 +547,8 @@ namespace QuickCampusAPI.Controllers
             try
             {
 
-                var collegeListCount = (await _collegeRepo.GetAll()).Where(x => x.IsActive == true && (cid == 0 ? true : x.CollegeId== cid)).Count();
-                var collegetList = (await _collegeRepo.GetAll()).Where(x => x.IsActive == true && (cid == 0 ? true : x.CollegeId == cid)).OrderByDescending(x => x.CollegeId).ToList();
+                var collegeListCount = (await _collegeRepo.GetAll()).Where(x => x.IsActive == true && x.IsDeleted==false &&   (cid == 0 ? true : x.CollegeId== cid)).Count();
+                var collegetList = (await _collegeRepo.GetAll()).Where(x => x.IsActive == true && x.IsDeleted==false && (cid == 0 ? true : x.CollegeId == cid)).OrderByDescending(x => x.CollegeId).ToList();
 
                 var res = collegetList.Select(x => ((CollegeVM)x)).ToList();
                 if (res != null && res.Count() > 0)

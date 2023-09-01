@@ -316,7 +316,7 @@ namespace QuickCampus_Core.Services
                     CampusId= y.CampusId,
                     CollegeCode = y.CollegeCode,
                     CollegeId = y.CollegeId ?? 0,
-                   
+                   // CollegeName = y.College.CollegeName.Trim(),
                     //CollegeName=y.CollegeId ==8030? y.College.CollegeName:"",
                     ExamEndTime = y.ExamEndTime.Value.ToString(),
                     StartDateTime = y.StartDateTime,

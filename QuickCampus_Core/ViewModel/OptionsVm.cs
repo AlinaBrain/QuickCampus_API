@@ -20,10 +20,10 @@ namespace QuickCampus_Core.ViewModel
 
         public string? OptionImage { get; set; }
 
-        public IFormFile Images { get; set; }
+        public IFormFile ImagePath { get; set; } = null;
         public byte[]? Image { get; set; }
 
-        public QuestionOption ToQuestionOptionVm()
+        public QuestionOption ToQuestionOptionVmDbModel()
         {
             return new QuestionOption
             {
