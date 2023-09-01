@@ -133,7 +133,7 @@ namespace QuickCampusAPI.Controllers
             IGeneralResult<List<CampusGridViewModel>> result = new GeneralResult<List<CampusGridViewModel>>();
             var _jwtSecretKey = _config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
+           var  isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
             int getClientId = 0;
 
             if (!isSuperAdmin && clientId == "0")
@@ -152,7 +152,9 @@ namespace QuickCampusAPI.Controllers
                 getClientId = string.IsNullOrEmpty(clientId) == true ? 0 : Convert.ToInt32(clientId);
             }
 
+            
             var res  = await _campusrepo.GetCampusByID(campusId, getClientId,isSuperAdmin);
+
             return Ok(res);
         }
 

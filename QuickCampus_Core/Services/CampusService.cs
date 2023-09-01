@@ -12,9 +12,10 @@ namespace QuickCampus_Core.Services
     public class CampusService : BaseRepository<QuikCampusDevContext, WalkIn>, ICampusRepo
     {
         private readonly QuikCampusDevContext _context;
-        public CampusService(QuikCampusDevContext context)
+        public CampusService(QuikCampusDevContext context,ICollegeRepo collegeRepo)
         {
             _context = context;
+
         }
 
         public Task<IEnumerable<CampusGridViewModel>> Add(CampusGridViewModel campusGridViewModel)
@@ -149,6 +150,7 @@ namespace QuickCampus_Core.Services
                     {
                         CampusWalkInCollege campusWalkInCollege = new CampusWalkInCollege()
                         {
+                            
                             WalkInId = sv.WalkInId,
                             CollegeId = rec.CollegeId,
                             ExamStartTime = TimeSpan.Parse(rec.ExamStartTime),
@@ -307,24 +309,27 @@ namespace QuickCampus_Core.Services
                 IsActive = campus.IsActive ?? false,
                 Title = campus.Title,
                 
+
+               
                 Colleges = campus.CampusWalkInColleges.Select(y => new CampusWalkInModel()
                 {
+                    CampusId= y.CampusId,
                     CollegeCode = y.CollegeCode,
                     CollegeId = y.CollegeId ?? 0,
-                    CollegeName = y.CollegeId > 0 ? y.College.CollegeName : "",
+                   
+                    //CollegeName=y.CollegeId ==8030? y.College.CollegeName:"",
                     ExamEndTime = y.ExamEndTime.Value.ToString(),
                     StartDateTime = y.StartDateTime,
                     ExamStartTime = y.ExamStartTime.Value.ToString()
                 }).ToList()
             };
+            
 
             result.Data = campusGridViewModel;
             result.Message = "Record Fatch Successfully";
             result.IsSuccess = true;
             return result;
         }
-
-
 
         public async Task<IGeneralResult<CampusGridViewModel>> UpdateCampusStatus(int id, int clientId,bool status, bool isSuperAdmin)
         {
@@ -526,23 +531,6 @@ namespace QuickCampus_Core.Services
 
             return result;
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         public async Task<IGeneralResult<CampusGridViewModel>> DeleteCampus(int id, int clientId, bool isDelete, bool isSuperAdmin)
         {

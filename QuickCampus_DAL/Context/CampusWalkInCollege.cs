@@ -18,6 +18,7 @@ public partial class CampusWalkInCollege
     public TimeSpan? ExamEndTime { get; set; }
 
     public bool? IsCompleted { get; set; }
+  
 
     public string CollegeCode { get; set; } = null!;
 

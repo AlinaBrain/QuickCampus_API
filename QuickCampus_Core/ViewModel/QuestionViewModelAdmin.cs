@@ -45,6 +45,7 @@ namespace QuickCampus_Core.ViewModel
         [Display(Name = "Option")]
         //[AllowHtml]
         public string OptionText { get; set; }
+        public IFormFile opImage {  get; set; }
         public string OptionImage { get; set; }
         
         public bool IsCorrect { get; set; }

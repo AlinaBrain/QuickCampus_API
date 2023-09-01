@@ -529,7 +529,6 @@ namespace QuickCampus_Core.Services
                 res.Message = "Question has not been created.";
                 res.Data = null;
             }
-
             return res;
         }
 

@@ -86,7 +86,7 @@ namespace QuickCampus_Core.ViewModel
         [Required(ErrorMessage = "Title is required.")]
         public string? Title { get; set; }
         public int CreatedBy { get; set; }
-        public List<CampusWalkInModel> Colleges { get; set; }
+        public IEnumerable<CampusWalkInModel> Colleges { get; set; }
 
     }
 
@@ -98,8 +98,8 @@ namespace QuickCampus_Core.ViewModel
 
         [Required]
         public int StateId { get; set; }
-
-        public string? CollegeName { get; set; }
+        [Required]
+        public string CollegeName { get; set; }
 
         [Required(ErrorMessage = "Time is required.")]
         
