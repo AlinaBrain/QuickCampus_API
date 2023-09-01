@@ -78,26 +78,16 @@ namespace QuickCampusAPI.Controllers
                             ClientId = clientdata.Id,
                             Mobile = clientdata.Phone,
                         };
-
                         var userdetails = await _userRepo.Add(userVm.ToUserDbModel());
-
-                        
-                            var res = await _roleRepo.SetClientAdminRole(userdetails.Id);
-                        
-
+                        var res = await _roleRepo.SetClientAdminRole(userdetails.Id);
                         result.Data = (ClientResponseVm)clientdata;
                         result.Message = "Client added successfully";
                         result.IsSuccess = true;
-
-
-
-
                     }
                     catch (Exception ex)
                     {
                         result.Message = ex.Message;
                     }
-
                     return Ok(result);
                 }
                 else
@@ -214,7 +204,6 @@ namespace QuickCampusAPI.Controllers
             }
             try
             {
-
                 var clientListCount = (await _clientRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.Id == cid)).Count();
                 var clientList = (await _clientRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.Id == cid)).OrderByDescending(x => x.Id).Skip(newPageStart).Take(pageSize).ToList();
 
