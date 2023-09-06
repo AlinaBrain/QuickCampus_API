@@ -1,11 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Common.Enum;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.Services;
 using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
+using System.Linq;
+using System.Net.Mail;
 
 namespace QuickCampusAPI.Controllers
 {
@@ -28,7 +31,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "GetAllApplicant")]
         [HttpGet]
         [Route("GetAllApplicant")]
-        public async Task<ActionResult> GetAllApplicant(int clientid, int pageStart=1,int pageSize=10)
+        public async Task<ActionResult> GetAllApplicant(int clientid, string? firstName, string ?lastName , string ?emailAddress, string ?phoneNumber,  int pageStart=1,int pageSize=10)
         {
             IGeneralResult<List<ApplicantViewModel>> result = new GeneralResult<List<ApplicantViewModel>>();
             int cid = 0;
@@ -52,12 +55,16 @@ namespace QuickCampusAPI.Controllers
             List<Applicant> apllicantlist = new List<Applicant>();
             var applicantTotalCount = 0;
             try
-            {
+            {      
                 if (isSuperAdmin)
                 {
-                    applicantTotalCount = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Count();
-                    apllicantlist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Skip(newPageStart).Take(pageSize).ToList();
-                }
+                   applicantTotalCount = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Count();
+                   apllicantlist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Skip(newPageStart).Take(pageSize).ToList();
+                   apllicantlist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && x.FirstName.Contains(firstName ?? "" , StringComparison.OrdinalIgnoreCase)).Skip(newPageStart).Take(pageSize).ToList();
+                   apllicantlist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && x.LastName.Contains(lastName ?? "" , StringComparison.OrdinalIgnoreCase)).Skip(newPageStart).Take(pageSize).ToList();
+                   apllicantlist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && x.EmailAddress.Contains(emailAddress ?? "", StringComparison.OrdinalIgnoreCase)).Skip(newPageStart).Take(pageSize).ToList();
+                   apllicantlist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && x.PhoneNumber.Contains(phoneNumber ?? "")).Skip(newPageStart).Take(pageSize).ToList();
+                } 
                 else
                 {
                     applicantTotalCount = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).Count();

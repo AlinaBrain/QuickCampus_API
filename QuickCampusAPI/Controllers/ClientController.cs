@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace QuickCampusAPI.Controllers
 {
@@ -181,7 +184,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "GetAllClient")]
         [HttpGet]
         [Route("GetAllClient")]
-        public async Task<IActionResult> GetAllClient(int clientid,int pageStart=1,int pageSize=10)
+        public async Task<IActionResult> GetAllClient(int clientid, string? name, string? email, string? phone, int pageStart=1,int pageSize=10)
         {
             IGeneralResult<List<ClientResponseVm>> result = new GeneralResult<List<ClientResponseVm>>();
             int cid = 0;
@@ -205,13 +208,18 @@ namespace QuickCampusAPI.Controllers
             try
             {
                 var clientListCount = (await _clientRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.Id == cid)).Count();
-                var clientList = (await _clientRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.Id == cid)).OrderByDescending(x => x.Id).Skip(newPageStart).Take(pageSize).ToList();
+                //var clientList = (await _clientRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.Id == cid)).OrderByDescending(x => x.Id).Skip(newPageStart).Take(pageSize).ToList();
+
+                var clientList = (await _clientRepo.GetAll()).Where(x => x.IsDeleted != true && x.Name.Contains(name ?? "", StringComparison.OrdinalIgnoreCase) && x.Email.Contains(email ?? "", StringComparison.OrdinalIgnoreCase) && x.Phone.Contains(phone ?? "")).OrderByDescending(x => x.Id).Skip(newPageStart).Take(pageSize).ToList();
+
+                
+                
+
 
                 var res = clientList.Select(x => ((ClientResponseVm)x)).ToList();
-                if (res != null && res.Count()>0)
+                if (res != null && res.Count() > 0)
                 {
                     result.IsSuccess = true;
-                    result.Message = "ClientList";
                     result.Data = res;
                     result.TotalRecordCount = clientListCount;
                 }

@@ -151,7 +151,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "UserList")]
         [HttpGet]
         [Route("UserList")]
-        public async Task<IActionResult> UserList(int clientid, int pageStart=1, int pageSize=10)
+        public async Task<IActionResult> UserList(int clientid, string? name, string? email, string? mobile, int pageStart=1, int pageSize=10)
         {
 
             IGeneralResult<List<UserResponseVm>> result = new GeneralResult<List<UserResponseVm>>();
@@ -184,11 +184,12 @@ namespace QuickCampusAPI.Controllers
                 {
                     clientListCount = (await userRepo.GetAll()).Where(x => x.IsDelete != true && (cid == 0 ? true : x.Id == cid)).Count();
                     collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete == false && (cid == 0 ? true : x.ClientId == cid)).OrderByDescending(o => o.Id).Skip(newPageStart).Take(pageSize).ToList();
-
+                    collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete == false &&  x.Name.Contains(name ?? "", StringComparison.OrdinalIgnoreCase)).OrderByDescending(o => o.Id).Skip(newPageStart).Take(pageSize).ToList();
+                    collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete == false && x.Email.Contains(email ?? "", StringComparison.OrdinalIgnoreCase)).OrderByDescending(o => o.Id).Skip(newPageStart).Take(pageSize).ToList();
+                    collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete == false && x.Mobile.Contains(mobile ?? "", StringComparison.OrdinalIgnoreCase)).OrderByDescending(o => o.Id).Skip(newPageStart).Take(pageSize).ToList();
                 }
                 else
                 {
-                    
                     collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete != true && x.ClientId == cid).OrderByDescending(o => o.Id).Skip(newPageStart).Take(pageSize).ToList();
                 }
 
