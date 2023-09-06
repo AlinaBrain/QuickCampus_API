@@ -30,24 +30,21 @@ namespace QuickCampus_Core.ViewModel
         public int Marks { get; set; }
         public bool IsActive { get; set; }
         public bool IsDeleted { get; set; }
-        public List<OptionViewModelAdmin> options { get; set; }
+        public List<OptionViewModelAdmin> options { get; set; } = null;
       
         public int ClientId { get; set; }
 
     }
     public class OptionViewModelAdmin
     {
-        [DataType(DataType.Upload)]
-        //public i ImageUpload { get; set; }
+        
         public int OptionId { get; set; }
         public int QuestionId { get; set; }
-        [RequiredIf("ImageUpload", "OptionId", ErrorMessage = "Options is required.")]
-        [Display(Name = "Option")]
-        //[AllowHtml]
-        public string OptionText { get; set; }
-        public IFormFile opImage {  get; set; }
-        public string OptionImage { get; set; }
         
+        public string OptionText { get; set; }
+        public IFormFile? Imagepath { get; set; } = null;
+        public string? OptionImage { get; set; }
+
         public bool IsCorrect { get; set; }
         public bool IsNew { get; set; }
 
