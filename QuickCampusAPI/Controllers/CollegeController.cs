@@ -41,7 +41,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "GetAllCollege")]
         [HttpGet]
         [Route("GetAllCollege")]
-        public async Task<IActionResult> GetAllCollege(int clientid, string collegeName, int pageStart=1,int pageSize=10)
+        public async Task<IActionResult> GetAllCollege(int clientid, string? collegeName, string? collegeCode, int pageStart=1,int pageSize=10)
         {
             IGeneralResult<List<CollegeCountryStateVm>> result = new GeneralResult<List<CollegeCountryStateVm>>();
             var _jwtSecretKey = _config["Jwt:Key"];
@@ -73,7 +73,8 @@ namespace QuickCampusAPI.Controllers
                 {
                    collegeListCount = (await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Count();
                    collegeList = (List<College>)(await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Skip(newPageStart).Take(pageSize).OrderByDescending(x=>x.CollegeId).ToList();
-                   collegeList = (List<College>)(await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && x.CollegeName.Contains(collegeName)).Skip(newPageStart).Take(pageSize).OrderByDescending(x => x.CollegeId).ToList();
+                   collegeList = (List<College>)(await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && x.CollegeName.Contains(collegeName ?? "", StringComparison.OrdinalIgnoreCase)).Skip(newPageStart).Take(pageSize).OrderByDescending(x => x.CollegeId).ToList();
+                   collegeList = (List<College>)(await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && string.IsNullOrEmpty(x.CollegeCode) ? true : (x.CollegeCode == collegeCode)).Skip(newPageStart).Take(pageSize).OrderByDescending(x => x.CollegeId).ToList();
                 }
                 else
                 {

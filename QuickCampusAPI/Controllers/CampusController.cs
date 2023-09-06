@@ -5,6 +5,7 @@ using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.Services;
 using QuickCampus_Core.ViewModel;
+using System.Net.Mail;
 using System.Security.Cryptography;
 
 namespace QuickCampusAPI.Controllers
@@ -29,13 +30,13 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "ManageCampus")]
         [HttpGet]
         [Route("ManageCampus")]
-       
-        public async Task<IActionResult> ManageCampus(int clientid ,int pageStart=1,int pageSize = 10)
+
+        public async Task<IActionResult> ManageCampus(int clientid, string? title, int pageStart = 1, int pageSize = 10)
         {
             IGeneralResult<List<CampusGridViewModel>> result = new GeneralResult<List<CampusGridViewModel>>();
             var _jwtSecretKey = _config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            var isSuperAdmin  = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
             int getClientId = 0;
             var newPageStart = 0;
             if (pageStart > 0)
@@ -43,7 +44,7 @@ namespace QuickCampusAPI.Controllers
                 var startPage = 1;
                 newPageStart = (pageStart - startPage) * pageSize;
             }
-            if (!isSuperAdmin && clientId=="0")
+            if (!isSuperAdmin && clientId == "0")
             {
                 result.Data = null;
                 result.IsSuccess = false;
@@ -56,11 +57,13 @@ namespace QuickCampusAPI.Controllers
             }
             else
             {
-                getClientId = string.IsNullOrEmpty(clientId)==true?0:Convert.ToInt32(clientId);
+                getClientId = string.IsNullOrEmpty(clientId) == true ? 0 : Convert.ToInt32(clientId);
             }
-            var rec = await _campusrepo.GetAllCampus(getClientId,isSuperAdmin,newPageStart,pageSize);
+
+            var rec = await _campusrepo.GetAllCampus(getClientId, isSuperAdmin, newPageStart, pageSize);
             var CampusListCount = (await _campusrepo.GetAll()).Where(x => x.IsActive == true && (getClientId == 0 ? true : x.ClientId == getClientId)).Count();
-            var CampusList = rec.Where(x => x.WalkInID != null).OrderByDescending(x=>x.WalkInID).ToList();
+            //var CampusList = rec.Where(x => x.WalkInID != null).OrderByDescending(x=>x.WalkInID).ToList();
+            var CampusList = rec.Where(x => x.IsActive == true && x.Title.Contains(title ?? "", StringComparison.OrdinalIgnoreCase)).ToList();
             var res = CampusList.Select(x => ((CampusGridViewModel)x)).OrderByDescending(x => x.WalkInID).ToList();
 
             if (res.Any())
@@ -81,7 +84,7 @@ namespace QuickCampusAPI.Controllers
         [HttpPost]
         [Route("AddCampus")]
 
-        public async Task<IActionResult> AddCampus(CampusGridRequestVM dto,int clientid)
+        public async Task<IActionResult> AddCampus(CampusGridRequestVM dto, int clientid)
         {
             int clientId = 0;
             var _jwtSecretKey = _config["Jwt:Key"];
@@ -95,9 +98,9 @@ namespace QuickCampusAPI.Controllers
             }
             else
             {
-                clientId = string.IsNullOrEmpty(cId)? 0 : Convert.ToInt32(cId);
+                clientId = string.IsNullOrEmpty(cId) ? 0 : Convert.ToInt32(cId);
             }
-            var response = await _campusrepo.AddCampus(dto, clientId, string.IsNullOrEmpty(userId)?0:Convert.ToInt32(userId));
+            var response = await _campusrepo.AddCampus(dto, clientId, string.IsNullOrEmpty(userId) ? 0 : Convert.ToInt32(userId));
             return Ok(response);
         }
         [Authorize(Roles = "UpdateCampus")]
@@ -123,12 +126,14 @@ namespace QuickCampusAPI.Controllers
             return Ok(response);
         }
 
+
         [Authorize(Roles = "GetCampusByCampusId")]
         [HttpGet]
         [Route("getCampusByCampusId")]
         public async Task<IActionResult> getcampusbyid(int campusId, int clientid)
         {
-         
+
+
             IGeneralResult<List<CampusGridViewModel>> result = new GeneralResult<List<CampusGridViewModel>>();
             var _jwtSecretKey = _config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
@@ -151,7 +156,7 @@ namespace QuickCampusAPI.Controllers
                 getClientId = string.IsNullOrEmpty(clientId) == true ? 0 : Convert.ToInt32(clientId);
             }
 
-            var res  = await _campusrepo.GetCampusByID(campusId, getClientId,isSuperAdmin);
+            var res = await _campusrepo.GetCampusByID(campusId, getClientId, isSuperAdmin);
             return Ok(res);
         }
 
@@ -159,7 +164,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "CampusAction")]
         [HttpGet]
         [Route("UpdateCampusStaus")]
-        public async Task<IActionResult> UpdateCampusStaus(int campusId,bool status, int clientid)
+        public async Task<IActionResult> UpdateCampusStaus(int campusId, bool status, int clientid)
         {
             IGeneralResult<string> result = new GeneralResult<string>();
             int cid = 0;
@@ -182,7 +187,7 @@ namespace QuickCampusAPI.Controllers
                 }
             }
 
-            var res = await _campusrepo.UpdateCampusStatus(campusId, cid,status, isSuperAdmin);
+            var res = await _campusrepo.UpdateCampusStatus(campusId, cid, status, isSuperAdmin);
             return Ok(res);
         }
 
@@ -213,20 +218,8 @@ namespace QuickCampusAPI.Controllers
                 }
             }
 
-            var res = await _campusrepo.DeleteCampus(campusId, cid, status,isSuperAdmin);
+            var res = await _campusrepo.DeleteCampus(campusId, cid, status, isSuperAdmin);
             return Ok(res);
         }
     }
-
-}
-
-
-
-
-
-
-
-
-
-
-
+    }
