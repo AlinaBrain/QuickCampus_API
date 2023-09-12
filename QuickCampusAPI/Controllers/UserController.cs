@@ -151,7 +151,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "UserList")]
         [HttpGet]
         [Route("UserList")]
-        public async Task<IActionResult> UserList(int clientid, string? name, string? email, string? mobile, int pageStart=1, int pageSize=10)
+        public async Task<IActionResult> UserList(int clientid, string? search, int pageStart=1, int pageSize=10)
         {
 
             IGeneralResult<List<UserResponseVm>> result = new GeneralResult<List<UserResponseVm>>();
@@ -163,7 +163,6 @@ namespace QuickCampusAPI.Controllers
                 newPageStart = (pageStart - startPage) * pageSize;
             }
           
-
             int cid = 0;
             var jwtSecretKey = config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
@@ -184,9 +183,7 @@ namespace QuickCampusAPI.Controllers
                 {
                     clientListCount = (await userRepo.GetAll()).Where(x => x.IsDelete != true && (cid == 0 ? true : x.Id == cid)).Count();
                     collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete == false && (cid == 0 ? true : x.ClientId == cid)).OrderByDescending(o => o.Id).Skip(newPageStart).Take(pageSize).ToList();
-                    collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete == false &&  x.Name.Contains(name ?? "", StringComparison.OrdinalIgnoreCase)).OrderByDescending(o => o.Id).Skip(newPageStart).Take(pageSize).ToList();
-                    collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete == false && x.Email.Contains(email ?? "", StringComparison.OrdinalIgnoreCase)).OrderByDescending(o => o.Id).Skip(newPageStart).Take(pageSize).ToList();
-                    collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete == false && x.Mobile.Contains(mobile ?? "", StringComparison.OrdinalIgnoreCase)).OrderByDescending(o => o.Id).Skip(newPageStart).Take(pageSize).ToList();
+                    collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete == false && x.Name.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.Email.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.Mobile.Contains(search ?? "")).OrderByDescending(o => o.Id).Skip(newPageStart).Take(pageSize).ToList();
                 }
                 else
                 {
@@ -194,7 +191,6 @@ namespace QuickCampusAPI.Controllers
                 }
 
                 var response = collegeList.Select(x => (UserResponseVm)x).ToList();
-
 
                 if (response.Count() > 0)
                 {

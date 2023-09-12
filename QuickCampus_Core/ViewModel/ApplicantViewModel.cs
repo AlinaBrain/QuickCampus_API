@@ -86,7 +86,7 @@ namespace QuickCampus_Core.ViewModel
         public DateTime? ModifiedDate { get; set; }
         public int? CollegeId { get; set; }
 
-
+      
         public Applicant ToApplicantDbModel()
         {
             return new Applicant

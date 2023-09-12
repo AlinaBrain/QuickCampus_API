@@ -13,7 +13,5 @@ public partial class Section
 
     public int? ClentId { get; set; }
 
-    public virtual TblClient? Clent { get; set; }
-
     public virtual ICollection<Question> Questions { get; set; } = new List<Question>();
 }

@@ -27,6 +27,8 @@ public partial class TblUser
 
     public virtual TblClient? Client { get; set; }
 
+    public virtual ICollection<TblClient> TblClients { get; set; } = new List<TblClient>();
+
     public virtual ICollection<TblContent> TblContentCreatedByNavigations { get; set; } = new List<TblContent>();
 
     public virtual ICollection<TblContent> TblContentModefiedByNavigations { get; set; } = new List<TblContent>();
