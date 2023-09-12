@@ -48,7 +48,11 @@ namespace QuickCampus_Core.ViewModel
 
         public decimal? Longitude { get; set; }
 
-        public decimal? Latitude { get; set; }
+        public decimal? Latitude { get; set; } 
+
+        public string CreatedName { get; set; }
+
+        public string ModifiedName { get; set; }
         
     }
 

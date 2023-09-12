@@ -373,10 +373,6 @@ public partial class QuikCampusDevContext : DbContext
             entity.Property(e => e.Section1)
                 .HasMaxLength(50)
                 .HasColumnName("Section");
-
-            entity.HasOne(d => d.Clent).WithMany(p => p.Sections)
-                .HasForeignKey(d => d.ClentId)
-                .HasConstraintName("FK__Section__ClentId__6166761E");
         });
 
         modelBuilder.Entity<State>(entity =>
@@ -414,6 +410,10 @@ public partial class QuikCampusDevContext : DbContext
             entity.Property(e => e.Name).HasMaxLength(100);
             entity.Property(e => e.Password).HasMaxLength(100);
             entity.Property(e => e.UserName).HasMaxLength(100);
+
+            entity.HasOne(d => d.User).WithMany(p => p.TblClients)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK__tbl_Clien__UserI__52E34C9D");
         });
 
         modelBuilder.Entity<TblContent>(entity =>

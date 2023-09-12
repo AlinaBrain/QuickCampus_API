@@ -37,11 +37,11 @@ public partial class TblClient
 
     public string? Password { get; set; }
 
+    public int? UserId { get; set; }
+
     public virtual ICollection<Groupdl> Groupdls { get; set; } = new List<Groupdl>();
 
     public virtual ICollection<QuestionType> QuestionTypes { get; set; } = new List<QuestionType>();
-
-    public virtual ICollection<Section> Sections { get; set; } = new List<Section>();
 
     public virtual ICollection<TblContent> TblContents { get; set; } = new List<TblContent>();
 
@@ -56,4 +56,6 @@ public partial class TblClient
     public virtual ICollection<TblTopicPChildSkill> TblTopicPChildSkills { get; set; } = new List<TblTopicPChildSkill>();
 
     public virtual ICollection<TblUser> TblUsers { get; set; } = new List<TblUser>();
+
+    public virtual TblUser? User { get; set; }
 }

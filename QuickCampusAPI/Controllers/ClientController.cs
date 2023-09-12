@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
+using QuickCampus_DAL.Context;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace QuickCampusAPI.Controllers
@@ -18,12 +20,15 @@ namespace QuickCampusAPI.Controllers
         private readonly IUserRepo _userRepo;
         private IConfiguration _config;
         private readonly IUserRoleRepo _roleRepo;
-        public ClientController(IClientRepo clientRepo, IConfiguration config, IUserRepo userRepo, IUserRoleRepo userRoleRepo)
+        private readonly QuikCampusDevContext _context;
+
+        public ClientController(IClientRepo clientRepo, IConfiguration config, IUserRepo userRepo, IUserRoleRepo userRoleRepo, QuikCampusDevContext quikCampusDevContext)
         {
             _clientRepo = clientRepo;
             _config = config;
             _userRepo = userRepo;
             _roleRepo = userRoleRepo;
+            _context = quikCampusDevContext;
         }
 
         [Authorize(Roles = "AddClient")]
@@ -82,7 +87,11 @@ namespace QuickCampusAPI.Controllers
                             Mobile = clientdata.Phone,
                         };
                         var userdetails = await _userRepo.Add(userVm.ToUserDbModel());
+
+
                         var res = await _roleRepo.SetClientAdminRole(userdetails.Id);
+
+
                         result.Data = (ClientResponseVm)clientdata;
                         result.Message = "Client added successfully";
                         result.IsSuccess = true;
@@ -111,11 +120,11 @@ namespace QuickCampusAPI.Controllers
             var _jwtSecretKey = _config["Jwt:Key"];
             var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            var cid = clientId == ""? 0: Convert.ToInt32(clientId);
+            var cid = clientId == "" ? 0 : Convert.ToInt32(clientId);
             if (_clientRepo.Any(x => x.Email == vm.Email.Trim() && x.IsDeleted != true && x.Id != vm.Id))
             {
                 result.Message = "Email Already Registered!";
-            } 
+            }
             else
             {
                 var res = await _clientRepo.GetById(vm.Id);
@@ -129,7 +138,7 @@ namespace QuickCampusAPI.Controllers
 
                 if (ModelState.IsValid && vm.Id > 0 && res.IsDeleted == false && vm.Id == cid)
                 {
-                   res.Email = vm.Email.Trim();
+                    res.Email = vm.Email.Trim();
                     res.Phone = vm.Phone.Trim();
                     res.Address = vm.Address.Trim();
                     res.SubscriptionPlan = vm.SubscriptionPlan.Trim();
@@ -149,7 +158,8 @@ namespace QuickCampusAPI.Controllers
                         result.Message = ex.Message;
                     }
                     return Ok(result);
-                }else if (isSuperAdmin)
+                }
+                else if (isSuperAdmin)
                 {
                     res.Email = vm.Email.Trim();
                     res.Phone = vm.Phone.Trim();
@@ -184,7 +194,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "GetAllClient")]
         [HttpGet]
         [Route("GetAllClient")]
-        public async Task<IActionResult> GetAllClient(int clientid, string? name, string? email, string? phone, int pageStart=1,int pageSize=10)
+        public async Task<IActionResult> GetAllClient(int clientid, string? search, int pageStart = 1, int pageSize = 10)
         {
             IGeneralResult<List<ClientResponseVm>> result = new GeneralResult<List<ClientResponseVm>>();
             int cid = 0;
@@ -207,21 +217,34 @@ namespace QuickCampusAPI.Controllers
             }
             try
             {
-                var clientListCount = (await _clientRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.Id == cid)).Count();
-                //var clientList = (await _clientRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.Id == cid)).OrderByDescending(x => x.Id).Skip(newPageStart).Take(pageSize).ToList();
+                var results = (from c in _context.TblClients
+                               join u in _context.TblUsers
+                               on c.CraetedBy equals u.Id
+                               
+                               select new ClientResponseVm()
+                               {
+                                   Name = c.Name,
+                                   CreatedName = u.Name,
+                                   Address=c.Address,
+                                   Email=c.Email,
+                                   Id=c.Id,
+                                   IsActive=c.IsActive,
+                                   Phone = c.Phone,
+                                   CreatedDate = c.CreatedDate,
+                                   CraetedBy = c.CraetedBy,
+                                   ModifiedName = u.Name,
+                                   ModofiedDate = c.ModofiedDate
+                               }).Where(x => x.Name.Contains(search ?? "") || x.Email.Contains(search ?? "")).OrderByDescending(x => x.Id).ToList();
 
-                var clientList = (await _clientRepo.GetAll()).Where(x => x.IsDeleted != true && x.Name.Contains(name ?? "", StringComparison.OrdinalIgnoreCase) && x.Email.Contains(email ?? "", StringComparison.OrdinalIgnoreCase) && x.Phone.Contains(phone ?? "")).OrderByDescending(x => x.Id).Skip(newPageStart).Take(pageSize).ToList();
 
-                
-                
-
-
+                var clientListCount = results.Count();
+                var clientList = results.Skip(newPageStart).Take(pageSize).ToList();
                 var res = clientList.Select(x => ((ClientResponseVm)x)).ToList();
+
                 if (res != null && res.Count() > 0)
                 {
                     result.IsSuccess = true;
                     result.Data = res;
-                    result.TotalRecordCount = clientListCount;
                 }
                 else
                 {
@@ -289,7 +312,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "DetailsClient")]
         [HttpGet]
         [Route("DetailsClient")]
-        public async Task<IActionResult> DetailsClient(int Id,int clientid)
+        public async Task<IActionResult> DetailsClient(int Id, int clientid)
         {
             var _jwtSecretKey = _config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);

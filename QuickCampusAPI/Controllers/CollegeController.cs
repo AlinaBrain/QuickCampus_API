@@ -27,7 +27,10 @@ namespace QuickCampusAPI.Controllers
         private readonly IStateRepo _stateRepo;
         private readonly ICityRepo _cityrepo;
         private string baseUrl;
-        public CollegeController(ICollegeRepo collegeRepo, IConfiguration config, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, ICountryRepo countryRepo, IStateRepo stateRepo,ICityRepo cityRepo)
+        private readonly QuikCampusDevContext _context;
+       
+
+        public CollegeController(ICollegeRepo collegeRepo, IConfiguration config, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, ICountryRepo countryRepo, IStateRepo stateRepo,ICityRepo cityRepo, QuikCampusDevContext quikCampusDevContext, Country country)
         {
             _collegeRepo = collegeRepo;
             _config = config;
@@ -36,12 +39,13 @@ namespace QuickCampusAPI.Controllers
             _countryRepo = countryRepo;
             _stateRepo = stateRepo;
             _cityrepo = cityRepo;
+            _context = quikCampusDevContext;
         }
 
         [Authorize(Roles = "GetAllCollege")]
         [HttpGet]
         [Route("GetAllCollege")]
-        public async Task<IActionResult> GetAllCollege(int clientid, string? collegeName, string? collegeCode, int pageStart=1,int pageSize=10)
+        public async Task<IActionResult> GetAllCollege(int clientid, string? search, int pageStart=1,int pageSize=10)
         {
             IGeneralResult<List<CollegeCountryStateVm>> result = new GeneralResult<List<CollegeCountryStateVm>>();
             var _jwtSecretKey = _config["Jwt:Key"];
@@ -67,93 +71,145 @@ namespace QuickCampusAPI.Controllers
             List<College> collegeList = new List<College>();
             try
             {
-                var collegeListCount=0;
+                var collegeListCount = 0;
 
                 if (isSuperAdmin)
                 {
-                   collegeListCount = (await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Count();
-                   collegeList = (List<College>)(await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Skip(newPageStart).Take(pageSize).OrderByDescending(x=>x.CollegeId).ToList();
-                   collegeList = (List<College>)(await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && x.CollegeName.Contains(collegeName ?? "", StringComparison.OrdinalIgnoreCase)).Skip(newPageStart).Take(pageSize).OrderByDescending(x => x.CollegeId).ToList();
-                   collegeList = (List<College>)(await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && string.IsNullOrEmpty(x.CollegeCode) ? true : (x.CollegeCode == collegeCode)).Skip(newPageStart).Take(pageSize).OrderByDescending(x => x.CollegeId).ToList();
+                    collegeListCount = (await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Count();
+                    collegeList = (List<College>)(await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Skip(newPageStart).Take(pageSize).OrderByDescending(x => x.CollegeId).ToList();
+                    collegeList = (List<College>)(await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && x.CollegeName.Contains(search ?? "", StringComparison.OrdinalIgnoreCase)).Skip(newPageStart).Take(pageSize).OrderByDescending(x => x.CollegeId).ToList();
                 }
+
                 else
                 {
                     collegeListCount = (await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).Count();
-                    collegeList = (List<College>)(await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).Skip(newPageStart).Take(pageSize).OrderByDescending(x=>x.CollegeId).ToList();
+                    collegeList = (List<College>)(await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).Skip(newPageStart).Take(pageSize).OrderByDescending(x => x.CollegeId).ToList();
                 }
+
+                var results = (from c in collegeList
+                               join u in _context.TblUsers                    
+                               on c.CreatedBy equals u.Id
+
+                               select new CollegeCountryStateVm
+                               {
+                                   CollegeId = c.CollegeId,
+                                   CollegeName = c.CollegeName,
+                                   Logo = c.Logo,
+                                   Address1 = c.Address1,
+                                   Address2 = c.Address2,
+                                   CityId = c.CityId,
+                                   StateId = c.StateId,
+                                   CountryId = c.CountryId,
+                                   IsActive = c.IsActive,
+                                   CreatedBy = c.CreatedBy,
+                                   CollegeCode = c.CollegeCode,
+                                   ContectPerson = c.ContectPerson,
+                                   ContectPhone = c.ContectPhone,
+                                   ContectEmail = c.ContectEmail,
+                                   ModifiedBy = c.ModifiedBy,
+                                   IsDeleted = c.IsDeleted,
+                                   ClientId = c.ClientId,
+                                   CreatedName = u.Name,
+                                   ModifiedName = u.Name  
+                                   
+                               }).ToList();
+
                 CollegeCountryStateVm vml = new CollegeCountryStateVm();
                 List<CountryTypeVm> VmList = new List<CountryTypeVm>();
                 List<StateTypeVm> statelist = new List<StateTypeVm>();
                 List<CityTypeVm> citylist = new List<CityTypeVm>();
-                var response = collegeList.Select(x => (CollegeCountryStateVm)x).OrderByDescending(x => x.CollegeId).ToList();
+
+                var response = results.Select(x => (CollegeCountryStateVm)x).OrderByDescending(x => x.CollegeId).ToList();
+            
                 if (response != null)
-                {
-                    int UserId = response.Count;
-                    var countryList = _countryRepo.GetAll().Result.Where(x => x.IsActive==true).ToList();
-                    var statelists = _stateRepo.GetAll().Result.Where(x => x.IsActive==true).ToList();
-                    var citylists = _cityrepo.GetAll().Result.Where(x => x.IsActive == true).ToList();
+                    {
+                        int UserId = response.Count;
+                        var countryList = _countryRepo.GetAll().Result.Where(x => x.IsActive == true).ToList();
+                        var statelists = _stateRepo.GetAll().Result.Where(x => x.IsActive == true).ToList();
+                        var citylists = _cityrepo.GetAll().Result.Where(x => x.IsActive == true).ToList();
+
                     if (countryList.Count() > 0)
-                    {
-                        foreach (var product in countryList)
                         {
-                            CountryTypeVm Vm = new CountryTypeVm();
-                            Vm = GetCountryDetails((int)product.CountryId, UserId);
-                            VmList.Add(Vm);
+                            foreach (var product in countryList)
+                            {
+                                CountryTypeVm Vm = new CountryTypeVm();
+                                Vm = GetCountryDetails((int)product.CountryId, UserId);
+                                VmList.Add(Vm);
+                            }
                         }
-                    }
-                    else
-                    {
-                        result.Message = "No Country found!";
-                    }
+                        else
+                        {
+                            result.Message = "No Country found!";
+                        }
+
                     if (statelists.Count() > 0)
-                    {
-                        foreach (var c in statelists)
                         {
-                            StateTypeVm Sm = new StateTypeVm();
-                            int? stateId = c.StateId;
-                            Sm = GetstateDetails((int)stateId, UserId);
-                            statelist.Add(Sm);
+                            foreach (var c in statelists)
+                            {
+                                StateTypeVm Sm = new StateTypeVm();
+                                int? stateId = c.StateId;
+                                Sm = GetstateDetails((int)stateId, UserId);
+                                statelist.Add(Sm);
+                            }
                         }
-                    }
-                    else
-                    {
-                        result.Message = "No State found!";
+                        else
+                        {
+                            result.Message = "No State found!";
+                        }
+
+                        if (citylists.Count() > 0)
+                        {
+                            foreach (var city in citylists)
+                            {
+                                CityTypeVm Vm = new CityTypeVm();
+                                int? cityId = city.CityId;
+                                Vm = GetCityDetails((int)cityId, UserId);
+                                citylist.Add(Vm);
+                            }
+                        }
+                        else
+                        {
+                            result.Message = "No State found!";
+                        }
                     }
 
-                    if (citylists.Count() > 0)
-                    {
-                        foreach (var city in citylists)
-                        {
-                            CityTypeVm Vm = new CityTypeVm();
-                            int? cityId = city.CityId;
-                            Vm = GetCityDetails((int)cityId, UserId);
-                            citylist.Add(Vm);
-                        }
-                    }
-                    else
-                    {
-                        result.Message = "No State found!";
-                    }
-                }
-                
                     vml.StateList = statelist;
-                vml.CityList = citylist;
+                    vml.CityList = citylist;
 
                     result.IsSuccess = true;
                     result.Message = "College details getting succesfully";
-                if (collegeList.Count > 0)
-                {
-                    result.IsSuccess = true;
-                    result.Message = "College get successfully";
-                    result.Data = response;
-                    result.TotalRecordCount = collegeListCount;
-                }
-                else
-                {
-                    result.IsSuccess = true;
-                    result.Message = "College list not found!";
-                    result.Data = null;
-                }
+
+                    if (collegeList.Count > 0)
+                    {
+                        result.IsSuccess = true;
+                        result.Message = "College get successfully";
+                        result.Data = response;
+                        result.TotalRecordCount = collegeListCount;
+                    }
+                    else
+                    {
+                        result.IsSuccess = true;
+                        result.Message = "College list not found!";
+                        result.Data = null;
+                    }
+
+
+                //var res = (from c in results
+                //           join ct in CollegeCountryStateVm
+                //           c.CountryName equals ct.CountryId
+
+                //           select new Country
+                //           {
+                //               CountryName = ct.CountryName
+                //           });
+
+
+
+
+
+
+
+
             }
             catch (Exception ex)
             {

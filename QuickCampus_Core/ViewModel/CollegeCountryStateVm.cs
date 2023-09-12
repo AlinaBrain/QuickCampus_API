@@ -63,8 +63,9 @@ namespace QuickCampus_Core.ViewModel
         [EmailAddress(ErrorMessage = "Enter a valid email.")]
         public string? ContectEmail { get; set; }
         public int? ModifiedBy { get; set; }
-
-
+        public string? CreatedName { get; set; }
+        public string? ModifiedName { get; set; }
+        public string? CountryName { get; set; }
         public bool? IsDeleted { get; set; }
         public int? ClientId { get; set; }
 
