@@ -29,7 +29,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "GetAllCity")]
         [HttpGet]
         [Route("GetAllCity")]
-        public async Task<IActionResult> GetAllCity(int clientid, int stateId, string cityName)
+        public async Task<IActionResult> GetAllCity(int clientid, int stateId)
         {
             IGeneralResult<List<CityVm>> result = new GeneralResult<List<CityVm>>();
             var _jwtSecretKey = _config["Jwt:Key"];
@@ -53,10 +53,11 @@ namespace QuickCampusAPI.Controllers
             try
             {      
                 if (isSuperAdmin)
+                   
                 {
                     cityTotalCount = (await _cityrepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Count();
-                    citylist = (await _cityrepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid) && x.StateId ==stateId ).ToList();             
-                    citylist = (await _cityrepo.GetAll()).Where(x => x.IsDeleted != true && (cityName == "" ? true : x.CityName.Contains(cityName))).ToList();
+                    citylist = (await _cityrepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid) && x.StateId ==stateId ).OrderByDescending(x=>x.CityId).ToList();             
+                  
                 }
                 else
                 {

@@ -187,7 +187,9 @@ namespace QuickCampusAPI.Controllers
                 }
                 else
                 {
-                    collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete != true && x.ClientId == cid).OrderByDescending(o => o.Id).Skip(newPageStart).Take(pageSize).ToList();
+                    clientListCount = (await userRepo.GetAll()).Where(x => x.IsDelete != true && (cid == 0 ? true : x.Id == cid)).Count();
+                    collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete == false && (cid == 0 ? true : x.ClientId == cid)).OrderByDescending(o => o.Id).Skip(newPageStart).Take(pageSize).ToList();
+                    collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete == false && x.Name.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.Email.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.Mobile.Contains(search ?? "")).OrderByDescending(o => o.Id).Skip(newPageStart).Take(pageSize).ToList();
                 }
 
                 var response = collegeList.Select(x => (UserResponseVm)x).ToList();

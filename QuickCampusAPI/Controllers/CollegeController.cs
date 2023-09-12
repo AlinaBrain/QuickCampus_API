@@ -82,8 +82,10 @@ namespace QuickCampusAPI.Controllers
 
                 else
                 {
-                    collegeListCount = (await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).Count();
-                    collegeList = (List<College>)(await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && x.ClientId == cid).Skip(newPageStart).Take(pageSize).OrderByDescending(x => x.CollegeId).ToList();
+                    collegeListCount = (await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Count();
+                    collegeList = (List<College>)(await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Skip(newPageStart).Take(pageSize).OrderByDescending(x => x.CollegeId).ToList();
+                    collegeList = (List<College>)(await _collegeRepo.GetAll()).Where(x => x.IsDeleted != true && x.CollegeName.Contains(search ?? "", StringComparison.OrdinalIgnoreCase)).Skip(newPageStart).Take(pageSize).OrderByDescending(x => x.CollegeId).ToList();
+
                 }
 
                 var results = (from c in collegeList

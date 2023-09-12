@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
+using System.Data;
 
 namespace QuickCampusAPI.Controllers
 {
@@ -19,7 +21,7 @@ namespace QuickCampusAPI.Controllers
            _sectionrepo= sectionRepo;
             _config= configuration;
         }
-
+        [Authorize(Roles = "GetAllSection")]
         [HttpGet]
         [Route("GetAllSection")]
         public async Task<IActionResult> GetAllSection(int clientid)
@@ -76,6 +78,7 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
+        [Authorize(Roles = "AddSection")]
         [HttpPost]
         [Route("AddSection")]
         public async Task<IActionResult> AddSection(SectionVm vm, int clientid)
