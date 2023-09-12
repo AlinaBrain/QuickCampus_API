@@ -121,9 +121,13 @@ namespace QuickCampus_Core.Services
                     GroupId = x.GroupId ?? 0,
                     QuestionSection = x.Section.Section1,
                     Question = x.Text,
+                    IsActive=true,
+                    IsDeleted=false,
+                    
                     Marks = x.Marks ?? 0,
                     options = x.QuestionOptions.Select(y => new OptionViewModelAdmin()
                     {
+                        QuestionId=x.QuestionId,
                         OptionId = y.OptionId,
                         OptionText = y.OptionText,
                         OptionImage = y.OptionImage,
@@ -136,11 +140,10 @@ namespace QuickCampus_Core.Services
                 if (question == null)
                 {
                     res.IsSuccess = false;
-                    res.Message = "Question not Succefully";
+                    res.Message = "Question is not Active Succefully";
                     res.Data = null;
                     return res;
                 }
-
                 res.IsSuccess = true;
                 res.Message = "Question fatch Successfully";
                 res.Data = question;
@@ -502,7 +505,9 @@ namespace QuickCampus_Core.Services
                 Marks = marks,
                 IsActive = true,
                 IsDeleted = false,
-                ClentId=model.ClientId
+                ClentId=model.ClientId,
+                
+
             };
             var result = _context.Questions.Add(question);
             foreach (var item in model.options)
@@ -626,6 +631,7 @@ namespace QuickCampus_Core.Services
                     var options = question.QuestionOptions.SingleOrDefault(y => y.OptionId == item.OptionId);
                     options.OptionText = item.OptionText;
                     options.IsCorrect = item.IsCorrect;
+                    options.OptionImage = item.Imagepath != null ? ProcessUploadFile(item) : item.OptionImage;
 
                 }
                 else
@@ -635,8 +641,8 @@ namespace QuickCampus_Core.Services
                         QuestionId = question.QuestionId,
                         OptionText = item.OptionText,
                         IsCorrect = item.IsCorrect,
-
-                    };
+                        OptionImage = item.Imagepath != null ? ProcessUploadFile(item) : item.OptionImage,
+                };
                     question.QuestionOptions.Add(questionoption);
 
                 }

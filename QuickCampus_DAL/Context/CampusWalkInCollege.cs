@@ -5,6 +5,8 @@ namespace QuickCampus_DAL.Context;
 
 public partial class CampusWalkInCollege
 {
+    public readonly int GetCollegeDetails;
+
     public int CampusId { get; set; }
 
     public int? WalkInId { get; set; }

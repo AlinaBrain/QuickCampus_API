@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.VisualBasic;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
@@ -17,12 +18,6 @@ namespace QuickCampus_Core.Services
             _context = context;
 
         }
-
-        public Task<IEnumerable<CampusGridViewModel>> Add(CampusGridViewModel campusGridViewModel)
-        {
-            throw new NotImplementedException();
-        }
-
 
         public async Task<IGeneralResult<string>> AddCampus(CampusGridRequestVM vm, int clientId, int userId)
         {
@@ -293,6 +288,7 @@ namespace QuickCampus_Core.Services
                 result.Message = "Record Not Found";
                 return result;
             }
+          
             var campusGridViewModel = new CampusGridViewModel()
             {
                 WalkInID = campus.WalkInId,
@@ -308,15 +304,14 @@ namespace QuickCampus_Core.Services
                 WalkInDate = campus.WalkInDate,
                 IsActive = campus.IsActive ?? false,
                 Title = campus.Title,
-                
-
                
                 Colleges = campus.CampusWalkInColleges.Select(y => new CampusWalkInModel()
                 {
                     CampusId= y.CampusId,
                     CollegeCode = y.CollegeCode,
-                    CollegeId = y.CollegeId ?? 0,
-                   // CollegeName = y.College.CollegeName.Trim(),
+                    CollegeId = y.CollegeId,
+                   
+
                     //CollegeName=y.CollegeId ==8030? y.College.CollegeName:"",
                     ExamEndTime = y.ExamEndTime.Value.ToString(),
                     StartDateTime = y.StartDateTime,
@@ -331,6 +326,16 @@ namespace QuickCampus_Core.Services
             return result;
         }
 
+        private CampusWalkInModel GetCollegeDetails(int collegeid)
+        {
+            CampusWalkInModel statevm = new CampusWalkInModel();
+
+            var cllgdetails = _context.Colleges.Find(collegeid);
+            statevm.CollegeName = cllgdetails.CollegeName;
+            statevm.CollegeId = cllgdetails.CollegeId;
+           
+            return statevm;
+        }
         public async Task<IGeneralResult<CampusGridViewModel>> UpdateCampusStatus(int id, int clientId,bool status, bool isSuperAdmin)
         {
             IGeneralResult<CampusGridViewModel> result = new GeneralResult<CampusGridViewModel>();
@@ -377,12 +382,8 @@ namespace QuickCampus_Core.Services
             var allCollages = _context.Colleges.Where(s => s.IsDeleted == false).Select(s => s.CollegeId).ToList();
             var allStates = _context.States.Where(w => w.IsDeleted == false).Select(s => s.StateId).ToList();
             var isStateExist = allStates.Any(a => a == vm.StateID);
-            bool isExits = _context.WalkIns.Any(x => x.Title == vm.Title && x.IsDeleted == false);
-            if (isExits)
-            {
-                result.Message = " Title is already exists";
-                return result;
-            }
+            bool isExits = _context.WalkIns.Any(x => x.IsDeleted == false);
+            
 
             foreach (var clg in vm.Colleges)
             {

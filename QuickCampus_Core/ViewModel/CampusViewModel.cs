@@ -20,26 +20,30 @@ namespace QuickCampus_Core.ViewModel
                 WalkInDate = x.WalkInDate,
                 JobDescription = x.JobDescription,
                 Title = x.Title,
-                Colleges = x.CampusWalkInColleges
+                Colleges = x.CampusWalkInColleges,
+                StateId=x.StateId,
+                CountryId=x.CountryId,
+               
+                
             };
         }
 
         public IEnumerable<CampusGridViewModel> CampusList { get; set; }
         public int WalkInID { get; set; }
-        public string? Address1 { get; private set; }
-        public string? Address2 { get; private set; }
-        public string? City { get; private set; }
+        public string? Address1 { get; set; }
+        public string? Address2 { get; set; }
+        public string? City { get; set; }
         public string? StateName { get;  set; }
-        public string? CountryName { get; private set; }
-        public DateTime? CreatedDate { get; private set; }
-        public bool? IsActive { get; private set; }
-        public DateTime? WalkInDate { get; private set; }
-        public string? JobDescription { get; private set; }
-        public string? Title { get; private set; }
-        public object Colleges { get; private set; }
-        public object StateId { get; private set; }
+        public string? CountryName { get; set; }
+        public DateTime? CreatedDate { get;  set; }
+        public bool? IsActive { get; set; }
+        public DateTime? WalkInDate { get; set; }
+        public string? JobDescription { get; set; }
+        public string? Title { get; set; }
+        public object Colleges { get; set; }
+        public object StateId { get; set; }
         
-        public int CountryId { get; set; }
+        public int? CountryId { get; set; }
 
        
 
@@ -86,7 +90,7 @@ namespace QuickCampus_Core.ViewModel
         [Required(ErrorMessage = "Title is required.")]
         public string? Title { get; set; }
         public int CreatedBy { get; set; }
-        public IEnumerable<CampusWalkInModel> Colleges { get; set; }
+        public List<CampusWalkInModel> Colleges { get; set; }
 
     }
 
@@ -94,12 +98,12 @@ namespace QuickCampus_Core.ViewModel
     {
         public int CampusId { get; set; }
         [Required]
-        public int CollegeId { get; set; }
+        public int? CollegeId { get; set; }
 
         [Required]
         public int StateId { get; set; }
         [Required]
-        public string CollegeName { get; set; }
+        public string? CollegeName { get; set; }
 
         [Required(ErrorMessage = "Time is required.")]
         
