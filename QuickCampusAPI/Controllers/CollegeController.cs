@@ -205,13 +205,6 @@ namespace QuickCampusAPI.Controllers
                 //               CountryName = ct.CountryName
                 //           });
 
-
-
-
-
-
-
-
             }
             catch (Exception ex)
             {
