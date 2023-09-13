@@ -22,7 +22,6 @@ public partial class TblRole
     public bool? IsDeleted { get; set; }
 
     public bool? IsActive { get; set; }
-
     public virtual TblUser? CreatedByNavigation { get; set; }
 
     public virtual TblUser? ModifiedByNavigation { get; set; }
