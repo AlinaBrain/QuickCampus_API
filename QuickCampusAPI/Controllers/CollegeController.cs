@@ -48,7 +48,7 @@ namespace QuickCampusAPI.Controllers
         [Route("GetAllCollege")]
         public async Task<IActionResult> GetAllCollege(int clientid, string? search, int pageStart=1,int pageSize=10)
         {
-            IGeneralResult<List<CollegeCountryStateVm>> result = new GeneralResult<List<CollegeCountryStateVm>>();
+            IGeneralResult<List<CollegeCountryStateVmmm>> result = new GeneralResult<List<CollegeCountryStateVmmm>>();
             var _jwtSecretKey = _config["Jwt:Key"];
 
             int cid = 0;
@@ -96,7 +96,7 @@ namespace QuickCampusAPI.Controllers
                                join st in _context.States on c.StateId equals st.StateId
                                join ci in _context.Cities on c.CityId equals ci.CityId
                               
-                               select new CollegeCountryStateVm
+                               select new CollegeCountryStateVmmm
                                {
                                    CollegeId = c.CollegeId,
                                    CollegeName = c.CollegeName,
@@ -127,7 +127,7 @@ namespace QuickCampusAPI.Controllers
                 List<StateTypeVm> statelist = new List<StateTypeVm>();
                 List<CityTypeVm> citylist = new List<CityTypeVm>();
 
-                var response = results.Select(x => (CollegeCountryStateVm)x).OrderByDescending(x => x.CollegeId).ToList();
+                var response = results.Select(x => (CollegeCountryStateVmmm)x).OrderByDescending(x => x.CollegeId).ToList();
             
                 if (response != null)
                     {
