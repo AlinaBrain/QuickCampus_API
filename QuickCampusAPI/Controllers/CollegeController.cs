@@ -11,6 +11,7 @@ using Microsoft.Extensions.Hosting.Internal;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Net.Mail;
+using System.Threading.Tasks.Dataflow;
 
 namespace QuickCampusAPI.Controllers
 {
@@ -30,7 +31,7 @@ namespace QuickCampusAPI.Controllers
         private readonly QuikCampusDevContext _context;
        
 
-        public CollegeController(ICollegeRepo collegeRepo, IConfiguration config, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, ICountryRepo countryRepo, IStateRepo stateRepo,ICityRepo cityRepo, QuikCampusDevContext quikCampusDevContext, Country country)
+        public CollegeController(ICollegeRepo collegeRepo, IConfiguration config, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, ICountryRepo countryRepo, IStateRepo stateRepo,ICityRepo cityRepo, QuikCampusDevContext quikCampusDevContext)
         {
             _collegeRepo = collegeRepo;
             _config = config;
@@ -89,9 +90,12 @@ namespace QuickCampusAPI.Controllers
                 }
 
                 var results = (from c in collegeList
-                               join u in _context.TblUsers                    
-                               on c.CreatedBy equals u.Id
-
+                               join u in _context.TblUsers  
+                               on c.CreatedBy equals u.Id                               
+                               join ct in _context.Countries on c.CountryId equals ct.CountryId
+                               join st in _context.States on c.StateId equals st.StateId
+                               join ci in _context.Cities on c.CityId equals ci.CityId
+                              
                                select new CollegeCountryStateVm
                                {
                                    CollegeId = c.CollegeId,
@@ -112,8 +116,10 @@ namespace QuickCampusAPI.Controllers
                                    IsDeleted = c.IsDeleted,
                                    ClientId = c.ClientId,
                                    CreatedName = u.Name,
-                                   ModifiedName = u.Name  
-                                   
+                                   ModifiedName = u.Name,
+                                   CountryName = ct.CountryName,
+                                   StateName = st.StateName,
+                                   CityName = ci.CityName                                 
                                }).ToList();
 
                 CollegeCountryStateVm vml = new CollegeCountryStateVm();
@@ -143,7 +149,7 @@ namespace QuickCampusAPI.Controllers
                         {
                             result.Message = "No Country found!";
                         }
-
+                     
                     if (statelists.Count() > 0)
                         {
                             foreach (var c in statelists)
@@ -194,16 +200,6 @@ namespace QuickCampusAPI.Controllers
                         result.Message = "College list not found!";
                         result.Data = null;
                     }
-
-
-                //var res = (from c in results
-                //           join ct in CollegeCountryStateVm
-                //           c.CountryName equals ct.CountryId
-
-                //           select new Country
-                //           {
-                //               CountryName = ct.CountryName
-                //           });
 
             }
             catch (Exception ex)

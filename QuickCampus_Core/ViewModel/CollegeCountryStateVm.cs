@@ -66,6 +66,9 @@ namespace QuickCampus_Core.ViewModel
         public string? CreatedName { get; set; }
         public string? ModifiedName { get; set; }
         public string? CountryName { get; set; }
+        public string? StateName { get; set; }
+        public string? CityName { get; set; }
+
         public bool? IsDeleted { get; set; }
         public int? ClientId { get; set; }
 
