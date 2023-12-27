@@ -147,12 +147,12 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    //app.UseFileServer(new FileServerOptions
-    //{
-    //    FileProvider = new PhysicalFileProvider(@"C:\WWW\QuikCampusDevLatest\wwwroot\UploadFiles\"),
-    //    RequestPath = new PathString("/UploadFiles"),
-    //    EnableDirectoryBrowsing = false
-    //});
+    app.UseFileServer(new FileServerOptions
+    {
+        FileProvider = new PhysicalFileProvider(@"D:\Inetpub\vhosts\btprojects.in\quickcampus.btprojects.in\wwwroot\UploadFiles"),
+        RequestPath = new PathString("/UploadFiles"),
+        EnableDirectoryBrowsing = false
+    });
 }
 app.UseSwagger();
 app.UseSwaggerUI();
