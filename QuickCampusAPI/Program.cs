@@ -135,7 +135,7 @@ if (app.Environment.IsDevelopment())
        // FileProvider = new PhysicalFileProvider(@"D:\Quick Campus\QuickCampusAPI\wwwroot\UploadFiles"),
 
        // FileProvider=new PhysicalFileProvider(@"D:\QuickCampusS\QuickCampus\QuickCampusAPI\wwwroot\UploadFiles"),
-         FileProvider = new PhysicalFileProvider(@"D:\QuickCampus\Quick_Campus\QuickCampusAPI\wwwroot\UploadFiles"),
+         FileProvider = new PhysicalFileProvider(@"E:\QuickCampus\Quick_Campus\QuickCampusAPI\wwwroot\UploadFiles"),
         // FileProvider = new PhysicalFileProvider(@"C:\Users\shrip\source\repos\AlinaBrain\QuickCampus_API\QuickCampusAPI\wwwroot\UploadFiles\\"),
         // FileProvider = new PhysicalFileProvider(@"E:\\TestImage\\"),
         // FileProvider = new PhysicalFileProvider(@"F:\Quikcampus\QuickCampusAPI\wwwroot\UploadFiles\\"),
@@ -147,12 +147,12 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    app.UseFileServer(new FileServerOptions
-    {
-        FileProvider = new PhysicalFileProvider(@"C:\WWW\QuikCampusDevLatest\wwwroot\UploadFiles\"),
-        RequestPath = new PathString("/UploadFiles"),
-        EnableDirectoryBrowsing = false
-    });
+    //app.UseFileServer(new FileServerOptions
+    //{
+    //    FileProvider = new PhysicalFileProvider(@"C:\WWW\QuikCampusDevLatest\wwwroot\UploadFiles\"),
+    //    RequestPath = new PathString("/UploadFiles"),
+    //    EnableDirectoryBrowsing = false
+    //});
 }
 app.UseSwagger();
 app.UseSwaggerUI();
