@@ -26,7 +26,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "GetAllState")]
         [HttpGet]
         [Route("GetAllState")]
-        public async Task<IActionResult> GetAllState(int clientid,int countryID, string stateName)
+        public async Task<IActionResult> GetAllState(int countryID)
         {
             IGeneralResult<List<StateVM>> result = new GeneralResult<List<StateVM>>();
             var _jwtSecretKey = _config["Jwt:Key"];
@@ -35,14 +35,7 @@ namespace QuickCampusAPI.Controllers
             var jwtSecretKey = _config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            if (isSuperAdmin)
-            {
-                cid = clientid;
-            }
-            else
-            {
-                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
-            }
+           
             List<State> statelist = new List<State>();
             try
             {
@@ -50,7 +43,7 @@ namespace QuickCampusAPI.Controllers
                 {
                     statelist = (await _stateRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid ) && x.CountryId== countryID).ToList();
 
-                    statelist = (await _stateRepo.GetAll()).Where(x => x.IsDeleted != true && x.StateName.Contains(stateName)).ToList();
+                
 
                 }
                 else
@@ -80,21 +73,14 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "AddState")]
         [HttpPost]
         [Route("AddState")]
-        public async Task<IActionResult> AddState( StateVM vm, int clientid)
+        public async Task<IActionResult> AddState( StateVM vm)
         {
             IGeneralResult<StateVM> result = new GeneralResult<StateVM>();
             var _jwtSecretKey = _config["Jwt:Key"];
             int cid = 0;
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            if (isSuperAdmin)
-            {
-                cid = clientid;
-            }
-            else
-            {
-                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
-            }
+           
             var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             if (vm != null)
             {
@@ -143,21 +129,14 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "GetStateById")]
         [HttpGet]
         [Route("GetStateById")]
-        public async Task<IActionResult> GetStateById(int stateid,int clientid)
+        public async Task<IActionResult> GetStateById(int stateid)
         {
             IGeneralResult<StateVM> result = new GeneralResult<StateVM>();
             var _jwtSecretKey = _config["Jwt:Key"];
             int cid = 0;
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            if (isSuperAdmin)
-            {
-                cid = clientid;
-            }
-            else
-            {
-                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
-            }
+          
 
             var res = await _stateRepo.GetById(stateid);
             if (res.IsDeleted == false && res.IsActive == true)

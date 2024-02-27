@@ -156,8 +156,6 @@ namespace QuickCampusAPI.Controllers
             var res = await _campusrepo.GetCampusByID(campusId, getClientId, isSuperAdmin);
             return Ok(res);
         }
-
-
         [Authorize(Roles = "CampusAction")]
         [HttpGet]
         [Route("UpdateCampusStaus")]

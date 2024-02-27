@@ -29,7 +29,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "GetAllCity")]
         [HttpGet]
         [Route("GetAllCity")]
-        public async Task<IActionResult> GetAllCity(int clientid, int stateId)
+        public async Task<IActionResult> GetAllCity( int stateId)
         {
             IGeneralResult<List<CityVm>> result = new GeneralResult<List<CityVm>>();
             var _jwtSecretKey = _config["Jwt:Key"];
@@ -40,14 +40,7 @@ namespace QuickCampusAPI.Controllers
             var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
             var newPageStart = 0;
             
-            if (isSuperAdmin)
-            {
-                cid = clientid;
-            }
-            else
-            {
-                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
-            }
+           
             List<City> citylist = new List<City>();
             var cityTotalCount = 0;
             try
@@ -89,7 +82,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "GetCityById")]
         [HttpGet]
         [Route("GetCityById")]
-        public async Task<IActionResult> GetCityById(int id,int clientid)
+        public async Task<IActionResult> GetCityById(int id)
         {
             IGeneralResult<CityVm> result=new GeneralResult<CityVm>();
             
@@ -97,14 +90,7 @@ namespace QuickCampusAPI.Controllers
             int cid = 0;
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            if (isSuperAdmin)
-            {
-                cid = clientid;
-            }
-            else
-            {
-                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
-            }
+            
 
             var res = await _cityrepo.GetById(id);
             if (res.IsDeleted == false && res.IsActive == true)
@@ -123,21 +109,14 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "AddCity")]
         [HttpPost]
         [Route("AddCity")]
-        public async Task<IActionResult> AddCity(CityVm vm, int clientid)
+        public async Task<IActionResult> AddCity(CityVm vm)
         {
             IGeneralResult<CityVm> result = new GeneralResult<CityVm>();
             var _jwtSecretKey = _config["Jwt:Key"];
             int cid = 0;
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            if (isSuperAdmin)
-            {
-                cid = clientid;
-            }
-            else
-            {
-                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
-            }
+            
             var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             if (vm != null)
             {

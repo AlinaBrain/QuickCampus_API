@@ -150,7 +150,7 @@ namespace QuickCampusAPI.Controllers
 
                     };
 
-                    var dataWithClientId = await _applicantRepo.Add(applicantViewModel.ToUpdateDbModel());
+                    var dataWithClientId = await _applicantRepo.Add(applicantViewModel.ToApplicantDbModel());
                     result.IsSuccess = true;
                     result.Message = "Applicant added successfully.";
                     result.Data = (ApplicantViewModel)dataWithClientId;

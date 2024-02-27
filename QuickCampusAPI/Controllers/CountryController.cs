@@ -26,7 +26,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "GetAllCountry")]
         [HttpGet]
         [Route("GetAllCountry")]
-        public async Task<IActionResult> GetAllCountry(int clientid, string countryName)
+        public async Task<IActionResult> GetAllCountry(int clientid)
         {
             IGeneralResult<List<CountryVM>> result = new GeneralResult<List<CountryVM>>();
             int cid = 0;
@@ -43,9 +43,9 @@ namespace QuickCampusAPI.Controllers
             }
             try
             {
-                //var clientList = (await _countryrepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.CountryId == cid)).ToList().OrderByDescending(x => x.CountryId);
+                var clientList = (await _countryrepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.CountryId == cid)).ToList().OrderByDescending(x => x.CountryId);
 
-                var clientList = (await _countryrepo.GetAll()).Where(x => x.IsDeleted != true && x.CountryName.Contains(countryName)).ToList();
+               // var clientList = (await _countryrepo.GetAll()).Where(x => x.IsDeleted != true && x.CountryName.Contains(countryName)).ToList();
 
 
                 var res = clientList.Select(x => ((CountryVM)x)).ToList();
