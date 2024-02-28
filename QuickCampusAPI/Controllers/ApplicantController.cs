@@ -57,14 +57,14 @@ namespace QuickCampusAPI.Controllers
                 if (isSuperAdmin)
                 {
                     applicantTotalCount = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Count();
-                    apllicantlist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Skip(newPageStart).Take(pageSize).ToList();
-                    apllicantlist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && (x.FirstName.Contains(search ?? "",StringComparison.OrdinalIgnoreCase) || x.LastName.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.EmailAddress.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.PhoneNumber.Contains(search ?? ""))).OrderByDescending(x => x.ApplicantId).Skip(newPageStart).Take(pageSize).ToList(); 
+                    apllicantlist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && x.IsActive==true && (cid == 0 ? true : x.ClientId == cid)).Skip(newPageStart).Take(pageSize).ToList();
+                    apllicantlist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && x.IsActive == true && (x.FirstName.Contains(search ?? "",StringComparison.OrdinalIgnoreCase) || x.LastName.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.EmailAddress.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.PhoneNumber.Contains(search ?? ""))).OrderByDescending(x => x.ApplicantId).Skip(newPageStart).Take(pageSize).ToList(); 
                 }
                 else
                 {
-                    applicantTotalCount = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Count();
-                    apllicantlist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Skip(newPageStart).Take(pageSize).ToList();
-                    apllicantlist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && (x.FirstName.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.LastName.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.EmailAddress.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.PhoneNumber.Contains(search ?? ""))).OrderByDescending(x => x.ApplicantId).Skip(newPageStart).Take(pageSize).ToList();
+                    applicantTotalCount = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true  && x.IsActive==true  && (cid == 0 ? true : x.ClientId == cid)).Count();
+                    apllicantlist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && x.IsActive == true && (cid == 0 ? true : x.ClientId == cid)).Skip(newPageStart).Take(pageSize).ToList();
+                    apllicantlist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && x.IsActive == true && (x.FirstName.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.LastName.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.EmailAddress.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.PhoneNumber.Contains(search ?? ""))).OrderByDescending(x => x.ApplicantId).Skip(newPageStart).Take(pageSize).ToList();
                 }
                 var response = apllicantlist.Select(x => (ApplicantViewModel)x).ToList();
                 if (apllicantlist.Count > 0)

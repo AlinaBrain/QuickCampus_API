@@ -228,12 +228,14 @@ namespace QuickCampusAPI.Controllers
                                    Address=c.Address,
                                    Email=c.Email,
                                    Id=c.Id,
-                                   IsActive=c.IsActive,
+                                   IsActive= c.IsDeleted ,
+                                   IsDeleted=c.IsDeleted,
                                    Phone = c.Phone,
                                    CreatedDate = c.CreatedDate,
                                    CraetedBy = c.CraetedBy,
                                    ModifiedName = u.Name,
-                                   ModofiedDate = c.ModofiedDate
+                                   ModofiedDate = c.ModofiedDate,
+                                   SubscriptionPlan=c.SubscriptionPlan
                                }).Where(x => x.Name.Contains(search ?? "") || x.Email.Contains(search ?? "")).OrderByDescending(x => x.Id).ToList();
 
 

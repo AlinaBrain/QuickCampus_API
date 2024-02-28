@@ -22,6 +22,7 @@ namespace QuickCampus_Core.ViewModel
                 Latitude = items.Latitude,
                 Longitude = items.Longitude,
                 IsActive = items.IsActive, 
+                IsDeleted=items.IsDeleted
             };
         }
         public int Id { get; set; }
@@ -53,7 +54,7 @@ namespace QuickCampus_Core.ViewModel
         public string CreatedName { get; set; }
 
         public string ModifiedName { get; set; }
-        
+        public bool? IsDeleted { get; set; }
     }
 
     public class ClientUpdateRequest
