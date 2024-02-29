@@ -181,13 +181,13 @@ namespace QuickCampusAPI.Controllers
                 var clientListCount = 0;
                 if (isSuperAdmin)
                 {
-                    clientListCount = (await userRepo.GetAll()).Where(x => x.IsDelete != true && (cid == 0 ? true : x.Id == cid)).Count();
+                    clientListCount = (await userRepo.GetAll()).Where(x => x.IsDelete == false && x.IsActive == true &&  (cid == 0 ? true : x.Id == cid)).Count();
                     collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete == false && (cid == 0 ? true : x.ClientId == cid)).OrderByDescending(o => o.Id).Skip(newPageStart).Take(pageSize).ToList();
                     collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete == false && x.Name.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.Email.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.Mobile.Contains(search ?? "")).OrderByDescending(o => o.Id).Skip(newPageStart).Take(pageSize).ToList();
                 }
                 else
                 {
-                    clientListCount = (await userRepo.GetAll()).Where(x => x.IsDelete != true && (cid == 0 ? true : x.Id == cid)).Count();
+                    clientListCount = (await userRepo.GetAll()).Where(x => x.IsDelete ==false &&x.IsActive ==true && (cid == 0 ? true : x.Id == cid)).Count();
                     collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete == false && (cid == 0 ? true : x.ClientId == cid)).OrderByDescending(o => o.Id).Skip(newPageStart).Take(pageSize).ToList();
                     collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete == false && x.Name.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.Email.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.Mobile.Contains(search ?? "")).OrderByDescending(o => o.Id).Skip(newPageStart).Take(pageSize).ToList();
                 }
@@ -204,7 +204,7 @@ namespace QuickCampusAPI.Controllers
                 else
                 {
                     result.IsSuccess = true;
-                    result.Message = "College list not found!";
+                    result.Message = "User Not Updated !";
                     result.Data = null;
                 }
             }

@@ -16,7 +16,7 @@ namespace QuickCampus_Core.ViewModel
                 CreateDate = items.CreateDate,
                 ModifiedDate = items.ModifiedDate,
                 IsActive = items.IsActive,
-                
+                IsDelete = items.IsDelete
             };
             }
         public int Id { get; set; }
@@ -32,7 +32,6 @@ namespace QuickCampus_Core.ViewModel
 
         public DateTime? ModifiedDate { get; set; }
          public bool? IsActive { get; set; }
-
-
+         public   bool? IsDelete { get; set; }
     }
 }
