@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
+using QuickCampus_Core.Services;
 using QuickCampus_Core.ViewModel;
 
 namespace QuickCampusAPI.Controllers
@@ -84,16 +85,18 @@ namespace QuickCampusAPI.Controllers
                     bool isExits = _companyRepo.Any(x => x.CompanyName == companyVM.CompanyName && x.Isdeleted == false);
                     if (isExits)
                     {
-                        result.Message = " Company is already exists";
+                        result.Message = " Company Name is already exists";
                     }
                     else
                     {
                         {
+                            int recordcount = (await _companyRepo.GetAll()).Count();
                             CompanyVm companyVm = new CompanyVm
                             {
                                 CompanyName = companyVM.CompanyName.Trim(),
                                 IsActive = true,
                                 Isdeleted = false,
+                                CompanyId = recordcount + 1
                             };
                             try
                             {

@@ -41,6 +41,7 @@ namespace QuickCampus_Core.ViewModel
         {
             return new Company
             {
+                CompanyId=CompanyId,
                 CompanyName = CompanyName,
                 IsActive = true,
                 Isdeleted=false,
