@@ -13,7 +13,7 @@ namespace QuickCampus_Core.Services
     public class CampusService : BaseRepository<QuikCampusDevContext, WalkIn>, ICampusRepo
     {
         private readonly QuikCampusDevContext _context;
-        public CampusService(QuikCampusDevContext context,ICollegeRepo collegeRepo)
+        public CampusService(QuikCampusDevContext context, ICollegeRepo collegeRepo)
         {
             _context = context;
 
@@ -44,7 +44,7 @@ namespace QuickCampus_Core.Services
                     return result;
                 }
                 var checkstate = allStates.Any(s => s == clg.StateId);
-                if(!checkstate)
+                if (!checkstate)
                 {
                     result.IsSuccess = false;
                     result.Message = "state id " + clg.StateId + " is not exist";
@@ -69,7 +69,7 @@ namespace QuickCampus_Core.Services
             {
                 if (vm.WalkInID > 0)
                 {
-                    WalkIn campus = _context.WalkIns.Where(x => x.WalkInId == vm.WalkInID && (clientId==0?true:x.ClientId == clientId)).Include(x => x.State).Include(x=>x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
+                    WalkIn campus = _context.WalkIns.Where(x => x.WalkInId == vm.WalkInID && (clientId == 0 ? true : x.ClientId == clientId)).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
                     if (campus != null)
                     {
                         campus.WalkInDate = vm.WalkInDate;
@@ -145,7 +145,7 @@ namespace QuickCampus_Core.Services
                     {
                         CampusWalkInCollege campusWalkInCollege = new CampusWalkInCollege()
                         {
-                            
+
                             WalkInId = sv.WalkInId,
                             CollegeId = rec.CollegeId,
                             ExamStartTime = TimeSpan.Parse(rec.ExamStartTime),
@@ -161,10 +161,10 @@ namespace QuickCampus_Core.Services
                 int response = _context.SaveChanges();
                 if (response > 0)
                 {
-                    
+
                     result.IsSuccess = true;
                     result.Message = "Record Saved Successfully";
-                    
+
                 }
                 else
                 {
@@ -188,13 +188,11 @@ namespace QuickCampus_Core.Services
             res = _context.CampusWalkInColleges.Include(i => i.College).Where(w => w.CampusId == id).FirstOrDefault();
             return res;
         }
-        public async Task<IEnumerable<CampusGridViewModel>> GetAllCampus(int clientId, bool isSuperAdmin,int pageStart,int pageSize)
+        public async Task<IEnumerable<CampusGridViewModel>> GetAllCampus(int clientId, bool isSuperAdmin, int pageStart, int pageSize)
         {
 
             if (isSuperAdmin)
             {
-
-
                 var campuse = _context.WalkIns.Where(x => x.IsDeleted == false && (clientId == 0 ? true : x.ClientId == clientId)).Include(x => x.CampusWalkInColleges).Include(x => x.State).Include(x => x.Country).OrderByDescending(x => x.WalkInDate).Select(x => new CampusGridViewModel()
                 {
                     WalkInID = x.WalkInId,
@@ -255,7 +253,7 @@ namespace QuickCampus_Core.Services
                         CollegeName = y.College.CollegeName.Trim(),
                         ExamEndTime = y.ExamEndTime.Value.ToString(),
                         ExamStartTime = y.ExamStartTime.Value.ToString(),
-                        StartDateTime= y.StartDateTime,
+                        StartDateTime = y.StartDateTime,
                     }).Skip(pageStart).Take(pageSize).ToList()
                 });
                 if (campuses.Any())
@@ -269,11 +267,11 @@ namespace QuickCampus_Core.Services
             }
         }
 
-        public async Task<IEnumerable<CampusGridViewModel>> GetCampusByID(int id, int clientId, bool isSuperAdmin)
+        public async Task<CampusGridViewModel> GetCampusByID(int id, int clientId, bool isSuperAdmin)
         {
             if (isSuperAdmin)
             {
-                var campuse = _context.WalkIns.Where(x => x.IsDeleted == false && x.WalkInId==id  && (clientId == 0 ? true : x.ClientId == clientId)).Include(x => x.CampusWalkInColleges).Include(x => x.State).Include(x => x.Country).OrderByDescending(x => x.WalkInDate).Select(x => new CampusGridViewModel()
+                var campusData = _context.WalkIns.Where(x => x.IsDeleted == false && x.WalkInId == id && (clientId == 0 ? true : x.ClientId == clientId)).Include(x => x.CampusWalkInColleges).Include(x => x.State).Include(x => x.Country).OrderByDescending(x => x.WalkInDate).Select(x => new CampusGridViewModel()
                 {
                     WalkInID = x.WalkInId,
                     Address1 = x.Address1,
@@ -297,21 +295,20 @@ namespace QuickCampus_Core.Services
                         ExamStartTime = y.ExamStartTime.Value.ToString()
 
                     }).ToList(),
-                }).ToList();
-                if (campuse.Any())
+                }).FirstOrDefault();
+                if (campusData.WalkInID > 0)
                 {
-                    return campuse.ToList();
+                    return campusData;
                 }
                 else
                 {
-                    return new List<CampusGridViewModel>();
+                    return new CampusGridViewModel();
                 }
-
             }
 
             else
             {
-                var campuses = _context.WalkIns.Where(x => x.IsDeleted == false && x.ClientId == clientId).Include(x => x.CampusWalkInColleges).Include(x => x.State).Include(x => x.Country).OrderByDescending(x => x.WalkInDate).Select(x => new CampusGridViewModel()
+                var campusData = _context.WalkIns.Where(x => x.IsDeleted == false && x.ClientId == clientId).Include(x => x.CampusWalkInColleges).Include(x => x.State).Include(x => x.Country).OrderByDescending(x => x.WalkInDate).Select(x => new CampusGridViewModel()
                 {
                     WalkInID = x.WalkInId,
                     Address1 = x.Address1.Trim(),
@@ -335,17 +332,17 @@ namespace QuickCampus_Core.Services
                         ExamStartTime = y.ExamStartTime.Value.ToString(),
                         StartDateTime = y.StartDateTime,
                     }).ToList()
-                });
-                if (campuses.Any())
+                }).FirstOrDefault();
+                if (campusData.WalkInID > 0)
                 {
-                    return campuses.ToList();
+                    return campusData;
                 }
                 else
                 {
-                    return new List<CampusGridViewModel>();
+                    return new CampusGridViewModel();
                 }
             }
-            }
+        }
 
         private CampusWalkInModel GetCollegeDetails(int collegeid)
         {
@@ -354,21 +351,21 @@ namespace QuickCampus_Core.Services
             var cllgdetails = _context.Colleges.Find(collegeid);
             statevm.CollegeName = cllgdetails.CollegeName;
             statevm.CollegeId = cllgdetails.CollegeId;
-           
+
             return statevm;
         }
-        public async Task<IGeneralResult<CampusGridViewModel>> UpdateCampusStatus(int id, int clientId,bool status, bool isSuperAdmin)
+        public async Task<IGeneralResult<CampusGridViewModel>> UpdateCampusStatus(int id, int clientId, bool status, bool isSuperAdmin)
         {
             IGeneralResult<CampusGridViewModel> result = new GeneralResult<CampusGridViewModel>();
             result.Data = new CampusGridViewModel();
             WalkIn campus = new WalkIn();
             if (isSuperAdmin)
             {
-                campus = _context.WalkIns.Where(x => x.WalkInId == id  && x.IsDeleted == false && (clientId==0?true:x.ClientId==clientId)).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
+                campus = _context.WalkIns.Where(x => x.WalkInId == id && x.IsDeleted == false && (clientId == 0 ? true : x.ClientId == clientId)).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
             }
             else
             {
-                campus = _context.WalkIns.Where(x => x.WalkInId == id  && x.IsDeleted == false && x.ClientId == clientId).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
+                campus = _context.WalkIns.Where(x => x.WalkInId == id && x.IsDeleted == false && x.ClientId == clientId).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
             }
             if (campus == null)
             {
@@ -379,7 +376,7 @@ namespace QuickCampus_Core.Services
             campus.IsActive = status;
 
             _context.WalkIns.Update(campus);
-            int st =  _context.SaveChanges();
+            int st = _context.SaveChanges();
 
             if (st > 0)
             {
@@ -404,7 +401,7 @@ namespace QuickCampus_Core.Services
             var allStates = _context.States.Where(w => w.IsDeleted == false).Select(s => s.StateId).ToList();
             var isStateExist = allStates.Any(a => a == vm.StateID);
             bool isExits = _context.WalkIns.Any(x => x.IsDeleted == false);
-            
+
 
             foreach (var clg in vm.Colleges)
             {
@@ -473,7 +470,7 @@ namespace QuickCampus_Core.Services
                                     ExamEndTime = TimeSpan.Parse(rec.ExamEndTime),
                                     CollegeCode = rec.CollegeCode,
                                     StartDateTime = rec.StartDateTime,
-                                    
+
                                     IsCompleted = null
                                 };
                                 _context.CampusWalkInColleges.Update(campusWalkInCollege);
@@ -496,7 +493,7 @@ namespace QuickCampus_Core.Services
 
                 var sv = new WalkIn()
                 {
-                    WalkInId=vm.WalkInID,
+                    WalkInId = vm.WalkInID,
                     WalkInDate = vm.WalkInDate,
                     JobDescription = vm.JobDescription,
                     Address1 = vm.Address1,
@@ -554,13 +551,13 @@ namespace QuickCampus_Core.Services
             return result;
         }
 
-        public async Task<IGeneralResult<CampusGridViewModel>> DeleteCampus(int id, int clientId, bool isDelete, bool isSuperAdmin)
+        public async Task<IGeneralResult<CampusGridViewModel>> DeleteCampus(int id, int clientId, bool isSuperAdmin)
         {
             IGeneralResult<CampusGridViewModel> result = new GeneralResult<CampusGridViewModel>();
             result.Data = new CampusGridViewModel();
             WalkIn campus = new WalkIn();
             if (isSuperAdmin)
-                campus = _context.WalkIns.Where(x => x.WalkInId == id && x.IsActive == true && x.IsDeleted == false && (clientId==0?true:x.ClientId==clientId)).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
+                campus = _context.WalkIns.Where(x => x.WalkInId == id && x.IsActive == true && x.IsDeleted == false && (clientId == 0 ? true : x.ClientId == clientId)).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
             else
                 campus = _context.WalkIns.Where(x => x.WalkInId == id && x.IsActive == true && x.IsDeleted == false && x.ClientId == clientId).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
 
@@ -570,8 +567,8 @@ namespace QuickCampus_Core.Services
                 result.Message = "Record Not Found";
                 return result;
             }
-            campus.IsDeleted = isDelete;
-
+            campus.IsDeleted = true;
+            campus.IsActive = false;
             _context.WalkIns.Update(campus);
             int st = _context.SaveChanges();
 

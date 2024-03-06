@@ -132,10 +132,10 @@ namespace QuickCampusAPI.Controllers
         [Route("getCampusByCampusId")]
         public async Task<IActionResult> getcampusbyid(int campusId, int clientid)
         {
-            IGeneralResult<List<CampusGridViewModel>> result = new GeneralResult<List<CampusGridViewModel>>();
+            IGeneralResult<CampusGridViewModel> result = new GeneralResult<CampusGridViewModel>();
             var _jwtSecretKey = _config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-           var  isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
             int getClientId = 0;
 
             if (!isSuperAdmin && clientId == "0")
@@ -154,8 +154,15 @@ namespace QuickCampusAPI.Controllers
                 getClientId = string.IsNullOrEmpty(clientId) == true ? 0 : Convert.ToInt32(clientId);
             }
             var res = await _campusrepo.GetCampusByID(campusId, getClientId, isSuperAdmin);
+            if(res.WalkInID > 0)
+            {
+                result.IsSuccess = true;
+                result.Message = "Campus Data";
+                result.Data = res;
+            }
             return Ok(res);
         }
+
         [Authorize(Roles = "CampusAction")]
         [HttpGet]
         [Route("UpdateCampusStaus")]
@@ -188,9 +195,9 @@ namespace QuickCampusAPI.Controllers
 
 
         [Authorize(Roles = "DeleteCampus")]
-        [HttpGet]
+        [HttpDelete]
         [Route("DeleteCampus")]
-        public async Task<IActionResult> DeleteCampus(int campusId, bool status, int clientid)
+        public async Task<IActionResult> DeleteCampus(int campusId, int clientid)
         {
             IGeneralResult<string> result = new GeneralResult<string>();
             int cid = 0;
@@ -213,8 +220,8 @@ namespace QuickCampusAPI.Controllers
                 }
             }
 
-            var res = await _campusrepo.DeleteCampus(campusId, cid, status, isSuperAdmin);
+            var res = await _campusrepo.DeleteCampus(campusId, cid, isSuperAdmin);
             return Ok(res);
         }
     }
-    }
+}

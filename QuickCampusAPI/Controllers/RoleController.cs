@@ -120,7 +120,7 @@ namespace QuickCampusAPI.Controllers
             if (isSuperAdmin)
             {
                 //rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted == false || x.IsActive == false && (cid == 0 ? true : x.ClientId == cid )).OrderByDescending(o=>o.Id).ToList();
-                rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted == false && x.Name.Contains(name ?? "", StringComparison.OrdinalIgnoreCase)).OrderByDescending(o => o.Id).ToList();
+                rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted == false  && x.Name.Contains(name ?? "", StringComparison.OrdinalIgnoreCase)).OrderByDescending(o => o.Id).ToList();
             }
             else
             {
@@ -169,7 +169,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "DeleteRole")]
         [HttpDelete]
         [Route("DeleteRole")]
-        public async Task<IActionResult> DeleteRole(int id, int clientid, bool isDeleted)
+        public async Task<IActionResult> DeleteRole(int id, int clientid)
         {
             IGeneralResult<RoleResponse> result = new GeneralResult<RoleResponse>();
 
@@ -192,7 +192,7 @@ namespace QuickCampusAPI.Controllers
                     return Ok(result);
                 }
             }
-            var res = await roleRepo.DeleteRole(isDeleted, id, cid, isSuperAdmin);
+            var res = await roleRepo.DeleteRole( id, cid, isSuperAdmin);
             return Ok(res);
         }
 

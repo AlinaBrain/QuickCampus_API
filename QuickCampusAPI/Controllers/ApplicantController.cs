@@ -134,7 +134,7 @@ namespace QuickCampusAPI.Controllers
                             MatricPercentage = vm.MatricPercentage,
                             IntermediatePercentage = vm.IntermediatePercentage,
                             Skills = vm.Skills,
-                            StatusId = (int)(StatusEnum)vm.StatusId,
+                            StatusId = vm.StatusId,
                             Comment = vm.Comment.Trim(),
                             CollegeName = vm.CollegeName.Trim(),
                             ClientId = cid,
@@ -145,9 +145,18 @@ namespace QuickCampusAPI.Controllers
                         {
 
                             var dataWithClientId = await _applicantRepo.Add(applicantViewModel.ToApplicantDbModel());
+                        if (dataWithClientId.ApplicantId > 0)
+                        {
                             result.IsSuccess = true;
+
                             result.Message = "Applicant added successfully.";
                             result.Data = (ApplicantViewModel)dataWithClientId;
+                        }
+                        else
+                        {
+                            result.Message = "Something Went Wrong";
+                        }
+                            
                            
                         }
                         catch(Exception ex)

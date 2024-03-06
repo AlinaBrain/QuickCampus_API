@@ -93,6 +93,7 @@ namespace QuickCampus_Core.Services
                 return result;
             }
             rl.IsActive = isActive;
+            rl.ModofiedDate = DateTime.Now;
             dbContext.TblRoles.Update(rl);
             int a = dbContext.SaveChanges();
             if (a > 0)
@@ -111,27 +112,22 @@ namespace QuickCampus_Core.Services
         }
 
 
-        public async Task<IGeneralResult<string>> DeleteRole(bool isDeleted, int id, int clientid, bool isSuperAdmin)
+        public async Task<IGeneralResult<string>> DeleteRole(int id, int clientid, bool isSuperAdmin)
         {
             IGeneralResult<string> result = new GeneralResult<string>();
             TblRole rl = new TblRole();
-            if (isSuperAdmin)
-            {
-                rl = _context.TblRoles.Where(w => w.IsDeleted != true && (clientid == 0 ? true : w.ClientId == clientid)).FirstOrDefault();
-            }
-            else
-            {
-                rl = _context.TblRoles.Where(w => w.IsDeleted != true && w.ClientId == clientid).FirstOrDefault();
-            }
+            rl = _context.TblRoles.Find(id);
+          
             if (rl == null)
             {
                 result.IsSuccess = false;
                 result.Message = "Role not found";
                 return result;
             }
-            rl.Id = id;
-            rl.IsDeleted = isDeleted;
+            rl.IsDeleted = true;
             rl.IsActive = false;
+            rl.ModofiedDate = DateTime.Now  ;
+            
             dbContext.TblRoles.Update(rl);
             int a = dbContext.SaveChanges();
             if (a > 0)
@@ -193,11 +189,11 @@ namespace QuickCampus_Core.Services
             TblRole rl = new TblRole();
             if (isSuperAdmin)
             {
-                rl = _context.TblRoles.Where(w => w.IsDeleted != true && w.IsActive==true && w.Id == rId && (clientid == 0 ? true : w.ClientId == clientid)).FirstOrDefault();
+                rl = _context.TblRoles.Where(w => w.IsDeleted != true && w.Id == rId && (clientid == 0 ? true : w.ClientId == clientid)).FirstOrDefault();
             }
             else
             {
-                rl = _context.TblRoles.Where(w => w.IsDeleted != true && w.IsActive == true && w.Id == rId && w.ClientId == clientid).FirstOrDefault();
+                rl = _context.TblRoles.Where(w => w.IsDeleted != true && w.Id == rId && w.ClientId == clientid).FirstOrDefault();
             }
             if (rl != null)
             {
