@@ -5,8 +5,6 @@ namespace QuickCampus_DAL.Context;
 
 public partial class CampusWalkInCollege
 {
-    public readonly int GetCollegeDetails;
-
     public int CampusId { get; set; }
 
     public int? WalkInId { get; set; }
@@ -20,7 +18,6 @@ public partial class CampusWalkInCollege
     public TimeSpan? ExamEndTime { get; set; }
 
     public bool? IsCompleted { get; set; }
-  
 
     public string CollegeCode { get; set; } = null!;
 

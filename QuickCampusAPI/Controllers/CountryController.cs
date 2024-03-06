@@ -26,39 +26,27 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "GetAllCountry")]
         [HttpGet]
         [Route("GetAllCountry")]
-        public async Task<IActionResult> GetAllCountry(int clientid)
+        public async Task<IActionResult> GetAllCountry()
         {
             IGeneralResult<List<CountryVM>> result = new GeneralResult<List<CountryVM>>();
             int cid = 0;
             var _jwtSecretKey = _config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            if (isSuperAdmin)
-            {
-                cid = clientid;
-            }
-            else
-            {
-                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
-            }
             try
             {
-                var clientList = (await _countryrepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.CountryId == cid)).ToList().OrderByDescending(x => x.CountryId);
-
-               // var clientList = (await _countryrepo.GetAll()).Where(x => x.IsDeleted != true && x.CountryName.Contains(countryName)).ToList();
-
-
-                var res = clientList.Select(x => ((CountryVM)x)).ToList();
+                var countryList = (await _countryrepo.GetAll()).Where(x => x.IsDeleted == false && x.IsActive == true).ToList().OrderByDescending(x => x.CountryName);
+                var res = countryList.Select(x => ((CountryVM)x)).ToList();
                 if (res != null && res.Count() > 0)
                 {
                     result.IsSuccess = true;
-                    result.Message = "CountryList";
+                    result.Message = "Country List";
                     result.Data = res;
                     result.TotalRecordCount = res.Count();
                 }
                 else
                 {
-                    result.Message = "Country List Not Found";
+                    result.Message = "No record found";
                 }
             }
             catch (Exception ex)
@@ -70,21 +58,14 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "GetCountryById")]
         [HttpGet]
         [Route("GetCountryById")]
-        public async Task<IActionResult> GetCountryById(int countryid,int clientid)
+        public async Task<IActionResult> GetCountryById(int countryid)
         {
             IGeneralResult<CountryVM> result = new GeneralResult<CountryVM>();
             var _jwtSecretKey = _config["Jwt:Key"];
             int cid = 0;
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            if (isSuperAdmin)
-            {
-                cid = clientid;
-            }
-            else
-            {
-                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
-            }
+
 
             var res = await _countryrepo.GetById(countryid);
             if (res.IsDeleted == false && res.IsActive == true)
@@ -95,14 +76,14 @@ namespace QuickCampusAPI.Controllers
             }
             else
             {
-                result.Message = "Country does Not exist";
+                result.Message = "No record found";
             }
             return Ok(result);
         }
         [Authorize(Roles = "AddCountry")]
         [HttpPost]
         [Route("AddCountry")]
-        public async Task<IActionResult> AddCountry(CountryVM countryVM,int clientid)
+        public async Task<IActionResult> AddCountry(CountryVM countryVM, int clientid)
         {
             IGeneralResult<CountryVM> result = new GeneralResult<CountryVM>();
             var _jwtSecretKey = _config["Jwt:Key"];
@@ -132,10 +113,11 @@ namespace QuickCampusAPI.Controllers
                         {
                             CountryVM country = new CountryVM
                             {
-                                CountryName=countryVM.CountryName.Trim(),
-                                IsActive=true,
-                                IsDeleted=false,
+                                CountryName = countryVM.CountryName.Trim(),
+                                IsActive = true,
+                                IsDeleted = false,
                                 ClientId = cid,
+
                             };
                             try
                             {
@@ -163,7 +145,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "EditCountry")]
         [HttpPost]
         [Route("EditCountry")]
-        public async Task<IActionResult> EditCountry(CountryVM vm,int clientid)
+        public async Task<IActionResult> EditCountry(CountryVM vm, int clientid)
         {
             IGeneralResult<CountryVM> result = new GeneralResult<CountryVM>();
             var _jwtSecretKey = _config["Jwt:Key"];
@@ -188,7 +170,7 @@ namespace QuickCampusAPI.Controllers
                     res.IsActive = true;
                     res.CountryId = vm.CountryId;
                     res.IsDeleted = false;
-                   
+
                     try
                     {
                         result.Data = (CountryVM)await _countryrepo.Update(res);

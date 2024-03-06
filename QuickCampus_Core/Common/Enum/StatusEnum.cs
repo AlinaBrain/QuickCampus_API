@@ -8,11 +8,11 @@ namespace QuickCampus_Core.Common.Enum
 {
     public enum StatusEnum
     {
-        Active = 1,
-        Selected = 2,
-        OnHold = 3,
-        Recruited = 4,
-        Deleted = 5,
+        Active = 0,
+        Selected = 1,
+        OnHold = 2,
+        Recruited = 3,
+        Deleted = 4,
         Inactive = 6
     }
 }

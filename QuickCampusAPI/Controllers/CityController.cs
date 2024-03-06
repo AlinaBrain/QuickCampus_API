@@ -109,7 +109,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "AddCity")]
         [HttpPost]
         [Route("AddCity")]
-        public async Task<IActionResult> AddCity(CityVm vm)
+        public async Task<IActionResult> AddCity(CityModel vm)
         {
             IGeneralResult<CityVm> result = new GeneralResult<CityVm>();
             var _jwtSecretKey = _config["Jwt:Key"];

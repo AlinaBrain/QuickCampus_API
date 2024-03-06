@@ -21,7 +21,11 @@ namespace QuickCampus_Core.ViewModel
                 Longitude = items.Longitude,
                 UserName = items.UserName,
                 Password = items.Password,
-                ConfirmPassword = items.Password  
+                ConfirmPassword = items.Password,
+                IsActive=items.IsActive,
+                IsDeleted=items.IsDeleted,
+                CreatedDate=items.CreatedDate,
+                ModifiedBy=items.ModifiedBy,
             };
         }
         public int Id { get; set; }

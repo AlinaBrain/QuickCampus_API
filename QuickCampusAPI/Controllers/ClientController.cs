@@ -131,7 +131,7 @@ namespace QuickCampusAPI.Controllers
                 bool isDeleted = (bool)res.IsDeleted ? true : false;
                 if (isDeleted)
                 {
-                    result.Message = " Client does Not Exist";
+                    result.Message = "Client does Not Exist";
                     return Ok(result);
                 }
                 var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
@@ -220,23 +220,23 @@ namespace QuickCampusAPI.Controllers
                 var results = (from c in _context.TblClients
                                join u in _context.TblUsers
                                on c.CraetedBy equals u.Id
-                               
+
                                select new ClientResponseVm()
                                {
                                    Name = c.Name,
                                    CreatedName = u.Name,
-                                   Address=c.Address,
-                                   Email=c.Email,
-                                   Id=c.Id,
-                                   IsActive= true,
-                                   IsDeleted=false,
+                                   Address = c.Address,
+                                   Email = c.Email,
+                                   Id = c.Id,
+                                   IsActive = c.IsActive,
+                                   IsDeleted = c.IsDeleted,
                                    Phone = c.Phone,
                                    CreatedDate = c.CreatedDate,
                                    CraetedBy = c.CraetedBy,
                                    ModifiedName = u.Name,
                                    ModofiedDate = c.ModofiedDate,
-                                   SubscriptionPlan=c.SubscriptionPlan
-                               }).Where(x => x.Name.Contains(search ?? "") || x.Email.Contains(search ?? "")).OrderByDescending(x => x.Id).ToList();
+                                   SubscriptionPlan = c.SubscriptionPlan
+                               }).Where(x => (x.Name.Contains(search ?? "") || x.Email.Contains(search ?? "")) && x.IsDeleted == false).OrderByDescending(x => x.Id).ToList();
 
 
                 var clientListCount = results.Count();
@@ -250,7 +250,7 @@ namespace QuickCampusAPI.Controllers
                 }
                 else
                 {
-                    result.Message = "Client List Not Found";
+                    result.Message = "No data found";
                 }
             }
             catch (Exception ex)
@@ -268,19 +268,20 @@ namespace QuickCampusAPI.Controllers
             var _jwtSecretKey = _config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             IGeneralResult<ClientVM> result = new GeneralResult<ClientVM>();
-            var res = await _clientRepo.GetById(Id);
-            if (res.IsDeleted == false)
+            var res = _clientRepo.GetAllQuerable().Where(x => x.Id == Id && x.IsDeleted == false).FirstOrDefault();
+            //if (res.IsDeleted == false)
+            if (res != null)
             {
 
                 res.IsActive = false;
                 res.IsDeleted = true;
                 await _clientRepo.Update(res);
                 result.IsSuccess = true;
-                result.Message = "Client Deleted Succesfully";
+                result.Message = "Client Deleted Successfully";
             }
             else
             {
-                result.Message = "Client does Not exist";
+                result.Message = "Client does not exist";
             }
             return Ok(result);
         }
@@ -293,8 +294,9 @@ namespace QuickCampusAPI.Controllers
             var _jwtSecretKey = _config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             IGeneralResult<ClientVM> result = new GeneralResult<ClientVM>();
-            var res = await _clientRepo.GetById(id);
-            if (res.IsDeleted == false)
+            var res = _clientRepo.GetAllQuerable().Where(x => x.Id == id && x.IsDeleted == false).FirstOrDefault();
+            //if (res.IsDeleted == false)
+            if (res != null)
             {
 
                 res.IsActive = isActive;
@@ -302,11 +304,11 @@ namespace QuickCampusAPI.Controllers
                 var data = await _clientRepo.Update(res);
                 result.Data = (ClientVM)data;
                 result.IsSuccess = true;
-                result.Message = "Client status changed succesfully";
+                result.Message = "Client status changed successfully";
             }
             else
             {
-                result.Message = "Client does Not exist";
+                result.Message = "Client does not exist";
             }
             return Ok(result);
         }
@@ -358,14 +360,7 @@ namespace QuickCampusAPI.Controllers
             var _jwtSecretKey = _config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            if (isSuperAdmin)
-            {
-                cid = clientid;
-            }
-            else
-            {
-                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
-            }
+            cid = isSuperAdmin ? clientid : (string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId));
             try
             {
                 var clientListCount = (await _clientRepo.GetAll()).Where(x => x.IsActive == true && (cid == 0 ? true : x.Id == cid)).Count();

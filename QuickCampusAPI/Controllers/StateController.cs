@@ -73,7 +73,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "AddState")]
         [HttpPost]
         [Route("AddState")]
-        public async Task<IActionResult> AddState( StateVM vm)
+        public async Task<IActionResult> AddState(StateModelVm vm)
         {
             IGeneralResult<StateVM> result = new GeneralResult<StateVM>();
             var _jwtSecretKey = _config["Jwt:Key"];

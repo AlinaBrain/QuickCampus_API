@@ -99,10 +99,10 @@ namespace QuickCampusAPI.Controllers
                 cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
             }
 
-            
+
             {
                 TblUser res = new TblUser();
-                if ( userRepo.Any(x => x.Email == vm.Email.Trim() && x.IsDelete != true && x.Id != vm.Id))
+                if (userRepo.Any(x => x.Email == vm.Email.Trim() && x.IsDelete != true && x.Id != vm.Id))
                 {
                     result.Message = "User Email Already Registered!";
                     return Ok(result);
@@ -110,7 +110,7 @@ namespace QuickCampusAPI.Controllers
 
                 if (isSuperAdmin)
                 {
-                    res = (await userRepo.GetAll()).Where(w=> w.Id== vm.Id && w.IsDelete==false && w.IsActive==true && (cid==0?true:w.ClientId==cid)).FirstOrDefault();
+                    res = (await userRepo.GetAll()).Where(w => w.Id == vm.Id && w.IsDelete == false && w.IsActive == true && (cid == 0 ? true : w.ClientId == cid)).FirstOrDefault();
                 }
                 else
                 {
@@ -151,7 +151,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "UserList")]
         [HttpGet]
         [Route("UserList")]
-        public async Task<IActionResult> UserList(int clientid, string? search, int pageStart=1, int pageSize=10)
+        public async Task<IActionResult> UserList(string? search, int pageStart = 1, int pageSize = 10)
         {
 
             IGeneralResult<List<UserResponseVm>> result = new GeneralResult<List<UserResponseVm>>();
@@ -162,50 +162,42 @@ namespace QuickCampusAPI.Controllers
                 var startPage = 1;
                 newPageStart = (pageStart - startPage) * pageSize;
             }
-          
+
             int cid = 0;
-            var jwtSecretKey = config["Jwt:Key"];
-            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            if (isSuperAdmin)
-            {
-                cid = clientid;
-            }
-            else
-            {
-                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
-            }
-            List<TblUser> collegeList = new List<TblUser>();
+            //var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            //var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            //if (isSuperAdmin)
+            //{
+            //    cid = Convert.ToInt32(clientId);
+            //}
+            //else
+            //{
+            //    cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
+            //}
+            List<TblUser> userList = new List<TblUser>();
             try
             {
                 var clientListCount = 0;
-                if (isSuperAdmin)
+                var usersData = (await userRepo.GetAll()).Where(x => x.IsDelete == false).OrderByDescending(o => o.Id).ToList();
+                clientListCount = usersData.Count();
+                userList = usersData.Skip(newPageStart).Take(pageSize).ToList();
+                if (!string.IsNullOrEmpty(search))
                 {
-                    clientListCount = (await userRepo.GetAll()).Where(x => x.IsDelete == false && x.IsActive == true &&  (cid == 0 ? true : x.Id == cid)).Count();
-                    collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete == false && (cid == 0 ? true : x.ClientId == cid)).OrderByDescending(o => o.Id).Skip(newPageStart).Take(pageSize).ToList();
-                    collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete == false && x.Name.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.Email.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.Mobile.Contains(search ?? "")).OrderByDescending(o => o.Id).Skip(newPageStart).Take(pageSize).ToList();
+                    userList = usersData.Where(x => x.IsDelete == false && x.Name.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.Email.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.Mobile.Contains(search ?? "")).OrderByDescending(o => o.Id).Skip(newPageStart).Take(pageSize).ToList();
                 }
-                else
-                {
-                    clientListCount = (await userRepo.GetAll()).Where(x => x.IsDelete ==false &&x.IsActive ==true && (cid == 0 ? true : x.Id == cid)).Count();
-                    collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete == false && (cid == 0 ? true : x.ClientId == cid)).OrderByDescending(o => o.Id).Skip(newPageStart).Take(pageSize).ToList();
-                    collegeList = (await userRepo.GetAll()).Where(x => x.IsDelete == false && x.Name.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.Email.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.Mobile.Contains(search ?? "")).OrderByDescending(o => o.Id).Skip(newPageStart).Take(pageSize).ToList();
-                }
-
-                var response = collegeList.Select(x => (UserResponseVm)x).ToList();
+                var response = userList.Select(x => (UserResponseVm)x).ToList();
 
                 if (response.Count() > 0)
                 {
                     result.IsSuccess = true;
-                    result.Message = "User get successfully";
+                    result.Message = "Users List";
                     result.Data = response;
                     result.TotalRecordCount = clientListCount;
                 }
                 else
                 {
                     result.IsSuccess = true;
-                    result.Message = "User Not Updated !";
-                    result.Data = null;
+                    result.Message = "No data found!";
                 }
             }
             catch (Exception ex)

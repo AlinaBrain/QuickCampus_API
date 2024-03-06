@@ -122,9 +122,7 @@ builder.Services.AddScoped<ICityRepo,CityServices>();
 builder.Services.AddScoped<IQuestionOptionRepo, QuestionOptionService>();
 builder.Services.AddScoped<IGroupRepo,GroupServices>();
 builder.Services.AddScoped<ISectionRepo, SectionServices>();
-
-
-
+builder.Services.AddScoped<ICompanyRepo, CompanyRepo>();
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {

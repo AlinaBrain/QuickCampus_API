@@ -32,12 +32,6 @@ namespace QuickCampus_Core.ViewModel
                 IsDeleted = x.IsDeleted,
             };
         }
-
-        // public ApplicantFilter filter { get; set; }
-        //public bool IsActive { get; set; }
-        //public bool IsDeleted { get; set; }
-        // public IEnumerable<ApplicantGridViewModel> ApplicantList { get; set; }
-
         public int ApplicantID { get; set; }
 
         [Required(ErrorMessage = "Name is required"), MaxLength(20)]
@@ -57,26 +51,29 @@ namespace QuickCampus_Core.ViewModel
         [Display(Name = "Contact Number")]
         [RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Not a valid Contact number.")]
         public string? PhoneNumber { get; set; }
-
         [Required(ErrorMessage = "You must provide a HighestQualification")]
         public string? HigestQualification { get; set; }
-
-
-        [Required(ErrorMessage = "You must provide a HigestQualificationPercentage")]
+        [Display(Name = "Higest Qualification  parcentage %")]
+        [Required(ErrorMessage = "You must provide %.")]
+        [Range(1, 100, ErrorMessage = "% should be in 1 - 100 range.")]
         public decimal? HigestQualificationPercentage { get; set; } = null;
-        [Required(ErrorMessage = "You must provide a MatricPercentage")]
-        [PercentageRange(ErrorMessage = "Percentage must be between 0 and 100.")]
+        [Display(Name = "Matric  Parcentage  %")]
+        [Required(ErrorMessage = "You must provide %.")]
+        [Range(1, 100, ErrorMessage = "% should be in 1 - 100 range.")]
         public decimal? MatricPercentage { get; set; } =null;
-        [Required(ErrorMessage = "You must provide a IntermediatePercentage")]
+        [Display(Name = "Intermediate Parcentage  %")]
+        [Required(ErrorMessage = "You must provide %.")]
+        [Range(1, 100, ErrorMessage = "% should be in 1 - 100 range.")]
         public decimal? IntermediatePercentage { get; set; }
         [Required(ErrorMessage = "You must provide a Skills ")]
         public string? Skills { get; set; }
         [Required(ErrorMessage = "You must provide a StatusId")]
-        public int? StatusId { get; set; }
+        public int StatusId { get; set; }
         public string? Comment { get; set; }
         public DateTime? CreatedDate { get; set; }
         public DateTime? RegisteredDate { get; set; }
-        public string? CollegeName { get; set; }
+        [Required(ErrorMessage ="College Name is Must Required")]
+        public string CollegeName { get; set; }
         public int? ClientId { get; set; }
 
         public bool? IsDeleted { get; set; }
@@ -85,8 +82,7 @@ namespace QuickCampus_Core.ViewModel
         public bool? IsActive { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public int? CollegeId { get; set; }
-
-      
+  
         public Applicant ToApplicantDbModel()
         {
             return new Applicant
@@ -100,9 +96,9 @@ namespace QuickCampus_Core.ViewModel
                 MatricPercentage = MatricPercentage,
                 IntermediatePercentage = IntermediatePercentage,
                 Skills = Skills,
-                StatusId = StatusId ?? 0,
+                StatusId = StatusId ,
                 Comment = Comment,
-              AssignedToCompany = AssignedToCompany,
+                AssignedToCompany = AssignedToCompany,
                 CollegeName = CollegeName,
                 ClientId = ClientId,
                 CreatedDate = DateTime.UtcNow,
@@ -127,7 +123,7 @@ namespace QuickCampus_Core.ViewModel
                 MatricPercentage = MatricPercentage,
                 IntermediatePercentage = IntermediatePercentage,
                 Skills = Skills,
-                StatusId = StatusId ?? 0,
+                StatusId = StatusId ,
                 Comment = Comment,
                AssignedToCompany= AssignedToCompany,
                 CollegeName = CollegeName,
@@ -197,7 +193,6 @@ namespace QuickCampus_Core.ViewModel
             public string? CollegeName { get; set; }
             public string RegisteredDate { get { return CreatedDate.HasValue ? CreatedDate.Value.ToShortDateString() : ""; } set { } }
         }
-
         public class ApplicantDetails
         {
             public string? FirstName { get; set; }
@@ -284,10 +279,5 @@ namespace QuickCampus_Core.ViewModel
                .Length(10, 10).WithMessage("Contact  length could not be greater than 10");
             }
         }
-
-
-
-
-
     }
 }

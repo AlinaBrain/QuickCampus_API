@@ -35,7 +35,7 @@ namespace QuickCampus_Core.Services
             adminLogin.Password = EncodePasswordToBase64(adminLogin.Password);
             response.Data.RoleMasters = rm;
 
-            var re = _context.TblUsers.Include(i => i.TblUserRoles).Where(w => w.Email == adminLogin.UserName && w.Password == adminLogin.Password && w.IsDelete == false && w.IsActive == true).FirstOrDefault();
+            var re = _context.TblUsers.Include(i => i.TblUserRoles).Where(w => w.Email == adminLogin.UserName && w.Password == adminLogin.Password.ToLower() && w.IsDelete == false && w.IsActive == true).FirstOrDefault();
             
             if (re != null)
             {

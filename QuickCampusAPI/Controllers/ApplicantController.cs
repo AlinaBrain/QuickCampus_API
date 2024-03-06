@@ -108,19 +108,12 @@ namespace QuickCampusAPI.Controllers
                 cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
             }
 
-            if (_applicantRepo.Any(x => x.EmailAddress == vm.EmailAddress && x.IsActive == true && x.IsDeleted == false && x.ApplicantId==vm.ApplicantID))
+            if (_applicantRepo.Any(x => x.EmailAddress == vm.EmailAddress && x.IsActive == true && x.IsDeleted == false  ))
             {
                 result.Message = "Email Address Already Registered!";
                 return Ok(result);
             }
-            bool isExits = _applicantRepo.Any(x => x.FirstName == vm.FirstName && x.IsDeleted == false && x.ApplicantId == vm.ApplicantID);
-            if (isExits)
-            {
-                result.Message = " FirstName is already exists";
-                return Ok(result);
-            }
-
-            bool isphonenumberexist = _applicantRepo.Any(x => x.PhoneNumber == vm.PhoneNumber && x.IsDeleted == false && x.ApplicantId == vm.ApplicantID);
+            bool isphonenumberexist = _applicantRepo.Any(x => x.PhoneNumber == vm.PhoneNumber && x.IsDeleted == false);
             if (isphonenumberexist)
             {
                 result.Message = "Phone Number  is Already Exist";
@@ -128,43 +121,51 @@ namespace QuickCampusAPI.Controllers
             }
             else
             {
-                if (ModelState.IsValid)
-                {
-                    ApplicantViewModel applicantViewModel = new ApplicantViewModel
+                    if (ModelState.IsValid)
                     {
-                        FirstName = vm.FirstName.Trim(),
-                        LastName = vm.LastName.Trim(),
-                        EmailAddress = vm.EmailAddress.Trim(),
-                        PhoneNumber = vm.PhoneNumber.Trim(),
-                        HigestQualification = vm.HigestQualification,
-                        HigestQualificationPercentage = vm.HigestQualificationPercentage,
-                        MatricPercentage = vm.MatricPercentage,
-                        IntermediatePercentage = vm.IntermediatePercentage,
-                        Skills = vm.Skills,
-                        StatusId = (int)(StatusEnum)vm.StatusId,
-                        Comment = vm.Comment.Trim(),
-                        CollegeName = vm.CollegeName.Trim(),
-                        ClientId = cid,
-                        AssignedToCompany= (int)(CompanyEnum)vm.AssignedToCompany,
-                        CollegeId =vm.CollegeId
+                        ApplicantViewModel applicantViewModel = new ApplicantViewModel
+                        {
+                            FirstName = vm.FirstName.Trim(),
+                            LastName = vm.LastName.Trim(),
+                            EmailAddress = vm.EmailAddress.Trim(),
+                            PhoneNumber = vm.PhoneNumber.Trim(),
+                            HigestQualification = vm.HigestQualification,
+                            HigestQualificationPercentage = vm.HigestQualificationPercentage,
+                            MatricPercentage = vm.MatricPercentage,
+                            IntermediatePercentage = vm.IntermediatePercentage,
+                            Skills = vm.Skills,
+                            StatusId = (int)(StatusEnum)vm.StatusId,
+                            Comment = vm.Comment.Trim(),
+                            CollegeName = vm.CollegeName.Trim(),
+                            ClientId = cid,
+                            AssignedToCompany = vm.AssignedToCompany,
+                            CollegeId = vm.CollegeId
+                        };
+                        try
+                        {
 
-                    };
+                            var dataWithClientId = await _applicantRepo.Add(applicantViewModel.ToApplicantDbModel());
+                            result.IsSuccess = true;
+                            result.Message = "Applicant added successfully.";
+                            result.Data = (ApplicantViewModel)dataWithClientId;
+                           
+                        }
+                        catch(Exception ex)
+                        {
+                            result.Message = ex.Message;
+                        }
+                       
+                        return Ok(result);
+                        }
 
-                    var dataWithClientId = await _applicantRepo.Add(applicantViewModel.ToApplicantDbModel());
-                    result.IsSuccess = true;
-                    result.Message = "Applicant added successfully.";
-                    result.Data = (ApplicantViewModel)dataWithClientId;
-                    return Ok(result);
+                    else
+                    {
+                        result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
+                    }
                 }
-                else
-                {
-                    result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
-                }
+                return Ok(result);
             }
-
-            return Ok(result);
-
-        }
+        
 
         [Authorize(Roles = "EditApplicant")]
         [HttpPost]
@@ -217,12 +218,7 @@ namespace QuickCampusAPI.Controllers
                     result.Message = " Applicant does Not Exist";
                     return Ok(result);
                 }
-                bool isExits = _applicantRepo.Any(x => x.FirstName == vm.FirstName && x.IsDeleted == false && x.ApplicantId!=vm.ApplicantID);
-                if (isExits)
-                {
-                    result.Message = " FirstName is already exists";
-                    return Ok(result);
-                }
+                
 
                 //bool isphonenumberexist = _applicantRepo.Any(x => x.PhoneNumber == vm.PhoneNumber && x.IsDeleted == false);
                 //if (isphonenumberexist)
@@ -230,13 +226,8 @@ namespace QuickCampusAPI.Controllers
                 //    result.Message = "Phone Number  is Already Exist";
                 //    return Ok(result);
                 //}
-                bool isemailAddress = _applicantRepo.Any(x => x.EmailAddress == vm.EmailAddress && x.IsDeleted == false && x.ApplicantId != vm.ApplicantID);
-                if (isemailAddress)
-                {
-                    result.Message = "Email Address is Already Exist";
-                    return Ok(result);
-                }
-                else
+                
+                
                 {
                     if (ModelState.IsValid && vm.ApplicantID > 0 && applicant.IsDeleted == false)
                     {

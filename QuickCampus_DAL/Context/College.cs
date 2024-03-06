@@ -46,5 +46,4 @@ public partial class College
     public virtual ICollection<CampusWalkInCollege> CampusWalkInColleges { get; set; } = new List<CampusWalkInCollege>();
 
     public virtual City? City { get; set; }
-  
 }
