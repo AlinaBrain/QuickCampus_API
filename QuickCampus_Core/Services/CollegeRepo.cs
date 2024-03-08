@@ -16,7 +16,7 @@ namespace QuickCampus_Core.Services
             _config = config;
             _context = context;
         }
-        public async Task<IGeneralResult<string>> DeleteCollege(bool isDeleted, int id, int clientid, bool isSuperAdmin)
+        public async Task<IGeneralResult<string>> DeleteCollege(int id, int clientid, bool isSuperAdmin)
         {
             IGeneralResult<string> result = new GeneralResult<string>();
             College college = new College();
@@ -35,8 +35,9 @@ namespace QuickCampus_Core.Services
                 return result;
             }
 
-            college.IsDeleted = isDeleted;
+            college.IsDeleted = true;
             college.IsActive = false;
+            college.ModifiedDate = DateTime.Now;
             dbContext.Colleges.Update(college);
             int a = dbContext.SaveChanges();
             if (a > 0)

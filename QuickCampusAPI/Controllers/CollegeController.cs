@@ -29,9 +29,9 @@ namespace QuickCampusAPI.Controllers
         private readonly ICityRepo _cityrepo;
         private string baseUrl;
         private readonly QuikCampusDevContext _context;
-       
 
-        public CollegeController(ICollegeRepo collegeRepo, IConfiguration config, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, ICountryRepo countryRepo, IStateRepo stateRepo,ICityRepo cityRepo, QuikCampusDevContext quikCampusDevContext)
+
+        public CollegeController(ICollegeRepo collegeRepo, IConfiguration config, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, ICountryRepo countryRepo, IStateRepo stateRepo, ICityRepo cityRepo, QuikCampusDevContext quikCampusDevContext)
         {
             _collegeRepo = collegeRepo;
             _config = config;
@@ -46,7 +46,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "GetAllCollege")]
         [HttpGet]
         [Route("GetAllCollege")]
-        public async Task<IActionResult> GetAllCollege(int clientid, string? search, int pageStart=1,int pageSize=10)
+        public async Task<IActionResult> GetAllCollege(int clientid, string? search, int pageStart = 1, int pageSize = 10)
         {
             IGeneralResult<List<CollegeCountryStateVmmm>> result = new GeneralResult<List<CollegeCountryStateVmmm>>();
             var _jwtSecretKey = _config["Jwt:Key"];
@@ -90,12 +90,12 @@ namespace QuickCampusAPI.Controllers
                 }
 
                 var results = (from c in collegeList
-                               join u in _context.TblUsers  
-                               on c.CreatedBy equals u.Id                               
+                               join u in _context.TblUsers
+                               on c.CreatedBy equals u.Id
                                join ct in _context.Countries on c.CountryId equals ct.CountryId
                                join st in _context.States on c.StateId equals st.StateId
                                join ci in _context.Cities on c.CityId equals ci.CityId
-                              
+
                                select new CollegeCountryStateVmmm
                                {
                                    CollegeId = c.CollegeId,
@@ -119,7 +119,7 @@ namespace QuickCampusAPI.Controllers
                                    ModifiedName = u.Name,
                                    CountryName = ct.CountryName,
                                    StateName = st.StateName,
-                                   CityName = ci.CityName                                 
+                                   CityName = ci.CityName
                                }).ToList();
 
                 CollegeCountryStateVm vml = new CollegeCountryStateVm();
@@ -128,78 +128,78 @@ namespace QuickCampusAPI.Controllers
                 List<CityTypeVm> citylist = new List<CityTypeVm>();
 
                 var response = results.Select(x => (CollegeCountryStateVmmm)x).OrderByDescending(x => x.CollegeId).ToList();
-            
+
                 if (response != null)
-                    {
-                        int UserId = response.Count;
-                        var countryList = _countryRepo.GetAll().Result.Where(x => x.IsActive == true).ToList();
-                        var statelists = _stateRepo.GetAll().Result.Where(x => x.IsActive == true).ToList();
-                        var citylists = _cityrepo.GetAll().Result.Where(x => x.IsActive == true).ToList();
+                {
+                    int UserId = response.Count;
+                    var countryList = _countryRepo.GetAll().Result.Where(x => x.IsActive == true).ToList();
+                    var statelists = _stateRepo.GetAll().Result.Where(x => x.IsActive == true).ToList();
+                    var citylists = _cityrepo.GetAll().Result.Where(x => x.IsActive == true).ToList();
 
                     if (countryList.Count() > 0)
-                        {
-                            foreach (var product in countryList)
-                            {
-                                CountryTypeVm Vm = new CountryTypeVm();
-                                Vm = GetCountryDetails((int)product.CountryId, UserId);
-                                VmList.Add(Vm);
-                            }
-                        }
-                        else
-                        {
-                            result.Message = "No Country found!";
-                        }
-                     
-                    if (statelists.Count() > 0)
-                        {
-                            foreach (var c in statelists)
-                            {
-                                StateTypeVm Sm = new StateTypeVm();
-                                int? stateId = c.StateId;
-                                Sm = GetstateDetails((int)stateId, UserId);
-                                statelist.Add(Sm);
-                            }
-                        }
-                        else
-                        {
-                            result.Message = "No State found!";
-                        }
-
-                        if (citylists.Count() > 0)
-                        {
-                            foreach (var city in citylists)
-                            {
-                                CityTypeVm Vm = new CityTypeVm();
-                                int? cityId = city.CityId;
-                                Vm = GetCityDetails((int)cityId, UserId);
-                                citylist.Add(Vm);
-                            }
-                        }
-                        else
-                        {
-                            result.Message = "No State found!";
-                        }
-                    }
-
-                    vml.StateList = statelist;
-                    vml.CityList = citylist;
-
-                    result.IsSuccess = true;
-                    result.Message = "College details getting succesfully";
-
-                    if (collegeList.Count > 0)
                     {
-                        result.IsSuccess = true;
-                        result.Message = "College get successfully";
-                        result.Data = response;
-                        result.TotalRecordCount = collegeListCount;
+                        foreach (var product in countryList)
+                        {
+                            CountryTypeVm Vm = new CountryTypeVm();
+                            Vm = GetCountryDetails((int)product.CountryId, UserId);
+                            VmList.Add(Vm);
+                        }
                     }
                     else
                     {
-                        result.IsSuccess = true;
-                        result.Message = "College list not found!";
-                        result.Data = null;
+                        result.Message = "No Country found!";
                     }
+
+                    if (statelists.Count() > 0)
+                    {
+                        foreach (var c in statelists)
+                        {
+                            StateTypeVm Sm = new StateTypeVm();
+                            int? stateId = c.StateId;
+                            Sm = GetstateDetails((int)stateId, UserId);
+                            statelist.Add(Sm);
+                        }
+                    }
+                    else
+                    {
+                        result.Message = "No State found!";
+                    }
+
+                    if (citylists.Count() > 0)
+                    {
+                        foreach (var city in citylists)
+                        {
+                            CityTypeVm Vm = new CityTypeVm();
+                            int? cityId = city.CityId;
+                            Vm = GetCityDetails((int)cityId, UserId);
+                            citylist.Add(Vm);
+                        }
+                    }
+                    else
+                    {
+                        result.Message = "No State found!";
+                    }
+                }
+
+                vml.StateList = statelist;
+                vml.CityList = citylist;
+
+                result.IsSuccess = true;
+                result.Message = "College details getting succesfully";
+
+                if (collegeList.Count > 0)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "College get successfully";
+                    result.Data = response;
+                    result.TotalRecordCount = collegeListCount;
+                }
+                else
+                {
+                    result.IsSuccess = true;
+                    result.Message = "College list not found!";
+                    result.Data = null;
+                }
 
             }
             catch (Exception ex)
@@ -245,7 +245,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "AddCollege")]
         [HttpPost]
         [Route("AddCollege")]
-        public async Task<IActionResult> AddCollege([FromForm] CollegeLogoVm vm, int clientid)
+        public async Task<IActionResult> AddCollege([FromForm] AddCollegeVm vm, int clientid)
         {
             IGeneralResult<CollegeVM> result = new GeneralResult<CollegeVM>();
             var _jwtSecretKey = _config["Jwt:Key"];
@@ -289,7 +289,7 @@ namespace QuickCampusAPI.Controllers
                     {
                         var Countrylist = await _countryRepo.GetAll(x => x.CountryId == vm.CountryId);
                         {
-                          
+
                             CollegeVM college = new CollegeVM
                             {
 
@@ -298,8 +298,7 @@ namespace QuickCampusAPI.Controllers
                                 Address1 = vm.Address1.Trim(),
                                 Address2 = vm.Address2,
                                 CreatedBy = Convert.ToInt32(userId),
-                                ModifiedBy = Convert.ToInt32(userId),
-                                CityId=vm.CityId,
+                                CityId = vm.CityId,
                                 StateId = vm.StateId,
                                 CountryId = vm.CountryId,
                                 CollegeCode = vm.CollegeCode,
@@ -336,7 +335,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "EditCollege")]
         [HttpPost]
         [Route("EditCollege")]
-        public async Task<IActionResult> EditCollege([FromForm] CollegeLogoVm vm, int clientid)
+        public async Task<IActionResult> EditCollege([FromForm] AddCollegeVm vm, int clientid)
         {
             IGeneralResult<CollegeLogoVm> result = new GeneralResult<CollegeLogoVm>();
             var _jwtSecretKey = _config["Jwt:Key"];
@@ -365,7 +364,7 @@ namespace QuickCampusAPI.Controllers
 
                 if (isSuperAdmin)
                 {
-                    clg = (await _collegeRepo.GetAll()).Where(w => w.IsDeleted == false && w.IsActive == true && (cid == 0 ? true : w.ClientId == cid )&& w.CollegeId == vm.CollegeId).FirstOrDefault();
+                    clg = (await _collegeRepo.GetAll()).Where(w => w.IsDeleted == false && w.IsActive == true && (cid == 0 ? true : w.ClientId == cid) && w.CollegeId == vm.CollegeId).FirstOrDefault();
                 }
                 else
                 {
@@ -384,7 +383,7 @@ namespace QuickCampusAPI.Controllers
                     result.Message = " College does Not Exist";
                     return Ok(result);
                 }
-                bool isExits = _collegeRepo.Any(x => x.CollegeName == vm.CollegeName && x.IsDeleted == false && x.CollegeId!=vm.CollegeId);
+                bool isExits = _collegeRepo.Any(x => x.CollegeName == vm.CollegeName && x.IsDeleted == false && x.CollegeId != vm.CollegeId);
                 if (isExits)
                 {
                     result.Message = " CollegeName is already exists";
@@ -406,11 +405,11 @@ namespace QuickCampusAPI.Controllers
                 {
                     if (ModelState.IsValid && vm.CollegeId > 0)
                     {
-                        clg.CollegeId = vm.CollegeId;
+                        clg.CollegeId = vm.CollegeId ?? 0;
                         clg.CollegeName = vm.CollegeName.Trim();
-                        clg.Logo =  vm.ImagePath !=null? ProcessUploadFile(vm) : clg.Logo;
+                        clg.Logo = vm.ImagePath != null ? ProcessUploadFile(vm) : clg.Logo;
                         clg.Address1 = vm.Address1.Trim();
-                        clg.Address2 = string.IsNullOrEmpty(vm.Address2)?clg.Address2.Trim():vm.Address2.Trim();
+                        clg.Address2 = string.IsNullOrEmpty(vm.Address2) ? clg.Address2.Trim() : vm.Address2.Trim();
                         clg.CreatedBy = Convert.ToInt32(userId);
                         clg.ModifiedBy = Convert.ToInt32(userId);
                         clg.CityId = vm.CityId;
@@ -446,7 +445,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "DeleteCollege")]
         [HttpDelete]
         [Route("DeleteCollege")]
-        public async Task<IActionResult> DeleteCollege(int id, int clientid,bool isDeleted)
+        public async Task<IActionResult> DeleteCollege(int id, int clientid)
         {
             IGeneralResult<CollegeVM> result = new GeneralResult<CollegeVM>();
             int cid = 0;
@@ -468,7 +467,7 @@ namespace QuickCampusAPI.Controllers
                     return Ok(result);
                 }
             }
-            var res =await _collegeRepo.DeleteCollege(isDeleted, id, cid, isSuperAdmin);
+            var res = await _collegeRepo.DeleteCollege(id, cid, isSuperAdmin);
             return Ok(res);
         }
 
@@ -497,9 +496,9 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-        private string ProcessUploadFile([FromForm] CollegeLogoVm model)
+        private string ProcessUploadFile([FromForm] AddCollegeVm model)
         {
-             List<string> url = new List<string>();
+            List<string> url = new List<string>();
             string uniqueFileName = null;
             if (model.ImagePath != null)
             {
@@ -516,7 +515,7 @@ namespace QuickCampusAPI.Controllers
             return url.FirstOrDefault();
         }
 
-        private CountryTypeVm GetCountryDetails(int countryId,int userId)
+        private CountryTypeVm GetCountryDetails(int countryId, int userId)
         {
             CountryTypeVm countryVm = new CountryTypeVm();
 
@@ -526,21 +525,21 @@ namespace QuickCampusAPI.Controllers
             return countryVm;
         }
 
-        private StateTypeVm GetstateDetails(int stateId,int userid)
+        private StateTypeVm GetstateDetails(int stateId, int userid)
         {
-            StateTypeVm statevm= new StateTypeVm();
+            StateTypeVm statevm = new StateTypeVm();
 
-            var stateDetails =_stateRepo.GetById(stateId).Result;
+            var stateDetails = _stateRepo.GetById(stateId).Result;
             statevm.StateId = stateDetails.StateId;
             statevm.StateName = stateDetails.StateName;
-            
+
             return statevm;
         }
 
-        private CityTypeVm GetCityDetails(int cityId,int userid)
+        private CityTypeVm GetCityDetails(int cityId, int userid)
         {
             CityTypeVm cityVm = new CityTypeVm();
-            var citydetails=_cityrepo.GetById(cityId).Result;
+            var citydetails = _cityrepo.GetById(cityId).Result;
             cityVm.CityId = citydetails.CityId;
             cityVm.CityName = citydetails.CityName;
             return cityVm;
@@ -548,7 +547,7 @@ namespace QuickCampusAPI.Controllers
 
         [HttpPost]
         [Route("ProcessUploadFile")]
-        public List<string>ProcessUploadFile(List<IFormFile> Files)
+        public List<string> ProcessUploadFile(List<IFormFile> Files)
         {
             List<string> url = new List<string>();
             if (Files.Count > 0)
@@ -595,8 +594,8 @@ namespace QuickCampusAPI.Controllers
             try
             {
 
-                var collegeListCount = (await _collegeRepo.GetAll()).Where(x => x.IsActive == true && x.IsDeleted==false &&   (cid == 0 ? true : x.CollegeId== cid)).Count();
-                var collegetList = (await _collegeRepo.GetAll()).Where(x => x.IsActive == true && x.IsDeleted==false && (cid == 0 ? true : x.CollegeId == cid)).OrderByDescending(x => x.CollegeId).ToList();
+                var collegeListCount = (await _collegeRepo.GetAll()).Where(x => x.IsActive == true && x.IsDeleted == false && (cid == 0 ? true : x.CollegeId == cid)).Count();
+                var collegetList = (await _collegeRepo.GetAll()).Where(x => x.IsActive == true && x.IsDeleted == false && (cid == 0 ? true : x.CollegeId == cid)).OrderByDescending(x => x.CollegeId).ToList();
 
                 var res = collegetList.Select(x => ((CollegeVM)x)).ToList();
                 if (res != null && res.Count() > 0)

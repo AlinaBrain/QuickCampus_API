@@ -115,7 +115,7 @@ namespace QuickCampusAPI.Controllers
                 cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
             }
 
-           // List<RoleResponse> roleVm = new List<RoleResponse>();
+            // List<RoleResponse> roleVm = new List<RoleResponse>();
             List<TblRole> rolelist = new List<TblRole>();
             if (isSuperAdmin)
             {
@@ -124,7 +124,7 @@ namespace QuickCampusAPI.Controllers
             }
             else
             {
-                rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted == false && x.ClientId == cid || x.IsActive==false ).OrderByDescending(o=>o.Id).ToList();
+                rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted == false && x.ClientId == cid || x.IsActive == false).OrderByDescending(o => o.Id).ToList();
             }
             return Ok(rolelist);
         }
@@ -169,7 +169,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "DeleteRole")]
         [HttpDelete]
         [Route("DeleteRole")]
-        public async Task<IActionResult> DeleteRole(int id, int clientid, bool isDeleted)
+        public async Task<IActionResult> DeleteRole(int id, int clientid)
         {
             IGeneralResult<RoleResponse> result = new GeneralResult<RoleResponse>();
 
@@ -192,7 +192,7 @@ namespace QuickCampusAPI.Controllers
                     return Ok(result);
                 }
             }
-            var res = await roleRepo.DeleteRole(isDeleted, id, cid, isSuperAdmin);
+            var res = await roleRepo.DeleteRole(id, cid, isSuperAdmin);
             return Ok(res);
         }
 
