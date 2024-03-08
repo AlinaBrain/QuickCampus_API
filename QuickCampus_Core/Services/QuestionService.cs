@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration.Ini;
 using Microsoft.Extensions.Hosting.Internal;
 using Microsoft.Extensions.Options;
 using QuickCampus_Core.Common;
+using QuickCampus_Core.Common.Helper;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
@@ -14,19 +15,22 @@ using System.Linq.Expressions;
 
 namespace QuickCampus_Core.Services
 {
-    public class QuestionService : BaseRepository<QuikCampusDevContext, Question>,IQuestion
+    public class QuestionService : BaseRepository<QuikCampusDevContext, Question>, IQuestion
     {
         private readonly IConfiguration _config;
         private readonly QuikCampusDevContext _context;
         private readonly Microsoft.AspNetCore.Hosting.IHostingEnvironment _hostingEnvironment;
         private readonly string basepath;
         private string baseUrl;
-        public QuestionService(QuikCampusDevContext context, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, IConfiguration config)
+        private readonly ProcessUploadFile _processUploadFile;
+
+        public QuestionService(QuikCampusDevContext context, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, IConfiguration config, ProcessUploadFile processUploadFile)
         {
             _config = config;
             _context = context;
             _hostingEnvironment = hostingEnvironment;
             baseUrl = _config.GetSection("APISitePath").Value;
+            _processUploadFile = processUploadFile;
         }
         public async Task<IGeneralResult<List<QuestionViewModelAdmin>>> GetAllQuestion(int clientid, bool issuperadmin, int pageStart, int pageSize)
         {
@@ -34,7 +38,7 @@ namespace QuickCampus_Core.Services
             List<QuestionViewModelAdmin> record = new List<QuestionViewModelAdmin>();
             if (issuperadmin)
             {
-                var totalCount = result.Data = _context.Questions.Where(x => x.IsDeleted == false && (clientid == 0 ? true : x.ClentId == clientid)).Select(x => new QuestionViewModelAdmin()
+                var totalCount = result.Data = _context.Questions.Where(x => x.IsDeleted == false && x.IsActive==true &&(clientid == 0 ? true : x.ClentId == clientid)).Select(x => new QuestionViewModelAdmin()
                 {
                     QuestionId = x.QuestionId,
                     QuestionTypeName = x.QuestionType.QuestionType1,
@@ -43,7 +47,7 @@ namespace QuickCampus_Core.Services
                     Question = x.Text,
                     IsActive = x.IsActive ?? false
                 }).ToList();
-                result.Data = _context.Questions.Where(x => x.IsDeleted == false && (clientid == 0 ? true : x.ClentId == clientid)).Select(x => new QuestionViewModelAdmin()
+                result.Data = _context.Questions.Where(x => x.IsDeleted == false &&x.IsActive==true && (clientid == 0 ? true : x.ClentId == clientid)).Select(x => new QuestionViewModelAdmin()
                 {
                     QuestionId = x.QuestionId,
                     QuestionTypeName = x.QuestionType.QuestionType1,
@@ -52,11 +56,11 @@ namespace QuickCampus_Core.Services
                     Question = x.Text,
                     IsActive = x.IsActive ?? false
                 }).OrderByDescending(x => x.QuestionId).Skip(pageStart).Take(pageSize).ToList();
-                if (result.Data.Count > 0)
+                if (result.Data.Count > 0 && result.Data.Any(x=>x.IsActive==true))
                 {
                     result.IsSuccess = true;
                     result.Message = "Record Fetch Successfully";
-                    result.TotalRecordCount = totalCount.Count();
+                    result.TotalRecordCount = result.Data.Count();
                 }
                 else
                 {
@@ -121,13 +125,13 @@ namespace QuickCampus_Core.Services
                     GroupId = x.GroupId ?? 0,
                     QuestionSection = x.Section.Section1,
                     Question = x.Text,
-                    IsActive=true,
-                    IsDeleted=false,
-                    
+                    IsActive = true,
+                    IsDeleted = false,
+
                     Marks = x.Marks ?? 0,
                     options = x.QuestionOptions.Select(y => new OptionViewModelAdmin()
                     {
-                        QuestionId=x.QuestionId,
+                        QuestionId = x.QuestionId,
                         OptionId = y.OptionId,
                         OptionText = y.OptionText,
                         OptionImage = y.OptionImage,
@@ -437,253 +441,76 @@ namespace QuickCampus_Core.Services
             }
             return result;
         }
-
-        public async Task<IGeneralResult<string>> AddQuestion( QuestionViewModelAdmin model, bool isSuperAdmin)
+        public async Task<IGeneralResult<QuestionTakeViewModel>> AddOrUpdateQuestion(QuestionTakeViewModel questionTakeView)
         {
-            List<QuestionType> allQuestions = new List<QuestionType>();
-            List<Section> allSections = new List<Section>();
-            List<Groupdl> allGroups = new List<Groupdl>();
-            IGeneralResult<string> res = new GeneralResult<string>();
-            if (isSuperAdmin)
+            IGeneralResult<QuestionTakeViewModel> res = new GeneralResult<QuestionTakeViewModel>();
+            try
             {
-                allQuestions = _context.QuestionTypes.Where(x => (model.ClientId == 0 ? true : x.ClentId == model.ClientId)).ToList();
-                allSections = _context.Sections.Where(x => (model.ClientId == 0 ? true : x.ClentId == model.ClientId)).ToList();
-                allGroups = _context.Groupdls.Where(x => (model.ClientId == 0 ? true : x.ClentId == model.ClientId)).ToList();
-            }
-            else
-            {
-                allQuestions = _context.QuestionTypes.Where(x => x.ClentId == model.ClientId).ToList();
-                allSections = _context.Sections.Where(x => x.ClentId == model.ClientId).ToList();
-                allGroups = _context.Groupdls.Where(x => x.ClentId == model.ClientId).ToList();
-
-                if (model.ClientId == 0)
+                if (questionTakeView.QuestionId > 0)
                 {
-                    res.IsSuccess = false;
-                    res.Message = "invalid client Id";
-                    return res;
-                }
-            }
-
-            bool isExistQuestionType = allQuestions.Any(a => a.QuestionTypeId == model.QuestionTypeId);
-            bool isExistGroup = allGroups.Any(a => a.GroupId == model.GroupId);
-            bool isExistSection = allSections.Any(a => a.SectionId == model.SectionId);
-
-            if (!isExistQuestionType)
-            {
-                res.IsSuccess = false;
-                res.Message = "invalid questiontype";
-                return res;
-            }
-            else if (!isExistGroup)
-            {
-                res.IsSuccess = false;
-                res.Message = "invalid group";
-                return res;
-            }
-            else if (!isExistSection)
-            {
-                res.IsSuccess = false;
-                res.Message = "invalid section";
-                return res;
-            }
-            bool isExist = _context.Questions.Any(w => w.IsDeleted != true && w.QuestionTypeId == model.QuestionTypeId && w.SectionId == model.SectionId && w.GroupId == model.GroupId);
-
-            if (isExist)
-            {
-                res.IsSuccess = false;
-                res.Message = "Question Already Exist";
-                return res;
-            }
-
-            int? marks = (int)_context.QuestionTypes.Where(y => y.QuestionTypeId == model.QuestionTypeId).SingleOrDefault().Marks;
-            Question question = new Question()
-            {
-                QuestionTypeId = model.QuestionTypeId,
-                SectionId = model.SectionId,
-                GroupId = model.GroupId,
-                Text = model.Question,
-                Marks = marks,
-                IsActive = true,
-                IsDeleted = false,
-                ClentId=model.ClientId,
-                
-
-            };
-            var result = _context.Questions.Add(question);
-            foreach (var item in model.options)
-            {
-                var fileName = string.Empty;
-                byte[] file = null;
-
-                QuestionOption questionoption = new QuestionOption()
-                {
-                    QuestionId = question.QuestionId,
-                    OptionText = item.OptionText,
-                    IsCorrect = item.IsCorrect,
-                    OptionImage = item.Imagepath != null ? ProcessUploadFile(item) : item.OptionImage,
-                    
-                    Image = file
-                };
-                question.QuestionOptions.Add(questionoption);
-            }
-            int status = _context.SaveChanges();
-            if (status > 0)
-            {
-                res.IsSuccess = true;
-                res.Message = "Question has been added successfully.";
-            }
-            else
-            {
-                res.IsSuccess = false;
-                res.Message = "Question has not been created.";
-                res.Data = null;
-            }
-            return res;
-        }
-
-        public async Task<IGeneralResult<string>> UpdateQuestion(QuestionViewModelAdmin model, bool isSuperAdmin)
-        {
-            IGeneralResult<string> res = new GeneralResult<string>();
-            Question question = new Question();
-
-
-            List<QuestionType> allQuestions = new List<QuestionType>();
-            List<Section> allSections = new List<Section>();
-            List<Groupdl> allGroups = new List<Groupdl>();
-
-            if (isSuperAdmin)
-            {
-                allQuestions = _context.QuestionTypes.Where(x => (model.ClientId == 0 ? true : x.ClentId == model.ClientId)).ToList();
-                allSections = _context.Sections.Where(x => (model.ClientId == 0 ? true : x.ClentId == model.ClientId)).ToList();
-                allGroups = _context.Groupdls.Where(x => (model.ClientId == 0 ? true : x.ClentId == model.ClientId)).ToList();
-                question = _context.Questions.Include(x => x.QuestionOptions).FirstOrDefault(x => x.QuestionId == model.QuestionId && x.IsDeleted == false && (model.ClientId == 0 ? true : x.ClentId == model.ClientId));
-
-            }
-            else
-            {
-
-                allQuestions = _context.QuestionTypes.Where(x => x.ClentId == model.ClientId).ToList();
-                allSections = _context.Sections.Where(x => x.ClentId == model.ClientId).ToList();
-                allGroups = _context.Groupdls.Where(x => x.ClentId == model.ClientId).ToList();
-                if (model.ClientId == 0)
-                {
-                    res.Message = "Invalid client ";
-                    res.IsSuccess = false;
-                    return res;
-                }
-
-                question = _context.Questions.Include(x => x.QuestionOptions).FirstOrDefault(x => x.QuestionId == model.QuestionId && x.ClentId == model.ClientId && x.IsDeleted == false);
-
-            }
-
-            bool isExistQuestionType = allQuestions.Any(a => a.QuestionTypeId == model.QuestionTypeId);
-            bool isExistGroup = allGroups.Any(a => a.GroupId == model.GroupId);
-            bool isExistSection = allSections.Any(a => a.SectionId == model.SectionId);
-
-            if (!isExistQuestionType)
-            {
-                res.IsSuccess = false;
-                res.Message = "invalid questiontype";
-                return res;
-            }
-            else if (!isExistGroup)
-            {
-                res.IsSuccess = false;
-                res.Message = "invalid group";
-                return res;
-            }
-            else if (!isExistSection)
-            {
-                res.IsSuccess = false;
-                res.Message = "invalid section";
-                return res;
-            }
-
-
-            if (question == null)
-            {
-                res.IsSuccess = false;
-                res.Message = "Question not found";
-                return res;
-            }
-
-            bool isExist = _context.Questions.Any(w => w.IsDeleted != true && w.QuestionTypeId == model.QuestionTypeId && w.SectionId == model.SectionId && w.GroupId == model.GroupId && w.QuestionId != model.QuestionId);
-
-            if (isExist)
-            {
-                res.IsSuccess = false;
-                res.Message = "Question Already Exist";
-                return res;
-            }
-
-            question.QuestionTypeId = model.QuestionTypeId;
-            question.Text = model.Question;
-            question.GroupId = model.GroupId;
-            question.SectionId = model.SectionId;
-            question.Marks = _context.QuestionTypes.Where(y => y.QuestionTypeId == model.QuestionTypeId).SingleOrDefault().Marks;
-            ArrayList itemIdToBeNotRemoved = new ArrayList();
-            foreach (var item in model.options)
-            {
-                itemIdToBeNotRemoved.Add(item.OptionId);
-
-                if (item.OptionId > 0)
-                {
-                    var options = question.QuestionOptions.SingleOrDefault(y => y.OptionId == item.OptionId);
-                    options.OptionText = item.OptionText;
-                    options.IsCorrect = item.IsCorrect;
-                    options.OptionImage = item.Imagepath != null ? ProcessUploadFile(item) : item.OptionImage;
-
+                    var questiondata = _context.Questions.Where(x => x.QuestionId == questionTakeView.QuestionId).FirstOrDefault();
+                    questiondata.Text = questionTakeView.Text;
+                    questiondata.QuestionTypeId = questionTakeView.QuestionTypeId;
+                    questiondata.GroupId = questionTakeView.GroupId;
+                    questiondata.SectionId = questionTakeView.SectionId;
+                    questiondata.Marks = questionTakeView.Marks;
+                    questiondata.ClentId = questionTakeView.ClentId;
+                    var question = _context.Questions.Update(questiondata);
+                    questionTakeView.QuestionId = question.Entity.QuestionId;
+                    foreach (var option in questionTakeView.QuestionssoptionVm)
+                    {
+                        var questionoptiondata = _context.QuestionOptions.Where(x => x.OptionId == option.OptionId).FirstOrDefault();
+                        questionoptiondata.OptionText = option.OptionText;
+                        questionoptiondata.IsCorrect = option.IsCorrect;
+                        questionoptiondata.Imagepath = _processUploadFile.GetUploadFile(option.Image);
+                        var questionoptions = _context.QuestionOptions.Update(questionoptiondata);
+                        option.OptionId = questionoptions.Entity.OptionId;
+                    }
+                    res.Data = questionTakeView;
+                    res.IsSuccess = true;
+                    res.Message = "Question Updated Successfully";
                 }
                 else
                 {
-                    QuestionOption questionoption = new QuestionOption()
+                    Question vm = new Question
                     {
-                        QuestionId = question.QuestionId,
-                        OptionText = item.OptionText,
-                        IsCorrect = item.IsCorrect,
-                        OptionImage = item.Imagepath != null ? ProcessUploadFile(item) : item.OptionImage,
-                };
-                    question.QuestionOptions.Add(questionoption);
-
+                        Text = questionTakeView.Text,
+                        QuestionTypeId = questionTakeView.QuestionTypeId,
+                        GroupId = questionTakeView.GroupId,
+                        SectionId = questionTakeView.SectionId,
+                        Marks = questionTakeView.Marks,
+                        ClentId = questionTakeView.ClentId,
+                        IsActive = true,
+                        IsDeleted = false
+                    };
+                    var question = _context.Questions.Add(vm);
+                    _context.SaveChanges();
+                    questionTakeView.QuestionId = question.Entity.QuestionId;
+                    foreach (var option in questionTakeView.QuestionssoptionVm)
+                    {
+                        QuestionOption questionoption = new QuestionOption
+                        {
+                            QuestionId = questionTakeView.QuestionId,
+                            OptionText = option.OptionText,
+                            IsCorrect = option.IsCorrect,
+                            Imagepath = _processUploadFile.GetUploadFile(option.Image),
+                        };
+                        var questionoptions = _context.QuestionOptions.Add(questionoption);
+                        _context.SaveChanges();
+                        option.OptionId = questionoptions.Entity.OptionId;
+                        option.Imagepath = baseUrl + questionoption.Imagepath;
+                        option.Image = null;
+                    }
+                    res.Data = questionTakeView;
+                    res.IsSuccess = true;
+                    res.Message = "Question Added Successfully";
                 }
-
-
             }
-            foreach (var op in question.QuestionOptions.ToList())
+            catch (Exception ex)
             {
-                if (!itemIdToBeNotRemoved.Contains(op.OptionId)) { question.QuestionOptions.Remove(op); }
-            }
-            int result = _context.SaveChanges();
-            if (result > 0)
-            {
-                res.IsSuccess = true;
-                res.Message = "Question has been updated successfully.";
-            }
-            else
-            {
-                res.IsSuccess = false;
-                res.Message = "something went worng.";
+                res.Message = ex.Message;
             }
             return res;
-        }
-
-        private string ProcessUploadFile([FromForm] OptionViewModelAdmin model)
-        {
-            List<string> url = new List<string>();
-            string uniqueFileName = null;
-            if (model.Imagepath != null)
-            {
-                string photoUoload = Path.Combine(_hostingEnvironment.WebRootPath, "UploadFiles");
-                uniqueFileName = Guid.NewGuid().ToString() + "_" + model.Imagepath.FileName;
-                string filepath = Path.Combine(photoUoload, uniqueFileName);
-                using (var filename = new FileStream(filepath, FileMode.Create))
-                {
-                    model.Imagepath.CopyTo(filename);
-                }
-            }
-
-            url.Add(Path.Combine(baseUrl, uniqueFileName));
-            return url.FirstOrDefault();
         }
     }
 }

@@ -65,10 +65,8 @@ namespace QuickCampusAPI.Controllers
             int cid = 0;
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
-
-
             var res = await _countryrepo.GetById(countryid);
-            if (res.IsDeleted == false && res.IsActive == true)
+            if (res!=null)
             {
                 result.Data = (CountryVM)res;
                 result.IsSuccess = true;

@@ -392,9 +392,9 @@ public partial class QuikCampusDevContext : DbContext
             entity.ToTable("Status");
 
             entity.Property(e => e.StatusId).ValueGeneratedNever();
-            entity.Property(e => e.Status1)
+            entity.Property(e => e.StatusName)
                 .HasMaxLength(50)
-                .HasColumnName("Status");
+                .HasColumnName("StatusName");
         });
 
         modelBuilder.Entity<TblClient>(entity =>

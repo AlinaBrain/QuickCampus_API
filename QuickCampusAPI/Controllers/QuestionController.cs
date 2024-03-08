@@ -161,7 +161,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "AddOrUpdateQuestion")]
         [HttpPost]
         [Route("addorupdatequestion")]
-        public async Task<ActionResult> AddOrUpdateQuestion( [FromForm]QuestionViewModelAdmin model, int clientid)
+        public async Task<ActionResult> AddOrUpdateQuestion( [FromForm] QuestionTakeViewModel model, int clientid)
         {
             int cid = 0;
             var _jwtSecretKey = _config["Jwt:Key"];
@@ -175,8 +175,8 @@ namespace QuickCampusAPI.Controllers
             {
                 cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
             }
-            model.ClientId = cid;
-            var res = model.QuestionId > 0 ? await _questionrepo.UpdateQuestion(model, isSuperAdmin) : await _questionrepo.AddQuestion(model, isSuperAdmin);
+            model.ClentId = cid;
+            var res = _questionrepo.AddOrUpdateQuestion(model);
             return Ok(res);
         }
 

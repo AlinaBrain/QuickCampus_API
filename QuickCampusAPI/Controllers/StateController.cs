@@ -139,7 +139,7 @@ namespace QuickCampusAPI.Controllers
           
 
             var res = await _stateRepo.GetById(stateid);
-            if (res.IsDeleted == false && res.IsActive == true)
+            if (res!=null)
             {
                 result.Data = (StateVM)res;
                 result.IsSuccess = true;

@@ -236,13 +236,13 @@ namespace QuickCampus_Core.ViewModel
                  .Cascade(CascadeMode.StopOnFirstFailure)
                  .NotNull().WithMessage("FirstName could not be null")
                  .NotEmpty().WithMessage("FirstName could not be empty")
-                  .Length(5, 50).WithMessage("FirstName length could 5 to 50 character");
+                  .Length(4, 50).WithMessage("FirstName length could 4 to 50 character");
 
                 RuleFor(x => x.LastName)
                  .Cascade(CascadeMode.StopOnFirstFailure)
                  .NotNull().WithMessage("LastName could not be null")
                  .NotEmpty().WithMessage("LastName could not be empty")
-                  .Length(5, 50).WithMessage("LastName length could not be greater than 50");
+                  .Length(3, 50).WithMessage("FirstName length could 3 to 50 character");
 
                 RuleFor(x => x.HigestQualificationPercentage)
                   .Cascade(CascadeMode.StopOnFirstFailure)

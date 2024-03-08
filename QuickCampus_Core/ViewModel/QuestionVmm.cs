@@ -43,7 +43,6 @@ namespace QuickCampus_Core.ViewModel
 
         public int? ClientId { get; set; }
 
-
         public Question ToQuestionDbModel()
         {
             return new Question

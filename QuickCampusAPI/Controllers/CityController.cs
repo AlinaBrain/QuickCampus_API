@@ -93,7 +93,7 @@ namespace QuickCampusAPI.Controllers
             
 
             var res = await _cityrepo.GetById(id);
-            if (res.IsDeleted == false && res.IsActive == true)
+            if (res != null)
             {
                 result.Data = (CityVm)res;
                 result.IsSuccess = true;
