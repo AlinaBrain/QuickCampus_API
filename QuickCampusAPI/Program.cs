@@ -104,8 +104,6 @@ builder.Services.AddAuthentication(auth =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
 });
-
-
 builder.Services.AddTransient<IApplicationUserRepo, ApplicationUserService>();
 builder.Services.AddTransient<IApplicantRepo, ApplicantRepoServices>();
 builder.Services.AddScoped<ICampusRepo, CampusService>();

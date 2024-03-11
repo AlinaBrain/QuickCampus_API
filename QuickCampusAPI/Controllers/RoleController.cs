@@ -130,6 +130,8 @@ namespace QuickCampusAPI.Controllers
             {
                 //rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted == false || x.IsActive == false && (cid == 0 ? true : x.ClientId == cid )).OrderByDescending(o=>o.Id).ToList();
                 rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted == false && x.Name.Contains(name ?? "", StringComparison.OrdinalIgnoreCase)).OrderByDescending(o => o.Id).ToList();
+                result.IsSuccess = true;
+                result.Message = "Record Fetched Successfully";
             }
             else
             {
