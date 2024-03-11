@@ -5,6 +5,7 @@ using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.Services;
 using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
+using System.Text.RegularExpressions;
 
 namespace QuickCampusAPI.Controllers
 {
@@ -52,6 +53,14 @@ namespace QuickCampusAPI.Controllers
 
                 if (ModelState.IsValid)
                 {
+                    string pattern = @"^[a-zA-Z][a-zA-Z\s]*$";
+                    string input = vm.RoleName;
+                    Match m = Regex.Match(input, pattern, RegexOptions.IgnoreCase);
+                    if (!m.Success)
+                    {
+                        result.Message = "Only alphabetic characters are allowed in the name.";
+                        return Ok(result);
+                    }
                     var userId = JwtHelper.GetuIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                     if (string.IsNullOrEmpty(userId))
                     {

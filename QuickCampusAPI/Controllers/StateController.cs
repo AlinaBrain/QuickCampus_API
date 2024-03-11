@@ -8,6 +8,7 @@ using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
 using System.Data;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 
 namespace QuickCampusAPI.Controllers
 {
@@ -87,6 +88,14 @@ namespace QuickCampusAPI.Controllers
 
                 if (ModelState.IsValid)
                 {
+                    string pattern = @"^[a-zA-Z][a-zA-Z\s]*$";
+                    string input = vm.StateName;
+                    Match m = Regex.Match(input, pattern, RegexOptions.IgnoreCase);
+                    if (!m.Success)
+                    {
+                        result.Message = "Only alphabetic characters are allowed in the name.";
+                        return Ok(result);
+                    }
                     bool isExits = _stateRepo.Any(x => x.StateName == vm.StateName && x.IsDeleted == false);
                     if (isExits)
                     {
@@ -138,7 +147,7 @@ namespace QuickCampusAPI.Controllers
             var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
           
 
-            var res = await _stateRepo.GetById(stateid);
+            var res = (await _stateRepo.GetAll(x=>x.IsActive==true && x.IsDeleted==false &&x.StateId==stateid)).FirstOrDefault();
             if (res!=null)
             {
                 result.Data = (StateVM)res;
@@ -211,6 +220,14 @@ namespace QuickCampusAPI.Controllers
                 {
                     if (ModelState.IsValid && vm.StateId > 0 && state.IsDeleted == false)
                     {
+                        string pattern = @"^[a-zA-Z][a-zA-Z\s]*$";
+                        string input = vm.StateName;
+                        Match m = Regex.Match(input, pattern, RegexOptions.IgnoreCase);
+                        if (!m.Success)
+                        {
+                            result.Message = "Only alphabetic characters are allowed in the name.";
+                            return Ok(result);
+                        }
                         state.IsDeleted = false;
                         state.StateName = vm.StateName;
                         state.CountryId = vm.CountryId;

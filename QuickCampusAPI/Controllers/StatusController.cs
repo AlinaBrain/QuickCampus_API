@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
+using QuickCampus_DAL.Context;
+using System.Text.RegularExpressions;
 
 namespace QuickCampusAPI.Controllers
 {
@@ -53,7 +55,7 @@ namespace QuickCampusAPI.Controllers
         public async Task<IActionResult> GetStatusById(int statusid)
         {
             IGeneralResult<StatusVm> result = new GeneralResult<StatusVm>();
-            var res = await _statusrepo.GetById(statusid);
+            var res = (await _statusrepo.GetAll(x=>x.IsActive==true && x.IsDeleted==false && x.StatusId==statusid)).FirstOrDefault();
             if (res != null)
             {
                 result.Data = (StatusVm)res;
@@ -68,7 +70,7 @@ namespace QuickCampusAPI.Controllers
         }
         //[Authorize(Roles = "AddCountry")]
         [HttpPost]
-        [Route("AddCompany")]
+        [Route("AddStatus")]
         public async Task<IActionResult> AddStatus(StatusVm statusVm)
         {
             IGeneralResult<StatusVm> result = new GeneralResult<StatusVm>();
@@ -77,6 +79,14 @@ namespace QuickCampusAPI.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    string pattern = @"^[a-zA-Z][a-zA-Z\s]*$";
+                    string input = statusVm.StatusName;
+                    Match m = Regex.Match(input, pattern, RegexOptions.IgnoreCase);
+                    if (!m.Success)
+                    {
+                        result.Message = "Only alphabetic characters are allowed in the name.";
+                        return Ok(result);
+                    }
                     bool isExits = _statusrepo.Any(x => x.StatusName == statusVm.StatusName && x.IsDeleted == false);
                     if (isExits)
                     {
@@ -112,6 +122,7 @@ namespace QuickCampusAPI.Controllers
                 }
                 else
                 {
+                    result.IsSuccess = false;
                     result.Message = "something Went Wrong";
                 }
             }
@@ -140,6 +151,14 @@ namespace QuickCampusAPI.Controllers
 
                 if (ModelState.IsValid && vm.StatusId > 0 && res.IsDeleted == false)
                 {
+                    string pattern = @"^[a-zA-Z][a-zA-Z\s]*$";
+                    string input = vm.StatusName;
+                    Match m = Regex.Match(input, pattern, RegexOptions.IgnoreCase);
+                    if (!m.Success)
+                    {
+                        result.Message = "Only alphabetic characters are allowed in the name.";
+                        return Ok(result);
+                    }
                     res.StatusName = vm.StatusName.Trim();
                     res.IsActive = true;
                     res.StatusId = vm.StatusId;

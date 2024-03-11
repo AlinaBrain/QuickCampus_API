@@ -281,7 +281,7 @@ namespace QuickCampusAPI.Controllers
         }
         [HttpGet]
         [Route("GetUserDetailsById")]
-        public async Task<IActionResult> GetUserDetailsById(int Id, int clientid)
+        public async Task<IActionResult> GetUserDetailsById(int id, int clientid)
         {
             IGeneralResult<UserResponseVm> result = new GeneralResult<UserResponseVm>();
             var _jwtSecretKey = config["Jwt:Key"];
@@ -297,8 +297,8 @@ namespace QuickCampusAPI.Controllers
                 cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
             }
 
-            var res = await userRepo.GetById(Id);
-            if (res.IsDelete == false && res.IsActive == true)
+            var res = (await userRepo.GetAll(x=>x.IsActive==true && x.IsDelete==false && x.Id==id)).FirstOrDefault();
+            if (res!=null)
             {
                 result.Data = (UserResponseVm)res;
                 result.IsSuccess = true;

@@ -8,6 +8,7 @@ using QuickCampus_Core.Services;
 using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
 using System.Data;
+using System.Text.RegularExpressions;
 
 namespace QuickCampusAPI.Controllers
 {
@@ -65,7 +66,7 @@ namespace QuickCampusAPI.Controllers
             int cid = 0;
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            var res = await _countryrepo.GetById(countryid);
+            var res = (await _countryrepo.GetAll(x=>x.IsActive==true && x.IsDeleted==false && x.CountryId==countryid)).FirstOrDefault();
             if (res!=null)
             {
                 result.Data = (CountryVM)res;
@@ -101,6 +102,14 @@ namespace QuickCampusAPI.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    string pattern = @"^[a-zA-Z][a-zA-Z\s]*$";
+                    string input = countryVM.CountryName;
+                    Match m = Regex.Match(input, pattern, RegexOptions.IgnoreCase);
+                    if (!m.Success)
+                    {
+                        result.Message = "Only alphabetic characters are allowed in the name.";
+                        return Ok(result);
+                    }
                     bool isExits = _countryrepo.Any(x => x.CountryName == countryVM.CountryName && x.IsDeleted == false);
                     if (isExits)
                     {
@@ -164,6 +173,14 @@ namespace QuickCampusAPI.Controllers
 
                 if (ModelState.IsValid && vm.CountryId > 0 && res.IsDeleted == false)
                 {
+                    string pattern = @"^[a-zA-Z][a-zA-Z\s]*$";
+                    string input = vm.CountryName;
+                    Match m = Regex.Match(input, pattern, RegexOptions.IgnoreCase);
+                    if (!m.Success)
+                    {
+                        result.Message = "Only alphabetic characters are allowed in the name.";
+                        return Ok(result);
+                    }
                     res.CountryName = vm.CountryName.Trim();
                     res.IsActive = true;
                     res.CountryId = vm.CountryId;

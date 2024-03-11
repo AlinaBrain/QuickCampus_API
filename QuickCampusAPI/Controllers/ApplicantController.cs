@@ -5,6 +5,7 @@ using QuickCampus_Core.Common.Enum;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
+using System.Text.RegularExpressions;
 
 
 
@@ -123,6 +124,16 @@ namespace QuickCampusAPI.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    string pattern = @"^[a-zA-Z][a-zA-Z\s]*$";
+                    string input1 = vm.FirstName;
+                    string input2 = vm.LastName;
+                    Match m1 = Regex.Match(input1, pattern, RegexOptions.IgnoreCase);
+                    Match m2 = Regex.Match(input2, pattern, RegexOptions.IgnoreCase);
+                    if (!m1.Success && !m2.Success)
+                    {
+                        result.Message = "Only alphabetic characters are allowed in the name.";
+                        return Ok(result);
+                    }
                     ApplicantViewModel applicantViewModel = new ApplicantViewModel
                     {
                         FirstName = vm.FirstName.Trim(),
@@ -250,14 +261,11 @@ namespace QuickCampusAPI.Controllers
                     applicant.ModifiedDate = DateTime.Now;
                     try
                     {
-
                         await _applicantRepo.Update(applicant);
 
                         result.Message = "Applicant updated successfully";
                         result.IsSuccess = true;
                     }
-
-
                     catch (Exception ex)
                     {
                         result.Message = ex.Message;
@@ -296,8 +304,8 @@ namespace QuickCampusAPI.Controllers
                 cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
             }
 
-            var res = await _applicantRepo.GetById(applicantId);
-            if (res.IsDeleted == false && res.IsActive == true)
+            var res =( await _applicantRepo.GetAll(x=>x.IsActive==true && x.IsDeleted== false  && x.ApplicantId==applicantId)).FirstOrDefault();
+            if (res!=null)
             {
                 result.Data = (ApplicantViewModel)res;
                 result.IsSuccess = true;

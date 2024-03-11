@@ -34,11 +34,9 @@ namespace QuickCampus_Core.ViewModel
         }
         public int ApplicantID { get; set; }
 
-        [Required(ErrorMessage = "Name is required"), MaxLength(20)]
-        [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "Only characters allowed.")]
+        
         public string? FirstName { get; set; }
-        [Required(ErrorMessage = "Name is required"), MaxLength(20)]
-        [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "Only characters allowed.")]
+        
         public string? LastName { get; set; }
 
         [Display(Name = "Email Address")]

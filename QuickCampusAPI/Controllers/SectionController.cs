@@ -6,6 +6,8 @@ using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
 using System.Data;
+using System.Security.Cryptography.X509Certificates;
+using System.Text.RegularExpressions;
 
 namespace QuickCampusAPI.Controllers
 {
@@ -102,8 +104,17 @@ namespace QuickCampusAPI.Controllers
 
                 if (ModelState.IsValid)
                 {
- 
-                        {
+                    string pattern = @"^[a-zA-Z][a-zA-Z\s]*$";
+                    string input = vm.Section1;
+                    Match m = Regex.Match(input, pattern, RegexOptions.IgnoreCase);
+                    if (!m.Success)
+                    {
+                        result.Message = "Only alphabetic characters are allowed in the name.";
+                        return Ok(result);
+                    }
+
+
+                    {
                         SectionVm sectionVm = new SectionVm()
                         {
                             Section1 = vm.Section1,

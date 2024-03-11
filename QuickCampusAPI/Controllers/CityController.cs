@@ -9,6 +9,7 @@ using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace QuickCampusAPI.Controllers
@@ -92,7 +93,7 @@ namespace QuickCampusAPI.Controllers
             var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
             
 
-            var res = await _cityrepo.GetById(id);
+            var res = (await _cityrepo.GetAll(x=>x.IsActive==true && x.IsDeleted==false && x.CityId== id)).FirstOrDefault();
             if (res != null)
             {
                 result.Data = (CityVm)res;
@@ -123,6 +124,14 @@ namespace QuickCampusAPI.Controllers
 
                 if (ModelState.IsValid)
                 {
+                    string pattern = @"^[a-zA-Z][a-zA-Z\s]*$";
+                    string input = vm.CityName;
+                    Match m = Regex.Match(input, pattern, RegexOptions.IgnoreCase);
+                    if (!m.Success)
+                    {
+                        result.Message = "Only alphabetic characters are allowed in the name.";
+                        return Ok(result);
+                    }
                     bool isExits = _cityrepo.Any(x => x.CityName == vm.CityName && x.IsDeleted == false);
                     if (isExits)
                     {

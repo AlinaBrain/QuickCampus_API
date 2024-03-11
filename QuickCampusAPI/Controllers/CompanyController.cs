@@ -5,6 +5,8 @@ using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.Services;
 using QuickCampus_Core.ViewModel;
+using QuickCampus_DAL.Context;
+using System.Text.RegularExpressions;
 
 namespace QuickCampusAPI.Controllers
 {
@@ -55,11 +57,11 @@ namespace QuickCampusAPI.Controllers
         //[Authorize(Roles = "GetCountryById")]
         [HttpGet]
         [Route("GetCompanyById")]
-        public async Task<IActionResult> GetCompanyById(int Companyid)
+        public async Task<IActionResult> GetCompanyById(int companyid)
         {
             IGeneralResult<CompanyVm> result = new GeneralResult<CompanyVm>();
-            var res = await _companyRepo.GetById(Companyid);
-            if (res.Isdeleted == false && res.IsActive == true)
+            var res = (await _companyRepo.GetAll(x=>x.Isdeleted==false && x.IsActive==true && x.CompanyId== companyid)).FirstOrDefault();
+            if (res!=null)
             {
                 result.Data = (CompanyVm)res;
                 result.IsSuccess = true;
@@ -82,6 +84,14 @@ namespace QuickCampusAPI.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    string pattern = @"^[a-zA-Z][a-zA-Z\s]*$";
+                    string input = companyVM.CompanyName;
+                    Match m = Regex.Match(input, pattern, RegexOptions.IgnoreCase);
+                    if (!m.Success)
+                    {
+                        result.Message = "Only alphabetic characters are allowed in the name.";
+                        return Ok(result);
+                    }
                     bool isExits = _companyRepo.Any(x => x.CompanyName == companyVM.CompanyName && x.Isdeleted == false);
                     if (isExits)
                     {
@@ -145,6 +155,14 @@ namespace QuickCampusAPI.Controllers
 
                 if (ModelState.IsValid && vm.CompanyId > 0 && res.Isdeleted == false)
                 {
+                    string pattern = @"^[a-zA-Z][a-zA-Z\s]*$";
+                    string input = vm.CompanyName;
+                    Match m = Regex.Match(input, pattern, RegexOptions.IgnoreCase);
+                    if (!m.Success)
+                    {
+                        result.Message = "Only alphabetic characters are allowed in the name.";
+                        return Ok(result);
+                    }
                     res.CompanyName = vm.CompanyName.Trim();
                     res.IsActive = true;
                     res.CompanyId = vm.CompanyId;

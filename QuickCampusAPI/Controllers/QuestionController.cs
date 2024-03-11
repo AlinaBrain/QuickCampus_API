@@ -42,7 +42,6 @@ namespace QuickCampusAPI.Controllers
             {
                 cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
             }
-
             var result = await _questionrepo.GetAllQuestion(cid, isSuperAdmin, newPageStart, pageSize);
             return Ok(result);
         }
