@@ -129,15 +129,21 @@ namespace QuickCampusAPI.Controllers
             if (isSuperAdmin)
             {
                 //rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted == false || x.IsActive == false && (cid == 0 ? true : x.ClientId == cid )).OrderByDescending(o=>o.Id).ToList();
-                rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted == false && x.Name.Contains(name ?? "", StringComparison.OrdinalIgnoreCase)).OrderByDescending(o => o.Id).ToList();
+                rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted == false && x.Name.Contains(name ?? "", StringComparison.OrdinalIgnoreCase))
+                    .OrderByDescending(o => o.Id).ToList();
                 result.IsSuccess = true;
                 result.Message = "Record Fetched Successfully";
+                
             }
             else
             {
                 rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted == false && x.ClientId == cid || x.IsActive == false).OrderByDescending(o => o.Id).ToList();
             }
-            return Ok(rolelist);
+            result.Data = rolelist.Select(y => new ActiveRoleVm
+            {
+                Name = y.Name,
+            }).ToList();
+            return Ok(result);
         }
 
         [Authorize(Roles = "UpdateRole")]
