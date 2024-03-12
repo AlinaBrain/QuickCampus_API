@@ -52,6 +52,7 @@ namespace QuickCampus_Core.Services
                 result.Data = _context.Questions.Where(x => x.IsDeleted == false &&x.IsActive==true && (clientid == 0 ? true : x.ClentId == clientid)).Select(x => new QuestionViewModelAdmin()
                 {
                     QuestionId = x.QuestionId,
+                    QuestionTypeId=(int)x.QuestionTypeId,
                     QuestionTypeName = x.QuestionType.QuestionType1,
                     QuestionSection = x.Section.Section1,
                     QuestionGroup = x.Group.GroupName,

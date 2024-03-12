@@ -142,6 +142,7 @@ namespace QuickCampusAPI.Controllers
             result.Data = rolelist.Select(y => new ActiveRoleVm
             {
                 Name = y.Name,
+                Id=y.Id
             }).ToList();
             return Ok(result);
         }
