@@ -41,10 +41,12 @@ namespace QuickCampus_Core.Services
                 var totalCount = result.Data = _context.Questions.Where(x => x.IsDeleted == false && x.IsActive==true &&(clientid == 0 ? true : x.ClentId == clientid)).Select(x => new QuestionViewModelAdmin()
                 {
                     QuestionId = x.QuestionId,
+                    GroupId=(int)x.GroupId,
                     QuestionTypeName = x.QuestionType.QuestionType1,
                     QuestionSection = x.Section.Section1,
                     QuestionGroup = x.Group.GroupName,
-                    Question = x.Text,
+                    Text = x.Text,
+                    Marks=Convert.ToInt32(x.Marks),
                     IsActive = x.IsActive ?? false
                 }).ToList();
                 result.Data = _context.Questions.Where(x => x.IsDeleted == false &&x.IsActive==true && (clientid == 0 ? true : x.ClentId == clientid)).Select(x => new QuestionViewModelAdmin()
@@ -53,7 +55,10 @@ namespace QuickCampus_Core.Services
                     QuestionTypeName = x.QuestionType.QuestionType1,
                     QuestionSection = x.Section.Section1,
                     QuestionGroup = x.Group.GroupName,
-                    Question = x.Text,
+                    Text = x.Text,
+                    Marks=x.Marks,
+                    GroupId=(int)x.GroupId,
+                    SectionId=(int)x.SectionId,
                     IsActive = x.IsActive ?? false
                 }).OrderByDescending(x => x.QuestionId).Skip(pageStart).Take(pageSize).ToList();
                 if (result.Data.Count > 0 && result.Data.Any(x=>x.IsActive==true))
@@ -82,7 +87,7 @@ namespace QuickCampus_Core.Services
                 QuestionTypeName = x.QuestionType.QuestionType1,
                 QuestionSection = x.Section.Section1,
                 QuestionGroup = x.Group.GroupName,
-                Question = x.Text,
+                Text = x.Text,
                 IsActive = x.IsActive ?? false
             }).ToList();
             result.Data = _context.Questions.Where(x => x.IsDeleted == false && x.ClentId == clientid).Select(x => new QuestionViewModelAdmin()
@@ -91,7 +96,7 @@ namespace QuickCampus_Core.Services
                 QuestionTypeName = x.QuestionType.QuestionType1,
                 QuestionSection = x.Section.Section1,
                 QuestionGroup = x.Group.GroupName,
-                Question = x.Text,
+                Text = x.Text,
                 IsActive = x.IsActive ?? false
             }).Skip(pageStart).Take(pageSize).ToList();
 
@@ -124,7 +129,7 @@ namespace QuickCampus_Core.Services
                     SectionId = x.SectionId ?? 0,
                     GroupId = x.GroupId ?? 0,
                     QuestionSection = x.Section.Section1,
-                    Question = x.Text,
+                    Text = x.Text,
                     IsActive = true,
                     IsDeleted = false,
 
@@ -169,7 +174,7 @@ namespace QuickCampus_Core.Services
                 SectionId = x.SectionId ?? 0,
                 GroupId = x.GroupId ?? 0,
                 QuestionSection = x.Section.Section1,
-                Question = x.Text,
+                Text = x.Text,
                 Marks = x.Marks ?? 0,
                 options = x.QuestionOptions.Select(y => new OptionViewModelAdmin()
                 {
@@ -464,6 +469,7 @@ namespace QuickCampus_Core.Services
                         questionoptiondata.IsCorrect = option.IsCorrect;
                         questionoptiondata.Imagepath = _processUploadFile.GetUploadFile(option.Image);
                         var questionoptions = _context.QuestionOptions.Update(questionoptiondata);
+                        _context.SaveChanges();
                         option.OptionId = questionoptions.Entity.OptionId;
                     }
                     res.Data = questionTakeView;
