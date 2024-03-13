@@ -23,11 +23,11 @@ namespace QuickCampus_Core.ViewModel
         public int GroupId { get; set; }
         [Required(ErrorMessage = "Question is required.")]
         [Display(Name = "Question")]
-        public string Question { get; set; }
+        public string Text { get; set; }
         public string QuestionTypeName { get; set; }
         public string QuestionSection { get; set; }
         public string QuestionGroup { get; set; }
-        public int Marks { get; set; }
+        public int? Marks { get; set; }
         public bool IsActive { get; set; }
         public bool IsDeleted { get; set; }
         public List<OptionViewModelAdmin> options { get; set; } = null;

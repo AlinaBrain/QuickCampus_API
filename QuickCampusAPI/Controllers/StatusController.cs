@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
-using QuickCampus_Core.Services;
 using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
 using System.Text.RegularExpressions;
@@ -12,30 +10,27 @@ namespace QuickCampusAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CompanyController : ControllerBase
+    public class StatusController : ControllerBase
     {
-        private readonly ICompanyRepo _companyRepo;
+        private readonly IStatusRepo _statusrepo;
 
-        public CompanyController(ICompanyRepo companyRepo)
+        public StatusController(IStatusRepo statusRepo)
         {
-            _companyRepo=companyRepo;
+            _statusrepo=statusRepo;
         }
-        //[Authorize(Roles = "GetAllCountry")]
         [HttpGet]
-        [Route("GetAllCompany")]
-        public async Task<IActionResult> GetAllCompany()
+        [Route("GetAllStatus")]
+        public async Task<IActionResult> GetAllStatus()
         {
-            IGeneralResult<List<CompanyVm>> result = new GeneralResult<List<CompanyVm>>();
-           
-           
+            IGeneralResult<List<StatusVm>> result = new GeneralResult<List<StatusVm>>();
             try
             {
-                var companylist = (await _companyRepo.GetAll()).Where(x => x.Isdeleted != true) .ToList().OrderByDescending(x => x.CompanyId);
+                var statuslist = (await _statusrepo.GetAll()).Where(x => x.IsDeleted == false && x.IsActive==true).ToList().OrderByDescending(x => x.StatusId);
 
                 // var clientList = (await _countryrepo.GetAll()).Where(x => x.IsDeleted != true && x.CountryName.Contains(countryName)).ToList();
 
 
-                var res = companylist.Select(x => ((CompanyVm)x)).ToList();
+                var res = statuslist.Select(x => ((StatusVm)x)).ToList();
                 if (res != null && res.Count() > 0)
                 {
                     result.IsSuccess = true;
@@ -56,64 +51,64 @@ namespace QuickCampusAPI.Controllers
         }
         //[Authorize(Roles = "GetCountryById")]
         [HttpGet]
-        [Route("GetCompanyById")]
-        public async Task<IActionResult> GetCompanyById(int companyid)
+        [Route("GetStatusById")]
+        public async Task<IActionResult> GetStatusById(int statusid)
         {
-            IGeneralResult<CompanyVm> result = new GeneralResult<CompanyVm>();
-            var res = (await _companyRepo.GetAll(x=>x.Isdeleted==false && x.IsActive==true && x.CompanyId== companyid)).FirstOrDefault();
-            if (res!=null)
+            IGeneralResult<StatusVm> result = new GeneralResult<StatusVm>();
+            var res = (await _statusrepo.GetAll(x=>x.IsActive==true && x.IsDeleted==false && x.StatusId==statusid)).FirstOrDefault();
+            if (res != null)
             {
-                result.Data = (CompanyVm)res;
+                result.Data = (StatusVm)res;
                 result.IsSuccess = true;
-                result.Message = "Company details getting succesfully";
+                result.Message = "Status details getting succesfully";
             }
             else
             {
-                result.Message = "Company does Not exist";
+                result.Message = "Status does Not exist";
             }
             return Ok(result);
         }
         //[Authorize(Roles = "AddCountry")]
         [HttpPost]
-        [Route("AddCompany")]
-        public async Task<IActionResult> AddCompany(CompanyVm companyVM)
+        [Route("AddStatus")]
+        public async Task<IActionResult> AddStatus(StatusVm statusVm)
         {
-            IGeneralResult<CompanyVm> result = new GeneralResult<CompanyVm>();
-           
-            if (companyVM != null)
+            IGeneralResult<StatusVm> result = new GeneralResult<StatusVm>();
+
+            if (statusVm != null)
             {
                 if (ModelState.IsValid)
                 {
                     string pattern = @"^[a-zA-Z][a-zA-Z\s]*$";
-                    string input = companyVM.CompanyName;
+                    string input = statusVm.StatusName;
                     Match m = Regex.Match(input, pattern, RegexOptions.IgnoreCase);
                     if (!m.Success)
                     {
                         result.Message = "Only alphabetic characters are allowed in the name.";
                         return Ok(result);
                     }
-                    bool isExits = _companyRepo.Any(x => x.CompanyName == companyVM.CompanyName && x.Isdeleted == false);
+                    bool isExits = _statusrepo.Any(x => x.StatusName == statusVm.StatusName && x.IsDeleted == false);
                     if (isExits)
                     {
-                        result.Message = " Company Name is already exists";
+                        result.Message = " Status Name is already exists";
                     }
                     else
                     {
                         {
-                            int recordcount = (await _companyRepo.GetAll()).Count();
-                            CompanyVm companyVm = new CompanyVm
+                            int recordcount = (await _statusrepo.GetAll()).Count();
+                            StatusVm statusvm = new StatusVm
                             {
-                                CompanyName = companyVM.CompanyName.Trim(),
+                                StatusName = statusVm.StatusName.Trim(),
                                 IsActive = true,
-                                Isdeleted = false,
-                                CompanyId = recordcount + 1
+                                IsDeleted = false,
+                                StatusId = recordcount + 1
                             };
                             try
                             {
-                                var companydata = await _companyRepo.Add(companyVm.ToDbModel());
-                                result.Data = (CompanyVm)companydata;
-                                
-                                result.Message = "Company added successfully";
+                                var companydata = await _statusrepo.Add(statusVm.ToDbModel());
+                                result.Data = (StatusVm)companydata;
+
+                                result.Message = "Status added successfully";
                                 result.IsSuccess = true;
                             }
 
@@ -127,6 +122,7 @@ namespace QuickCampusAPI.Controllers
                 }
                 else
                 {
+                    result.IsSuccess = false;
                     result.Message = "something Went Wrong";
                 }
             }
@@ -134,44 +130,44 @@ namespace QuickCampusAPI.Controllers
         }
         //[Authorize(Roles = "EditCountry")]
         [HttpPost]
-        [Route("EditCompany")]
-        public async Task<IActionResult> EditCompany(CompanyVm vm)
+        [Route("EditStatus")]
+        public async Task<IActionResult> EditStatus(StatusVm vm)
         {
-            IGeneralResult<CompanyVm> result = new GeneralResult<CompanyVm>();
-            
-            if (_companyRepo.Any(x => x.CompanyName == vm.CompanyName && x.IsActive == true && x.CompanyId != vm.CompanyId))
+            IGeneralResult<StatusVm> result = new GeneralResult<StatusVm>();
+
+            if (_statusrepo.Any(x => x.StatusName == vm.StatusName && x.IsActive == true && x.StatusId != vm.StatusId))
             {
-                result.Message = "Email Already Registered!";
+                result.Message = "Status Name Already Registered!";
             }
             else
             {
-                var res = await _companyRepo.GetById(vm.CompanyId);
-                bool isDeleted = (bool)res.Isdeleted ? true : false;
+                var res = await _statusrepo.GetById(vm.StatusId);
+                bool isDeleted = (bool)res.IsDeleted ? true : false;
                 if (isDeleted)
                 {
-                    result.Message = " Company does Not Exist";
+                    result.Message = "Status does Not Exist";
                     return Ok(result);
                 }
 
-                if (ModelState.IsValid && vm.CompanyId > 0 && res.Isdeleted == false)
+                if (ModelState.IsValid && vm.StatusId > 0 && res.IsDeleted == false)
                 {
                     string pattern = @"^[a-zA-Z][a-zA-Z\s]*$";
-                    string input = vm.CompanyName;
+                    string input = vm.StatusName;
                     Match m = Regex.Match(input, pattern, RegexOptions.IgnoreCase);
                     if (!m.Success)
                     {
                         result.Message = "Only alphabetic characters are allowed in the name.";
                         return Ok(result);
                     }
-                    res.CompanyName = vm.CompanyName.Trim();
+                    res.StatusName = vm.StatusName.Trim();
                     res.IsActive = true;
-                    res.CompanyId = vm.CompanyId;
-                    res.Isdeleted = false;
+                    res.StatusId = vm.StatusId;
+                    res.IsDeleted = false;
 
                     try
                     {
-                        result.Data = (CompanyVm)await _companyRepo.Update(res);
-                        result.Message = "Company updated successfully";
+                        result.Data = (StatusVm)await _statusrepo.Update(res);
+                        result.Message = "Status updated successfully";
                         result.IsSuccess = true;
                     }
                     catch (Exception ex)
@@ -189,26 +185,25 @@ namespace QuickCampusAPI.Controllers
         }
         //[Authorize(Roles = "DeleteCountry")]
         [HttpDelete]
-        [Route("DeleteCompany")]
-        public async Task<IActionResult> DeleteCompany(int companyid)
+        [Route("DeleteStatus")]
+        public async Task<IActionResult> DeleteStatus(int statusid)
         {
-            
-            IGeneralResult<CompanyVm> result = new GeneralResult<CompanyVm>();
-            var res = await _companyRepo.GetById(companyid);
-            if (res.Isdeleted == false)
+
+            IGeneralResult<StatusVm> result = new GeneralResult<StatusVm>();
+            var res = await _statusrepo.GetById(statusid);
+            if (res.IsDeleted == false)
             {
                 res.IsActive = false;
-                res.Isdeleted = true;
-                await _companyRepo.Update(res);
+                res.IsDeleted = true;
+                await _statusrepo.Update(res);
                 result.IsSuccess = true;
-                result.Message = "Company Deleted Succesfully";
+                result.Message = "Status Deleted Succesfully";
             }
             else
             {
-                result.Message = "Company does Not exist";
+                result.Message = "Status does Not exist";
             }
             return Ok(result);
         }
-
     }
 }

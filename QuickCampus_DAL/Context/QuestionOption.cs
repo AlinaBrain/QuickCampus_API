@@ -17,6 +17,8 @@ public partial class QuestionOption
 
     public byte[]? Image { get; set; }
 
+    public string? Imagepath { get; set; }
+
     public virtual ICollection<ApplicantAnswerSummary> ApplicantAnswerSummaries { get; set; } = new List<ApplicantAnswerSummary>();
 
     public virtual Question? Question { get; set; }

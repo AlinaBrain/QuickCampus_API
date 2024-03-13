@@ -44,7 +44,6 @@ namespace QuickCampus_Core.Services
                 result.IsSuccess = true;
                 result.Message = "status update successfully";
                 return result;
-
             }
             else
             {

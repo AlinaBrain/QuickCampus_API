@@ -5,6 +5,7 @@ using QuickCampus_Core.Common.Enum;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
+using System.Text.RegularExpressions;
 
 
 
@@ -29,7 +30,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "GetAllApplicant")]
         [HttpGet]
         [Route("GetAllApplicant")]
-        public async Task<ActionResult> GetAllApplicant(int clientid, string? search, int pageStart=1,int pageSize=10)
+        public async Task<ActionResult> GetAllApplicant(int clientid, string? search, int pageStart = 1, int pageSize = 10)
         {
             IGeneralResult<List<ApplicantViewModel>> result = new GeneralResult<List<ApplicantViewModel>>();
             int cid = 0;
@@ -53,16 +54,16 @@ namespace QuickCampusAPI.Controllers
             List<Applicant> apllicantlist = new List<Applicant>();
             var applicantTotalCount = 0;
             try
-            {      
+            {
                 if (isSuperAdmin)
                 {
                     applicantTotalCount = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && (cid == 0 ? true : x.ClientId == cid)).Count();
-                    apllicantlist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && x.IsActive==true && (cid == 0 ? true : x.ClientId == cid)).Skip(newPageStart).Take(pageSize).ToList();
-                    apllicantlist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && x.IsActive == true && (x.FirstName.Contains(search ?? "",StringComparison.OrdinalIgnoreCase) || x.LastName.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.EmailAddress.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.PhoneNumber.Contains(search ?? ""))).OrderByDescending(x => x.ApplicantId).Skip(newPageStart).Take(pageSize).ToList(); 
+                    apllicantlist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && x.IsActive == true && (cid == 0 ? true : x.ClientId == cid)).Skip(newPageStart).Take(pageSize).ToList();
+                    apllicantlist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && x.IsActive == true && (x.FirstName.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.LastName.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.EmailAddress.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.PhoneNumber.Contains(search ?? ""))).OrderByDescending(x => x.ApplicantId).Skip(newPageStart).Take(pageSize).ToList();
                 }
                 else
                 {
-                    applicantTotalCount = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true  && x.IsActive==true  && (cid == 0 ? true : x.ClientId == cid)).Count();
+                    applicantTotalCount = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && x.IsActive == true && (cid == 0 ? true : x.ClientId == cid)).Count();
                     apllicantlist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && x.IsActive == true && (cid == 0 ? true : x.ClientId == cid)).Skip(newPageStart).Take(pageSize).ToList();
                     apllicantlist = (await _applicantRepo.GetAll()).Where(x => x.IsDeleted != true && x.IsActive == true && (x.FirstName.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.LastName.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.EmailAddress.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.PhoneNumber.Contains(search ?? ""))).OrderByDescending(x => x.ApplicantId).Skip(newPageStart).Take(pageSize).ToList();
                 }
@@ -94,9 +95,9 @@ namespace QuickCampusAPI.Controllers
         public async Task<IActionResult> AddApplicant(ApplicantViewModel vm, int clientid)
         {
             IGeneralResult<ApplicantViewModel> result = new GeneralResult<ApplicantViewModel>();
-            var _jwtSecretKey = _config["Jwt:Key"];
-            int cid = 0;
             var jwtSecretKey = _config["Jwt:Key"];
+            int cid = 0;
+            var _jwtSecretKey = _config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
             if (isSuperAdmin)
@@ -108,7 +109,7 @@ namespace QuickCampusAPI.Controllers
                 cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
             }
 
-            if (_applicantRepo.Any(x => x.EmailAddress == vm.EmailAddress && x.IsActive == true && x.IsDeleted == false  ))
+            if (_applicantRepo.Any(x => x.EmailAddress == vm.EmailAddress && x.IsActive == true && x.IsDeleted == false))
             {
                 result.Message = "Email Address Already Registered!";
                 return Ok(result);
@@ -121,30 +122,40 @@ namespace QuickCampusAPI.Controllers
             }
             else
             {
-                    if (ModelState.IsValid)
+                if (ModelState.IsValid)
+                {
+                    string pattern = @"^[a-zA-Z][a-zA-Z\s]*$";
+                    string input1 = vm.FirstName;
+                    string input2 = vm.LastName;
+                    Match m1 = Regex.Match(input1, pattern, RegexOptions.IgnoreCase);
+                    Match m2 = Regex.Match(input2, pattern, RegexOptions.IgnoreCase);
+                    if (!m1.Success && !m2.Success)
                     {
-                        ApplicantViewModel applicantViewModel = new ApplicantViewModel
-                        {
-                            FirstName = vm.FirstName.Trim(),
-                            LastName = vm.LastName.Trim(),
-                            EmailAddress = vm.EmailAddress.Trim(),
-                            PhoneNumber = vm.PhoneNumber.Trim(),
-                            HigestQualification = vm.HigestQualification,
-                            HigestQualificationPercentage = vm.HigestQualificationPercentage,
-                            MatricPercentage = vm.MatricPercentage,
-                            IntermediatePercentage = vm.IntermediatePercentage,
-                            Skills = vm.Skills,
-                            StatusId = vm.StatusId,
-                            Comment = vm.Comment.Trim(),
-                            CollegeName = vm.CollegeName.Trim(),
-                            ClientId = cid,
-                            AssignedToCompany = vm.AssignedToCompany,
-                            CollegeId = vm.CollegeId
-                        };
-                        try
-                        {
+                        result.Message = "Only alphabetic characters are allowed in the name.";
+                        return Ok(result);
+                    }
+                    ApplicantViewModel applicantViewModel = new ApplicantViewModel
+                    {
+                        FirstName = vm.FirstName.Trim(),
+                        LastName = vm.LastName.Trim(),
+                        EmailAddress = vm.EmailAddress.Trim(),
+                        PhoneNumber = vm.PhoneNumber.Trim(),
+                        HigestQualification = vm.HigestQualification,
+                        HigestQualificationPercentage = vm.HigestQualificationPercentage,
+                        MatricPercentage = vm.MatricPercentage,
+                        IntermediatePercentage = vm.IntermediatePercentage,
+                        Skills = vm.Skills,
+                        StatusId = vm.StatusId,
+                        Comment = vm.Comment.Trim(),
+                        CollegeName = vm.CollegeName.Trim(),
+                        ClientId = cid,
+                        AssignedToCompany = vm.AssignedToCompany,
+                        CollegeId = vm.CollegeId
+                    };
+                    try
+                    {
 
-                            var dataWithClientId = await _applicantRepo.Add(applicantViewModel.ToApplicantDbModel());
+                        var dataWithClientId = await _applicantRepo.Add(applicantViewModel.ToApplicantDbModel());
                         if (dataWithClientId.ApplicantId > 0)
                         {
                             result.IsSuccess = true;
@@ -156,25 +167,25 @@ namespace QuickCampusAPI.Controllers
                         {
                             result.Message = "Something Went Wrong";
                         }
-                            
-                           
-                        }
-                        catch(Exception ex)
-                        {
-                            result.Message = ex.Message;
-                        }
-                       
-                        return Ok(result);
-                        }
 
-                    else
-                    {
-                        result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
+
                     }
+                    catch (Exception ex)
+                    {
+                        result.Message = ex.Message;
+                    }
+
+                    return Ok(result);
                 }
-                return Ok(result);
+
+                else
+                {
+                    result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
+                }
             }
-        
+            return Ok(result);
+        }
+
 
         [Authorize(Roles = "EditApplicant")]
         [HttpPost]
@@ -182,98 +193,94 @@ namespace QuickCampusAPI.Controllers
         public async Task<IActionResult> EditApplicant(ApplicantViewModel vm, int clientid)
         {
             IGeneralResult<ApplicantViewModel> result = new GeneralResult<ApplicantViewModel>();
-            var _jwtSecretKey = _config["Jwt:Key"];
-            var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            if (vm.StatusId > 0 && vm.AssignedToCompany > 0)
+            {
 
-            int cid = 0;
-            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            if (isSuperAdmin)
-            {
-                cid = clientid;
-            }
-            else
-            {
-                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
-                if (cid == 0)
-                {
-                    result.IsSuccess = false;
-                    result.Message = "Invalid Client";
-                    return Ok(result);
-                }
-            }
-            if (vm != null)
-            {
-                Applicant applicant = new Applicant();
 
+
+                var _jwtSecretKey = _config["Jwt:Key"];
+                var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+
+                int cid = 0;
+                var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
                 if (isSuperAdmin)
                 {
-                    applicant = (await _applicantRepo.GetAll()).Where(w => w.IsDeleted == false && w.IsActive == true && cid == 0 ? true : w.ClientId == cid && w.ApplicantId==vm.ApplicantID).FirstOrDefault();
+                    cid = clientid;
                 }
                 else
                 {
-                    applicant = (await _applicantRepo.GetAll()).Where(w => w.IsDeleted == false && w.IsActive == true && w.ClientId == cid && w.ApplicantId == vm.ApplicantID).FirstOrDefault();
-                }
-                if (applicant == null)
-                {
-                    result.IsSuccess = false;
-                    result.Message = " Applicant does Not Exist";
-                    return Ok(result);
-                }
-                bool isDeleted = (bool)applicant.IsDeleted ? true : false;
-                if (isDeleted)
-                {
-                    result.IsSuccess = false;
-                    result.Message = " Applicant does Not Exist";
-                    return Ok(result);
-                }
-                
-
-                //bool isphonenumberexist = _applicantRepo.Any(x => x.PhoneNumber == vm.PhoneNumber && x.IsDeleted == false);
-                //if (isphonenumberexist)
-                //{
-                //    result.Message = "Phone Number  is Already Exist";
-                //    return Ok(result);
-                //}
-                
-                
-                {
-                    if (ModelState.IsValid && vm.ApplicantID > 0 && applicant.IsDeleted == false)
+                    cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
+                    if (cid == 0)
                     {
-                        applicant.ApplicantId = vm.ApplicantID;
-                        applicant.CollegeName = vm.CollegeName.Trim();
-                        applicant.FirstName = vm.FirstName.Trim();
-                        applicant.LastName = vm.LastName.Trim();
-                        applicant.EmailAddress = vm.EmailAddress.Trim();
-                        applicant.HigestQualification = vm.HigestQualification.Trim();
-                        applicant.IntermediatePercentage = vm.IntermediatePercentage;
-                        applicant.ClientId = cid;
-                        applicant.HigestQualificationPercentage = vm.HigestQualificationPercentage;
-                        applicant.Skills = vm.Skills.Trim();
-                        applicant.MatricPercentage = vm.MatricPercentage;
-                        applicant.PhoneNumber = vm.PhoneNumber.Trim();
-                        applicant.StatusId = (int)(StatusEnum)vm.StatusId;
-                        applicant.AssignedToCompany =(int)(CompanyEnum)vm.AssignedToCompany;
-                        applicant.CollegeId = vm.CollegeId;
-                        applicant.Comment = vm.Comment;
-                        applicant.ModifiedDate = DateTime.Now;
-                        try
-                        {
-                            result.Data = (ApplicantViewModel)await _applicantRepo.Update(applicant);
-                            result.Message = "Applicant updated successfully";
-                            result.IsSuccess = true;
-                        }
-                        catch (Exception ex)
-                        {
-                            result.Message = ex.Message;
-                        }
+                        result.IsSuccess = false;
+                        result.Message = "Invalid Client";
                         return Ok(result);
+                    }
+                }
+                if (vm != null)
+                {
+                    Applicant applicant = new Applicant();
+
+                    if (isSuperAdmin)
+                    {
+                        applicant = (await _applicantRepo.GetAll()).Where(w => w.IsDeleted == false && w.IsActive == true && w.ClientId == cid && w.ApplicantId == vm.ApplicantID).FirstOrDefault();
                     }
                     else
                     {
-                        result.Message = "something Went Wrong";
+                        applicant = (await _applicantRepo.GetAll()).Where(w => w.IsDeleted == false && w.IsActive == true && w.ClientId == cid && w.ApplicantId == vm.ApplicantID).FirstOrDefault();
                     }
+                    if (applicant == null)
+                    {
+                        result.IsSuccess = false;
+                        result.Message = " Applicant does Not Exist";
+                        return Ok(result);
+                    }
+                    bool isDeleted = (bool)applicant.IsDeleted ? true : false;
+                    if (isDeleted)
+                    {
+                        result.IsSuccess = false;
+                        result.Message = " Applicant does Not Exist";
+                        return Ok(result);
+                    }
+                    applicant.CollegeName = vm.CollegeName.Trim();
+                    applicant.FirstName = vm.FirstName.Trim();
+                    applicant.LastName = vm.LastName.Trim();
+                    applicant.EmailAddress = vm.EmailAddress.Trim();
+                    applicant.HigestQualification = vm.HigestQualification.Trim();
+                    applicant.IntermediatePercentage = vm.IntermediatePercentage;
+                    applicant.ClientId = cid;
+                    applicant.HigestQualificationPercentage = vm.HigestQualificationPercentage;
+                    applicant.Skills = vm.Skills.Trim();
+                    applicant.MatricPercentage = vm.MatricPercentage;
+                    applicant.PhoneNumber = vm.PhoneNumber.Trim();
+                    applicant.StatusId = vm.StatusId;
+                    applicant.AssignedToCompany = vm.AssignedToCompany;
+                    applicant.CollegeId = vm.CollegeId;
+                    applicant.Comment = vm.Comment;
+                    applicant.ModifiedDate = DateTime.Now;
+                    try
+                    {
+                        await _applicantRepo.Update(applicant);
+
+                        result.Message = "Applicant updated successfully";
+                        result.IsSuccess = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        result.Message = ex.Message;
+                    }
+                    return Ok(result);
                 }
+                else
+                {
+                    result.Message = "Validation Error";
+                }
+                return Ok(result);
+            }
+            else
+            {
+                result.Message = "You   Give Assigned Company Id And Status Id Can't  be 0";
             }
             return Ok(result);
         }
@@ -297,8 +304,8 @@ namespace QuickCampusAPI.Controllers
                 cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
             }
 
-            var res = await _applicantRepo.GetById(applicantId);
-            if (res.IsDeleted == false && res.IsActive == true)
+            var res =( await _applicantRepo.GetAll(x=>x.IsActive==true && x.IsDeleted== false  && x.ApplicantId==applicantId)).FirstOrDefault();
+            if (res!=null)
             {
                 result.Data = (ApplicantViewModel)res;
                 result.IsSuccess = true;
@@ -314,7 +321,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "DeleteApplicant")]
         [HttpDelete]
         [Route("DeleteApplicant")]
-        public async Task<IActionResult> DeleteApplicant(int applicantId,int clientid, bool isDeleted)
+        public async Task<IActionResult> DeleteApplicant(int applicantId, int clientid, bool isDeleted)
         {
             IGeneralResult<ApplicantViewModel> result = new GeneralResult<ApplicantViewModel>();
             int cid = 0;

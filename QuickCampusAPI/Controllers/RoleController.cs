@@ -5,6 +5,7 @@ using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.Services;
 using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
+using System.Text.RegularExpressions;
 
 namespace QuickCampusAPI.Controllers
 {
@@ -52,6 +53,14 @@ namespace QuickCampusAPI.Controllers
 
                 if (ModelState.IsValid)
                 {
+                    string pattern = @"^[a-zA-Z][a-zA-Z\s]*$";
+                    string input = vm.RoleName;
+                    Match m = Regex.Match(input, pattern, RegexOptions.IgnoreCase);
+                    if (!m.Success)
+                    {
+                        result.Message = "Only alphabetic characters are allowed in the name.";
+                        return Ok(result);
+                    }
                     var userId = JwtHelper.GetuIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                     if (string.IsNullOrEmpty(userId))
                     {
@@ -115,18 +124,27 @@ namespace QuickCampusAPI.Controllers
                 cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
             }
 
-           // List<RoleResponse> roleVm = new List<RoleResponse>();
+            // List<RoleResponse> roleVm = new List<RoleResponse>();
             List<TblRole> rolelist = new List<TblRole>();
             if (isSuperAdmin)
             {
                 //rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted == false || x.IsActive == false && (cid == 0 ? true : x.ClientId == cid )).OrderByDescending(o=>o.Id).ToList();
-                rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted == false  && x.Name.Contains(name ?? "", StringComparison.OrdinalIgnoreCase)).OrderByDescending(o => o.Id).ToList();
+                rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted == false && x.Name.Contains(name ?? "", StringComparison.OrdinalIgnoreCase))
+                    .OrderByDescending(o => o.Id).ToList();
+                result.IsSuccess = true;
+                result.Message = "Record Fetched Successfully";
+                
             }
             else
             {
-                rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted == false && x.ClientId == cid || x.IsActive==false ).OrderByDescending(o=>o.Id).ToList();
+                rolelist = (await roleRepo.GetAll()).Where(x => x.IsDeleted == false && x.ClientId == cid || x.IsActive == false).OrderByDescending(o => o.Id).ToList();
             }
-            return Ok(rolelist);
+            result.Data = rolelist.Select(y => new ActiveRoleVm
+            {
+                Name = y.Name,
+                Id=y.Id
+            }).ToList();
+            return Ok(result);
         }
 
         [Authorize(Roles = "UpdateRole")]
@@ -192,7 +210,7 @@ namespace QuickCampusAPI.Controllers
                     return Ok(result);
                 }
             }
-            var res = await roleRepo.DeleteRole( id, cid, isSuperAdmin);
+            var res = await roleRepo.DeleteRole(id, cid, isSuperAdmin);
             return Ok(res);
         }
 

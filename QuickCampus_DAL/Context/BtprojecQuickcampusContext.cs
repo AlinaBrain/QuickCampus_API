@@ -401,9 +401,9 @@ public partial class BtprojecQuickcampusContext : DbContext
             entity.ToTable("Status", "dbo");
 
             entity.Property(e => e.StatusId).ValueGeneratedNever();
-            entity.Property(e => e.Status1)
-                .HasMaxLength(50)
-                .HasColumnName("Status");
+            entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+            entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.StatusName).HasMaxLength(200);
         });
 
         modelBuilder.Entity<TblClient>(entity =>

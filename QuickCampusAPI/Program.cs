@@ -104,8 +104,6 @@ builder.Services.AddAuthentication(auth =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
 });
-
-
 builder.Services.AddTransient<IApplicationUserRepo, ApplicationUserService>();
 builder.Services.AddTransient<IApplicantRepo, ApplicantRepoServices>();
 builder.Services.AddScoped<ICampusRepo, CampusService>();
@@ -123,6 +121,8 @@ builder.Services.AddScoped<IQuestionOptionRepo, QuestionOptionService>();
 builder.Services.AddScoped<IGroupRepo,GroupServices>();
 builder.Services.AddScoped<ISectionRepo, SectionServices>();
 builder.Services.AddScoped<ICompanyRepo, CompanyRepo>();
+builder.Services.AddScoped<IStatusRepo, StatusRepo>();
+builder.Services.AddScoped<QuickCampus_Core.Common.Helper.ProcessUploadFile>();
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {

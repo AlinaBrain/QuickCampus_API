@@ -117,7 +117,7 @@ namespace QuickCampus_Core.Services
             IGeneralResult<string> result = new GeneralResult<string>();
             TblRole rl = new TblRole();
             rl = _context.TblRoles.Find(id);
-          
+
             if (rl == null)
             {
                 result.IsSuccess = false;
@@ -126,8 +126,8 @@ namespace QuickCampus_Core.Services
             }
             rl.IsDeleted = true;
             rl.IsActive = false;
-            rl.ModofiedDate = DateTime.Now  ;
-            
+            rl.ModofiedDate = DateTime.Now;
+
             dbContext.TblRoles.Update(rl);
             int a = dbContext.SaveChanges();
             if (a > 0)

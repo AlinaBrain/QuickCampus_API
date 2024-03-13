@@ -154,7 +154,7 @@ namespace QuickCampusAPI.Controllers
                 getClientId = string.IsNullOrEmpty(clientId) == true ? 0 : Convert.ToInt32(clientId);
             }
             var res = await _campusrepo.GetCampusByID(campusId, getClientId, isSuperAdmin);
-            if(res.WalkInID > 0)
+            if (res.WalkInID > 0)
             {
                 result.IsSuccess = true;
                 result.Message = "Campus Data";

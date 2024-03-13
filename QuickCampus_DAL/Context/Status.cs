@@ -7,7 +7,15 @@ public partial class Status
 {
     public int StatusId { get; set; }
 
-    public string? Status1 { get; set; }
+    public bool? IsActive { get; set; }
+
+    public bool? IsDeleted { get; set; }
+
+    public DateTime? CreatedDate { get; set; }
+
+    public DateTime? ModifiedDate { get; set; }
+
+    public string? StatusName { get; set; }
 
     public virtual ICollection<Applicant> Applicants { get; set; } = new List<Applicant>();
 }

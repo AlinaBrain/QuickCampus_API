@@ -212,7 +212,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "GetCollegeDetailsById")]
         [HttpGet]
         [Route("GetCollegeDetailsById")]
-        public async Task<IActionResult> GetCollegeDetailsById(int Id, int clientid)
+        public async Task<IActionResult> GetCollegeDetailsById(int collegeid, int clientid)
         {
             IGeneralResult<CollegeCountryDetailsById> result = new GeneralResult<CollegeCountryDetailsById>();
             var _jwtSecretKey = _config["Jwt:Key"];
@@ -228,8 +228,8 @@ namespace QuickCampusAPI.Controllers
                 cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
             }
 
-            var res = await _collegeRepo.GetById(Id);
-            if (res.IsDeleted == false && res.IsActive == true)
+            var res = (await _collegeRepo.GetAll(x=>x.IsDeleted==false && x.IsActive==true && x.CollegeId== collegeid)).FirstOrDefault();
+            if (res != null)
             {
                 result.Data = (CollegeCountryDetailsById)res;
                 result.IsSuccess = true;
@@ -245,7 +245,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "AddCollege")]
         [HttpPost]
         [Route("AddCollege")]
-        public async Task<IActionResult> AddCollege([FromForm]AddCollegeVm vm, int clientid)
+        public async Task<IActionResult> AddCollege([FromForm] AddCollegeVm vm, int clientid)
         {
             IGeneralResult<CollegeVM> result = new GeneralResult<CollegeVM>();
             var _jwtSecretKey = _config["Jwt:Key"];

@@ -271,7 +271,7 @@ namespace QuickCampus_Core.Services
         {
             if (isSuperAdmin)
             {
-                var campusData = _context.WalkIns.Where(x => x.IsDeleted == false && x.WalkInId == id && (clientId == 0 ? true : x.ClientId == clientId)).Include(x => x.CampusWalkInColleges).Include(x => x.State).Include(x => x.Country).OrderByDescending(x => x.WalkInDate).Select(x => new CampusGridViewModel()
+                var campusData = _context.WalkIns.Where(x => x.IsDeleted == false && x.IsActive==true && x.WalkInId == id && (clientId == 0 ? true : x.ClientId == clientId)).Include(x => x.CampusWalkInColleges).Include(x => x.State).Include(x => x.Country).OrderByDescending(x => x.WalkInDate).Select(x => new CampusGridViewModel()
                 {
                     WalkInID = x.WalkInId,
                     Address1 = x.Address1,
@@ -296,7 +296,7 @@ namespace QuickCampus_Core.Services
 
                     }).ToList(),
                 }).FirstOrDefault();
-                if (campusData.WalkInID > 0)
+                if (campusData!= null)
                 {
                     return campusData;
                 }

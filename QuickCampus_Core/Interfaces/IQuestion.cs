@@ -1,4 +1,5 @@
 ﻿using QuickCampus_Core.Common;
+using QuickCampus_Core.Services;
 using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
 
@@ -13,7 +14,8 @@ namespace QuickCampus_Core.Interfaces
         Task<List<QuestionTypeViewModelAdmin>> GetAllQuestionTypes(bool isSuperAdmin, int clientId);
         Task<List<SectionViewModelAdmin>> GetAllSectionList(bool isSuperAdmin, int clientId);
         Task<IGeneralResult<string>> DeleteQuestion(int questionId, int clientId, bool isSuperAdmin, bool isDelete);
-        Task<IGeneralResult<string>> AddQuestion(QuestionViewModelAdmin model, bool isSuperAdmin);
-        Task<IGeneralResult<string>> UpdateQuestion(QuestionViewModelAdmin model, bool isSuperAdmin);
+        Task<IGeneralResult<QuestionTakeViewModel>> AddOrUpdateQuestion(QuestionTakeViewModel questionTakeView);
+        //Task<IGeneralResult<string>> AddQuestion(QuestionViewModelAdmin model, bool isSuperAdmin);
+        //Task<IGeneralResult<string>> UpdateQuestion(QuestionViewModelAdmin model, bool isSuperAdmin);
     }
 }
