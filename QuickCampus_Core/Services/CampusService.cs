@@ -103,6 +103,7 @@ namespace QuickCampus_Core.Services
                                     IsCompleted = null
                                 };
                                 _context.CampusWalkInColleges.Add(campusWalkInCollege);
+                                _context.SaveChanges();
                             }
                         }
                     }
@@ -155,22 +156,11 @@ namespace QuickCampus_Core.Services
                             IsCompleted = null
                         };
                         _context.CampusWalkInColleges.Add(campusWalkInCollege);
+                        _context.SaveChanges();
                     }
                 }
-
-                int response = _context.SaveChanges();
-                if (response > 0)
-                {
-
                     result.IsSuccess = true;
                     result.Message = "Record Saved Successfully";
-
-                }
-                else
-                {
-                    result.IsSuccess = false;
-                    result.Message = "Something went wrong.";
-                }
             }
             catch (Exception ex)
             {
@@ -286,7 +276,7 @@ namespace QuickCampus_Core.Services
                     WalkInDate = x.WalkInDate,
                     IsActive = x.IsActive ?? false,
                     Title = x.Title,
-                    Colleges = x.CampusWalkInColleges.Select(y => new CampusWalkInModel()
+                    Colleges = x.CampusWalkInColleges.Where(z=>z.WalkInId==x.WalkInId).Select(y => new CampusWalkInModel()
                     {
                         CollegeCode = y.CollegeCode,
                         CollegeId = y.CollegeId ?? 0,
