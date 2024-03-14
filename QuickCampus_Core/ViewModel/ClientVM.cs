@@ -29,8 +29,6 @@ namespace QuickCampus_Core.ViewModel
             };
         }
         public int Id { get; set; }
-
-        [Remote("IsAlreadyExist", "Client", HttpMethod = "POST", ErrorMessage = "Name already exists in database.")]
         public string? Name { get; set; }
 
        public int? CraetedBy { get; set; }
@@ -129,7 +127,6 @@ namespace QuickCampus_Core.ViewModel
                   .NotNull().WithMessage("Email could not be null")
                   .NotEmpty().WithMessage("Email could not be empty");
 
-
                 RuleFor(x => x.SubscriptionPlan)
                   .Cascade(CascadeMode.StopOnFirstFailure)
                   .Length(0, 20).WithMessage("SubscriptionPlan lengh could not be greater than 20");
@@ -144,13 +141,10 @@ namespace QuickCampus_Core.ViewModel
                   .Cascade(CascadeMode.StopOnFirstFailure)
                   .NotNull().WithMessage("Password could not be null")
                   .NotEmpty().WithMessage("Password could not be empty")
-                  .Length(4, 50).WithMessage("Password length could not be greater than 4 Character");
+                  .Length(4, 50).WithMessage("Length Should be Greater Than 4 and less than 50");
             }
         }
-
-
     }
-
     public class ClientReponse
     {
         public static explicit operator ClientReponse(TblClient items)

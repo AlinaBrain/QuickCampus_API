@@ -19,11 +19,15 @@ using static QuickCampus_Core.ViewModel.UserVm;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: "MyAllowSpecificOrigins",
-                      policy =>
-                      {
-                          policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
-                      });
+    options.AddPolicy("AllowedCorsPolicy",
+        builder => builder
+            //.SetIsOriginAllowedToAllowWildcardSubdomains()
+            //.WithOrigins("http://localhost:4200", "https://localhost:90", "https://*.sentridocs.com", "http://*.sentridocs.com")
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+        //.AllowCredentials()
+        );
 });
 
 //Add services to the container.
@@ -155,7 +159,8 @@ else
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseAuthentication();
-app.UseCors("MyAllowSpecificOrigins");
+//app.UseCors("MyAllowSpecificOrigins");
+app.UseCors("AllowedCorsPolicy");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
