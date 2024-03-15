@@ -106,25 +106,29 @@ namespace QuickCampusAPI.Controllers
                                         RoleId = vm.RoleId,
                                         UserId = userdetails.Id
                                     };
-                                }
+                                    var userRoleData = await _UserRoleRepo.Add(userRole);
+                                    if(userRoleData.Id > 0)
+                                    {
 
-                                ClientResponseViewModel clientresponse = new ClientResponseViewModel
-                                {
-                                    Id = clientdata.Id,
-                                    Name = clientdata.Name,
-                                    Email = clientdata.Email,
-                                    Phone = clientdata.Phone,
-                                    SubscriptionPlan = clientdata.SubscriptionPlan,
-                                    Address = clientdata.Address,
-                                    Latitude = clientdata.Latitude,
-                                    Longitude = clientdata.Longitude,
-                                    RoleName = _roleRepo.GetAllQuerable().Where(x => x.Id == vm.RoleId).Select(x=>x.Name).First(),
-                                    AppRoleName = userAppRole.RoleId.ToString(),
-                                    IsActive = clientdata.IsActive
-                                };
-                                result.Data = clientresponse;
-                                result.Message = "Client added successfully";
-                                result.IsSuccess = true;
+                                        ClientResponseViewModel clientresponse = new ClientResponseViewModel
+                                        {
+                                            Id = clientdata.Id,
+                                            Name = clientdata.Name,
+                                            Email = clientdata.Email,
+                                            Phone = clientdata.Phone,
+                                            SubscriptionPlan = clientdata.SubscriptionPlan,
+                                            Address = clientdata.Address,
+                                            Latitude = clientdata.Latitude,
+                                            Longitude = clientdata.Longitude,
+                                            RoleName = _roleRepo.GetAllQuerable().Where(x => x.Id == vm.RoleId).Select(x => x.Name).First(),
+                                            AppRoleName = ((common.AppRole)userAppRole.RoleId).ToString(),
+                                            IsActive = clientdata.IsActive
+                                        };
+                                        result.Data = clientresponse;
+                                        result.Message = "Client added successfully";
+                                        result.IsSuccess = true;
+                                    }
+                                }
                             }
                         }
                     }

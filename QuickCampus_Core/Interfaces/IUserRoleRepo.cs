@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace QuickCampus_Core.Interfaces
 {
-    public interface IUserRoleRepo 
+    public interface IUserRoleRepo : IGenericRepository<TblUserRole> 
     {
-        Task<IGeneralResult<string>> SetClientAdminRole(int userId);
+        //Task<IGeneralResult<string>> SetClientAdminRole(int userId);
     }
 }
