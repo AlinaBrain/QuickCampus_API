@@ -5,7 +5,7 @@ namespace QuickCampus_Core.Services
 {
     public class ClientRepo : BaseRepository<BtprojecQuickcampustestContext, TblClient>, IClientRepo
     {
-       
+
     }
 
 

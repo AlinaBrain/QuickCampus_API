@@ -172,7 +172,7 @@ public class JwtHelper
             // Retrieve the "id" claim value
             string nameClaim = string.Empty;
 
-            nameClaim = jwtToken.Claims.First(c => c.Type == "CraetedBy").Value;
+            nameClaim = jwtToken.Claims.First(c => c.Type == "CreatedBy").Value;
 
 
             return nameClaim;
