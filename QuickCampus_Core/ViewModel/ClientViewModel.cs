@@ -23,13 +23,13 @@ namespace QuickCampus_Core.ViewModel
         public string? Email { get; set; }
         [Required(ErrorMessage = "Subscription plan is required"), MaxLength(20)]
         public string? SubscriptionPlan { get; set; }
-        [Required(ErrorMessage = "Longitude is required")]
-        [RegularExpression(@"^\d+(\.\d{1,2})?$")]
+       
+        [RegularExpression(@"^\d+(\.\d{1,2})?$",ErrorMessage ="Please Enter a Valid Longitude ")]
         public decimal? Longitude { get; set; }
         [Required(ErrorMessage ="Client Role is required.")]
         public int? RoleId { get; set; }
-        [Required(ErrorMessage = "Longitude is required")]
-        [RegularExpression(@"^\d+(\.\d{1,2})?$")]
+       
+        [RegularExpression(@"^\d+(\.\d{1,2})?$",ErrorMessage ="Please Enter a Valid Latitude")]
         public decimal? Latitude { get; set; }
         [Required(ErrorMessage = "You must provide an UserName.")]
         [RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$", ErrorMessage = "Only Username allowed.")]
