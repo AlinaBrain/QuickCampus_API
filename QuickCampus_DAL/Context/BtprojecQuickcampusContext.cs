@@ -45,6 +45,8 @@ public partial class BtprojecQuickcampusContext : DbContext
 
     public virtual DbSet<Groupdl> Groupdls { get; set; }
 
+    public virtual DbSet<MstAppRole> MstAppRoles { get; set; }
+
     public virtual DbSet<Question> Questions { get; set; }
 
     public virtual DbSet<QuestionOption> QuestionOptions { get; set; }
@@ -80,6 +82,8 @@ public partial class BtprojecQuickcampusContext : DbContext
     public virtual DbSet<TblTopicPChildSkill> TblTopicPChildSkills { get; set; }
 
     public virtual DbSet<TblUser> TblUsers { get; set; }
+
+    public virtual DbSet<TblUserAppRole> TblUserAppRoles { get; set; }
 
     public virtual DbSet<TblUserRole> TblUserRoles { get; set; }
 
@@ -326,6 +330,17 @@ public partial class BtprojecQuickcampusContext : DbContext
             entity.HasOne(d => d.Clent).WithMany(p => p.Groupdls)
                 .HasForeignKey(d => d.ClentId)
                 .HasConstraintName("FK__Groupdl__ClentId__625A9A57");
+        });
+
+        modelBuilder.Entity<MstAppRole>(entity =>
+        {
+            entity.HasKey(e => e.AppRoleId).HasName("PK__MstAppRo__E66DD69817DFA44A");
+
+            entity.ToTable("MstAppRole", "dbo");
+
+            entity.Property(e => e.AppRoleName).HasMaxLength(100);
+            entity.Property(e => e.IsActive).HasDefaultValueSql("((1))");
+            entity.Property(e => e.IsDeleted).HasDefaultValueSql("((0))");
         });
 
         modelBuilder.Entity<Question>(entity =>
@@ -578,9 +593,6 @@ public partial class BtprojecQuickcampusContext : DbContext
 
             entity.ToTable("tbl_RolePermission", "dbo");
 
-            entity.Property(e => e.DisplayName).HasMaxLength(500);
-            entity.Property(e => e.PermissionName).HasMaxLength(500);
-
             entity.HasOne(d => d.Permission).WithMany(p => p.TblRolePermissions)
                 .HasForeignKey(d => d.PermissionId)
                 .HasConstraintName("FK__tbl_RoleP__Permi__3C34F16F");
@@ -693,6 +705,21 @@ public partial class BtprojecQuickcampusContext : DbContext
             entity.HasOne(d => d.Client).WithMany(p => p.TblUsers)
                 .HasForeignKey(d => d.ClientId)
                 .HasConstraintName("FK__tbl_User__Client__3A4CA8FD");
+        });
+
+        modelBuilder.Entity<TblUserAppRole>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__tblUserA__3214EC0787904FA5");
+
+            entity.ToTable("tblUserAppRole", "dbo");
+
+            entity.HasOne(d => d.Role).WithMany(p => p.TblUserAppRoles)
+                .HasForeignKey(d => d.RoleId)
+                .HasConstraintName("FK__tblUserAp__RoleI__15A53433");
+
+            entity.HasOne(d => d.User).WithMany(p => p.TblUserAppRoles)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK__tblUserAp__UserI__14B10FFA");
         });
 
         modelBuilder.Entity<TblUserRole>(entity =>

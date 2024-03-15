@@ -34,32 +34,31 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "AddClient")]
         [HttpPost]
         [Route("AddClient")]
-        public async Task<IActionResult> AddClient([FromBody] ClientVM vm)
+        public async Task<IActionResult> AddClient([FromBody] ClientViewModel vm)
         {
-            IGeneralResult<ClientResponseVm> result = new GeneralResult<ClientResponseVm>();
-            var _jwtSecretKey = _config["Jwt:Key"];
-            var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            if (_clientRepo.Any(x => x.Email == vm.Email && x.IsActive == true))
+            IGeneralResult<ClientResponseViewModel> result = new GeneralResult<ClientResponseViewModel>();
+            if (ModelState.IsValid)
             {
-                result.Message = "Email Already Registered!";
-                return Ok(result);
-            }
-            else if (_clientRepo.Any(x => x.IsActive == true && x.Name == vm.Name.Trim()))
-            {
-                result.Message = "Name Already Exist!";
-                return Ok(result);
-            }
-            else if (_clientRepo.Any(x => x.UserName == vm.UserName && x.IsActive == true))
-            {
-                result.Message = "Username Already Registered! Please use diffrent name";
-                return Ok(result);
-            }
-            else
-            {
-                if (ModelState.IsValid)
+                var _jwtSecretKey = _config["Jwt:Key"];
+                var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                if (_clientRepo.Any(x => x.Email == vm.Email && x.IsActive == true))
+                {
+                    result.Message = "Email Already Registered!";
+                    return Ok(result);
+                }
+                else if (_clientRepo.Any(x => x.IsActive == true && x.Name == vm.Name.Trim()))
+                {
+                    result.Message = "Name Already Exist!";
+                    return Ok(result);
+                }
+                else if (_clientRepo.Any(x => x.UserName == vm.UserName && x.IsActive == true))
+                {
+                    result.Message = "Username Already Registered! Please use diffrent name";
+                    return Ok(result);
+                }
+                else
                 {
                     vm.Password = EncodePasswordToBase64(vm.Password);
-
                     ClientVM clientVM = new ClientVM
                     {
                         Name = vm.Name.Trim(),
@@ -87,12 +86,28 @@ namespace QuickCampusAPI.Controllers
                             Mobile = clientdata.Phone,
                         };
                         var userdetails = await _userRepo.Add(userVm.ToUserDbModel());
+                        //  var res = await _roleRepo.SetClientAdminRole(userdetails.Id);
+                        TblUserAppRoleVm tbluserrolevm = new TblUserAppRoleVm
+                        {
+                            
+                            
+                            
+                        };
 
 
-                        var res = await _roleRepo.SetClientAdminRole(userdetails.Id);
-
-
-                        result.Data = (ClientResponseVm)clientdata;
+                         ClientResponseViewModel clientresponse = new ClientResponseViewModel
+                        {
+                            Id = clientdata.Id,
+                            Name = clientdata.Name,
+                            Email = clientdata.Email,
+                            Phone = clientdata.Phone,
+                            SubscriptionPlan = clientdata.SubscriptionPlan,
+                            Address = clientdata.Address,
+                            Latitude = clientdata.Latitude,
+                            Longitude = clientdata.Longitude,
+                            IsActive = clientdata.IsActive
+                        };
+                        result.Data = clientresponse;
                         result.Message = "Client added successfully";
                         result.IsSuccess = true;
                     }
@@ -102,21 +117,19 @@ namespace QuickCampusAPI.Controllers
                     }
                     return Ok(result);
                 }
-                else
-                {
-                    result.Message = "something Went Wrong";
-                }
-
+            }
+            else
+            {
+                result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
             }
             return Ok(result);
         }
-
         [Authorize(Roles = "EditClient")]
         [HttpPost]
         [Route("EditClient")]
-        public async Task<IActionResult> EditClient([FromBody] ClientUpdateRequest vm)
+        public async Task<IActionResult> EditClient([FromBody] EditClientVm vm)
         {
-            IGeneralResult<ClientResponseVm> result = new GeneralResult<ClientResponseVm>();
+            IGeneralResult<ClientResponseViewModel> result = new GeneralResult<ClientResponseViewModel>();
             var _jwtSecretKey = _config["Jwt:Key"];
             var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
@@ -149,7 +162,7 @@ namespace QuickCampusAPI.Controllers
                     res.ModofiedDate = DateTime.Now;
                     try
                     {
-                        result.Data = (ClientResponseVm)await _clientRepo.Update(res);
+                        await _clientRepo.Update(res);
                         result.Message = "Client updated successfully";
                         result.IsSuccess = true;
                     }
@@ -172,7 +185,7 @@ namespace QuickCampusAPI.Controllers
                     res.ModofiedDate = DateTime.Now;
                     try
                     {
-                        result.Data = (ClientResponseVm)await _clientRepo.Update(res);
+                         _clientRepo.Update(res);
                         result.Message = "Client updated successfully";
                         result.IsSuccess = true;
                     }

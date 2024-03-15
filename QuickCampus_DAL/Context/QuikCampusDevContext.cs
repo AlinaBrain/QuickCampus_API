@@ -569,8 +569,7 @@ public partial class QuikCampusDevContext : DbContext
 
             entity.ToTable("tbl_RolePermission");
 
-            entity.Property(e => e.DisplayName).HasMaxLength(500);
-            entity.Property(e => e.PermissionName).HasMaxLength(500);
+         
 
             entity.HasOne(d => d.Permission).WithMany(p => p.TblRolePermissions)
                 .HasForeignKey(d => d.PermissionId)
