@@ -127,6 +127,7 @@ builder.Services.AddScoped<IGroupRepo,GroupServices>();
 builder.Services.AddScoped<ISectionRepo, SectionServices>();
 builder.Services.AddScoped<ICompanyRepo, CompanyRepo>();
 builder.Services.AddScoped<IStatusRepo, StatusRepo>();
+builder.Services.AddScoped<IUserAppRoleRepo, UserAppRoleRepo>();
 builder.Services.AddTransient<ValidationFilterAttribute>();
 builder.Services.Configure<ApiBehaviorOptions>(options
     => options.SuppressModelStateInvalidFilter = true);
