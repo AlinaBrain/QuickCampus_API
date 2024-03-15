@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using QuickCampus_Core.Common;
@@ -47,6 +48,7 @@ namespace QuickCampusAPI.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    await _context.Database.BeginTransactionAsync();
                     var _jwtSecretKey = _config["Jwt:Key"];
                     var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                     if (_clientRepo.Any(x => x.Email == vm.Email && x.IsActive == true))
@@ -127,12 +129,14 @@ namespace QuickCampusAPI.Controllers
                                         result.Data = clientresponse;
                                         result.Message = "Client added successfully";
                                         result.IsSuccess = true;
+                                        await _context.Database.CommitTransactionAsync();
                                     }
                                 }
                             }
                         }
                     }
-                    return Ok(result);
+
+                   
                 }
                 else
                 {
@@ -143,6 +147,7 @@ namespace QuickCampusAPI.Controllers
             catch (Exception ex)
             {
                 result.Message = ex.Message;
+                await _context.Database.RollbackTransactionAsync();
             }
             return Ok(result);
         }
