@@ -25,6 +25,8 @@ namespace QuickCampus_Core.ViewModel
         public decimal? Longitude { get; set; }
 
         public decimal? Latitude { get; set; }
+        public string? RoleName { get; set; }
+        public string? AppRoleName { get; set; }
 
     }
 }

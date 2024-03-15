@@ -26,6 +26,8 @@ namespace QuickCampus_Core.ViewModel
         [Required(ErrorMessage = "Longitude is required")]
         [RegularExpression(@"^\d+(\.\d{1,2})?$")]
         public decimal? Longitude { get; set; }
+        [Required(ErrorMessage ="Client Role is required.")]
+        public int? RoleId { get; set; }
         [Required(ErrorMessage = "Longitude is required")]
         [RegularExpression(@"^\d+(\.\d{1,2})?$")]
         public decimal? Latitude { get; set; }

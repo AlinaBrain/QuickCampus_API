@@ -16,18 +16,24 @@ namespace QuickCampusAPI.Controllers
     [ApiController]
     public class ClientController : ControllerBase
     {
+        private readonly IUserAppRoleRepo _userAppRoleRepo;
+        private readonly IRoleRepo _roleRepo;
         private readonly IClientRepo _clientRepo;
         private readonly IUserRepo _userRepo;
         private IConfiguration _config;
-        private readonly IUserRoleRepo _roleRepo;
+        private readonly IUserRoleRepo _UserRoleRepo;
         private readonly BtprojecQuickcampustestContext _context;
 
-        public ClientController(IClientRepo clientRepo, IConfiguration config, IUserRepo userRepo, IUserRoleRepo userRoleRepo, BtprojecQuickcampustestContext BtprojecQuickcampustestContext)
+        public ClientController(IUserAppRoleRepo userAppRoleRepo, IRoleRepo roleRepo,
+            IClientRepo clientRepo, IConfiguration config, IUserRepo userRepo, 
+            IUserRoleRepo userRoleRepo, BtprojecQuickcampustestContext BtprojecQuickcampustestContext)
         {
+            _userAppRoleRepo = userAppRoleRepo;
+            _roleRepo = roleRepo;
             _clientRepo = clientRepo;
             _config = config;
             _userRepo = userRepo;
-            _roleRepo = userRoleRepo;
+            _UserRoleRepo = userRoleRepo;
             _context = BtprojecQuickcampustestContext;
         }
 
@@ -89,29 +95,39 @@ namespace QuickCampusAPI.Controllers
                                 UserId = userdetails.Id,
                                 RoleId = (int)common.AppRole.Client
                             };
-                           
+                            var roleAdd = await _userAppRoleRepo.Add(userAppRole);
+                            if(roleAdd.Id > 0)
+                            {
+                                bool ClientRoleCheck =  await _roleRepo.AnyAsync(x => x.Id == vm.RoleId);
+                                if (ClientRoleCheck)
+                                {
+                                    TblUserRole userRole = new TblUserRole
+                                    {
+                                        RoleId = vm.RoleId,
+                                        UserId = userdetails.Id
+                                    };
+                                }
+
+                                ClientResponseViewModel clientresponse = new ClientResponseViewModel
+                                {
+                                    Id = clientdata.Id,
+                                    Name = clientdata.Name,
+                                    Email = clientdata.Email,
+                                    Phone = clientdata.Phone,
+                                    SubscriptionPlan = clientdata.SubscriptionPlan,
+                                    Address = clientdata.Address,
+                                    Latitude = clientdata.Latitude,
+                                    Longitude = clientdata.Longitude,
+                                    RoleName = _roleRepo.GetAllQuerable().Where(x => x.Id == vm.RoleId).Select(x=>x.Name).First(),
+                                    AppRoleName = userAppRole.RoleId.ToString(),
+                                    IsActive = clientdata.IsActive
+                                };
+                                result.Data = clientresponse;
+                                result.Message = "Client added successfully";
+                                result.IsSuccess = true;
+                            }
                         }
-                        //  var res = await _roleRepo.SetClientAdminRole(userdetails.Id);
-                        
-
-
-                        ClientResponseViewModel clientresponse = new ClientResponseViewModel
-                        {
-                            Id = clientdata.Id,
-                            Name = clientdata.Name,
-                            Email = clientdata.Email,
-                            Phone = clientdata.Phone,
-                            SubscriptionPlan = clientdata.SubscriptionPlan,
-                            Address = clientdata.Address,
-                            Latitude = clientdata.Latitude,
-                            Longitude = clientdata.Longitude,
-                            IsActive = clientdata.IsActive
-                        };
-                        result.Data = clientresponse;
-                        result.Message = "Client added successfully";
-                        result.IsSuccess = true;
                     }
-
                     return Ok(result);
                 }
                 else
