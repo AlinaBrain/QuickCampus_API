@@ -10,12 +10,12 @@ using System.Threading.Tasks;
 
 namespace QuickCampus_Core.Services
 {
-    public class CityServices :BaseRepository<QuikCampusDevContext,City>,ICityRepo
+    public class CityServices :BaseRepository<BtprojecQuickcampustestContext,City>,ICityRepo
     {
-        private readonly QuikCampusDevContext _context;
+        private readonly BtprojecQuickcampustestContext _context;
         private IConfiguration _config;
 
-        public CityServices(QuikCampusDevContext context, IConfiguration config)
+        public CityServices(BtprojecQuickcampustestContext context, IConfiguration config)
         {
             _config = config;
             _context = context;

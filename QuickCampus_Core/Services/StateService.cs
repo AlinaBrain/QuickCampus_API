@@ -4,7 +4,7 @@ using QuickCampus_DAL.Context;
 
 namespace QuickCampus_Core.Services
 {
-    public class StateServices :BaseRepository<QuikCampusDevContext, State>,IStateRepo
+    public class StateServices :BaseRepository<BtprojecQuickcampustestContext, State>,IStateRepo
     {
 
     }

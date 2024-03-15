@@ -7,12 +7,12 @@ using QuickCampus_DAL.Context;
 
 namespace QuickCampus_Core.Services
 {
-    public class RoleRepo : BaseRepository<QuikCampusDevContext, TblRole>, IRoleRepo
+    public class RoleRepo : BaseRepository<BtprojecQuickcampustestContext, TblRole>, IRoleRepo
     {
-        private readonly QuikCampusDevContext _context;
+        private readonly BtprojecQuickcampustestContext _context;
         private IConfiguration _config;
 
-        public RoleRepo(QuikCampusDevContext context, IConfiguration config)
+        public RoleRepo(BtprojecQuickcampustestContext context, IConfiguration config)
         {
             _config = config;
             _context = context;

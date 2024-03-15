@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace QuickCampus_Core.Services
 {
-    public class GroupServices :BaseRepository<QuikCampusDevContext, Groupdl>, IGroupRepo
+    public class GroupServices :BaseRepository<BtprojecQuickcampustestContext, Groupdl>, IGroupRepo
     {
     }
 }

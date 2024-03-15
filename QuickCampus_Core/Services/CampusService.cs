@@ -10,10 +10,10 @@ using System.Security.Cryptography;
 
 namespace QuickCampus_Core.Services
 {
-    public class CampusService : BaseRepository<QuikCampusDevContext, WalkIn>, ICampusRepo
+    public class CampusService : BaseRepository<BtprojecQuickcampustestContext, WalkIn>, ICampusRepo
     {
-        private readonly QuikCampusDevContext _context;
-        public CampusService(QuikCampusDevContext context, ICollegeRepo collegeRepo)
+        private readonly BtprojecQuickcampustestContext _context;
+        public CampusService(BtprojecQuickcampustestContext context, ICollegeRepo collegeRepo)
         {
             _context = context;
 

@@ -3,7 +3,7 @@ using QuickCampus_DAL.Context;
 
 namespace QuickCampus_Core.Services
 {
-    public class ApplicationUserService : BaseRepository<QuikCampusDevContext, ApplicationUser>, IApplicationUserRepo
+    public class ApplicationUserService : BaseRepository<BtprojecQuickcampustestContext, ApplicationUser>, IApplicationUserRepo
     {
 
     }

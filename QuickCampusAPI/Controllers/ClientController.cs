@@ -20,15 +20,15 @@ namespace QuickCampusAPI.Controllers
         private readonly IUserRepo _userRepo;
         private IConfiguration _config;
         private readonly IUserRoleRepo _roleRepo;
-        private readonly QuikCampusDevContext _context;
+        private readonly BtprojecQuickcampustestContext _context;
 
-        public ClientController(IClientRepo clientRepo, IConfiguration config, IUserRepo userRepo, IUserRoleRepo userRoleRepo, QuikCampusDevContext quikCampusDevContext)
+        public ClientController(IClientRepo clientRepo, IConfiguration config, IUserRepo userRepo, IUserRoleRepo userRoleRepo, BtprojecQuickcampustestContext BtprojecQuickcampustestContext)
         {
             _clientRepo = clientRepo;
             _config = config;
             _userRepo = userRepo;
             _roleRepo = userRoleRepo;
-            _context = quikCampusDevContext;
+            _context = BtprojecQuickcampustestContext;
         }
 
         [Authorize(Roles = "AddClient")]

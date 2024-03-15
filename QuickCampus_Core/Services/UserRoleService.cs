@@ -9,8 +9,8 @@ namespace QuickCampus_Core.Services
 {
     public class UserRoleService: IUserRoleRepo
     {
-        private readonly QuikCampusDevContext _context;
-        public UserRoleService(QuikCampusDevContext context)
+        private readonly BtprojecQuickcampustestContext _context;
+        public UserRoleService(BtprojecQuickcampustestContext context)
         {
             _context = context;
         }

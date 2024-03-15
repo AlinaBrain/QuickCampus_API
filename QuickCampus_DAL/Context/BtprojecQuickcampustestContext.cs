@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace QuickCampus_DAL.Context;
 
-public partial class QuikCampusDevContext : DbContext
+public partial class BtprojecQuickcampustestContext : DbContext
 {
-    public QuikCampusDevContext()
+    public BtprojecQuickcampustestContext()
     {
     }
 
-    public QuikCampusDevContext(DbContextOptions<QuikCampusDevContext> options)
+    public BtprojecQuickcampustestContext(DbContextOptions<BtprojecQuickcampustestContext> options)
         : base(options)
     {
     }
@@ -44,6 +44,8 @@ public partial class QuikCampusDevContext : DbContext
     public virtual DbSet<Error> Errors { get; set; }
 
     public virtual DbSet<Groupdl> Groupdls { get; set; }
+
+    public virtual DbSet<MstAppRole> MstAppRoles { get; set; }
 
     public virtual DbSet<Question> Questions { get; set; }
 
@@ -81,33 +83,54 @@ public partial class QuikCampusDevContext : DbContext
 
     public virtual DbSet<TblUser> TblUsers { get; set; }
 
+    public virtual DbSet<TblUserAppRole> TblUserAppRoles { get; set; }
+
     public virtual DbSet<TblUserRole> TblUserRoles { get; set; }
+
+    public virtual DbSet<TempTable> TempTables { get; set; }
 
     public virtual DbSet<WalkIn> WalkIns { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=103.93.16.117;Database=btprojec_quickcampus;TrustServerCertificate=true;user id=btprojec_admin;password=Bwy0w65ixN*bsE9wy;Integrated Security=false;");
+        => optionsBuilder.UseSqlServer("Server=103.93.16.117;Database=btprojec_quickcampustest;TrustServerCertificate=true;user id=btprojec_admin;password=Bwy0w65ixN*bsE9wy;Integrated Security=false;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.HasDefaultSchema("btprojec_admin");
+
         modelBuilder.Entity<Applicant>(entity =>
         {
-            entity.ToTable("Applicant");
+            entity.ToTable("Applicant", "dbo");
 
             entity.Property(e => e.ClientId).HasColumnName("ClientID");
-            entity.Property(e => e.CollegeName).HasMaxLength(255);
+            entity.Property(e => e.CollegeName)
+                .HasMaxLength(255)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            entity.Property(e => e.Comment).UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
-            entity.Property(e => e.EmailAddress).HasMaxLength(100);
-            entity.Property(e => e.FirstName).HasMaxLength(100);
-            entity.Property(e => e.HigestQualification).HasMaxLength(100);
+            entity.Property(e => e.EmailAddress)
+                .HasMaxLength(100)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            entity.Property(e => e.FirstName)
+                .HasMaxLength(100)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            entity.Property(e => e.HigestQualification)
+                .HasMaxLength(100)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.HigestQualificationPercentage).HasColumnType("decimal(18, 0)");
             entity.Property(e => e.IntermediatePercentage).HasColumnType("decimal(18, 0)");
-            entity.Property(e => e.LastName).HasMaxLength(100);
+            entity.Property(e => e.LastName)
+                .HasMaxLength(100)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.MatricPercentage).HasColumnType("decimal(18, 0)");
             entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
-            entity.Property(e => e.PhoneNumber).HasMaxLength(25);
-            entity.Property(e => e.Skills).HasMaxLength(500);
+            entity.Property(e => e.PhoneNumber)
+                .HasMaxLength(25)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            entity.Property(e => e.Skills)
+                .HasMaxLength(500)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
 
             entity.HasOne(d => d.AssignedToCompanyNavigation).WithMany(p => p.Applicants)
                 .HasForeignKey(d => d.AssignedToCompany)
@@ -122,7 +145,7 @@ public partial class QuikCampusDevContext : DbContext
         {
             entity.HasKey(e => e.AnswerSummaryId);
 
-            entity.ToTable("ApplicantAnswerSummary");
+            entity.ToTable("ApplicantAnswerSummary", "dbo");
 
             entity.HasOne(d => d.Answer).WithMany(p => p.ApplicantAnswerSummaries)
                 .HasForeignKey(d => d.AnswerId)
@@ -137,9 +160,10 @@ public partial class QuikCampusDevContext : DbContext
         {
             entity.HasKey(e => e.CommentId);
 
-            entity.ToTable("ApplicantComment");
+            entity.ToTable("ApplicantComment", "dbo");
 
             entity.Property(e => e.CommentedOn).HasColumnType("datetime");
+            entity.Property(e => e.Description).UseCollation("SQL_Latin1_General_CP1_CI_AS");
 
             entity.HasOne(d => d.Applicant).WithMany(p => p.ApplicantComments)
                 .HasForeignKey(d => d.ApplicantId)
@@ -150,7 +174,7 @@ public partial class QuikCampusDevContext : DbContext
         {
             entity.HasKey(e => e.TestId).HasName("PK_ApplicantExamination");
 
-            entity.ToTable("ApplicantTest");
+            entity.ToTable("ApplicantTest", "dbo");
 
             entity.Property(e => e.TestDate).HasColumnType("datetime");
 
@@ -171,8 +195,9 @@ public partial class QuikCampusDevContext : DbContext
         {
             entity.HasKey(e => e.SummaryId).HasName("PK_ExaminationDetail");
 
-            entity.ToTable("ApplicantTestSummary");
+            entity.ToTable("ApplicantTestSummary", "dbo");
 
+            entity.Property(e => e.Answer).UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.SubmittedOn).HasColumnType("datetime");
 
             entity.HasOne(d => d.Question).WithMany(p => p.ApplicantTestSummaries)
@@ -186,28 +211,38 @@ public partial class QuikCampusDevContext : DbContext
 
         modelBuilder.Entity<ApplicationRole>(entity =>
         {
-            entity.ToTable("ApplicationRole");
+            entity.ToTable("ApplicationRole", "dbo");
 
             entity.Property(e => e.ApplicationRoleId).ValueGeneratedNever();
-            entity.Property(e => e.Description).HasMaxLength(50);
-            entity.Property(e => e.Role).HasMaxLength(50);
+            entity.Property(e => e.Description)
+                .HasMaxLength(50)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            entity.Property(e => e.Role)
+                .HasMaxLength(50)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
         });
 
         modelBuilder.Entity<ApplicationUser>(entity =>
         {
-            entity.ToTable("ApplicationUser");
+            entity.ToTable("ApplicationUser", "dbo");
 
             entity.HasIndex(e => e.UserName, "UK_UserName_User").IsUnique();
 
             entity.Property(e => e.ApplicationUserId).ValueGeneratedNever();
-            entity.Property(e => e.Password).HasMaxLength(50);
-            entity.Property(e => e.Token).HasMaxLength(1);
-            entity.Property(e => e.UserName).HasMaxLength(50);
+            entity.Property(e => e.Password)
+                .HasMaxLength(50)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            entity.Property(e => e.Token)
+                .HasMaxLength(1)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            entity.Property(e => e.UserName)
+                .HasMaxLength(50)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
         });
 
         modelBuilder.Entity<ApplicationUserRole>(entity =>
         {
-            entity.ToTable("ApplicationUserRole");
+            entity.ToTable("ApplicationUserRole", "dbo");
 
             entity.HasOne(d => d.ApplicationRole).WithMany(p => p.ApplicationUserRoles)
                 .HasForeignKey(d => d.ApplicationRoleId)
@@ -224,11 +259,12 @@ public partial class QuikCampusDevContext : DbContext
         {
             entity.HasKey(e => e.CampusId).HasName("PK_CampusCollege");
 
-            entity.ToTable("CampusWalkInCollege");
+            entity.ToTable("CampusWalkInCollege", "dbo");
 
             entity.Property(e => e.CollegeCode)
                 .HasMaxLength(255)
-                .HasDefaultValueSql("('ABB')");
+                .HasDefaultValueSql("('ABB')")
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.StartDateTime).HasColumnType("datetime");
 
             entity.HasOne(d => d.College).WithMany(p => p.CampusWalkInColleges)
@@ -242,65 +278,89 @@ public partial class QuikCampusDevContext : DbContext
 
         modelBuilder.Entity<City>(entity =>
         {
-            entity.HasKey(e => e.CityId).HasName("PK__City__F2D21B7678E7EEB8");
+            entity.HasKey(e => e.CityId).HasName("PK__City__F2D21B760C7D81FB");
 
-            entity.ToTable("City");
+            entity.ToTable("City", "dbo");
 
             entity.Property(e => e.CityName)
                 .HasMaxLength(150)
-                .IsUnicode(false);
+                .IsUnicode(false)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.CreatedAt).HasColumnType("datetime");
             entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
 
             entity.HasOne(d => d.State).WithMany(p => p.Cities)
                 .HasForeignKey(d => d.StateId)
-                .HasConstraintName("FK__City__StateId__41B8C09B");
+                .HasConstraintName("FK__City__StateId__7D439ABD");
         });
 
         modelBuilder.Entity<College>(entity =>
         {
-            entity.ToTable("College");
+            entity.ToTable("College", "dbo");
 
-            entity.Property(e => e.Address1).HasMaxLength(50);
-            entity.Property(e => e.Address2).HasMaxLength(50);
-            entity.Property(e => e.CollegeCode).HasMaxLength(50);
-            entity.Property(e => e.CollegeName).HasMaxLength(250);
-            entity.Property(e => e.ContectEmail).HasMaxLength(100);
-            entity.Property(e => e.ContectPerson).HasMaxLength(100);
-            entity.Property(e => e.ContectPhone).HasMaxLength(100);
+            entity.Property(e => e.Address1)
+                .HasMaxLength(50)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            entity.Property(e => e.Address2)
+                .HasMaxLength(50)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            entity.Property(e => e.CollegeCode)
+                .HasMaxLength(50)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            entity.Property(e => e.CollegeName)
+                .HasMaxLength(250)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            entity.Property(e => e.ContectEmail)
+                .HasMaxLength(100)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            entity.Property(e => e.ContectPerson)
+                .HasMaxLength(100)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            entity.Property(e => e.ContectPhone)
+                .HasMaxLength(100)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
             entity.Property(e => e.Logo)
                 .HasMaxLength(250)
-                .IsUnicode(false);
+                .IsUnicode(false)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
             entity.HasOne(d => d.City).WithMany(p => p.Colleges)
                 .HasForeignKey(d => d.CityId)
-                .HasConstraintName("FK__College__CityId__42ACE4D4");
+                .HasConstraintName("FK__College__CityId__7E37BEF6");
         });
 
         modelBuilder.Entity<Company>(entity =>
         {
-            entity.ToTable("Company");
+            entity.ToTable("Company", "dbo");
 
             entity.Property(e => e.CompanyId).ValueGeneratedNever();
-            entity.Property(e => e.CompanyName).HasMaxLength(150);
+            entity.Property(e => e.CompanyName)
+                .HasMaxLength(150)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+            entity.Property(e => e.Isdeleted).HasColumnName("ISDeleted");
+            entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
         });
 
         modelBuilder.Entity<Country>(entity =>
         {
-            entity.ToTable("Country");
+            entity.ToTable("Country", "dbo");
 
             entity.Property(e => e.CountryId).ValueGeneratedNever();
-            entity.Property(e => e.CountryName).HasMaxLength(50);
+            entity.Property(e => e.CountryName)
+                .HasMaxLength(50)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
         });
 
         modelBuilder.Entity<Error>(entity =>
         {
-            entity.ToTable("Error");
+            entity.ToTable("Error", "dbo");
 
             entity.Property(e => e.Date).HasColumnType("datetime");
             entity.Property(e => e.Error1)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS")
                 .HasColumnType("text")
                 .HasColumnName("Error");
         });
@@ -309,19 +369,36 @@ public partial class QuikCampusDevContext : DbContext
         {
             entity.HasKey(e => e.GroupId).HasName("PK_Group");
 
-            entity.ToTable("Groupdl");
+            entity.ToTable("Groupdl", "dbo");
 
             entity.Property(e => e.GroupId).ValueGeneratedNever();
-            entity.Property(e => e.GroupName).HasMaxLength(50);
+            entity.Property(e => e.GroupName)
+                .HasMaxLength(50)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
 
             entity.HasOne(d => d.Clent).WithMany(p => p.Groupdls)
                 .HasForeignKey(d => d.ClentId)
-                .HasConstraintName("FK__Groupdl__ClentId__625A9A57");
+                .HasConstraintName("FK__Groupdl__ClentId__7F2BE32F");
+        });
+
+        modelBuilder.Entity<MstAppRole>(entity =>
+        {
+            entity.HasKey(e => e.AppRoleId).HasName("PK__MstAppRo__E66DD698EDF1A5D6");
+
+            entity.ToTable("MstAppRole", "dbo");
+
+            entity.Property(e => e.AppRoleName)
+                .HasMaxLength(100)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            entity.Property(e => e.IsActive).HasDefaultValueSql("((1))");
+            entity.Property(e => e.IsDeleted).HasDefaultValueSql("((0))");
         });
 
         modelBuilder.Entity<Question>(entity =>
         {
-            entity.ToTable("Question");
+            entity.ToTable("Question", "dbo");
+
+            entity.Property(e => e.Text).UseCollation("SQL_Latin1_General_CP1_CI_AS");
 
             entity.HasOne(d => d.Group).WithMany(p => p.Questions)
                 .HasForeignKey(d => d.GroupId)
@@ -340,9 +417,13 @@ public partial class QuikCampusDevContext : DbContext
         {
             entity.HasKey(e => e.OptionId).HasName("PK_Answer");
 
-            entity.ToTable("QuestionOption");
+            entity.ToTable("QuestionOption", "dbo");
 
-            entity.Property(e => e.OptionImage).HasMaxLength(100);
+            entity.Property(e => e.Imagepath).UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            entity.Property(e => e.OptionImage)
+                .HasMaxLength(100)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            entity.Property(e => e.OptionText).UseCollation("SQL_Latin1_General_CP1_CI_AS");
 
             entity.HasOne(d => d.Question).WithMany(p => p.QuestionOptions)
                 .HasForeignKey(d => d.QuestionId)
@@ -351,36 +432,40 @@ public partial class QuikCampusDevContext : DbContext
 
         modelBuilder.Entity<QuestionType>(entity =>
         {
-            entity.ToTable("QuestionType");
+            entity.ToTable("QuestionType", "dbo");
 
             entity.Property(e => e.QuestionTypeId).ValueGeneratedNever();
             entity.Property(e => e.QuestionType1)
                 .HasMaxLength(50)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS")
                 .HasColumnName("QuestionType");
 
             entity.HasOne(d => d.Clent).WithMany(p => p.QuestionTypes)
                 .HasForeignKey(d => d.ClentId)
-                .HasConstraintName("FK__QuestionT__Clent__607251E5");
+                .HasConstraintName("FK__QuestionT__Clent__03F0984C");
         });
 
         modelBuilder.Entity<Section>(entity =>
         {
             entity.HasKey(e => e.SectionId).HasName("PK_ExaminationSection");
 
-            entity.ToTable("Section");
+            entity.ToTable("Section", "dbo");
 
             entity.Property(e => e.SectionId).ValueGeneratedNever();
             entity.Property(e => e.Section1)
                 .HasMaxLength(50)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS")
                 .HasColumnName("Section");
         });
 
         modelBuilder.Entity<State>(entity =>
         {
-            entity.ToTable("State");
+            entity.ToTable("State", "dbo");
 
             entity.Property(e => e.StateId).ValueGeneratedNever();
-            entity.Property(e => e.StateName).HasMaxLength(150);
+            entity.Property(e => e.StateName)
+                .HasMaxLength(150)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
 
             entity.HasOne(d => d.Country).WithMany(p => p.States)
                 .HasForeignKey(d => d.CountryId)
@@ -389,328 +474,415 @@ public partial class QuikCampusDevContext : DbContext
 
         modelBuilder.Entity<Status>(entity =>
         {
-            entity.ToTable("Status");
+            entity.ToTable("Status", "dbo");
 
             entity.Property(e => e.StatusId).ValueGeneratedNever();
+            entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+            entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
             entity.Property(e => e.StatusName)
-                .HasMaxLength(50)
-                .HasColumnName("StatusName");
+                .HasMaxLength(200)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
         });
 
         modelBuilder.Entity<TblClient>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__tbl_Clie__3214EC078E237C90");
+            entity.HasKey(e => e.Id).HasName("PK__tbl_Clie__3214EC0728D8A50C");
 
-            entity.ToTable("tbl_Client");
+            entity.ToTable("tbl_Client", "dbo");
 
+            entity.Property(e => e.Address).UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+            entity.Property(e => e.Email).UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.Latitude).HasColumnType("decimal(20, 2)");
             entity.Property(e => e.Longitude).HasColumnType("decimal(20, 2)");
             entity.Property(e => e.ModofiedDate).HasColumnType("datetime");
-            entity.Property(e => e.Name).HasMaxLength(100);
-            entity.Property(e => e.Password).HasMaxLength(100);
-            entity.Property(e => e.UserName).HasMaxLength(100);
+            entity.Property(e => e.Name)
+                .HasMaxLength(100)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            entity.Property(e => e.Password)
+                .HasMaxLength(100)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            entity.Property(e => e.Phone).UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            entity.Property(e => e.SubscriptionPlan).UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            entity.Property(e => e.UserName)
+                .HasMaxLength(100)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
 
             entity.HasOne(d => d.User).WithMany(p => p.TblClients)
                 .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__tbl_Clien__UserI__52E34C9D");
+                .HasConstraintName("FK__tbl_Clien__UserI__05D8E0BE");
         });
 
         modelBuilder.Entity<TblContent>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Tbl_Cont__3214EC07BE73DE67");
+            entity.HasKey(e => e.Id).HasName("PK__Tbl_Cont__3214EC07C3575B93");
 
-            entity.ToTable("Tbl_Content");
+            entity.ToTable("Tbl_Content", "dbo");
 
             entity.Property(e => e.CreatedOn).HasColumnType("datetime");
-            entity.Property(e => e.Description).IsUnicode(false);
+            entity.Property(e => e.Description)
+                .IsUnicode(false)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.ExternalLink)
                 .HasMaxLength(1000)
                 .IsUnicode(false)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS")
                 .HasColumnName("External_link");
             entity.Property(e => e.FileName)
                 .HasMaxLength(1000)
                 .IsUnicode(false)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS")
                 .HasColumnName("File_name");
             entity.Property(e => e.ModefiedOn).HasColumnType("datetime");
             entity.Property(e => e.Name)
                 .HasMaxLength(200)
-                .IsUnicode(false);
+                .IsUnicode(false)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.TagId).HasColumnName("Tag_Id");
             entity.Property(e => e.TopicId).HasColumnName("Topic_Id");
             entity.Property(e => e.Type)
                 .HasMaxLength(100)
-                .IsUnicode(false);
+                .IsUnicode(false)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
 
             entity.HasOne(d => d.Client).WithMany(p => p.TblContents)
                 .HasForeignKey(d => d.ClientId)
-                .HasConstraintName("FK__Tbl_Conte__Clien__2AD55B43");
+                .HasConstraintName("FK__Tbl_Conte__Clien__06CD04F7");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.TblContentCreatedByNavigations)
                 .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Tbl_Conte__Creat__2BC97F7C");
+                .HasConstraintName("FK__Tbl_Conte__Creat__07C12930");
 
             entity.HasOne(d => d.Deparment).WithMany(p => p.TblContents)
                 .HasForeignKey(d => d.DeparmentId)
-                .HasConstraintName("FK__Tbl_Conte__Depar__29E1370A");
+                .HasConstraintName("FK__Tbl_Conte__Depar__08B54D69");
 
             entity.HasOne(d => d.ModefiedByNavigation).WithMany(p => p.TblContentModefiedByNavigations)
                 .HasForeignKey(d => d.ModefiedBy)
-                .HasConstraintName("FK__Tbl_Conte__Modef__2CBDA3B5");
+                .HasConstraintName("FK__Tbl_Conte__Modef__09A971A2");
 
             entity.HasOne(d => d.Tag).WithMany(p => p.TblContents)
                 .HasForeignKey(d => d.TagId)
-                .HasConstraintName("FK__Tbl_Conte__Tag_I__28ED12D1");
+                .HasConstraintName("FK__Tbl_Conte__Tag_I__0A9D95DB");
 
             entity.HasOne(d => d.Topic).WithMany(p => p.TblContents)
                 .HasForeignKey(d => d.TopicId)
-                .HasConstraintName("FK__Tbl_Conte__Topic__27F8EE98");
+                .HasConstraintName("FK__Tbl_Conte__Topic__0B91BA14");
         });
 
         modelBuilder.Entity<TblDepartment>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Tbl_Depa__3214EC0722A741B0");
+            entity.HasKey(e => e.Id).HasName("PK__Tbl_Depa__3214EC0731C5B2A4");
 
-            entity.ToTable("Tbl_Department");
+            entity.ToTable("Tbl_Department", "dbo");
 
             entity.Property(e => e.CreatedOn).HasColumnType("datetime");
-            entity.Property(e => e.DepartmentName).HasMaxLength(100);
-            entity.Property(e => e.Description).IsUnicode(false);
+            entity.Property(e => e.DepartmentName)
+                .HasMaxLength(100)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            entity.Property(e => e.Description)
+                .IsUnicode(false)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.ModefiedOn).HasColumnType("datetime");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.TblDepartments)
                 .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Tbl_Depar__Creat__09746778");
+                .HasConstraintName("FK__Tbl_Depar__Creat__0C85DE4D");
         });
 
         modelBuilder.Entity<TblGoal>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__tbl_Goal__3214EC07F7186BCD");
+            entity.HasKey(e => e.Id).HasName("PK__tbl_Goal__3214EC07134B0881");
 
-            entity.ToTable("tbl_Goal");
+            entity.ToTable("tbl_Goal", "dbo");
 
             entity.Property(e => e.CreatedOn).HasColumnType("datetime");
-            entity.Property(e => e.Goal).HasMaxLength(200);
+            entity.Property(e => e.Goal)
+                .HasMaxLength(200)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.ModefiedOn).HasColumnType("datetime");
-            entity.Property(e => e.TargetYear).HasMaxLength(10);
+            entity.Property(e => e.TargetYear)
+                .HasMaxLength(10)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
 
             entity.HasOne(d => d.Client).WithMany(p => p.TblGoals)
                 .HasForeignKey(d => d.ClientId)
-                .HasConstraintName("FK__tbl_Goal__Client__0D44F85C");
+                .HasConstraintName("FK__tbl_Goal__Client__0D7A0286");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.TblGoalCreatedByNavigations)
                 .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__tbl_Goal__Create__0E391C95");
+                .HasConstraintName("FK__tbl_Goal__Create__0E6E26BF");
 
             entity.HasOne(d => d.ModefiedByNavigation).WithMany(p => p.TblGoalModefiedByNavigations)
                 .HasForeignKey(d => d.ModefiedBy)
-                .HasConstraintName("FK__tbl_Goal__Modefi__0F2D40CE");
+                .HasConstraintName("FK__tbl_Goal__Modefi__0F624AF8");
         });
 
         modelBuilder.Entity<TblParentSkill>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Tbl_Pare__3214EC07BD3F66C1");
+            entity.HasKey(e => e.Id).HasName("PK__Tbl_Pare__3214EC07C1B6BE7C");
 
-            entity.ToTable("Tbl_ParentSkill");
+            entity.ToTable("Tbl_ParentSkill", "dbo");
 
             entity.Property(e => e.CreatedOn).HasColumnType("datetime");
-            entity.Property(e => e.Description).IsUnicode(false);
+            entity.Property(e => e.Description)
+                .IsUnicode(false)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.ModefiedOn).HasColumnType("datetime");
             entity.Property(e => e.Name)
                 .HasMaxLength(200)
-                .IsUnicode(false);
+                .IsUnicode(false)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
 
             entity.HasOne(d => d.Client).WithMany(p => p.TblParentSkills)
                 .HasForeignKey(d => d.ClientId)
-                .HasConstraintName("FK__Tbl_Paren__Clien__16CE6296");
+                .HasConstraintName("FK__Tbl_Paren__Clien__10566F31");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.TblParentSkillCreatedByNavigations)
                 .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Tbl_Paren__Creat__17C286CF");
+                .HasConstraintName("FK__Tbl_Paren__Creat__114A936A");
 
             entity.HasOne(d => d.ModefiedByNavigation).WithMany(p => p.TblParentSkillModefiedByNavigations)
                 .HasForeignKey(d => d.ModefiedBy)
-                .HasConstraintName("FK__Tbl_Paren__Modef__18B6AB08");
+                .HasConstraintName("FK__Tbl_Paren__Modef__123EB7A3");
         });
 
         modelBuilder.Entity<TblPermission>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Tbl_perm__3214EC07E8B524C3");
+            entity.HasKey(e => e.Id).HasName("PK__Tbl_perm__3214EC07F1375A94");
 
-            entity.ToTable("Tbl_permission");
+            entity.ToTable("Tbl_permission", "dbo");
 
-            entity.Property(e => e.PermissionDisplay).HasMaxLength(100);
-            entity.Property(e => e.PermissionName).HasMaxLength(100);
+            entity.Property(e => e.PermissionDisplay)
+                .HasMaxLength(100)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            entity.Property(e => e.PermissionName)
+                .HasMaxLength(100)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
         });
 
         modelBuilder.Entity<TblRole>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__tbl_Role__3214EC07D7A69E98");
+            entity.HasKey(e => e.Id).HasName("PK__tbl_Role__3214EC07D22FB3FE");
 
-            entity.ToTable("tbl_Role");
+            entity.ToTable("tbl_Role", "dbo");
 
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
             entity.Property(e => e.ModifiedBy).HasColumnName("modifiedBy");
             entity.Property(e => e.ModofiedDate).HasColumnType("datetime");
-            entity.Property(e => e.Name).HasMaxLength(50);
+            entity.Property(e => e.Name)
+                .HasMaxLength(50)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.TblRoleCreatedByNavigations)
                 .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__tbl_Role__Create__1CBC4616");
+                .HasConstraintName("FK__tbl_Role__Create__1332DBDC");
 
             entity.HasOne(d => d.ModifiedByNavigation).WithMany(p => p.TblRoleModifiedByNavigations)
                 .HasForeignKey(d => d.ModifiedBy)
-                .HasConstraintName("FK__tbl_Role__modifi__1DB06A4F");
+                .HasConstraintName("FK__tbl_Role__modifi__14270015");
         });
 
         modelBuilder.Entity<TblRolePermission>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__RolePerm__3214EC07E1F91B9B");
+            entity.HasKey(e => e.Id).HasName("PK__tbl_Role__3214EC0723025571");
 
-            entity.ToTable("tbl_RolePermission");
-
-         
+            entity.ToTable("tbl_RolePermission", "dbo");
 
             entity.HasOne(d => d.Permission).WithMany(p => p.TblRolePermissions)
                 .HasForeignKey(d => d.PermissionId)
-                .HasConstraintName("FK__tbl_RoleP__Permi__3C34F16F");
+                .HasConstraintName("FK__tbl_RoleP__Permi__160F4887");
 
             entity.HasOne(d => d.Role).WithMany(p => p.TblRolePermissions)
                 .HasForeignKey(d => d.RoleId)
-                .HasConstraintName("FK__RolePermi__RoleI__08B54D69");
+                .HasConstraintName("FK__tbl_RoleP__RoleI__151B244E");
         });
 
         modelBuilder.Entity<TblTag>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Tbl_Tags__3214EC07929A02C5");
+            entity.HasKey(e => e.Id).HasName("PK__Tbl_Tags__3214EC070332C303");
 
-            entity.ToTable("Tbl_Tags");
+            entity.ToTable("Tbl_Tags", "dbo");
 
             entity.Property(e => e.CreatedOn).HasColumnType("datetime");
             entity.Property(e => e.ModefiedOn).HasColumnType("datetime");
             entity.Property(e => e.Tag)
                 .HasMaxLength(100)
-                .IsUnicode(false);
+                .IsUnicode(false)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
 
             entity.HasOne(d => d.Client).WithMany(p => p.TblTags)
                 .HasForeignKey(d => d.ClientId)
-                .HasConstraintName("FK__Tbl_Tags__Client__1209AD79");
+                .HasConstraintName("FK__Tbl_Tags__Client__17036CC0");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.TblTagCreatedByNavigations)
                 .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Tbl_Tags__Create__12FDD1B2");
+                .HasConstraintName("FK__Tbl_Tags__Create__17F790F9");
 
             entity.HasOne(d => d.ModefiedByNavigation).WithMany(p => p.TblTagModefiedByNavigations)
                 .HasForeignKey(d => d.ModefiedBy)
-                .HasConstraintName("FK__Tbl_Tags__Modefi__13F1F5EB");
+                .HasConstraintName("FK__Tbl_Tags__Modefi__18EBB532");
         });
 
         modelBuilder.Entity<TblTopicPCChildSkill>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Tbl_Topi__3214EC076DAEA623");
+            entity.HasKey(e => e.Id).HasName("PK__Tbl_Topi__3214EC077434B10E");
 
-            entity.ToTable("Tbl_Topic_P_C_ChildSkill");
+            entity.ToTable("Tbl_Topic_P_C_ChildSkill", "dbo");
 
             entity.Property(e => e.CreatedOn).HasColumnType("datetime");
-            entity.Property(e => e.Description).IsUnicode(false);
+            entity.Property(e => e.Description)
+                .IsUnicode(false)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.ModefiedOn).HasColumnType("datetime");
             entity.Property(e => e.Name)
                 .HasMaxLength(200)
-                .IsUnicode(false);
+                .IsUnicode(false)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
 
             entity.HasOne(d => d.Child).WithMany(p => p.TblTopicPCChildSkills)
                 .HasForeignKey(d => d.ChildId)
-                .HasConstraintName("FK__Tbl_Topic__Child__22401542");
+                .HasConstraintName("FK__Tbl_Topic__Child__19DFD96B");
 
             entity.HasOne(d => d.Client).WithMany(p => p.TblTopicPCChildSkills)
                 .HasForeignKey(d => d.ClientId)
-                .HasConstraintName("FK__Tbl_Topic__Clien__2334397B");
+                .HasConstraintName("FK__Tbl_Topic__Clien__1AD3FDA4");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.TblTopicPCChildSkillCreatedByNavigations)
                 .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Tbl_Topic__Creat__24285DB4");
+                .HasConstraintName("FK__Tbl_Topic__Creat__1BC821DD");
 
             entity.HasOne(d => d.ModefiedByNavigation).WithMany(p => p.TblTopicPCChildSkillModefiedByNavigations)
                 .HasForeignKey(d => d.ModefiedBy)
-                .HasConstraintName("FK__Tbl_Topic__Modef__251C81ED");
+                .HasConstraintName("FK__Tbl_Topic__Modef__1CBC4616");
         });
 
         modelBuilder.Entity<TblTopicPChildSkill>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Tbl_Topi__3214EC074CD55139");
+            entity.HasKey(e => e.Id).HasName("PK__Tbl_Topi__3214EC070687A866");
 
-            entity.ToTable("Tbl_Topic_P_ChildSkill");
+            entity.ToTable("Tbl_Topic_P_ChildSkill", "dbo");
 
             entity.Property(e => e.CreatedOn).HasColumnType("datetime");
-            entity.Property(e => e.Description).IsUnicode(false);
+            entity.Property(e => e.Description)
+                .IsUnicode(false)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.ModefiedOn).HasColumnType("datetime");
             entity.Property(e => e.Name)
                 .HasMaxLength(200)
-                .IsUnicode(false);
+                .IsUnicode(false)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
 
             entity.HasOne(d => d.Client).WithMany(p => p.TblTopicPChildSkills)
                 .HasForeignKey(d => d.ClientId)
-                .HasConstraintName("FK__Tbl_Topic__Clien__1C873BEC");
+                .HasConstraintName("FK__Tbl_Topic__Clien__1DB06A4F");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.TblTopicPChildSkillCreatedByNavigations)
                 .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Tbl_Topic__Creat__1D7B6025");
+                .HasConstraintName("FK__Tbl_Topic__Creat__1EA48E88");
 
             entity.HasOne(d => d.ModefiedByNavigation).WithMany(p => p.TblTopicPChildSkillModefiedByNavigations)
                 .HasForeignKey(d => d.ModefiedBy)
-                .HasConstraintName("FK__Tbl_Topic__Modef__1E6F845E");
+                .HasConstraintName("FK__Tbl_Topic__Modef__1F98B2C1");
 
             entity.HasOne(d => d.Parent).WithMany(p => p.TblTopicPChildSkills)
                 .HasForeignKey(d => d.ParentId)
-                .HasConstraintName("FK__Tbl_Topic__Paren__1B9317B3");
+                .HasConstraintName("FK__Tbl_Topic__Paren__208CD6FA");
         });
 
         modelBuilder.Entity<TblUser>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__tbl_User__3214EC0755C239B7");
+            entity.HasKey(e => e.Id).HasName("PK__tbl_User__3214EC073AFA6D64");
 
-            entity.ToTable("tbl_User");
+            entity.ToTable("tbl_User", "dbo");
 
             entity.Property(e => e.CreateDate).HasColumnType("datetime");
-            entity.Property(e => e.Email).HasMaxLength(100);
+            entity.Property(e => e.Email)
+                .HasMaxLength(100)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.IsActive).HasDefaultValueSql("('true')");
             entity.Property(e => e.IsDelete).HasDefaultValueSql("('false')");
-            entity.Property(e => e.Mobile).HasMaxLength(15);
+            entity.Property(e => e.Mobile)
+                .HasMaxLength(15)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
-            entity.Property(e => e.Name).HasMaxLength(100);
-            entity.Property(e => e.Password).HasMaxLength(500);
+            entity.Property(e => e.Name)
+                .HasMaxLength(100)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            entity.Property(e => e.Password)
+                .HasMaxLength(500)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
 
             entity.HasOne(d => d.Client).WithMany(p => p.TblUsers)
                 .HasForeignKey(d => d.ClientId)
-                .HasConstraintName("FK__tbl_User__Client__3A4CA8FD");
+                .HasConstraintName("FK__tbl_User__Client__2180FB33");
+        });
+
+        modelBuilder.Entity<TblUserAppRole>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__tblUserA__3214EC0734D6D21C");
+
+            entity.ToTable("tblUserAppRole", "dbo");
+
+            entity.HasOne(d => d.Role).WithMany(p => p.TblUserAppRoles)
+                .HasForeignKey(d => d.RoleId)
+                .HasConstraintName("FK__tblUserAp__RoleI__245D67DE");
+
+            entity.HasOne(d => d.User).WithMany(p => p.TblUserAppRoles)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK__tblUserAp__UserI__25518C17");
         });
 
         modelBuilder.Entity<TblUserRole>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Tbl_User__3214EC072A498D72");
+            entity.HasKey(e => e.Id).HasName("PK__Tbl_User__3214EC07BF879BE9");
 
-            entity.ToTable("Tbl_UserRole");
+            entity.ToTable("Tbl_UserRole", "dbo");
 
             entity.HasOne(d => d.Role).WithMany(p => p.TblUserRoles)
                 .HasForeignKey(d => d.RoleId)
-                .HasConstraintName("FK__Tbl_UserR__RoleI__0C85DE4D");
+                .HasConstraintName("FK__Tbl_UserR__RoleI__22751F6C");
 
             entity.HasOne(d => d.User).WithMany(p => p.TblUserRoles)
                 .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__Tbl_UserR__UserI__0B91BA14");
+                .HasConstraintName("FK__Tbl_UserR__UserI__236943A5");
+        });
+
+        modelBuilder.Entity<TempTable>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("temp_table", "dbo");
+
+            entity.Property(e => e.Age).HasColumnName("age");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Name)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS")
+                .HasColumnName("name");
         });
 
         modelBuilder.Entity<WalkIn>(entity =>
         {
             entity.HasKey(e => e.WalkInId).HasName("PK_CampusWalkIn");
 
-            entity.ToTable("WalkIn");
+            entity.ToTable("WalkIn", "dbo");
 
-            entity.Property(e => e.Address1).HasMaxLength(100);
-            entity.Property(e => e.Address2).HasMaxLength(100);
-            entity.Property(e => e.City).HasMaxLength(50);
+            entity.Property(e => e.Address1)
+                .HasMaxLength(100)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            entity.Property(e => e.Address2)
+                .HasMaxLength(100)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            entity.Property(e => e.City)
+                .HasMaxLength(50)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
-            entity.Property(e => e.Title).HasMaxLength(250);
+            entity.Property(e => e.JobDescription).UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            entity.Property(e => e.Title)
+                .HasMaxLength(250)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.WalkInDate).HasColumnType("datetime");
 
             entity.HasOne(d => d.Country).WithMany(p => p.WalkIns)

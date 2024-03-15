@@ -28,10 +28,10 @@ namespace QuickCampusAPI.Controllers
         private readonly IStateRepo _stateRepo;
         private readonly ICityRepo _cityrepo;
         private string baseUrl;
-        private readonly QuikCampusDevContext _context;
+        private readonly BtprojecQuickcampustestContext _context;
 
 
-        public CollegeController(ICollegeRepo collegeRepo, IConfiguration config, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, ICountryRepo countryRepo, IStateRepo stateRepo, ICityRepo cityRepo, QuikCampusDevContext quikCampusDevContext)
+        public CollegeController(ICollegeRepo collegeRepo, IConfiguration config, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, ICountryRepo countryRepo, IStateRepo stateRepo, ICityRepo cityRepo, BtprojecQuickcampustestContext BtprojecQuickcampustestContext)
         {
             _collegeRepo = collegeRepo;
             _config = config;
@@ -40,7 +40,7 @@ namespace QuickCampusAPI.Controllers
             _countryRepo = countryRepo;
             _stateRepo = stateRepo;
             _cityrepo = cityRepo;
-            _context = quikCampusDevContext;
+            _context = BtprojecQuickcampustestContext;
         }
 
         [Authorize(Roles = "GetAllCollege")]
