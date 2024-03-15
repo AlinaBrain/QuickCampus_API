@@ -37,44 +37,40 @@ namespace QuickCampusAPI.Controllers
         public async Task<IActionResult> AddClient([FromBody] ClientViewModel vm)
         {
             IGeneralResult<ClientResponseViewModel> result = new GeneralResult<ClientResponseViewModel>();
-            if (ModelState.IsValid)
+            try
             {
-                var _jwtSecretKey = _config["Jwt:Key"];
-                var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-                if (_clientRepo.Any(x => x.Email == vm.Email && x.IsActive == true))
+                if (ModelState.IsValid)
                 {
-                    result.Message = "Email Already Registered!";
-                    return Ok(result);
-                }
-                else if (_clientRepo.Any(x => x.IsActive == true && x.Name == vm.Name.Trim()))
-                {
-                    result.Message = "Name Already Exist!";
-                    return Ok(result);
-                }
-                else if (_clientRepo.Any(x => x.UserName == vm.UserName && x.IsActive == true))
-                {
-                    result.Message = "Username Already Registered! Please use diffrent name";
-                    return Ok(result);
-                }
-                else
-                {
-                    vm.Password = EncodePasswordToBase64(vm.Password);
-                    ClientVM clientVM = new ClientVM
+                    var _jwtSecretKey = _config["Jwt:Key"];
+                    var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                    if (_clientRepo.Any(x => x.Email == vm.Email && x.IsActive == true))
                     {
-                        Name = vm.Name.Trim(),
-                        Email = vm.Email.Trim(),
-                        Phone = vm.Phone.Trim(),
-                        Address = vm.Address.Trim(),
-                        CraetedBy = Convert.ToInt32(userId),
-                        ModifiedBy = Convert.ToInt32(userId),
-                        SubscriptionPlan = vm.SubscriptionPlan.Trim(),
-                        Latitude = vm.Latitude,
-                        Longitude = vm.Longitude,
-                        UserName = vm.UserName.Trim(),
-                        Password = vm.Password.Trim(),
-                    };
-                    try
+                        result.Message = "Email Already Registered!";
+                        return Ok(result);
+                    }
+                    else if (_clientRepo.Any(x => x.UserName == vm.UserName && x.IsActive == true))
                     {
+                        result.Message = "Username Already Registered!";
+                        return Ok(result);
+                    }
+                    else
+                    {
+                        vm.Password = EncodePasswordToBase64(vm.Password);
+                        ClientVM clientVM = new ClientVM
+                        {
+                            Name = vm.Name.Trim(),
+                            Email = vm.Email.Trim(),
+                            Phone = vm.Phone.Trim(),
+                            Address = vm.Address.Trim(),
+                            CreatedBy = Convert.ToInt32(userId),
+                            ModifiedBy = Convert.ToInt32(userId),
+                            SubscriptionPlan = vm.SubscriptionPlan.Trim(),
+                            Latitude = vm.Latitude,
+                            Longitude = vm.Longitude,
+                            UserName = vm.UserName.Trim(),
+                            Password = vm.Password.Trim(),
+                        };
+
                         var clientdata = await _clientRepo.Add(clientVM.ToClientDbModel());
 
                         UserVm userVm = new UserVm()
@@ -86,16 +82,20 @@ namespace QuickCampusAPI.Controllers
                             Mobile = clientdata.Phone,
                         };
                         var userdetails = await _userRepo.Add(userVm.ToUserDbModel());
-                        //  var res = await _roleRepo.SetClientAdminRole(userdetails.Id);
-                        TblUserAppRoleVm tbluserrolevm = new TblUserAppRoleVm
+                        if(userdetails.Id > 0)
                         {
-                            
-                            
-                            
-                        };
+                            TblUserAppRole userAppRole = new TblUserAppRole()
+                            {
+                                UserId = userdetails.Id,
+                                RoleId = (int)common.AppRole.Client
+                            };
+                           
+                        }
+                        //  var res = await _roleRepo.SetClientAdminRole(userdetails.Id);
+                        
 
 
-                         ClientResponseViewModel clientresponse = new ClientResponseViewModel
+                        ClientResponseViewModel clientresponse = new ClientResponseViewModel
                         {
                             Id = clientdata.Id,
                             Name = clientdata.Name,
@@ -111,16 +111,18 @@ namespace QuickCampusAPI.Controllers
                         result.Message = "Client added successfully";
                         result.IsSuccess = true;
                     }
-                    catch (Exception ex)
-                    {
-                        result.Message = ex.Message;
-                    }
+
                     return Ok(result);
                 }
+                else
+                {
+                    result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
+                }
             }
-            else
+
+            catch (Exception ex)
             {
-                result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
+                result.Message = ex.Message;
             }
             return Ok(result);
         }

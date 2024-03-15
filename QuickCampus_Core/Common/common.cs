@@ -20,7 +20,12 @@ namespace QuickCampus_Core.Common
             Technical = 2,
             HR = 3
         }
-
+        public enum AppRole
+        {
+            Admin = 1,
+            Client = 2,
+            Client_User = 3
+        }
 
 
     }
