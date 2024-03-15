@@ -59,5 +59,7 @@ public partial class TblUser
 
     public virtual ICollection<TblTopicPChildSkill> TblTopicPChildSkillModefiedByNavigations { get; set; } = new List<TblTopicPChildSkill>();
 
+    public virtual ICollection<TblUserAppRole> TblUserAppRoles { get; set; } = new List<TblUserAppRole>();
+
     public virtual ICollection<TblUserRole> TblUserRoles { get; set; } = new List<TblUserRole>();
 }

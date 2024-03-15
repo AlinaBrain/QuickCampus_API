@@ -56,8 +56,7 @@ namespace QuickCampus_Core.Services
                 {
                     PermissionId = pId.PermissionIds,
                     RoleId = roleMappingRequest.RoleId,
-                    PermissionName = "",
-                    DisplayName = ""
+                   
                 };
                 _context.TblRolePermissions.Add(record);
 

@@ -101,48 +101,6 @@ namespace QuickCampus_Core.ViewModel
                 IsDeleted = false,
             };
         }
-
-        public class ClientValidator : AbstractValidator<ClientVM>
-        {
-            public ClientValidator()
-            {
-                RuleFor(x => x.Name)
-                     .Cascade(CascadeMode.StopOnFirstFailure)
-                  .NotNull().WithMessage("Name could not be null")
-                  .NotEmpty().WithMessage("Name could not be empty")
-            .Length(3, 100);
-                RuleFor(x => x.Address)
-                  .Cascade(CascadeMode.StopOnFirstFailure)
-                  .NotNull().WithMessage("Address could not be null")
-                  .NotEmpty().WithMessage("Address could not be empty")
-                  .Length(0, 100).WithMessage("Address lengh could not be greater than 100");
-
-                RuleFor(x => x.Phone)
-                  .Cascade(CascadeMode.StopOnFirstFailure)
-                  .NotNull().WithMessage("Phone could not be null")
-                  .NotEmpty().WithMessage("Phone could not be empty");
-
-                RuleFor(x => x.Email)
-                  .Cascade(CascadeMode.StopOnFirstFailure).EmailAddress()
-                  .NotNull().WithMessage("Email could not be null")
-                  .NotEmpty().WithMessage("Email could not be empty");
-
-                RuleFor(x => x.SubscriptionPlan)
-                  .Cascade(CascadeMode.StopOnFirstFailure)
-                  .Length(0, 20).WithMessage("SubscriptionPlan lengh could not be greater than 20");
-
-                RuleFor(x => x.UserName)
-               .Cascade(CascadeMode.StopOnFirstFailure).EmailAddress()
-               .NotNull().WithMessage("UserName could not be null")
-               .NotEmpty().WithMessage("UserName could not be empty")
-               .Length(3, 100).WithMessage("UserName lengh could not be greater than 100");
-
-                RuleFor(x => x.Password)
-                  .Cascade(CascadeMode.StopOnFirstFailure)
-                  .NotNull().WithMessage("Password could not be null")
-                  .NotEmpty().WithMessage("Password could not be empty")
-                  .Length(4, 50).WithMessage("Length Should be Greater Than 4 and less than 50");
-            }
         }
     }
     public class ClientReponse
@@ -194,4 +152,5 @@ namespace QuickCampus_Core.ViewModel
         public decimal? Latitude { get; set; }
         public bool? IsDeleted { get; set; }
     }
-}
+
+
