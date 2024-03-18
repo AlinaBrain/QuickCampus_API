@@ -31,22 +31,17 @@ builder.Services.AddCors(options =>
         //.AllowCredentials()
         );
 });
-
 //Add services to the container.
 builder.Services.AddDbContext<BtprojecQuickcampustestContext>(
     x => x.UseSqlServer(
         builder.Configuration.GetConnectionString("ConnectionString"))
     );
-
 builder.Services.AddControllers();
 builder.Services.AddScoped<IValidator<AdminLogin>, AdminLoginValidator>();
 builder.Services.AddScoped<IValidator<UserVm>, UserValidator>();
 builder.Services.AddScoped<IValidator<ClientUpdateRequest>, ClientValidatorRequest>();
 builder.Services.AddScoped<IValidator<CollegeVM>, CollegeValidator>();
 builder.Services.AddScoped<IValidator<ApplicantViewModel>, ApplicantValidator>();
-
-
-
 builder.Services.AddControllers()
                 .AddFluentValidation(options =>
                 {
@@ -89,7 +84,6 @@ builder.Services.AddSwaggerGen(option =>
         }
     });
 });
-
 builder.Services.AddAuthentication(auth =>
 {
     auth.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

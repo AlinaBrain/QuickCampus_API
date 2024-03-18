@@ -111,7 +111,6 @@ namespace QuickCampusAPI.Controllers
                                     var userRoleData = await _UserRoleRepo.Add(userRole);
                                     if (userRoleData.Id > 0)
                                     {
-
                                         ClientResponseViewModel clientresponse = new ClientResponseViewModel
                                         {
                                             Id = clientdata.Id,
@@ -137,8 +136,6 @@ namespace QuickCampusAPI.Controllers
                         }
                         await _context.Database.RollbackTransactionAsync();
                     }
-
-
                 }
                 else
                 {
@@ -201,7 +198,7 @@ namespace QuickCampusAPI.Controllers
                             };
                             var userRoleData = await _UserRoleRepo.Add(userRole);
                             result.Message = "Client updated successfully";
-                            
+
                             result.IsSuccess = true;
                         }
                         else if (isSuperAdmin)
@@ -233,10 +230,10 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-        [Authorize(Roles = "GetAllClient")]
+       // [Authorize(Roles = "GetAllClient")]
         [HttpGet]
         [Route("GetAllClient")]
-        public async Task<IActionResult> GetAllClient(int clientid, string? search, int Datatype int pageStart = 1, int pageSize = 10)
+        public async Task<IActionResult> GetAllClient(int clientid, string? search, int Datatype, int pageStart = 1, int pageSize = 10)
         {
             IGeneralResult<List<ClientResponseViewModel>> result = new GeneralResult<List<ClientResponseViewModel>>();
             int cid = 0;
@@ -246,21 +243,30 @@ namespace QuickCampusAPI.Controllers
             var newPageStart = 0;
             if (pageStart > 0)
             {
-                var clienttotalcount = 0;
-                //if (Datatype == 1)
-                //{
-                //    var IsActiveorInactiverecored = _clientRepo.GetAll(x => x.IsDeleted == false ||).Result.Count();
-                //}
-
-                clienttotalcount =  _clientRepo.GetAll(x => x.IsActive == true && x.IsDeleted == false).Result.Count();
-                var clientdata = _clientRepo.GetAll(x => x.IsActive == true && x.IsDeleted == false);
+                
+                List<TblClient> tblclient = new List<TblClient>();
+                if (Datatype == 1)
+                {
+                    tblclient =await _clientRepo.GetAll(x => x.IsDeleted == false  );
+                    
+                }
+                else if (Datatype == 2)
+                {
+                    tblclient = await _clientRepo.GetAll(x => x.IsActive == true && x.IsDeleted ==false);
+                    
+                }
+                else
+                {
+                    tblclient = await _clientRepo.GetAll(x => x.IsActive == false && x.IsDeleted == false);
+                }
+                var clienttotalcount = tblclient.Count();
                 var roledata = _roleRepo.GetAll(x => x.IsActive == true && x.IsDeleted == false).Result.FirstOrDefault();
                 var userapprole = _userAppRoleRepo.GetAll(x => x.UserId == x.Id).Result.FirstOrDefault();
                 var userapproleid = userapprole != null ? userapprole.RoleId : 0;
                 List<ClientResponseViewModel> data = new List<ClientResponseViewModel>();
-                data.AddRange(clientdata.Result.Select(x => new ClientResponseViewModel
+                data.AddRange(tblclient.Select(x => new ClientResponseViewModel
                 {
-                    Id=x.Id,
+                    Id = x.Id,
                     Name = x.Name,
                     Address = x.Address,
                     SubscriptionPlan = x.SubscriptionPlan,
@@ -268,16 +274,17 @@ namespace QuickCampusAPI.Controllers
                     Phone = x.Phone,
                     Latitude = x.Latitude,
                     Longitude = x.Longitude,
+                    IsActive=x.IsActive,
                     RoleName = _roleRepo.GetAllQuerable().Where(y => y.Id == roledata.Id).Select(x => x.Name).First(),
                     AppRoleName = ((common.AppRole)userapproleid).ToString(),
-                }).ToList().Where(x => (x.Name.Contains(search ?? "") || x.Email.Contains(search ?? "") || x.Address.Contains(search ?? "") || x.Phone.Contains(search?? ""))).OrderByDescending(x => x.Id).ToList());
+                }).ToList().Where(x => (x.Name.Contains(search ?? "") || x.Email.Contains(search ?? "") || x.Address.Contains(search ?? "") || x.Phone.Contains(search ?? ""))).OrderByDescending(x => x.Id).ToList());
                 result.Data = data;
                 result.Message = "Client Get Successfully";
                 result.TotalRecordCount = clienttotalcount;
+                return Ok(result);
             }
             return Ok(result);
         }
-
         [Authorize(Roles = "DeleteClient")]
         [HttpDelete]
         [Route("DeleteClient")]
@@ -304,24 +311,26 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = "ActiveInActive")]
+       // [Authorize(Roles = "ActiveInActive")]
         [HttpGet]
         [Route("activeAndInactive")]
         public async Task<IActionResult> ActiveAndInactive(bool isActive, int id)
         {
             var _jwtSecretKey = _config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            IGeneralResult<ClientVM> result = new GeneralResult<ClientVM>();
+            IGeneralResult<ActiveInactivevm> result = new GeneralResult<ActiveInactivevm>();
             var res = _clientRepo.GetAllQuerable().Where(x => x.Id == id && x.IsDeleted == false).FirstOrDefault();
+            var clienttotalCount = 0;
+            clienttotalCount = _clientRepo.GetAllQuerable().Where(x => x.Id == id && x.IsDeleted == false).Count();
             //if (res.IsDeleted == false)
             if (res != null)
             {
-
                 res.IsActive = isActive;
                 res.IsDeleted = false;
                 var data = await _clientRepo.Update(res);
-                result.Data = (ClientVM)data;
+                result.Data = (ActiveInactivevm)data;
                 result.IsSuccess = true;
+                result.TotalRecordCount = clienttotalCount;
                 result.Message = "Client status changed successfully";
             }
             else
@@ -331,18 +340,18 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = "DetailsClient")]
+        //[Authorize(Roles = "DetailsClient")]
         [HttpGet]
-        [Route("DetailsClient")]
-        public async Task<IActionResult> DetailsClient(int Id, int clientid)
+        [Route("GetByClient")]
+        public async Task<IActionResult> GetByClient(int clientid)
         {
             var _jwtSecretKey = _config["Jwt:Key"];
             var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            IGeneralResult<ClientReponse> result = new GeneralResult<ClientReponse>();
-            var res = await _clientRepo.GetById(Id);
+            IGeneralResult<GetClientById> result = new GeneralResult<GetClientById>();
+            var res = await _clientRepo.GetById(clientid);
             if (res.IsDeleted == false && res.IsActive == true)
             {
-                result.Data = (ClientReponse)res;
+                result.Data = (GetClientById)res;
                 result.IsSuccess = true;
                 result.Message = "Client details getting succesfully";
             }
@@ -352,7 +361,6 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-
         private string EncodePasswordToBase64(string password)
         {
             try

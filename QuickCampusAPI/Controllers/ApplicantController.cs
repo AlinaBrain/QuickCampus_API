@@ -27,7 +27,7 @@ namespace QuickCampusAPI.Controllers
             _config = configuration;
         }
 
-        [Authorize(Roles = "GetAllApplicant")]
+        //[Authorize(Roles = "GetAllApplicant")]
         [HttpGet]
         [Route("GetAllApplicant")]
         public async Task<ActionResult> GetAllApplicant(int clientid, string? search, int pageStart = 1, int pageSize = 10)
@@ -88,7 +88,6 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-
         [Authorize(Roles = "AddApplicant")]
         [HttpPost]
         [Route("AddApplicant")]
@@ -167,17 +166,13 @@ namespace QuickCampusAPI.Controllers
                         {
                             result.Message = "Something Went Wrong";
                         }
-
-
                     }
                     catch (Exception ex)
                     {
                         result.Message = ex.Message;
                     }
-
                     return Ok(result);
                 }
-
                 else
                 {
                     result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
@@ -185,8 +180,6 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-
-
         [Authorize(Roles = "EditApplicant")]
         [HttpPost]
         [Route("EditApplicant")]
@@ -372,11 +365,9 @@ namespace QuickCampusAPI.Controllers
                     return Ok(result);
                 }
             }
-
             var res = _applicantRepo.ActiveInActiveRole(isActive, id, cid, isSuperAdmin);
             return Ok(res);
         }
-
     }
 }
 
