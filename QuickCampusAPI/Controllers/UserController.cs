@@ -30,21 +30,19 @@ namespace QuickCampusAPI.Controllers
         {
             vm.Password = EncodePasswordToBase64(vm.Password);
             IGeneralResult<UserResponseVm> result = new GeneralResult<UserResponseVm>();
-            var _jwtSecretKey = config["Jwt:Key"];
-
-
             int cid = 0;
-            var jwtSecretKey = config["Jwt:Key"];
-            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var _jwtSecretKey = config["Jwt:Key"];
+            var LoggedInUser = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var clientId = userRepo.GetAllQuerable().Where(x=>x.Id.ToString() == LoggedInUser).Select(x=>x.ClientId).First();
             var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            if (isSuperAdmin)
-            {
-                cid = clientid;
-            }
-            else
-            {
-                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
-            }
+            //if (isSuperAdmin)
+            //{
+            //    cid = clientid;
+            //}
+            //else
+            //{
+            //    cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
+            //}
 
             if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.IsDelete == false))
             {

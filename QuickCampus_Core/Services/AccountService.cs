@@ -9,6 +9,7 @@ using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 
 namespace QuickCampus_Core.Services
 {
@@ -23,58 +24,38 @@ namespace QuickCampus_Core.Services
             _context = context;
         }
 
-        List<string> permissionRecord = new List<string>();
-
         public async Task<IGeneralResult<LoginResponseVM>> Login(AdminLogin adminLogin)
         {
             IGeneralResult<LoginResponseVM> response = new GeneralResult<LoginResponseVM>();
             LoginResponseVM data = new LoginResponseVM();
             response.Data = data;
-            List<RoleMaster> rm = new List<RoleMaster>();
 
             adminLogin.Password = EncodePasswordToBase64(adminLogin.Password);
-            response.Data.RoleMasters = rm;
 
-            var re = _context.TblUsers.Include(i => i.TblUserRoles).Where(w => w.Email == adminLogin.UserName && w.Password == adminLogin.Password.ToLower() && w.IsDelete == false && w.IsActive == true).FirstOrDefault();
-            
-            if (re != null)
+            var findUser = _context.TblUsers.Include(i => i.TblUserRoles).Where(w => w.Email == adminLogin.UserName && w.Password == adminLogin.Password.ToLower() && w.IsDelete == false && w.IsActive == true).FirstOrDefault();
+
+            if (findUser != null)
             {
+                var uRoles = await _context.TblUserRoles
+                    .Include(w => w.Role)
+                    .Where(w => w.UserId == findUser.Id)
+                    .FirstOrDefaultAsync();
 
-                var user = _context.TblUserRoles.
-                                Include(i => i.User)
-                                .Include(i => i.Role)
-                                .Include(i => i.Role.TblRolePermissions)
-                                .Where(w => w.User.Email.ToLower() == adminLogin.UserName.ToLower() && w.User.Password == adminLogin.Password && w.User.IsDelete == false && w.User.IsActive == true)
-                                .FirstOrDefault();
-
-                var uRoles = _context.TblUserRoles.Include(w=>w.Role)
-                    .Where(w => w.User.Email.ToLower() == adminLogin.UserName.ToLower() && w.User.Password == adminLogin.Password && w.User.IsDelete == false && w.User.IsActive == true)
-                    .Select(s => new RoleMaster()
-                    {
-                        Id = s.Role.Id,
-                        RoleName = s.Role.Name
-                    }).ToList();
-
-                response.Data.IsSuperAdmin = uRoles.Any(w => w.RoleName == "SuperAdmin");
-
-                foreach (var rec in uRoles)
+                var uAppRole = await _context.TblUserAppRoles.Where(x => x.UserId == findUser.Id).FirstOrDefaultAsync();
+                
+                response.Data.RoleMasters = new RoleMaster()
                 {
-                    response.Data.RoleMasters.Add(new RoleMaster()
-                    {
-                        Id = rec.Id,
-                        RoleName = rec.RoleName,
-                        rolePermissions = getPermission(rec.Id, user.Role)
-                    });
-                }
-
+                    Id = uRoles.Id,
+                    RoleName = uRoles.Role.Name,
+                    UserAppRoleName = uAppRole != null ? ((common.AppRole)uAppRole.RoleId).ToString() : "",
+                    rolePermissions = GetUserPermission(uRoles.RoleId ?? 0)
+                };
                 response.IsSuccess = true;
                 response.Message = "Login Successfully";
-                List<string> record = new List<string>();
-                record = uRoles.Select(s => s.RoleName).ToList();
-                response.Data.Token = GenerateToken(adminLogin, record, re.ClientId == null ? 0 : re.ClientId, re.Id,response.Data.IsSuperAdmin);
-                response.Data.UserName = re.Email;
-                response.Data.UserId = re.Id;
-                response.Data.CilentId = re.ClientId;
+                response.Data.Token = GenerateToken(adminLogin, response.Data.RoleMasters, findUser.ClientId == null ? 0 : findUser.ClientId, findUser.Id, response.Data.IsSuperAdmin);
+                response.Data.UserName = findUser.Email;
+                response.Data.UserId = findUser.Id;
+                response.Data.CilentId = findUser.ClientId ;
             }
             else
             {
@@ -84,45 +65,32 @@ namespace QuickCampus_Core.Services
             return response;
         }
 
-
-        public List<RolePermissions> getPermission(int roleId, TblRole tblRole)
+        private List<RolePermissions> GetUserPermission(int RoleId)
         {
             List<RolePermissions> rolePermissions = new List<RolePermissions>();
 
-            rolePermissions = _context.TblRolePermissions.Include(i => i.Permission).Where(w => w.RoleId == roleId).Select(s => new RolePermissions()
+            rolePermissions = _context.TblRolePermissions.Include(i => i.Permission).Where(w => w.RoleId == RoleId).Select(s => new RolePermissions()
             {
                 Id = s.Id,
                 PermissionName = s.Permission.PermissionName,
                 DisplayName = s.Permission.PermissionDisplay
             }).ToList();
-
-            foreach (var rec in rolePermissions)
-            {
-                permissionRecord.Add(rec.PermissionName.Trim());
-            }
-
             return rolePermissions;
         }
 
-        private string GenerateToken(AdminLogin adminlogin, List<string> obj, int? clientId, int userId, bool isSuperAdmin)
+        private string GenerateToken(AdminLogin adminlogin, RoleMaster roleVm, int? clientId, int userId, bool isSuperAdmin)
         {
             var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
+            string roleArr = JsonSerializer.Serialize(roleVm.rolePermissions);
             var claims = new List<Claim>
          {
-                //new Claim(ClaimTypes.Name,clientId==0?string.Empty:clientId.ToString()),
                 new Claim("UserId",userId.ToString()),
-                new Claim("cilentId",clientId==0?string.Empty:clientId.ToString()),
-                new Claim(ClaimTypes.Role,"Test"),
-                new Claim("IsSuperAdmin",isSuperAdmin==true?"1":"0")
-                //new Claim("IsSuperAdmin",(isSuperAdmin==true?"True":"False").ToString().Trim())
+                new Claim("ClientId",clientId.ToString() ?? "0"),
+                new Claim("RolesArray",roleArr ?? ""),
+                new Claim("UserAppRole",roleVm.UserAppRoleName ?? ""),
+                new Claim(ClaimTypes.Role,roleVm.RoleName),
             };
-
-           
-            foreach (var role in permissionRecord)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
 
             var token = new JwtSecurityToken(_config["Jwt:Issuer"], _config["Jwt:Audience"], claims,
                expires: DateTime.Now.AddHours(24), signingCredentials: credentials);
@@ -155,11 +123,11 @@ namespace QuickCampus_Core.Services
             return lst;
         }
 
-        public async Task<IGeneralResult<List<RoleMappingVM>>> ListRoles()
+        public async Task<IGeneralResult<List<RoleMappingVM>>> ListRoles(int ClientId, int UserId)
         {
             IGeneralResult<List<RoleMappingVM>> lst = new GeneralResult<List<RoleMappingVM>>();
             lst.Data = new List<RoleMappingVM>();
-            var record = await _context.TblRoles.Select(s => new RoleMappingVM()
+            var record = await _context.TblRoles.Where(x=>x.IsDeleted == false && x.IsActive == true &&  (ClientId > 0 ? x.ClientId == ClientId : x.CreatedBy == UserId)).Select(s => new RoleMappingVM()
             {
                 Id = s.Id,
                 RoleName = s.Name
@@ -193,6 +161,7 @@ namespace QuickCampus_Core.Services
 
             return response;
         }
+        
         private string EncodePasswordToBase64(string password)
         {
             try

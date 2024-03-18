@@ -7,6 +7,6 @@ namespace QuickCampus_Core.Interfaces
     {
         Task<IGeneralResult<LoginResponseVM>> Login(AdminLogin adminLogin);
         Task<IGeneralResult<List<PermissionVM>>> ListPermission();
-        Task<IGeneralResult<List<RoleMappingVM>>> ListRoles();
+        Task<IGeneralResult<List<RoleMappingVM>>> ListRoles(int ClientId, int UserId);
     }
 }
