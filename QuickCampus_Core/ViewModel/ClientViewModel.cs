@@ -31,11 +31,7 @@ namespace QuickCampus_Core.ViewModel
        
         [RegularExpression(@"^\d+(\.\d{1,2})?$",ErrorMessage ="Please Enter a Valid Latitude")]
         public decimal? Latitude { get; set; }
-        [Required(ErrorMessage = "You must provide an UserName.")]
-        [RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$", ErrorMessage = "Only Username allowed.")]
-        [MaxLength(100, ErrorMessage = "can't exceed more than 100 characters.")]
-        [EmailAddress(ErrorMessage = "Not a valid Username address.")]
-        public string? UserName { get; set; }
+        
         [Required(ErrorMessage = "Name is required"), MaxLength(20)]
         [RegularExpression(@"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$", ErrorMessage = "Only Password allowed.")]
         public string? Password { get; set; }

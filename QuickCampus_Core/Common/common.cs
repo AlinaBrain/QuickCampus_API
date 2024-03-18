@@ -22,6 +22,7 @@ namespace QuickCampus_Core.Common
         }
         public enum AppRole
         {
+            None = 0,
             Admin = 1,
             Client = 2,
             Client_User = 3

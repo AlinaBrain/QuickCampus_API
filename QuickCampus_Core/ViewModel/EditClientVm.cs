@@ -25,12 +25,11 @@ namespace QuickCampus_Core.ViewModel
         public string? Email { get; set; }
         [Required(ErrorMessage = "Subscription plan is required"), MaxLength(20)]
         public string? SubscriptionPlan { get; set; }
-        [Required(ErrorMessage = "Longitude is required")]
         [RegularExpression(@"^\d+(\.\d{1,2})?$")]
         public decimal? Longitude { get; set; }
-        [Required(ErrorMessage = "Longitude is required")]
         [RegularExpression(@"^\d+(\.\d{1,2})?$")]
         public decimal? Latitude { get; set; }
-        
-    } 
+        [Required(ErrorMessage ="Please  Enter a  Valid Role Id")]
+        public int? RoleId { get; set; }
+    }
 }
