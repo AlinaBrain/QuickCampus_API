@@ -818,6 +818,10 @@ public partial class BtprojecQuickcampusContext : DbContext
             entity.Property(e => e.Title).HasMaxLength(250);
             entity.Property(e => e.WalkInDate).HasColumnType("datetime");
 
+            entity.HasOne(d => d.CityNavigation).WithMany(p => p.WalkIns)
+                .HasForeignKey(d => d.City)
+                .HasConstraintName("FK__WalkIn__City__4DE98D56");
+
             entity.HasOne(d => d.Country).WithMany(p => p.WalkIns)
                 .HasForeignKey(d => d.CountryId)
                 .HasConstraintName("FK_WalkIn_Country");

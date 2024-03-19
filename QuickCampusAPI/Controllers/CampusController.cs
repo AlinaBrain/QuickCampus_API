@@ -80,7 +80,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = "AddCampus")]
+       //[Authorize(Roles = "AddCampus")]
         [HttpPost]
         [Route("AddCampus")]
 

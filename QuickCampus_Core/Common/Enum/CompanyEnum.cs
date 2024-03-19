@@ -12,4 +12,11 @@ namespace QuickCampus_Core.Common.Enum
         AriaTelecom = 2,
 
     }
+
+    public enum GetClientFilter
+    {
+        All=1,
+        OnlyActive=2,
+        OnlyInActive=3
+    }
 }

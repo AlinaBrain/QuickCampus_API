@@ -19,7 +19,7 @@ namespace QuickCampus_Core.ViewModel
         public string Address1 { get; set; }=String.Empty;
         public string Address2 { get; set; } = String.Empty;
         public int WalkInID { get; set; }
-        public string City { get; set; } = String.Empty;
+        public int City { get; set; } 
         [Required]
         public int? StateID { get; set; }
         [Required]

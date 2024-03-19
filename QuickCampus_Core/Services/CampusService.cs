@@ -27,6 +27,7 @@ namespace QuickCampus_Core.Services
             var allCollages = _context.Colleges.Where(s => s.IsDeleted == false).Select(s => s.CollegeId).ToList();
             var allStates = _context.States.Where(w => w.IsDeleted == false).Select(s => s.StateId).ToList();
             var isStateExist = allStates.Any(a => a == vm.StateID);
+            var allCity = _context.Cities.Where(m => m.IsDeleted == false).Select(c => c.CityId).ToList();
             bool isExits = _context.WalkIns.Any(x => x.Title == vm.Title && x.IsDeleted == false);
             if (isExits)
             {
@@ -50,7 +51,19 @@ namespace QuickCampus_Core.Services
                     result.Message = "state id " + clg.StateId + " is not exist";
                     return result;
                 }
+                var checkcity = allCity.Any(x => x == clg.City);
+                if (!checkcity)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "city id " + clg.City + "is not exist";
+                }
+                else
+                {
+                    result.Message = "City Does  not exist";
+                    return result;
+                }
             }
+
 
             if (!isCountryExist)
             {
@@ -64,12 +77,13 @@ namespace QuickCampus_Core.Services
                 result.Message = "State is not exist";
                 return result;
             }
+            
 
             try
             {
                 if (vm.WalkInID > 0)
                 {
-                    WalkIn campus = _context.WalkIns.Where(x => x.WalkInId == vm.WalkInID && (clientId == 0 ? true : x.ClientId == clientId)).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
+                    WalkIn campus = _context.WalkIns.Where(x => x.WalkInId == vm.WalkInID && (clientId == 0 ? true : x.ClientId == clientId)).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).Include(x=>x.City).FirstOrDefault();
                     if (campus != null)
                     {
                         campus.WalkInDate = vm.WalkInDate;
@@ -183,7 +197,7 @@ namespace QuickCampus_Core.Services
 
             if (isSuperAdmin)
             {
-                var campuse = _context.WalkIns.Where(x => x.IsDeleted == false && (clientId == 0 ? true : x.ClientId == clientId)).Include(x => x.CampusWalkInColleges).Include(x => x.State).Include(x => x.Country).OrderByDescending(x => x.WalkInDate).Select(x => new CampusGridViewModel()
+                var campuse = _context.WalkIns.Where(x => x.IsDeleted == false && (clientId == 0 ? true : x.ClientId == clientId)).Include(x => x.CampusWalkInColleges).Include(x => x.State).Include(x => x.Country).Include(x=>x.City).OrderByDescending(x => x.WalkInDate).Select(x => new CampusGridViewModel()
                 {
                     WalkInID = x.WalkInId,
                     Address1 = x.Address1,
@@ -221,12 +235,12 @@ namespace QuickCampus_Core.Services
 
             else
             {
-                var campuses = _context.WalkIns.Where(x => x.IsDeleted == false && x.ClientId == clientId).Include(x => x.CampusWalkInColleges).Include(x => x.State).Include(x => x.Country).OrderByDescending(x => x.WalkInDate).Select(x => new CampusGridViewModel()
+                var campuses = _context.WalkIns.Where(x => x.IsDeleted == false && x.ClientId == clientId).Include(x => x.CampusWalkInColleges).Include(x => x.State).Include(x => x.Country).Include(x=>x.City).OrderByDescending(x => x.WalkInDate).Select(x => new CampusGridViewModel()
                 {
                     WalkInID = x.WalkInId,
                     Address1 = x.Address1.Trim(),
                     Address2 = x.Address2.Trim(),
-                    City = x.City.Trim(),
+                    City = x.City,
                     StateID = x.StateId,
                     StateName = x.StateId > 0 ? x.State.StateName : "",
                     CountryID = x.CountryId,
@@ -298,12 +312,12 @@ namespace QuickCampus_Core.Services
 
             else
             {
-                var campusData = _context.WalkIns.Where(x => x.IsDeleted == false && x.ClientId == clientId).Include(x => x.CampusWalkInColleges).Include(x => x.State).Include(x => x.Country).OrderByDescending(x => x.WalkInDate).Select(x => new CampusGridViewModel()
+                var campusData = _context.WalkIns.Where(x => x.IsDeleted == false && x.ClientId == clientId).Include(x => x.CampusWalkInColleges).Include(x => x.State).Include(x => x.Country).OrderByDescending(x => x.WalkInDate).Include(x=>x.City).Select(x => new CampusGridViewModel()
                 {
                     WalkInID = x.WalkInId,
                     Address1 = x.Address1.Trim(),
                     Address2 = x.Address2.Trim(),
-                    City = x.City.Trim(),
+                    City = x.City,
                     StateID = x.StateId,
                     StateName = x.StateId > 0 ? x.State.StateName : "",
                     CountryID = x.CountryId,
