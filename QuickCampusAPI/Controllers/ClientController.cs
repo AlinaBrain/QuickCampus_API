@@ -14,7 +14,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace QuickCampusAPI.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class ClientController : ControllerBase
@@ -40,7 +40,6 @@ namespace QuickCampusAPI.Controllers
             _context = BtprojecQuickcampusContext;
         }
 
-        //[Authorize(Roles = "AddClient")]
         [HttpPost]
         [Route("AddClient")]
         public async Task<IActionResult> AddClient([FromBody] ClientViewModel vm)
@@ -152,7 +151,7 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-        [Authorize(Roles = "EditClient")]
+
         [HttpPost]
         [Route("EditClient")]
         public async Task<IActionResult> EditClient([FromBody] EditClientVm vm)
@@ -219,7 +218,7 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-       [Authorize(Roles = "Admin")]
+
         [HttpGet]
         [Route("GetAllClient")]
         public async Task<IActionResult> GetAllClient( string? search, int Datatype, int pageStart = 1, int pageSize = 10)
@@ -290,7 +289,7 @@ namespace QuickCampusAPI.Controllers
            
             return Ok(result);
         }
-       // [Authorize(Roles = "DeleteClient")]
+        
         [HttpDelete]
         [Route("DeleteClient")]
         public async Task<IActionResult> DeleteClient(int Id)
@@ -332,7 +331,7 @@ namespace QuickCampusAPI.Controllers
 
          return Ok(result);
         }
-       // [Authorize(Roles = "ActiveInActive")]
+
         [HttpGet]
         [Route("activeAndInactive")]
         public async Task<IActionResult> ActiveAndInactive(bool isActive, int id)
@@ -371,7 +370,7 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
 }
-        [Authorize(Roles = "Admin")]
+
         [HttpGet]
         [Route("GetIdByClient")]
         public async Task<IActionResult> GetIdByClient(int clientid)
@@ -404,6 +403,7 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
+
         private string EncodePasswordToBase64(string password)
         {
             try
@@ -454,36 +454,18 @@ namespace QuickCampusAPI.Controllers
         //    }
         //    return Ok(result);
         //}
-                var res = clientList.Select(x => ((ClientResponseVm)x)).ToList();
-                if (res != null && res.Count() > 0)
-                {
-                    result.IsSuccess = true;
-                    result.Message = "ActiveclientList";
-                    result.Data = res;
-                    result.TotalRecordCount = clientListCount;
-                }
-                else
-                {
-                    result.Message = " Active Client List Not Found";
-                }
-            }
-            catch (Exception ex)
-            {
-                result.Message = ex.Message;
-            }
-            return Ok(result);
-        }
+                
 
-        [Authorize]
-        [HttpPost]
-        [Route("AddPermission")]
-        public IActionResult AddPermission(MenuRoleVm vm)
-        {
-            var _jwtSecretKey = _config["Jwt:Key"];
-            var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            var res = _clientRepo.AddMenuRoles(vm, Convert.ToInt32(LoggedInUserId));
-            return Ok(res);
-        }
+        //[Authorize]
+        //[HttpPost]
+        //[Route("AddPermission")]
+        //public IActionResult AddPermission(MenuRoleVm vm)
+        //{
+        //    var _jwtSecretKey = _config["Jwt:Key"];
+        //    var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+        //    var res = _clientRepo.AddMenuRoles(vm, Convert.ToInt32(LoggedInUserId));
+        //    return Ok(res);
+        //}
 
         //[Authorize]
         //[HttpPost]
