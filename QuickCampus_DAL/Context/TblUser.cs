@@ -39,6 +39,8 @@ public partial class TblUser
 
     public virtual ICollection<TblGoal> TblGoalModefiedByNavigations { get; set; } = new List<TblGoal>();
 
+    public virtual ICollection<TblMenuItemUserPermission> TblMenuItemUserPermissions { get; set; } = new List<TblMenuItemUserPermission>();
+
     public virtual ICollection<TblParentSkill> TblParentSkillCreatedByNavigations { get; set; } = new List<TblParentSkill>();
 
     public virtual ICollection<TblParentSkill> TblParentSkillModefiedByNavigations { get; set; } = new List<TblParentSkill>();

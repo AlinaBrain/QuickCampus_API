@@ -13,8 +13,6 @@ public partial class WalkIn
 
     public string? Address2 { get; set; }
 
-    public string? City { get; set; }
-
     public int? StateId { get; set; }
 
     public int? CountryId { get; set; }
@@ -33,9 +31,13 @@ public partial class WalkIn
 
     public int? ClientId { get; set; }
 
+    public int? City { get; set; }
+
     public virtual ICollection<ApplicantTest> ApplicantTests { get; set; } = new List<ApplicantTest>();
 
     public virtual ICollection<CampusWalkInCollege> CampusWalkInColleges { get; set; } = new List<CampusWalkInCollege>();
+
+    public virtual City? CityNavigation { get; set; }
 
     public virtual Country? Country { get; set; }
 

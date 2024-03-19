@@ -89,7 +89,7 @@ namespace QuickCampus_Core.Services
                 new Claim("ClientId",clientId.ToString() ?? "0"),
                 new Claim("RolesArray",roleArr ?? ""),
                 new Claim("UserAppRole",roleVm.UserAppRoleName ?? ""),
-                new Claim(ClaimTypes.Role,roleVm.RoleName),
+                new Claim(ClaimTypes.Role,roleVm.UserAppRoleName),
             };
 
             var token = new JwtSecurityToken(_config["Jwt:Issuer"], _config["Jwt:Audience"], claims,

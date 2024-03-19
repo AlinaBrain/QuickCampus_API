@@ -32,7 +32,7 @@ namespace QuickCampus_Core.ViewModel
         public int WalkInID { get; set; }
         public string? Address1 { get; set; }
         public string? Address2 { get; set; }
-        public string? City { get; set; }
+        public int? City { get; set; }
         public string? StateName { get;  set; }
         public string? CountryName { get; set; }
         public DateTime? CreatedDate { get;  set; }
@@ -58,7 +58,7 @@ namespace QuickCampus_Core.ViewModel
 
         public string? Address2 { get; set; }
         //[Required( ErrorMessage = "City is required." )]      
-        public string? City { get; set; }
+        public int? City { get; set; }
 
         //[Required( ErrorMessage = "State is required." )]
         public int? StateID { get; set; }
@@ -99,7 +99,8 @@ namespace QuickCampus_Core.ViewModel
         public int CampusId { get; set; }
         [Required]
         public int? CollegeId { get; set; }
-
+        [Required]
+        public int City { get; set; }
         [Required]
         public int StateId { get; set; }
         [Required]
@@ -136,6 +137,4 @@ namespace QuickCampus_Core.ViewModel
         public string? StateName { get; set; }
         public int CountryID { get; set; }
     }
-
-   
 }

@@ -5,9 +5,11 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using QuickCampus_Core.Common;
+using QuickCampus_Core.Common.Enum;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
+using static QuickCampus_Core.Common.common;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace QuickCampusAPI.Controllers
@@ -230,59 +232,75 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-       // [Authorize(Roles = "GetAllClient")]
+       [Authorize(Roles = "Admin")]
         [HttpGet]
         [Route("GetAllClient")]
-        public async Task<IActionResult> GetAllClient(int clientid, string? search, int Datatype, int pageStart = 1, int pageSize = 10)
+        public async Task<IActionResult> GetAllClient( string? search, int Datatype, int pageStart = 1, int pageSize = 10)
         {
             IGeneralResult<List<ClientResponseViewModel>> result = new GeneralResult<List<ClientResponseViewModel>>();
-            int cid = 0;
-            var _jwtSecretKey = _config["Jwt:Key"];
-            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            var newPageStart = 0;
-            if (pageStart > 0)
+            try
             {
-                
-                List<TblClient> tblclient = new List<TblClient>();
-                if (Datatype == 1)
+                var _jwtSecretKey = _config["Jwt:Key"];
+                var userid = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var userrole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(userid))).FirstOrDefault();
+                if (userrole.RoleId == (int)AppRole.Admin)
                 {
-                    tblclient =await _clientRepo.GetAll(x => x.IsDeleted == false  );
-                    
+                    var newPageStart = 0;
+                    if (pageStart > 0)
+                    {
+                        var startPage = 1;
+                        newPageStart = (pageStart - startPage) * pageSize;
+
+                        List<TblClient> tblclient = new List<TblClient>();
+                        if (Datatype == (int)GetClientFilter.All)
+                        {
+                            tblclient = await _clientRepo.GetAll(x => x.IsDeleted == false);
+
+                        }
+                        else if (Datatype == (int)GetClientFilter.OnlyInActive)
+                        {
+                            tblclient = await _clientRepo.GetAll(x => x.IsActive == true && x.IsDeleted == false);
+
+                        }
+                        else
+                        {
+                            tblclient = await _clientRepo.GetAll(x => x.IsActive == false && x.IsDeleted == false);
+                        }
+                        var clienttotalcount = tblclient.Count();
+                        var roledata = _roleRepo.GetAll(x => x.IsActive == true && x.IsDeleted == false).Result.FirstOrDefault();
+                        var userapprole = _userAppRoleRepo.GetAll(x => x.UserId == x.Id).Result.FirstOrDefault();
+                        var userapproleid = userapprole != null ? userapprole.RoleId : 0;
+                        List<ClientResponseViewModel> data = new List<ClientResponseViewModel>();
+                        data.AddRange(tblclient.Select(x => new ClientResponseViewModel
+                        {
+                            Id = x.Id,
+                            Name = x.Name,
+                            Address = x.Address,
+                            SubscriptionPlan = x.SubscriptionPlan,
+                            Email = x.Email,
+                            Phone = x.Phone,
+                            Latitude = x.Latitude,
+                            Longitude = x.Longitude,
+                            IsActive = x.IsActive,
+                            RoleName = _roleRepo.GetAllQuerable().Where(y => y.Id == roledata.Id).Select(x => x.Name).First(),
+                            AppRoleName = ((common.AppRole)userapproleid).ToString(),
+                        }).ToList().Where(x => (x.Name.Contains(search ?? "") || x.Email.Contains(search ?? "") || x.Address.Contains(search ?? "") || x.Phone.Contains(search ?? ""))).OrderByDescending(x => x.Id).ToList());
+                        result.Data = data;
+                        result.Message = "Client Get Successfully";
+                        result.TotalRecordCount = clienttotalcount;
+                        return Ok(result);
+                    }
+                    else
+                    {
+                        result.Message = "Access Denied";
+                    }
                 }
-                else if (Datatype == 2)
-                {
-                    tblclient = await _clientRepo.GetAll(x => x.IsActive == true && x.IsDeleted ==false);
-                    
-                }
-                else
-                {
-                    tblclient = await _clientRepo.GetAll(x => x.IsActive == false && x.IsDeleted == false);
-                }
-                var clienttotalcount = tblclient.Count();
-                var roledata = _roleRepo.GetAll(x => x.IsActive == true && x.IsDeleted == false).Result.FirstOrDefault();
-                var userapprole = _userAppRoleRepo.GetAll(x => x.UserId == x.Id).Result.FirstOrDefault();
-                var userapproleid = userapprole != null ? userapprole.RoleId : 0;
-                List<ClientResponseViewModel> data = new List<ClientResponseViewModel>();
-                data.AddRange(tblclient.Select(x => new ClientResponseViewModel
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    Address = x.Address,
-                    SubscriptionPlan = x.SubscriptionPlan,
-                    Email = x.Email,
-                    Phone = x.Phone,
-                    Latitude = x.Latitude,
-                    Longitude = x.Longitude,
-                    IsActive=x.IsActive,
-                    RoleName = _roleRepo.GetAllQuerable().Where(y => y.Id == roledata.Id).Select(x => x.Name).First(),
-                    AppRoleName = ((common.AppRole)userapproleid).ToString(),
-                }).ToList().Where(x => (x.Name.Contains(search ?? "") || x.Email.Contains(search ?? "") || x.Address.Contains(search ?? "") || x.Phone.Contains(search ?? ""))).OrderByDescending(x => x.Id).ToList());
-                result.Data = data;
-                result.Message = "Client Get Successfully";
-                result.TotalRecordCount = clienttotalcount;
-                return Ok(result);
             }
+            catch(Exception ex)
+            {
+                result.Message = "Server Error " + ex.Message;
+            }
+           
             return Ok(result);
         }
        // [Authorize(Roles = "DeleteClient")]
@@ -290,10 +308,15 @@ namespace QuickCampusAPI.Controllers
         [Route("DeleteClient")]
         public async Task<IActionResult> DeleteClient(int Id)
         {
-            var _jwtSecretKey = _config["Jwt:Key"];
-            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             IGeneralResult<ClientVM> result = new GeneralResult<ClientVM>();
-            var res = _clientRepo.GetAllQuerable().Where(x => x.Id == Id && x.IsDeleted == false).FirstOrDefault();
+            try
+            {
+            var _jwtSecretKey = _config["Jwt:Key"];
+            var userid = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var userrole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(userid))).FirstOrDefault();
+            if (userrole.RoleId == (int)AppRole.Admin)
+            {
+                var res = _clientRepo.GetAllQuerable().Where(x => x.Id == Id && x.IsDeleted == false).FirstOrDefault();
             //if (res.IsDeleted == false)
             if (res != null)
             {
@@ -309,17 +332,33 @@ namespace QuickCampusAPI.Controllers
                 result.Message = "Client does not exist";
             }
             return Ok(result);
+            }
+            else
+            {
+                result.Message = "Access Denied";
+            }
         }
+            catch (Exception ex)
+            {
+                result.Message = "Server Error " + ex.Message;
+            }
 
+         return Ok(result);
+        }
        // [Authorize(Roles = "ActiveInActive")]
         [HttpGet]
         [Route("activeAndInactive")]
         public async Task<IActionResult> ActiveAndInactive(bool isActive, int id)
         {
-            var _jwtSecretKey = _config["Jwt:Key"];
-            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             IGeneralResult<ActiveInactivevm> result = new GeneralResult<ActiveInactivevm>();
-            var res = _clientRepo.GetAllQuerable().Where(x => x.Id == id && x.IsDeleted == false).FirstOrDefault();
+            try
+            {
+                var _jwtSecretKey = _config["Jwt:Key"];
+                var userid = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var userrole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(userid))).FirstOrDefault();
+                if (userrole.RoleId == (int)AppRole.Admin)
+                {
+                    var res = _clientRepo.GetAllQuerable().Where(x => x.Id == id && x.IsDeleted == false).FirstOrDefault();
             var clienttotalCount = 0;
             clienttotalCount = _clientRepo.GetAllQuerable().Where(x => x.Id == id && x.IsDeleted == false).Count();
             //if (res.IsDeleted == false)
@@ -333,31 +372,48 @@ namespace QuickCampusAPI.Controllers
                 result.TotalRecordCount = clienttotalCount;
                 result.Message = "Client status changed successfully";
             }
-            else
+                }
+                else
+                {
+                    result.Message = "Access Denied";
+                }
+            }
+            catch (Exception ex)
             {
-                result.Message = "Client does not exist";
+                result.Message = "Server Error " + ex.Message;
             }
             return Ok(result);
-        }
-
-        //[Authorize(Roles = "DetailsClient")]
+}
+        [Authorize(Roles = "Admin")]
         [HttpGet]
-        [Route("GetByClient")]
-        public async Task<IActionResult> GetByClient(int clientid)
+        [Route("GetIdByClient")]
+        public async Task<IActionResult> GetIdByClient(int clientid)
         {
-            var _jwtSecretKey = _config["Jwt:Key"];
-            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
             IGeneralResult<GetClientById> result = new GeneralResult<GetClientById>();
-            var res = await _clientRepo.GetById(clientid);
-            if (res.IsDeleted == false && res.IsActive == true)
+            try
             {
-                result.Data = (GetClientById)res;
-                result.IsSuccess = true;
-                result.Message = "Client details getting succesfully";
+                var _jwtSecretKey = _config["Jwt:Key"];
+                var userid = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var userrole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(userid))).FirstOrDefault();
+                if (userrole.RoleId == (int)AppRole.Admin)
+                {
+                    var res = await _clientRepo.GetById(clientid);
+                    if (res.IsDeleted == false && res.IsActive == true)
+                    {
+                        result.Data = (GetClientById)res;
+                        result.IsSuccess = true;
+                        result.Message = "Client details getting succesfully";
+                        return Ok(result);
+                    }
+                    else
+                    {
+                        result.Message = "Access Denied";
+                    }
+                }
             }
-            else
+            catch (Exception ex)
             {
-                result.Message = "Client does Not exist";
+                result.Message = "Server Error " + ex.Message;
             }
             return Ok(result);
         }
@@ -376,41 +432,41 @@ namespace QuickCampusAPI.Controllers
             }
         }
 
-        [Authorize(Roles = "GetAllActiveClient")]
-        [HttpGet]
-        [Route("GetAllActiveClient")]
-        public async Task<IActionResult> GetAllActiveClient(int clientid)
-        {
-            IGeneralResult<List<ClientResponseVm>> result = new GeneralResult<List<ClientResponseVm>>();
-            int cid = 0;
-            var _jwtSecretKey = _config["Jwt:Key"];
-            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            cid = isSuperAdmin ? clientid : (string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId));
-            try
-            {
-                var clientListCount = (await _clientRepo.GetAll()).Where(x => x.IsActive == true && (cid == 0 ? true : x.Id == cid)).Count();
-                var clientList = (await _clientRepo.GetAll()).Where(x => x.IsActive == true && (cid == 0 ? true : x.Id == cid)).OrderByDescending(x => x.Id).ToList();
+        //[Authorize(Roles = "GetAllActiveClient")]
+        //[HttpGet]
+        //[Route("GetAllActiveClient")]
+        //public async Task<IActionResult> GetAllActiveClient(int clientid)
+        //{
+        //    IGeneralResult<List<ClientResponseVm>> result = new GeneralResult<List<ClientResponseVm>>();
+        //    int cid = 0;
+        //    var _jwtSecretKey = _config["Jwt:Key"];
+        //    var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+        //    var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
+        //    cid = isSuperAdmin ? clientid : (string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId));
+        //    try
+        //    {
+        //        var clientListCount = (await _clientRepo.GetAll()).Where(x => x.IsActive == true && (cid == 0 ? true : x.Id == cid)).Count();
+        //        var clientList = (await _clientRepo.GetAll()).Where(x => x.IsActive == true && (cid == 0 ? true : x.Id == cid)).OrderByDescending(x => x.Id).ToList();
 
-                var res = clientList.Select(x => ((ClientResponseVm)x)).ToList();
-                if (res != null && res.Count() > 0)
-                {
-                    result.IsSuccess = true;
-                    result.Message = "ActiveclientList";
-                    result.Data = res;
-                    result.TotalRecordCount = clientListCount;
-                }
-                else
-                {
-                    result.Message = " Active Client List Not Found";
-                }
-            }
-            catch (Exception ex)
-            {
-                result.Message = ex.Message;
-            }
-            return Ok(result);
-        }
+        //        var res = clientList.Select(x => ((ClientResponseVm)x)).ToList();
+        //        if (res != null && res.Count() > 0)
+        //        {
+        //            result.IsSuccess = true;
+        //            result.Message = "ActiveclientList";
+        //            result.Data = res;
+        //            result.TotalRecordCount = clientListCount;
+        //        }
+        //        else
+        //        {
+        //            result.Message = " Active Client List Not Found";
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        result.Message = ex.Message;
+        //    }
+        //    return Ok(result);
+        //}
     }
 }
 
