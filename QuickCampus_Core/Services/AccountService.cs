@@ -16,9 +16,9 @@ namespace QuickCampus_Core.Services
     public class AccountService : IAccount
     {
 
-        private readonly BtprojecQuickcampustestContext _context;
+        private readonly BtprojecQuickcampusContext _context;
         private IConfiguration _config;
-        public AccountService(BtprojecQuickcampustestContext context, IConfiguration config)
+        public AccountService(BtprojecQuickcampusContext context, IConfiguration config)
         {
             _config = config;
             _context = context;
@@ -42,7 +42,7 @@ namespace QuickCampus_Core.Services
                     .FirstOrDefaultAsync();
 
                 var uAppRole = await _context.TblUserAppRoles.Where(x => x.UserId == findUser.Id).FirstOrDefaultAsync();
-                
+
                 response.Data.RoleMasters = new RoleMaster()
                 {
                     Id = uRoles.Id,
@@ -55,7 +55,7 @@ namespace QuickCampus_Core.Services
                 response.Data.Token = GenerateToken(adminLogin, response.Data.RoleMasters, findUser.ClientId == null ? 0 : findUser.ClientId, findUser.Id, response.Data.IsSuperAdmin);
                 response.Data.UserName = findUser.Email;
                 response.Data.UserId = findUser.Id;
-                response.Data.CilentId = findUser.ClientId ;
+                response.Data.CilentId = findUser.ClientId;
             }
             else
             {
@@ -68,6 +68,8 @@ namespace QuickCampus_Core.Services
         private List<RolePermissions> GetUserPermission(int RoleId)
         {
             List<RolePermissions> rolePermissions = new List<RolePermissions>();
+
+            //var UserPermission = _context.TblMenuItemUserPermissions.Where(x => x.UserId == UserId && x.IsActive == true && x.IsDeleted == false).FirstOrDefault();
 
             rolePermissions = _context.TblRolePermissions.Include(i => i.Permission).Where(w => w.RoleId == RoleId).Select(s => new RolePermissions()
             {
@@ -87,9 +89,9 @@ namespace QuickCampus_Core.Services
          {
                 new Claim("UserId",userId.ToString()),
                 new Claim("ClientId",clientId.ToString() ?? "0"),
-                new Claim("RolesArray",roleArr ?? ""),
+                //new Claim("RolesArray",roleArr ?? ""),
                 new Claim("UserAppRole",roleVm.UserAppRoleName ?? ""),
-                new Claim(ClaimTypes.Role,roleVm.RoleName),
+                new Claim(ClaimTypes.Role,roleVm.UserAppRoleName)
             };
 
             var token = new JwtSecurityToken(_config["Jwt:Issuer"], _config["Jwt:Audience"], claims,
@@ -127,7 +129,7 @@ namespace QuickCampus_Core.Services
         {
             IGeneralResult<List<RoleMappingVM>> lst = new GeneralResult<List<RoleMappingVM>>();
             lst.Data = new List<RoleMappingVM>();
-            var record = await _context.TblRoles.Where(x=>x.IsDeleted == false && x.IsActive == true &&  (ClientId > 0 ? x.ClientId == ClientId : x.CreatedBy == UserId)).Select(s => new RoleMappingVM()
+            var record = await _context.TblRoles.Where(x => x.IsDeleted == false && x.IsActive == true && (ClientId > 0 ? x.ClientId == ClientId : x.CreatedBy == UserId)).Select(s => new RoleMappingVM()
             {
                 Id = s.Id,
                 RoleName = s.Name
@@ -161,7 +163,7 @@ namespace QuickCampus_Core.Services
 
             return response;
         }
-        
+
         private string EncodePasswordToBase64(string password)
         {
             try

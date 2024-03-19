@@ -15,16 +15,16 @@ using System.Linq.Expressions;
 
 namespace QuickCampus_Core.Services
 {
-    public class QuestionService : BaseRepository<BtprojecQuickcampustestContext, Question>, IQuestion
+    public class QuestionService : BaseRepository<BtprojecQuickcampusContext, Question>, IQuestion
     {
         private readonly IConfiguration _config;
-        private readonly BtprojecQuickcampustestContext _context;
+        private readonly BtprojecQuickcampusContext _context;
         private readonly Microsoft.AspNetCore.Hosting.IHostingEnvironment _hostingEnvironment;
         private readonly string basepath;
         private string baseUrl;
         private readonly ProcessUploadFile _processUploadFile;
 
-        public QuestionService(BtprojecQuickcampustestContext context, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, IConfiguration config, ProcessUploadFile processUploadFile)
+        public QuestionService(BtprojecQuickcampusContext context, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, IConfiguration config, ProcessUploadFile processUploadFile)
         {
             _config = config;
             _context = context;

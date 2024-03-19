@@ -7,12 +7,12 @@ using static QuickCampus_Core.ViewModel.ApplicantViewModel;
 
 namespace QuickCampus_Core.Services
 {
-    public class ApplicantRepoServices : BaseRepository<BtprojecQuickcampustestContext, Applicant>, IApplicantRepo
+    public class ApplicantRepoServices : BaseRepository<BtprojecQuickcampusContext, Applicant>, IApplicantRepo
     {
-        private readonly BtprojecQuickcampustestContext _context;
+        private readonly BtprojecQuickcampusContext _context;
         private IConfiguration _config;
 
-        public ApplicantRepoServices(BtprojecQuickcampustestContext context, IConfiguration config)
+        public ApplicantRepoServices(BtprojecQuickcampusContext context, IConfiguration config)
         {
             _config = config;
             _context = context;
@@ -64,8 +64,8 @@ namespace QuickCampus_Core.Services
                 LastName = applicant.LastName,
                 EmailAddress = applicant.EmailAddress,
                 PhoneNumber = applicant.PhoneNumber,
-                HigestQualification = applicant.HigestQualification,
-                HigestQualificationPercentage = applicant.HigestQualificationPercentage,
+                HighestQualification = applicant.HigestQualification,
+                HighestQualificationPercentage = applicant.HigestQualificationPercentage,
                 MatricPercentage = applicant.MatricPercentage,
                 IntermediatePercentage = applicant.IntermediatePercentage,
                 Skills = applicant.Skills,
@@ -87,8 +87,8 @@ namespace QuickCampus_Core.Services
         //            applicant.LastName = model.LastName;
         //            applicant.EmailAddress = model.EmailAddress;
         //            applicant.PhoneNumber = model.PhoneNumber;
-        //            applicant.HigestQualification = model.HigestQualification;
-        //            applicant.HigestQualificationPercentage = model.HigestQualificationPercentage;
+        //            applicant.HighestQualification = model.HighestQualification;
+        //            applicant.HighestQualificationPercentage = model.HighestQualificationPercentage;
         //            applicant.MatricPercentage = model.MatricPercentage;
         //            applicant.IntermediatePercentage = model.IntermediatePercentage;
         //            applicant.Skills = model.Skills;

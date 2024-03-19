@@ -17,8 +17,8 @@ namespace QuickCampus_Core.ViewModel
                 LastName = x.LastName,
                 EmailAddress = x.EmailAddress,
                 PhoneNumber = x.PhoneNumber,
-                HigestQualification = x.HigestQualification,
-                HigestQualificationPercentage = x.HigestQualificationPercentage,
+                HighestQualification = x.HigestQualification,
+                HighestQualificationPercentage = x.HigestQualificationPercentage,
                 MatricPercentage = x.MatricPercentage,
                 IntermediatePercentage = x.IntermediatePercentage,
                 Skills = x.Skills,
@@ -34,9 +34,8 @@ namespace QuickCampus_Core.ViewModel
         }
         public int ApplicantID { get; set; }
 
-        
         public string? FirstName { get; set; }
-        
+
         public string? LastName { get; set; }
 
         [Display(Name = "Email Address")]
@@ -50,16 +49,16 @@ namespace QuickCampus_Core.ViewModel
         [RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Not a valid Contact number.")]
         public string? PhoneNumber { get; set; }
         [Required(ErrorMessage = "You must provide a HighestQualification")]
-        public string? HigestQualification { get; set; }
-        [Display(Name = "Higest Qualification  parcentage %")]
+        public string? HighestQualification { get; set; }
+        [Display(Name = "Highest Qualification  Percentage %")]
         [Required(ErrorMessage = "You must provide %.")]
         [Range(1, 100, ErrorMessage = "% should be in 1 - 100 range.")]
-        public decimal? HigestQualificationPercentage { get; set; } = null;
-        [Display(Name = "Matric  Parcentage  %")]
+        public decimal? HighestQualificationPercentage { get; set; } = null;
+        [Display(Name = "Matric  Percentage  %")]
         [Required(ErrorMessage = "You must provide %.")]
         [Range(1, 100, ErrorMessage = "% should be in 1 - 100 range.")]
-        public decimal? MatricPercentage { get; set; } =null;
-        [Display(Name = "Intermediate Parcentage  %")]
+        public decimal? MatricPercentage { get; set; } = null;
+        [Display(Name = "Intermediate Percentage  %")]
         [Required(ErrorMessage = "You must provide %.")]
         [Range(1, 100, ErrorMessage = "% should be in 1 - 100 range.")]
         public decimal? IntermediatePercentage { get; set; }
@@ -70,7 +69,7 @@ namespace QuickCampus_Core.ViewModel
         public string? Comment { get; set; }
         public DateTime? CreatedDate { get; set; }
         public DateTime? RegisteredDate { get; set; }
-        [Required(ErrorMessage ="College Name is Must Required")]
+        [Required(ErrorMessage = "College Name is Must Required")]
         public string CollegeName { get; set; }
         public int? ClientId { get; set; }
 
@@ -80,7 +79,7 @@ namespace QuickCampus_Core.ViewModel
         public bool? IsActive { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public int? CollegeId { get; set; }
-  
+
         public Applicant ToApplicantDbModel()
         {
             return new Applicant
@@ -89,12 +88,12 @@ namespace QuickCampus_Core.ViewModel
                 LastName = LastName,
                 EmailAddress = EmailAddress,
                 PhoneNumber = PhoneNumber,
-                HigestQualification = HigestQualification,
-                HigestQualificationPercentage = HigestQualificationPercentage,
+                HigestQualification = HighestQualification,
+                HigestQualificationPercentage = HighestQualificationPercentage,
                 MatricPercentage = MatricPercentage,
                 IntermediatePercentage = IntermediatePercentage,
                 Skills = Skills,
-                StatusId = StatusId ,
+                StatusId = StatusId,
                 Comment = Comment,
                 AssignedToCompany = AssignedToCompany,
                 CollegeName = CollegeName,
@@ -103,7 +102,7 @@ namespace QuickCampus_Core.ViewModel
                 ModifiedDate = ApplicantID > 0 ? DateTime.UtcNow : null,
                 IsActive = true,
                 IsDeleted = false,
-                CollegeId   = CollegeId,
+                CollegeId = CollegeId,
             };
         }
 
@@ -116,14 +115,14 @@ namespace QuickCampus_Core.ViewModel
                 LastName = LastName,
                 EmailAddress = EmailAddress,
                 PhoneNumber = PhoneNumber,
-                HigestQualification = HigestQualification,
-                HigestQualificationPercentage = HigestQualificationPercentage,
+                HigestQualification = HighestQualification,
+                HigestQualificationPercentage = HighestQualificationPercentage,
                 MatricPercentage = MatricPercentage,
                 IntermediatePercentage = IntermediatePercentage,
                 Skills = Skills,
-                StatusId = StatusId ,
+                StatusId = StatusId,
                 Comment = Comment,
-               AssignedToCompany= AssignedToCompany,
+                AssignedToCompany = AssignedToCompany,
                 CollegeName = CollegeName,
                 ClientId = ClientId,
                 ModifiedDate = DateTime.UtcNow,
@@ -136,7 +135,7 @@ namespace QuickCampus_Core.ViewModel
         public class ApplicantGridViewModel
         {
             public int ApplicantID { get; set; }
-           
+
             [Required(ErrorMessage = "Name is required"), MaxLength(20)]
             [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "Only characters allowed.")]
             public string? FirstName { get; set; }
@@ -145,7 +144,7 @@ namespace QuickCampus_Core.ViewModel
             [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "Only characters allowed.")]
             public string? LastName { get; set; }
 
-            
+
             public int? CollegeId { get; set; }
             public List<SelectListItem>? Colleges { get; set; }
 
@@ -159,20 +158,20 @@ namespace QuickCampus_Core.ViewModel
             [Required(ErrorMessage = "You must provide a Contact Number")]
             [Display(Name = "Contact Number")]
             [RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Not a valid Contact number.")]
-            public string PhoneNumber { get; set; }
-            [Display(Name = "Higest Qualification")]
+            public string? PhoneNumber { get; set; }
+            [Display(Name = "Highest Qualification")]
             [Required(ErrorMessage = "You must provide your highest qualification.")]
             [MaxLength(100, ErrorMessage = "can't exceed more than 100 characters.")]
-            public string? HigestQualification { get; set; }
+            public string? HighestQualification { get; set; }
 
             [Display(Name = "Best 3 Skills")]
             [MaxLength(100, ErrorMessage = "can't exceed more than 100 characters.")]
             public string? Skills { get; set; }
 
-            [Display(Name = "Higest Qualification %")]
+            [Display(Name = "Highest Qualification %")]
             [Required(ErrorMessage = "You must provide %.")]
             [Range(1, 100, ErrorMessage = "% should be in 1 - 100 range.")]
-            public decimal? HigestQualificationPercentage { get; set; }
+            public decimal? HighestQualificationPercentage { get; set; }
 
             [Display(Name = "10th Class %")]
             [Required(ErrorMessage = "You must provide %.")]
@@ -197,8 +196,8 @@ namespace QuickCampus_Core.ViewModel
             public string? LastName { get; set; }
             public string? EmailAddress { get; set; }
             public string? PhoneNumber { get; set; }
-            public string? HigestQualification { get; set; }
-            public string? HigestQualificationPercentage { get; set; }
+            public string? HighestQualification { get; set; }
+            public string? HighestQualificationPercentage { get; set; }
             public string? MatricPercentage { get; set; }
             public string? IntermediatePercentage { get; set; }
             public string? Skills { get; set; }
@@ -242,16 +241,16 @@ namespace QuickCampus_Core.ViewModel
                  .NotEmpty().WithMessage("LastName could not be empty")
                   .Length(3, 50).WithMessage("FirstName length could 3 to 50 character");
 
-                RuleFor(x => x.HigestQualificationPercentage)
+                RuleFor(x => x.HighestQualificationPercentage)
                   .Cascade(CascadeMode.StopOnFirstFailure)
-                 
-                  .NotEmpty().WithMessage("HigestQualificationPercentage could not be empty");
+
+                  .NotEmpty().WithMessage("HighestQualificationPercentage could not be empty");
 
 
-                RuleFor(x => x.HigestQualification)
+                RuleFor(x => x.HighestQualification)
                   .Cascade(CascadeMode.StopOnFirstFailure)
-                  .NotNull().WithMessage("HigestQualification could not be null")
-                  .NotEmpty().WithMessage("HigestQualification could not be empty");
+                  .NotNull().WithMessage("HighestQualification could not be null")
+                  .NotEmpty().WithMessage("HighestQualification could not be empty");
 
 
                 RuleFor(x => x.IntermediatePercentage)
@@ -272,8 +271,8 @@ namespace QuickCampus_Core.ViewModel
 
                 RuleFor(x => x.PhoneNumber)
                .Cascade(CascadeMode.StopOnFirstFailure)
-               .NotNull().WithMessage("Contect Phone could not be null")
-               .NotEmpty().WithMessage("Contect Phone could not be empty")
+               .NotNull().WithMessage("Contact Phone could not be null")
+               .NotEmpty().WithMessage("Contact Phone could not be empty")
                .Length(10, 10).WithMessage("Contact  length could not be greater than 10");
             }
         }

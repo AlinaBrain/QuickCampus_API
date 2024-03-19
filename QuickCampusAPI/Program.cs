@@ -21,7 +21,7 @@ using static QuickCampus_Core.ViewModel.UserVm;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowedCorsPolicy",
+    options.AddPolicy("MyAllowSpecificOrigins",
         builder => builder
             //.SetIsOriginAllowedToAllowWildcardSubdomains()
             //.WithOrigins("http://localhost:4200", "https://localhost:90", "https://*.sentridocs.com", "http://*.sentridocs.com")
@@ -33,7 +33,7 @@ builder.Services.AddCors(options =>
 });
 
 //Add services to the container.
-builder.Services.AddDbContext<BtprojecQuickcampustestContext>(
+builder.Services.AddDbContext<BtprojecQuickcampusContext>(
     x => x.UseSqlServer(
         builder.Configuration.GetConnectionString("ConnectionString"))
     );
@@ -143,7 +143,7 @@ if (app.Environment.IsDevelopment())
         // FileProvider = new PhysicalFileProvider(@"D:\Quick Campus\QuickCampusAPI\wwwroot\UploadFiles"),
 
         //FileProvider=new PhysicalFileProvider(@"D:\QuickCampus_01-02-2024\QuickCampus_API\Quick_Campus\QuickCampusAPI\wwwroot\UploadFiles"),
-        FileProvider = new PhysicalFileProvider(@"D:\QuickCampus_01-02-2024\QuickCampus_API\Quick_Campus\QuickCampusAPI\wwwroot\UploadFiles"),
+        FileProvider = new PhysicalFileProvider(@"D:\Quick_Campus\QuickCampusAPI\wwwroot\UploadFiles"),
         // FileProvider = new PhysicalFileProvider(@"C:\Users\shrip\source\repos\AlinaBrain\QuickCampus_API\QuickCampusAPI\wwwroot\UploadFiles\\"),
         // FileProvider = new PhysicalFileProvider(@"E:\\TestImage\\"),
         // FileProvider = new PhysicalFileProvider(@"F:\Quikcampus\QuickCampusAPI\wwwroot\UploadFiles\\"),
@@ -165,8 +165,8 @@ else
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseAuthentication();
-//app.UseCors("MyAllowSpecificOrigins");
-app.UseCors("AllowedCorsPolicy");
+app.UseCors("MyAllowSpecificOrigins");
+//app.UseCors("AllowedCorsPolicy");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();

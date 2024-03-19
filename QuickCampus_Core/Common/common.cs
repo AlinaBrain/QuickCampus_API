@@ -27,6 +27,12 @@ namespace QuickCampus_Core.Common
             Client = 2,
             Client_User = 3
         }
+        public enum DataTypeFilter
+        {
+            All = 1,
+            OnlyActive = 2,
+            OnlyInActive = 3
+        }
 
 
     }

@@ -4,10 +4,10 @@ using QuickCampus_DAL.Context;
 
 namespace QuickCampus_Core.Services
 {
-   public class CountryService : BaseRepository<BtprojecQuickcampustestContext, Country>, ICountryRepo
+   public class CountryService : BaseRepository<BtprojecQuickcampusContext, Country>, ICountryRepo
     {
-        private readonly BtprojecQuickcampustestContext _context;
-        public CountryService(BtprojecQuickcampustestContext context)
+        private readonly BtprojecQuickcampusContext _context;
+        public CountryService(BtprojecQuickcampusContext context)
         {
             _context = context;
         }

@@ -23,11 +23,11 @@ namespace QuickCampusAPI.Controllers
         private readonly IUserRepo _userRepo;
         private IConfiguration _config;
         private readonly IUserRoleRepo _UserRoleRepo;
-        private readonly BtprojecQuickcampustestContext _context;
+        private readonly BtprojecQuickcampusContext _context;
 
         public ClientController(IUserAppRoleRepo userAppRoleRepo, IRoleRepo roleRepo,
             IClientRepo clientRepo, IConfiguration config, IUserRepo userRepo,
-            IUserRoleRepo userRoleRepo, BtprojecQuickcampustestContext BtprojecQuickcampustestContext)
+            IUserRoleRepo userRoleRepo, BtprojecQuickcampusContext BtprojecQuickcampusContext)
         {
             _userAppRoleRepo = userAppRoleRepo;
             _roleRepo = roleRepo;
@@ -35,10 +35,10 @@ namespace QuickCampusAPI.Controllers
             _config = config;
             _userRepo = userRepo;
             _UserRoleRepo = userRoleRepo;
-            _context = BtprojecQuickcampustestContext;
+            _context = BtprojecQuickcampusContext;
         }
 
-        [Authorize(Roles = "AddClient")]
+        //[Authorize(Roles = "AddClient")]
         [HttpPost]
         [Route("AddClient")]
         public async Task<IActionResult> AddClient([FromBody] ClientViewModel vm)
@@ -71,7 +71,7 @@ namespace QuickCampusAPI.Controllers
                             Phone = vm.Phone.Trim(),
                             Address = vm.Address.Trim(),
                             CreatedBy = Convert.ToInt32(userId),
-                            ModifiedBy = Convert.ToInt32(userId),
+                            CreatedDate = DateTime.Now,
                             SubscriptionPlan = vm.SubscriptionPlan.Trim(),
                             Latitude = vm.Latitude,
                             Longitude = vm.Longitude,
@@ -166,7 +166,6 @@ namespace QuickCampusAPI.Controllers
                     var _jwtSecretKey = _config["Jwt:Key"];
                     var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                     var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-                    var cid = clientId == "" ? 0 : Convert.ToInt32(clientId);
                     if (_clientRepo.Any(x => x.Email == vm.Email.Trim() && x.IsDeleted != true && x.Id != vm.Id))
                     {
                         result.Message = "Email Already Registered!";
@@ -181,7 +180,6 @@ namespace QuickCampusAPI.Controllers
                             result.Message = "Client does Not Exist";
                             return Ok(result);
                         }
-                        var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
                         res.Name = vm.Name;
                         res.Email = vm.Email.Trim();
                         res.Phone = vm.Phone.Trim();
@@ -201,29 +199,18 @@ namespace QuickCampusAPI.Controllers
                             };
                             var userRoleData = await _UserRoleRepo.Add(userRole);
                             result.Message = "Client updated successfully";
-                            
-                            result.IsSuccess = true;
-                        }
-                        else if (isSuperAdmin)
-                        {
-                            res.Email = vm.Email.Trim();
-                            res.Phone = vm.Phone.Trim();
-                            res.Address = vm.Address.Trim();
-                            res.SubscriptionPlan = vm.SubscriptionPlan.Trim();
-                            res.CraetedBy = Convert.ToInt32(userId);
-                            res.ModifiedBy = Convert.ToInt32(userId);
-                            res.Longitude = vm.Longitude;
-                            res.Latitude = vm.Latitude;
-                            res.ModofiedDate = DateTime.Now;
-                            _clientRepo.Update(res);
-                            result.Message = "Client updated successfully";
+
                             result.IsSuccess = true;
                         }
                         else
                         {
-                            result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
+                            result.Message = "Role does not exists!";
                         }
                     }
+                }
+                else
+                {
+                    result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
                 }
             }
             catch (Exception ex)
@@ -236,7 +223,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "GetAllClient")]
         [HttpGet]
         [Route("GetAllClient")]
-        public async Task<IActionResult> GetAllClient(int clientid, string? search, int Datatype int pageStart = 1, int pageSize = 10)
+        public async Task<IActionResult> GetAllClient(string? search, int Datatype, int pageStart = 1, int pageSize = 10)
         {
             IGeneralResult<List<ClientResponseViewModel>> result = new GeneralResult<List<ClientResponseViewModel>>();
             int cid = 0;
@@ -403,6 +390,28 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
+
+        [Authorize]
+        [HttpPost]
+        [Route("AddPermission")]
+        public IActionResult AddPermission(MenuRoleVm vm)
+        {
+            var _jwtSecretKey = _config["Jwt:Key"];
+            var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var res = _clientRepo.AddMenuRoles(vm, Convert.ToInt32(LoggedInUserId));
+            return Ok(res);
+        }
+
+        //[Authorize]
+        //[HttpPost]
+        //[Route("GetPermission")]
+        //public IActionResult GetLoggedInUserPermission()
+        //{
+        //    var _jwtSecretKey = _config["Jwt:Key"];
+        //    var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+        //    var res = _clientRepo.AddMenuRoles(vm, Convert.ToInt32(LoggedInUserId));
+        //    return Ok(res);
+        //}
     }
 }
 

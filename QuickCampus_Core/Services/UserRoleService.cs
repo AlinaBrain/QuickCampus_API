@@ -7,10 +7,10 @@ using System.Linq.Expressions;
 
 namespace QuickCampus_Core.Services
 {
-    public class UserRoleService: BaseRepository<BtprojecQuickcampustestContext, TblUserRole>,IUserRoleRepo
+    public class UserRoleService: BaseRepository<BtprojecQuickcampusContext, TblUserRole>,IUserRoleRepo
     {
-        //private readonly BtprojecQuickcampustestContext _context;
-        //public UserRoleService(BtprojecQuickcampustestContext context)
+        //private readonly BtprojecQuickcampusContext _context;
+        //public UserRoleService(BtprojecQuickcampusContext context)
         //{
         //    _context = context;
         //}

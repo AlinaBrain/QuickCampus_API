@@ -59,7 +59,7 @@ namespace QuickCampus_Core.ViewModel
         [Required(ErrorMessage = "You must provide a HighestQualification")]
         
         public string? HigestQualification { get; set; }
-        [Required(ErrorMessage = "You must provide a HigestQualificationPercentage")]
+        [Required(ErrorMessage = "You must provide a HighestQualificationPercentage")]
         [PercentageRange(ErrorMessage = "Percentage must be between 0 and 100.")]
         public decimal? HigestQualificationPercentage { get; set; }
         [Required(ErrorMessage = "You must provide a MatricPercentage")]
@@ -173,14 +173,14 @@ namespace QuickCampus_Core.ViewModel
 
                 RuleFor(x => x.HigestQualificationPercentage)
                   .Cascade(CascadeMode.StopOnFirstFailure)
-                  .NotNull().WithMessage("HigestQualificationPercentage could not be null")
-                  .NotEmpty().WithMessage("HigestQualificationPercentage could not be empty");
+                  .NotNull().WithMessage("HighestQualificationPercentage could not be null")
+                  .NotEmpty().WithMessage("HighestQualificationPercentage could not be empty");
 
 
                 RuleFor(x => x.HigestQualification)
                   .Cascade(CascadeMode.StopOnFirstFailure)
-                  .NotNull().WithMessage("HigestQualification could not be null")
-                  .NotEmpty().WithMessage("HigestQualification could not be empty");
+                  .NotNull().WithMessage("HighestQualification could not be null")
+                  .NotEmpty().WithMessage("HighestQualification could not be empty");
 
 
                 RuleFor(x => x.IntermediatePercentage)
