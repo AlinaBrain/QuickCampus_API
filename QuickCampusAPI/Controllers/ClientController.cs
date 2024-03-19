@@ -285,7 +285,7 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-        [Authorize(Roles = "DeleteClient")]
+       // [Authorize(Roles = "DeleteClient")]
         [HttpDelete]
         [Route("DeleteClient")]
         public async Task<IActionResult> DeleteClient(int Id)
