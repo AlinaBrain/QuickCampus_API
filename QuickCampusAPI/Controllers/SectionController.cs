@@ -127,7 +127,7 @@ namespace QuickCampusAPI.Controllers
                             {
                                 var sectiondata = await _sectionrepo.Add(sectionVm.ToSectionDbModel());
                                 result.Data = (SectionVm)sectiondata;
-                                result.Message = "City added successfully";
+                                result.Message = "MstCity added successfully";
                                 result.IsSuccess = true;
                             }
 

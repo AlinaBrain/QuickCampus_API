@@ -42,11 +42,11 @@ namespace QuickCampus_Core.ViewModel
         public string? Address1 { get; set; }
         [Required(ErrorMessage = "Address2 is required.")]
         public string? Address2 { get; set; }
-        [Required(ErrorMessage = "City is required.")]
+        [Required(ErrorMessage = "MstCity is required.")]
         public int? CityId { get; set; }
         [Required(ErrorMessage = "StateId is required.")]
         public int? StateId { get; set; }
-        [Required(ErrorMessage = "Country is required.")]
+        [Required(ErrorMessage = "MstCity_State_Country is required.")]
         public int? CountryId { get; set; }
         public bool? IsActive { get; set; }
         public DateTime? CreatedDate { get; set; }
@@ -135,8 +135,8 @@ namespace QuickCampus_Core.ViewModel
 
                 RuleFor(x => x.CityId)
                   .Cascade(CascadeMode.StopOnFirstFailure)
-                  .NotNull().WithMessage("City could not be null")
-                  .NotEmpty().WithMessage("City could not be empty");
+                  .NotNull().WithMessage("MstCity could not be null")
+                  .NotEmpty().WithMessage("MstCity could not be empty");
 
                 RuleFor(x => x.ContectPerson)
                   .Cascade(CascadeMode.StopOnFirstFailure)

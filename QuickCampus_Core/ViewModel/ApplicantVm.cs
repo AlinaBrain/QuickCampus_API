@@ -21,7 +21,7 @@ namespace QuickCampus_Core.ViewModel
                 LastName = x.LastName,
                 EmailAddress = x.EmailAddress,
                 PhoneNumber = x.PhoneNumber,
-                HigestQualification = x.HigestQualification,
+               
                 HigestQualificationPercentage = x.HigestQualificationPercentage,
                 MatricPercentage = x.MatricPercentage,
                 IntermediatePercentage = x.IntermediatePercentage,
@@ -94,7 +94,7 @@ namespace QuickCampus_Core.ViewModel
                 LastName = LastName,
                 EmailAddress = EmailAddress,
                 PhoneNumber = PhoneNumber,
-                HigestQualification = HigestQualification,
+                
                 HigestQualificationPercentage = HigestQualificationPercentage,
                 MatricPercentage = MatricPercentage,
                 IntermediatePercentage = IntermediatePercentage,
@@ -121,7 +121,7 @@ namespace QuickCampus_Core.ViewModel
                 LastName = LastName,
                 EmailAddress = EmailAddress,
                 PhoneNumber = PhoneNumber,
-                HigestQualification = HigestQualification,
+               
                 HigestQualificationPercentage = HigestQualificationPercentage,
                 MatricPercentage = MatricPercentage,
                 IntermediatePercentage = IntermediatePercentage,

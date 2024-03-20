@@ -39,11 +39,11 @@ namespace QuickCampus_Core.ViewModel
         [Required(ErrorMessage = "Address1 is required.")]
         public string? Address1 { get; set; }
         public string? Address2 { get; set; }
-        [Required(ErrorMessage = "City is required.")]
+        [Required(ErrorMessage = "MstCity is required.")]
         public int? CityId { get; set; }
-        [Required(ErrorMessage = "State is required.")]
+        [Required(ErrorMessage = "MstCity_State is required.")]
         public int? StateId { get; set; }
-        [Required(ErrorMessage = "Country is required.")]
+        [Required(ErrorMessage = "MstCity_State_Country is required.")]
         public int? CountryId { get; set; }
         public bool IsActive { get; set; }
         public DateTime? CreatedDate { get; set; }

@@ -29,7 +29,7 @@ namespace QuickCampus_Core.ViewModel
         public bool? IsDeleted { get; set; }
         public DateTime? CreatedDate { get; set; }
         public DateTime? ModifiedDate { get; set; }
-        [Required(ErrorMessage = "State Name is required.")]
+        [Required(ErrorMessage = "MstCity_State Name is required.")]
         [MaxLength(50, ErrorMessage = "Name must be at most 20 characters long.")]
         public string? StatusName { get; set; }
         public Status ToDbModel()

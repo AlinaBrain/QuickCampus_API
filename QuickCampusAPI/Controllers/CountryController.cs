@@ -37,7 +37,7 @@ namespace QuickCampusAPI.Controllers
                 if (res != null && res.Count() > 0)
                 {
                     result.IsSuccess = true;
-                    result.Message = "Country fetched successfully.";
+                    result.Message = "MstCity_State_Country fetched successfully.";
                     result.Data = res;
                     result.TotalRecordCount = res.Count();
                 }
@@ -68,7 +68,7 @@ namespace QuickCampusAPI.Controllers
         //    {
         //        result.Data = (CountryVM)res;
         //        result.IsSuccess = true;
-        //        result.Message = "Country details getting succesfully";
+        //        result.Message = "MstCity_State_Country details getting succesfully";
         //    }
         //    else
         //    {
@@ -110,7 +110,7 @@ namespace QuickCampusAPI.Controllers
         //            bool isExits = _countryRepo.Any(x => x.CountryName == countryVM.CountryName && x.IsDeleted == false);
         //            if (isExits)
         //            {
-        //                result.Message = " Country is already exists";
+        //                result.Message = " MstCity_State_Country is already exists";
         //            }
         //            else
         //            {
@@ -127,7 +127,7 @@ namespace QuickCampusAPI.Controllers
         //                    {
         //                        var countrydata = await _countryRepo.Add(country.ToCountryDbModel());
         //                        result.Data = (CountryVM)countrydata;
-        //                        result.Message = "Country added successfully";
+        //                        result.Message = "MstCity_State_Country added successfully";
         //                        result.IsSuccess = true;
         //                    }
 
@@ -164,7 +164,7 @@ namespace QuickCampusAPI.Controllers
         //        bool isDeleted = (bool)res.IsDeleted ? true : false;
         //        if (isDeleted)
         //        {
-        //            result.Message = " Country does Not Exist";
+        //            result.Message = " MstCity_State_Country does Not Exist";
         //            return Ok(result);
         //        }
 
@@ -186,7 +186,7 @@ namespace QuickCampusAPI.Controllers
         //            try
         //            {
         //                result.Data = (CountryVM)await _countryRepo.Update(res);
-        //                result.Message = "Country updated successfully";
+        //                result.Message = "MstCity_State_Country updated successfully";
         //                result.IsSuccess = true;
         //            }
         //            catch (Exception ex)
@@ -217,11 +217,11 @@ namespace QuickCampusAPI.Controllers
         //        res.IsDeleted = true;
         //        await _countryRepo.Update(res);
         //        result.IsSuccess = true;
-        //        result.Message = "Country Deleted Succesfully";
+        //        result.Message = "MstCity_State_Country Deleted Succesfully";
         //    }
         //    else
         //    {
-        //        result.Message = "Country does Not exist";
+        //        result.Message = "MstCity_State_Country does Not exist";
         //    }
         //    return Ok(result);
         //}

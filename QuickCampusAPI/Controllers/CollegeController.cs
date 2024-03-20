@@ -92,9 +92,9 @@ namespace QuickCampusAPI.Controllers
                 var results = (from c in collegeList
                                join u in _context.TblUsers
                                on c.CreatedBy equals u.Id
-                               join ct in _context.Countries on c.CountryId equals ct.CountryId
-                               join st in _context.States on c.StateId equals st.StateId
-                               join ci in _context.Cities on c.CityId equals ci.CityId
+                               join ct in _context.MstCityStateCountries on c.CountryId equals ct.CountryId
+                               join st in _context.MstCityStates on c.StateId equals st.StateId
+                               join ci in _context.MstCities on c.CityId equals ci.CityId
 
                                select new CollegeCountryStateVmmm
                                {
@@ -147,7 +147,7 @@ namespace QuickCampusAPI.Controllers
                     }
                     else
                     {
-                        result.Message = "No Country found!";
+                        result.Message = "No MstCity_State_Country found!";
                     }
 
                     if (statelists.Count() > 0)
@@ -162,7 +162,7 @@ namespace QuickCampusAPI.Controllers
                     }
                     else
                     {
-                        result.Message = "No State found!";
+                        result.Message = "No MstCity_State found!";
                     }
 
                     if (citylists.Count() > 0)
@@ -177,7 +177,7 @@ namespace QuickCampusAPI.Controllers
                     }
                     else
                     {
-                        result.Message = "No State found!";
+                        result.Message = "No MstCity_State found!";
                     }
                 }
 

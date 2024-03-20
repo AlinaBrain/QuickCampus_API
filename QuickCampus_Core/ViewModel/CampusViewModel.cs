@@ -57,10 +57,10 @@ namespace QuickCampus_Core.ViewModel
         public string? Address1 { get; set; }
 
         public string? Address2 { get; set; }
-        //[Required( ErrorMessage = "City is required." )]      
+        //[Required( ErrorMessage = "MstCity is required." )]      
         public int? City { get; set; }
 
-        //[Required( ErrorMessage = "State is required." )]
+        //[Required( ErrorMessage = "MstCity_State is required." )]
         public int? StateID { get; set; }
 
         public string? StateName { get; set; }
@@ -71,7 +71,7 @@ namespace QuickCampus_Core.ViewModel
 
         public IEnumerable<SelectListItem> Countries { get; set; }
 
-        //[Required( ErrorMessage = "Country is required." )]
+        //[Required( ErrorMessage = "MstCity_State_Country is required." )]
         public int? CountryID { get; set; }
 
         [Required(ErrorMessage = "Date is required.")]

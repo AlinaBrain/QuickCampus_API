@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace QuickCampus_Core.Services
 {
-    public class CityServices :BaseRepository<BtprojecQuickcampusContext,City>,ICityRepo
+    public class CityServices :BaseRepository<BtprojecQuickcampusContext,MstCity>,ICityRepo
     {
         private readonly BtprojecQuickcampusContext _context;
         private IConfiguration _config;
@@ -23,14 +23,14 @@ namespace QuickCampus_Core.Services
         public async Task<IGeneralResult<string>> DeleteCity(bool isDeleted, int id, int clientid, bool isSuperAdmin)
         {
             IGeneralResult<string> result = new GeneralResult<string>();
-            City city = new City();
+            MstCity city = new MstCity();
             if (isSuperAdmin)
             {
-                city = _context.Cities.Where(w => w.IsDeleted == false && (clientid == 0 ? true : w.ClientId == clientid) && w.CityId == id).FirstOrDefault();
+                city = _context.MstCities.Where(w => w.IsDeleted == false && (clientid == 0 ? true : w.ClientId == clientid) && w.CityId == id).FirstOrDefault();
             }
             else
             {
-                city = _context.Cities.Where(w => w.IsDeleted == false && w.ClientId == clientid && w.CityId == id).FirstOrDefault();
+                city = _context.MstCities.Where(w => w.IsDeleted == false && w.ClientId == clientid && w.CityId == id).FirstOrDefault();
             }
             if (city == null)
             {
@@ -41,12 +41,12 @@ namespace QuickCampus_Core.Services
 
             city.IsDeleted = isDeleted;
             city.IsActive = false;
-            dbContext.Cities.Update(city);
+            dbContext.MstCities.Update(city);
             int a = dbContext.SaveChanges();
             if (a > 0)
             {
                 result.IsSuccess = true;
-                result.Message = "City delete successfully";
+                result.Message = "MstCity delete successfully";
                 return result;
 
             }

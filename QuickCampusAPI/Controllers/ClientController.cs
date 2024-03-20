@@ -65,6 +65,11 @@ namespace QuickCampusAPI.Controllers
                             result.Message = "Username Already Registered!";
                             return Ok(result);
                         }
+                        else if (_clientRepo.Any(x => x.Phone == vm.Phone && x.IsActive==true))
+                        {
+                            result.Message = "Phone Number Already Register";
+                            return Ok(result);
+                        }
                         else
                         {
                             vm.Password = EncodePasswordToBase64(vm.Password);
@@ -175,6 +180,10 @@ namespace QuickCampusAPI.Controllers
                         {
                             result.Message = "Email Already Registered!";
                         }
+                        else if(_clientRepo.Any(y=>y.Phone==vm.Phone.Trim() && y.IsDeleted!=true && y.Id != vm.Id))
+                        {
+                            result.Message = "Phone Number Already";
+                        }
                         else
                         {
                             var res = (await _clientRepo.GetAll(x => x.Id == vm.Id && x.IsDeleted == false)).FirstOrDefault();
@@ -267,7 +276,7 @@ namespace QuickCampusAPI.Controllers
                             Latitude = x.Latitude,
                             Longitude = x.Longitude,
                             IsActive = x.IsActive,
-                            RoleName = _clientRepo.GetClientRoleName(x.Id),
+                            RoleName = _clientRepo.GetClientRoleName((int)x.Id),
                             AppRoleName = _clientRepo.GetClientAppRoleName(x.Id)
                         }).ToList().Where(x => (x.Name.Contains(search ?? "") || x.Email.Contains(search ?? "") || x.Address.Contains(search ?? "") || x.Phone.Contains(search ?? ""))).OrderByDescending(x => x.Id).ToList());
                         result.Data = data;
@@ -369,8 +378,8 @@ namespace QuickCampusAPI.Controllers
         }
 
         [HttpGet]
-        [Route("GetIdByClient")]
-        public async Task<IActionResult> GetIdByClient(int clientId)
+        [Route("GetClientById")]
+        public async Task<IActionResult> GetClientById(int clientId)
         {
             IGeneralResult<GetClientById> result = new GeneralResult<GetClientById>();
             try

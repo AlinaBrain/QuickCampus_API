@@ -64,7 +64,6 @@ namespace QuickCampus_Core.Services
                 LastName = applicant.LastName,
                 EmailAddress = applicant.EmailAddress,
                 PhoneNumber = applicant.PhoneNumber,
-                HighestQualification = applicant.HigestQualification,
                 HighestQualificationPercentage = applicant.HigestQualificationPercentage,
                 MatricPercentage = applicant.MatricPercentage,
                 IntermediatePercentage = applicant.IntermediatePercentage,
@@ -99,7 +98,7 @@ namespace QuickCampus_Core.Services
         //                applicant.AssignedToCompany = model.CompanyId;
         //            }
         //        }
-        //        var result = dbContext.Entry(applicant).State = EntityState.Modified;
+        //        var result = dbContext.Entry(applicant).MstCity_State = EntityState.Modified;
         //        dbContext.SaveChanges();
         //        if (result > 0)
         //        {

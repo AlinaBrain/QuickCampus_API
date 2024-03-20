@@ -33,13 +33,9 @@ public partial class BtprojecQuickcampusContext : DbContext
 
     public virtual DbSet<CampusWalkInCollege> CampusWalkInColleges { get; set; }
 
-    public virtual DbSet<City> Cities { get; set; }
-
     public virtual DbSet<College> Colleges { get; set; }
 
     public virtual DbSet<Company> Companies { get; set; }
-
-    public virtual DbSet<Country> Countries { get; set; }
 
     public virtual DbSet<Error> Errors { get; set; }
 
@@ -47,9 +43,17 @@ public partial class BtprojecQuickcampusContext : DbContext
 
     public virtual DbSet<MstAppRole> MstAppRoles { get; set; }
 
+    public virtual DbSet<MstCity> MstCities { get; set; }
+
+    public virtual DbSet<MstCityState> MstCityStates { get; set; }
+
+    public virtual DbSet<MstCityStateCountry> MstCityStateCountries { get; set; }
+
     public virtual DbSet<MstMenuItem> MstMenuItems { get; set; }
 
     public virtual DbSet<MstMenuSubItem> MstMenuSubItems { get; set; }
+
+    public virtual DbSet<MstQualification> MstQualifications { get; set; }
 
     public virtual DbSet<Question> Questions { get; set; }
 
@@ -58,8 +62,6 @@ public partial class BtprojecQuickcampusContext : DbContext
     public virtual DbSet<QuestionType> QuestionTypes { get; set; }
 
     public virtual DbSet<Section> Sections { get; set; }
-
-    public virtual DbSet<State> States { get; set; }
 
     public virtual DbSet<Status> Statuses { get; set; }
 
@@ -99,7 +101,7 @@ public partial class BtprojecQuickcampusContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=103.93.16.117;Database=btprojec_quickcampus;TrustServerCertificate=true;user id=btprojec_admin;password=Bwy0w65ixN*bsE9wy;Integrated Security=false");
+        => optionsBuilder.UseSqlServer("Server=103.93.16.117;Database=btprojec_quickcampus;TrustServerCertificate=true;user id=btprojec_admin;password=Bwy0w65ixN*bsE9wy;Integrated Security=false;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -116,7 +118,6 @@ public partial class BtprojecQuickcampusContext : DbContext
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
             entity.Property(e => e.EmailAddress).HasMaxLength(100);
             entity.Property(e => e.FirstName).HasMaxLength(100);
-            entity.Property(e => e.HigestQualification).HasMaxLength(100);
             entity.Property(e => e.HigestQualificationPercentage).HasColumnType("decimal(18, 0)");
             entity.Property(e => e.IntermediatePercentage).HasColumnType("decimal(18, 0)");
             entity.Property(e => e.LastName).HasMaxLength(100);
@@ -128,6 +129,10 @@ public partial class BtprojecQuickcampusContext : DbContext
             entity.HasOne(d => d.AssignedToCompanyNavigation).WithMany(p => p.Applicants)
                 .HasForeignKey(d => d.AssignedToCompany)
                 .HasConstraintName("FK_Applicant_Company");
+
+            entity.HasOne(d => d.HighestQualificationNavigation).WithMany(p => p.Applicants)
+                .HasForeignKey(d => d.HighestQualification)
+                .HasConstraintName("FK__Applicant__Highe__595B4002");
 
             entity.HasOne(d => d.Status).WithMany(p => p.Applicants)
                 .HasForeignKey(d => d.StatusId)
@@ -256,23 +261,6 @@ public partial class BtprojecQuickcampusContext : DbContext
                 .HasConstraintName("FK_CampusCollege_CampusWalkIn");
         });
 
-        modelBuilder.Entity<City>(entity =>
-        {
-            entity.HasKey(e => e.CityId).HasName("PK__City__F2D21B7678E7EEB8");
-
-            entity.ToTable("City", "dbo");
-
-            entity.Property(e => e.CityName)
-                .HasMaxLength(150)
-                .IsUnicode(false);
-            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
-            entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
-
-            entity.HasOne(d => d.State).WithMany(p => p.Cities)
-                .HasForeignKey(d => d.StateId)
-                .HasConstraintName("FK__City__StateId__41B8C09B");
-        });
-
         modelBuilder.Entity<College>(entity =>
         {
             entity.ToTable("College", "dbo");
@@ -289,10 +277,6 @@ public partial class BtprojecQuickcampusContext : DbContext
                 .HasMaxLength(250)
                 .IsUnicode(false);
             entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
-
-            entity.HasOne(d => d.City).WithMany(p => p.Colleges)
-                .HasForeignKey(d => d.CityId)
-                .HasConstraintName("FK__College__CityId__42ACE4D4");
         });
 
         modelBuilder.Entity<Company>(entity =>
@@ -304,14 +288,6 @@ public partial class BtprojecQuickcampusContext : DbContext
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
             entity.Property(e => e.Isdeleted).HasColumnName("ISDeleted");
             entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
-        });
-
-        modelBuilder.Entity<Country>(entity =>
-        {
-            entity.ToTable("Country", "dbo");
-
-            entity.Property(e => e.CountryId).ValueGeneratedNever();
-            entity.Property(e => e.CountryName).HasMaxLength(50);
         });
 
         modelBuilder.Entity<Error>(entity =>
@@ -349,6 +325,43 @@ public partial class BtprojecQuickcampusContext : DbContext
             entity.Property(e => e.IsDeleted).HasDefaultValueSql("((0))");
         });
 
+        modelBuilder.Entity<MstCity>(entity =>
+        {
+            entity.HasKey(e => e.CityId).HasName("PK__City__F2D21B7678E7EEB8");
+
+            entity.ToTable("MstCity", "dbo");
+
+            entity.Property(e => e.CityName)
+                .HasMaxLength(150)
+                .IsUnicode(false);
+            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+            entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<MstCityState>(entity =>
+        {
+            entity.HasKey(e => e.StateId).HasName("PK_State");
+
+            entity.ToTable("MstCity_State", "dbo");
+
+            entity.Property(e => e.StateId).ValueGeneratedNever();
+            entity.Property(e => e.StateName).HasMaxLength(150);
+
+            entity.HasOne(d => d.Country).WithMany(p => p.MstCityStates)
+                .HasForeignKey(d => d.CountryId)
+                .HasConstraintName("FK_State_Country");
+        });
+
+        modelBuilder.Entity<MstCityStateCountry>(entity =>
+        {
+            entity.HasKey(e => e.CountryId).HasName("PK_Country");
+
+            entity.ToTable("MstCity_State_Country", "dbo");
+
+            entity.Property(e => e.CountryId).ValueGeneratedNever();
+            entity.Property(e => e.CountryName).HasMaxLength(50);
+        });
+
         modelBuilder.Entity<MstMenuItem>(entity =>
         {
             entity.HasKey(e => e.ItemId).HasName("PK__MstMenuI__727E838B869ADFD2");
@@ -379,6 +392,19 @@ public partial class BtprojecQuickcampusContext : DbContext
             entity.HasOne(d => d.Item).WithMany(p => p.MstMenuSubItems)
                 .HasForeignKey(d => d.ItemId)
                 .HasConstraintName("FK__MstMenuSu__ItemI__46486B8E");
+        });
+
+        modelBuilder.Entity<MstQualification>(entity =>
+        {
+            entity.HasKey(e => e.QualId).HasName("PK__MstQuali__B8C90223D30ED447");
+
+            entity.ToTable("MstQualification", "dbo");
+
+            entity.Property(e => e.CreateAt).HasColumnType("datetime");
+            entity.Property(e => e.IsActive).HasDefaultValueSql("((1))");
+            entity.Property(e => e.IsDeleted).HasDefaultValueSql("((0))");
+            entity.Property(e => e.ModifiedAt).HasColumnType("datetime");
+            entity.Property(e => e.QualName).HasMaxLength(200);
         });
 
         modelBuilder.Entity<Question>(entity =>
@@ -437,18 +463,6 @@ public partial class BtprojecQuickcampusContext : DbContext
                 .HasColumnName("Section");
         });
 
-        modelBuilder.Entity<State>(entity =>
-        {
-            entity.ToTable("State", "dbo");
-
-            entity.Property(e => e.StateId).ValueGeneratedNever();
-            entity.Property(e => e.StateName).HasMaxLength(150);
-
-            entity.HasOne(d => d.Country).WithMany(p => p.States)
-                .HasForeignKey(d => d.CountryId)
-                .HasConstraintName("FK_State_Country");
-        });
-
         modelBuilder.Entity<Status>(entity =>
         {
             entity.ToTable("Status", "dbo");
@@ -475,6 +489,7 @@ public partial class BtprojecQuickcampusContext : DbContext
 
             entity.HasOne(d => d.User).WithMany(p => p.TblClients)
                 .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK__tbl_Clien__UserI__52E34C9D");
         });
 
@@ -813,14 +828,9 @@ public partial class BtprojecQuickcampusContext : DbContext
 
             entity.Property(e => e.Address1).HasMaxLength(100);
             entity.Property(e => e.Address2).HasMaxLength(100);
-            entity.Property(e => e.City).HasMaxLength(50);
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
             entity.Property(e => e.Title).HasMaxLength(250);
             entity.Property(e => e.WalkInDate).HasColumnType("datetime");
-
-            entity.HasOne(d => d.CityNavigation).WithMany(p => p.WalkIns)
-                .HasForeignKey(d => d.City)
-                .HasConstraintName("FK__WalkIn__City__4DE98D56");
 
             entity.HasOne(d => d.Country).WithMany(p => p.WalkIns)
                 .HasForeignKey(d => d.CountryId)

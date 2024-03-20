@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace QuickCampus_DAL.Context;
 
-public partial class State
+public partial class MstCity_State
 {
     public int StateId { get; set; }
 
@@ -17,9 +17,7 @@ public partial class State
 
     public int? ClientId { get; set; }
 
-    public virtual ICollection<City> Cities { get; set; } = new List<City>();
-
-    public virtual Country? Country { get; set; }
+    public virtual MstCity_State_Country? Country { get; set; }
 
     public virtual ICollection<WalkIn> WalkIns { get; set; } = new List<WalkIn>();
 }

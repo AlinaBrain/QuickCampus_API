@@ -9,7 +9,7 @@ namespace QuickCampus_Core.ViewModel
 {
     public class CountryVM
     {
-        public static explicit operator CountryVM(Country items)
+        public static explicit operator CountryVM(MstCity_State_Country items)
         {
             return new CountryVM
             {
@@ -30,9 +30,9 @@ namespace QuickCampus_Core.ViewModel
 
         public int? ClientId { get; set; }
 
-        public Country ToCountryDbModel()
+        public MstCity_State_Country ToCountryDbModel()
         {
-            return new Country
+            return new MstCity_State_Country
             {
                 CountryName = CountryName,
                 IsActive = true,
@@ -40,9 +40,9 @@ namespace QuickCampus_Core.ViewModel
                 ClientId = ClientId
             };
         }
-        public Country ToUpDateDbModel()
+        public MstCity_State_Country ToUpDateDbModel()
         {
-            return new Country
+            return new MstCity_State_Country
             {   CountryId = CountryId,
                 CountryName = CountryName,
                 IsActive = true,

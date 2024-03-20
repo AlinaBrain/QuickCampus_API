@@ -33,13 +33,13 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
     public virtual DbSet<CampusWalkInCollege> CampusWalkInColleges { get; set; }
 
-    public virtual DbSet<City> Cities { get; set; }
+    public virtual DbSet<MstCity> Cities { get; set; }
 
     public virtual DbSet<College> Colleges { get; set; }
 
     public virtual DbSet<Company> Companies { get; set; }
 
-    public virtual DbSet<Country> Countries { get; set; }
+    public virtual DbSet<MstCity_State_Country> Countries { get; set; }
 
     public virtual DbSet<Error> Errors { get; set; }
 
@@ -55,7 +55,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
     public virtual DbSet<Section> Sections { get; set; }
 
-    public virtual DbSet<State> States { get; set; }
+    public virtual DbSet<MstCity_State> States { get; set; }
 
     public virtual DbSet<Status> Statuses { get; set; }
 
@@ -115,9 +115,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
             entity.Property(e => e.FirstName)
                 .HasMaxLength(100)
                 .UseCollation("SQL_Latin1_General_CP1_CI_AS");
-            entity.Property(e => e.HigestQualification)
-                .HasMaxLength(100)
-                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+         
             entity.Property(e => e.HigestQualificationPercentage).HasColumnType("decimal(18, 0)");
             entity.Property(e => e.IntermediatePercentage).HasColumnType("decimal(18, 0)");
             entity.Property(e => e.LastName)
@@ -276,11 +274,11 @@ public partial class BtprojecQuickcampustestContext : DbContext
                 .HasConstraintName("FK_CampusCollege_CampusWalkIn");
         });
 
-        modelBuilder.Entity<City>(entity =>
+        modelBuilder.Entity<MstCity>(entity =>
         {
             entity.HasKey(e => e.CityId).HasName("PK__City__F2D21B760C7D81FB");
 
-            entity.ToTable("City", "dbo");
+            entity.ToTable("MstCity", "dbo");
 
             entity.Property(e => e.CityName)
                 .HasMaxLength(150)
@@ -289,9 +287,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
             entity.Property(e => e.CreatedAt).HasColumnType("datetime");
             entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
 
-            entity.HasOne(d => d.State).WithMany(p => p.Cities)
-                .HasForeignKey(d => d.StateId)
-                .HasConstraintName("FK__City__StateId__7D439ABD");
+            
         });
 
         modelBuilder.Entity<College>(entity =>
@@ -326,9 +322,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
                 .UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
-            entity.HasOne(d => d.City).WithMany(p => p.Colleges)
-                .HasForeignKey(d => d.CityId)
-                .HasConstraintName("FK__College__CityId__7E37BEF6");
+           
         });
 
         modelBuilder.Entity<Company>(entity =>
@@ -344,9 +338,9 @@ public partial class BtprojecQuickcampustestContext : DbContext
             entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
         });
 
-        modelBuilder.Entity<Country>(entity =>
+        modelBuilder.Entity<MstCity_State_Country>(entity =>
         {
-            entity.ToTable("Country", "dbo");
+            entity.ToTable("MstCity_State_Country", "dbo");
 
             entity.Property(e => e.CountryId).ValueGeneratedNever();
             entity.Property(e => e.CountryName)
@@ -458,9 +452,9 @@ public partial class BtprojecQuickcampustestContext : DbContext
                 .HasColumnName("Section");
         });
 
-        modelBuilder.Entity<State>(entity =>
+        modelBuilder.Entity<MstCity_State>(entity =>
         {
-            entity.ToTable("State", "dbo");
+            entity.ToTable("MstCity_State", "dbo");
 
             entity.Property(e => e.StateId).ValueGeneratedNever();
             entity.Property(e => e.StateName)

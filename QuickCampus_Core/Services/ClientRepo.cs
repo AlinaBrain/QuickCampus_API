@@ -53,10 +53,14 @@ namespace QuickCampus_Core.Services
         public string GetClientRoleName(int ClientId)
         {
             string RoleName = "";
-            int UserId = _context.TblClients.Include(x => x.User).Where(x => x.Id == ClientId).FirstOrDefault().User.Id;
+            int UserId = _context.TblUsers.Where(x => x.ClientId == ClientId).FirstOrDefault().Id;
             if(UserId  > 0)
             {
-                RoleName = _context.TblUserRoles.Include(y=>y.Role).Where(x => x.UserId == UserId).FirstOrDefault().Role.Name;
+                var r = _context.TblUserRoles.Include(y=>y.Role).Where(x => x.UserId == UserId).FirstOrDefault();
+                if (r != null)
+                {
+                    RoleName = _context.TblRoles.Where(x=>x.Id==r.RoleId).First().Name;
+                }
             }
             return RoleName;
         }
@@ -64,7 +68,7 @@ namespace QuickCampus_Core.Services
         public string GetClientAppRoleName(int ClientId)
         {
             string RoleName = "";
-            int UserId = _context.TblClients.Include(x => x.User).Where(x => x.Id == ClientId).FirstOrDefault().User.Id;
+            int UserId = _context.TblUsers.Where(x => x.ClientId == ClientId).FirstOrDefault().Id;
             if (UserId > 0)
             {
                 RoleName = _context.TblUserAppRoles.Include(y => y.Role).Where(x => x.UserId == UserId).FirstOrDefault().Role.AppRoleName;

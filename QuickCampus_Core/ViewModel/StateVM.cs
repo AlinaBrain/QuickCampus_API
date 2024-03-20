@@ -9,7 +9,7 @@ namespace QuickCampus_Core.ViewModel
 {
     public class StateVM
     {
-        public static explicit operator StateVM(State items)
+        public static explicit operator StateVM(MstCity_State items)
         {
             return new StateVM
             {
@@ -33,9 +33,9 @@ namespace QuickCampus_Core.ViewModel
         public int? ClientId { get; set; }
 
 
-        public State ToStateDbModel()
+        public MstCity_State ToStateDbModel()
         {
-            return new State
+            return new MstCity_State
             {
                 StateName = StateName,
                 CountryId = CountryId,
@@ -44,9 +44,9 @@ namespace QuickCampus_Core.ViewModel
                 ClientId= ClientId,
             };
         }
-        public State ToUpdateDbModel()
+        public MstCity_State ToUpdateDbModel()
         {
-            return new State
+            return new MstCity_State
             {
                 StateId = (int)StateId,
                 StateName = StateName,

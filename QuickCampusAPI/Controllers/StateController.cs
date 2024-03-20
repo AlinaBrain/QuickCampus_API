@@ -33,7 +33,7 @@ namespace QuickCampusAPI.Controllers
         {
             IGeneralResult<List<StateVM>> result = new GeneralResult<List<StateVM>>();
             
-            List<State> stateList = new List<State>();
+            List<MstCity_State> stateList = new List<MstCity_State>();
             try
             {
                 stateList = (await _stateRepo.GetAll()).Where(x => x.IsDeleted == false && x.CountryId == countryID).ToList();
@@ -41,7 +41,7 @@ namespace QuickCampusAPI.Controllers
                 if (stateList.Count > 0)
                 {
                     result.IsSuccess = true;
-                    result.Message = "State fetched successfully";
+                    result.Message = "MstCity_State fetched successfully";
                     result.Data = response;
                 }
                 else
@@ -101,7 +101,7 @@ namespace QuickCampusAPI.Controllers
         //                    {
         //                        var statedata = await _stateRepo.Add(state.ToStateDbModel());
         //                        result.Data = (StateVM)statedata;
-        //                        result.Message = "State added successfully";
+        //                        result.Message = "MstCity_State added successfully";
         //                        result.IsSuccess = true;
         //                    }
 
@@ -137,11 +137,11 @@ namespace QuickCampusAPI.Controllers
         //    {
         //        result.Data = (StateVM)res;
         //        result.IsSuccess = true;
-        //        result.Message = "State details getting succesfully";
+        //        result.Message = "MstCity_State details getting succesfully";
         //    }
         //    else
         //    {
-        //        result.Message = "State does Not exist";
+        //        result.Message = "MstCity_State does Not exist";
         //    }
         //    return Ok(result);
         //}
@@ -173,7 +173,7 @@ namespace QuickCampusAPI.Controllers
         //    }
         //    if (vm != null)
         //    {
-        //        State state = new State();
+        //        MstCity_State state = new MstCity_State();
 
         //        if (isSuperAdmin)
         //        {
@@ -186,7 +186,7 @@ namespace QuickCampusAPI.Controllers
         //        if (state == null)
         //        {
         //            result.IsSuccess = false;
-        //            result.Message = " State does Not Exist";
+        //            result.Message = " MstCity_State does Not Exist";
         //            return Ok(result);
         //        }
         //        bool isDeleted = (bool)state.IsDeleted ? true : false;
@@ -220,7 +220,7 @@ namespace QuickCampusAPI.Controllers
         //                try
         //                {
         //                    result.Data = (StateVM)await _stateRepo.Update(state);
-        //                    result.Message = "State updated successfully";
+        //                    result.Message = "MstCity_State updated successfully";
         //                    result.IsSuccess = true;
         //                }
         //                catch (Exception ex)
@@ -252,11 +252,11 @@ namespace QuickCampusAPI.Controllers
         //        res.IsDeleted = true;
         //        await _stateRepo.Update(res);
         //        result.IsSuccess = true;
-        //        result.Message = "State Deleted Succesfully";
+        //        result.Message = "MstCity_State Deleted Succesfully";
         //    }
         //    else
         //    {
-        //        result.Message = "State does Not exist";
+        //        result.Message = "MstCity_State does Not exist";
         //    }
         //    return Ok(result);
         //}

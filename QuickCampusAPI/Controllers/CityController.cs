@@ -33,7 +33,7 @@ namespace QuickCampusAPI.Controllers
         public IActionResult GetAllCityByState(int stateId)
         {
             IGeneralResult<dynamic> result = new GeneralResult<dynamic>();
-            List<City> CityList = new List<City>();
+            List<MstCity> CityList = new List<MstCity>();
             var cityTotalCount = 0;
             try
             {
@@ -48,7 +48,7 @@ namespace QuickCampusAPI.Controllers
                 if (cityTotalCount > 0)
                 {
                     result.IsSuccess = true;
-                    result.Message = "City fetched successfully.";
+                    result.Message = "MstCity fetched successfully.";
                     result.Data = response;
                     result.TotalRecordCount= cityTotalCount;
                 }
@@ -82,11 +82,11 @@ namespace QuickCampusAPI.Controllers
         //    {
         //        result.Data = (CityVm)res;
         //        result.IsSuccess = true;
-        //        result.Message = "City details getting succesfully";
+        //        result.Message = "MstCity details getting succesfully";
         //    }
         //    else
         //    {
-        //        result.Message = "City does Not exist";
+        //        result.Message = "MstCity does Not exist";
         //    }
         //    return Ok(result);
         //}
@@ -119,7 +119,7 @@ namespace QuickCampusAPI.Controllers
         //            bool isExits = _cityRepo.Any(x => x.CityName == vm.CityName && x.IsDeleted == false);
         //            if (isExits)
         //            {
-        //                result.Message = " City is already exists";
+        //                result.Message = " MstCity is already exists";
         //            }
         //            else
         //            {
@@ -136,7 +136,7 @@ namespace QuickCampusAPI.Controllers
         //                    {
         //                        var citydata = await _cityRepo.Add(city.ToCityDbModel());
         //                        result.Data = (CityVm)citydata;
-        //                        result.Message = "City added successfully";
+        //                        result.Message = "MstCity added successfully";
         //                        result.IsSuccess = true;
         //                    }
 
@@ -183,7 +183,7 @@ namespace QuickCampusAPI.Controllers
         //    }
         //    if (vm != null)
         //    {
-        //        City city = new City();
+        //        MstCity city = new MstCity();
 
         //        if (isSuperAdmin)
         //        {
@@ -196,14 +196,14 @@ namespace QuickCampusAPI.Controllers
         //        if (city == null)
         //        {
         //            result.IsSuccess = false;
-        //            result.Message = " City does Not Exist";
+        //            result.Message = " MstCity does Not Exist";
         //            return Ok(result);
         //        }
         //        bool isDeleted = (bool)city.IsDeleted ? true : false;
         //        if (isDeleted)
         //        {
         //            result.IsSuccess = false;
-        //            result.Message = " City does Not Exist";
+        //            result.Message = " MstCity does Not Exist";
         //            return Ok(result);
         //        }
         //        bool isExits = _cityRepo.Any(x => x.CityName == vm.CityName && x.IsDeleted == false);
@@ -222,7 +222,7 @@ namespace QuickCampusAPI.Controllers
         //                try
         //                {
         //                    result.Data = (CityVm)await _cityRepo.Update(city);
-        //                    result.Message = "City updated successfully";
+        //                    result.Message = "MstCity updated successfully";
         //                    result.IsSuccess = true;
         //                }
         //                catch (Exception ex)

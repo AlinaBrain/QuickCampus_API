@@ -10,7 +10,7 @@ namespace QuickCampus_Core.ViewModel
 {
     public class CityVm
     {
-        public static explicit operator CityVm(City items)
+        public static explicit operator CityVm(MstCity items)
         {
             return new CityVm
             {
@@ -42,9 +42,9 @@ namespace QuickCampus_Core.ViewModel
         public int? ClientId { get; set; }
 
 
-        public City ToCityDbModel()
+        public MstCity ToCityDbModel()
         {
-            return new City
+            return new MstCity
             {
                 CityName = CityName,
                 ClientId = ClientId,
@@ -56,9 +56,9 @@ namespace QuickCampus_Core.ViewModel
             };
 
         }
-        public City ToUpdateDbModel()
+        public MstCity ToUpdateDbModel()
         {
-            return new City
+            return new MstCity
             {
                 CityId= CityId,
                 CityName = CityName,

@@ -3,11 +3,13 @@ using System.Collections.Generic;
 
 namespace QuickCampus_DAL.Context;
 
-public partial class Country
+public partial class MstCityState
 {
-    public int CountryId { get; set; }
+    public int StateId { get; set; }
 
-    public string? CountryName { get; set; }
+    public string? StateName { get; set; }
+
+    public int? CountryId { get; set; }
 
     public bool? IsActive { get; set; }
 
@@ -15,7 +17,7 @@ public partial class Country
 
     public int? ClientId { get; set; }
 
-    public virtual ICollection<State> States { get; set; } = new List<State>();
+    public virtual MstCityStateCountry? Country { get; set; }
 
     public virtual ICollection<WalkIn> WalkIns { get; set; } = new List<WalkIn>();
 }

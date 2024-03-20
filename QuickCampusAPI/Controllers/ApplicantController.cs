@@ -65,7 +65,7 @@ namespace QuickCampusAPI.Controllers
                 }
                 applicantTotalCount = applicantData.Count();
                 applicantList = applicantData.Skip(newPageStart).Take(pageSize).ToList();
-                applicantList = applicantData.Where(x => (x.FirstName.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.LastName.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.HigestQualification.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.EmailAddress.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.PhoneNumber.Contains(search ?? ""))).OrderByDescending(x => x.ApplicantId).ToList();
+                applicantList = applicantData.Where(x => (x.FirstName.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.LastName.Contains(search ?? "", StringComparison.OrdinalIgnoreCase)  || x.EmailAddress.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.PhoneNumber.Contains(search ?? ""))).OrderByDescending(x => x.ApplicantId).ToList();
 
                 var response = applicantList.Select(x => (ApplicantViewModel)x).ToList();
                 if (applicantList.Count > 0)
@@ -216,7 +216,7 @@ namespace QuickCampusAPI.Controllers
                         applicant.FirstName = vm.FirstName?.Trim();
                         applicant.LastName = vm.LastName?.Trim();
                         applicant.EmailAddress = vm.EmailAddress?.Trim();
-                        applicant.HigestQualification = vm.HighestQualification?.Trim();
+                    
                         applicant.IntermediatePercentage = vm.IntermediatePercentage;
                         applicant.HigestQualificationPercentage = vm.HighestQualificationPercentage;
                         applicant.Skills = vm.Skills?.Trim();

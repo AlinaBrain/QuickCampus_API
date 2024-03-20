@@ -18,16 +18,15 @@ namespace QuickCampus_Core.Services
             _context = context;
 
         }
-
         public async Task<IGeneralResult<string>> AddCampus(CampusGridRequestVM vm, int clientId, int userId)
         {
             IGeneralResult<string> result = new GeneralResult<string>();
 
-            var isCountryExist = _context.Countries.Where(w => w.IsDeleted == false).Any(a => a.CountryId == vm.CountryID);
+            var isCountryExist = _context.MstCityStateCountries.Where(w => w.IsDeleted == false).Any(a => a.CountryId == vm.CountryID);
             var allCollages = _context.Colleges.Where(s => s.IsDeleted == false).Select(s => s.CollegeId).ToList();
-            var allStates = _context.States.Where(w => w.IsDeleted == false).Select(s => s.StateId).ToList();
+            var allStates = _context.MstCityStates.Where(w => w.IsDeleted == false).Select(s => s.StateId).ToList();
             var isStateExist = allStates.Any(a => a == vm.StateID);
-            var allCity = _context.Cities.Where(m => m.IsDeleted == false).Select(c => c.CityId).ToList();
+            var allCity = _context.MstCities.Where(m => m.IsDeleted == false).Select(c => c.CityId).ToList();
             bool isExits = _context.WalkIns.Any(x => x.Title == vm.Title && x.IsDeleted == false);
             if (isExits)
             {
@@ -59,7 +58,7 @@ namespace QuickCampus_Core.Services
                 }
                 else
                 {
-                    result.Message = "City Does  not exist";
+                    result.Message = "MstCity Does  not exist";
                     return result;
                 }
             }
@@ -68,13 +67,13 @@ namespace QuickCampus_Core.Services
             if (!isCountryExist)
             {
                 result.IsSuccess = false;
-                result.Message = "Country is not exist";
+                result.Message = "MstCity_State_Country is not exist";
                 return result;
             }
             else if (!isStateExist)
             {
                 result.IsSuccess = false;
-                result.Message = "State is not exist";
+                result.Message = "MstCity_State is not exist";
                 return result;
             }
             
@@ -400,9 +399,9 @@ namespace QuickCampus_Core.Services
         {
             IGeneralResult<string> result = new GeneralResult<string>();
 
-            var isCountryExist = _context.Countries.Where(w => w.IsDeleted == false).Any(a => a.CountryId == vm.CountryID);
+            var isCountryExist = _context.MstCityStateCountries.Where(w => w.IsDeleted == false).Any(a => a.CountryId == vm.CountryID);
             var allCollages = _context.Colleges.Where(s => s.IsDeleted == false).Select(s => s.CollegeId).ToList();
-            var allStates = _context.States.Where(w => w.IsDeleted == false).Select(s => s.StateId).ToList();
+            var allStates = _context.MstCityStates.Where(w => w.IsDeleted == false).Select(s => s.StateId).ToList();
             var isStateExist = allStates.Any(a => a == vm.StateID);
             bool isExits = _context.WalkIns.Any(x => x.IsDeleted == false);
 
@@ -428,13 +427,13 @@ namespace QuickCampus_Core.Services
             if (!isCountryExist)
             {
                 result.IsSuccess = false;
-                result.Message = "Country is not exist";
+                result.Message = "MstCity_State_Country is not exist";
                 return result;
             }
             else if (!isStateExist)
             {
                 result.IsSuccess = false;
-                result.Message = "State is not exist";
+                result.Message = "MstCity_State is not exist";
                 return result;
             }
 
