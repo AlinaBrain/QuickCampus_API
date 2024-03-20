@@ -18,7 +18,7 @@ namespace QuickCampus_Core.Services
             _context = context;
 
         }
-        public async Task<IGeneralResult<string>> AddCampus(CampusGridRequestVM vm, int clientId, int userId)
+        public async Task<IGeneralResult<string>> AddCampus(CampusGridRequestVM vm)
         {
             IGeneralResult<string> result = new GeneralResult<string>();
 
@@ -28,52 +28,28 @@ namespace QuickCampus_Core.Services
             var isStateExist = allStates.Any(a => a == vm.StateID);
             var allCity = _context.MstCities.Where(m => m.IsDeleted == false).Select(c => c.CityId).ToList();
             bool isExits = _context.WalkIns.Any(x => x.Title == vm.Title && x.IsDeleted == false);
-            if (isExits)
-            {
-                result.Message = " Title is already exists";
-                return result;
-            }
-
+            
             foreach (var clg in vm.Colleges)
             {
                 var checkclg = allCollages.Any(s => s == clg.CollegeId);
                 if (!checkclg)
                 {
-                    result.IsSuccess = false;
-                    result.Message = "College id " + clg.CollegeId + " is not exist";
+                    
+                    result.Message = "College id " + clg.CollegeId + " does not exist";
                     return result;
                 }
-                var checkstate = allStates.Any(s => s == clg.StateId);
-                if (!checkstate)
-                {
-                    result.IsSuccess = false;
-                    result.Message = "state id " + clg.StateId + " is not exist";
-                    return result;
-                }
-                var checkcity = allCity.Any(x => x == clg.City);
-                if (!checkcity)
-                {
-                    result.IsSuccess = false;
-                    result.Message = "city id " + clg.City + "is not exist";
-                }
-                else
-                {
-                    result.Message = "MstCity Does  not exist";
-                    return result;
-                }
+               
             }
-
-
             if (!isCountryExist)
             {
-                result.IsSuccess = false;
-                result.Message = "MstCity_State_Country is not exist";
+                
+                result.Message = "Country is not exist";
                 return result;
             }
             else if (!isStateExist)
             {
-                result.IsSuccess = false;
-                result.Message = "MstCity_State is not exist";
+                
+                result.Message = "State is not exist";
                 return result;
             }
             
@@ -82,7 +58,7 @@ namespace QuickCampus_Core.Services
             {
                 if (vm.WalkInID > 0)
                 {
-                    WalkIn campus = _context.WalkIns.Where(x => x.WalkInId == vm.WalkInID && (clientId == 0 ? true : x.ClientId == clientId)).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).Include(x=>x.City).FirstOrDefault();
+                    WalkIn campus = _context.WalkIns.Where(x => x.WalkInId == vm.WalkInID ).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).Include(x=>x.City).FirstOrDefault();
                     if (campus != null)
                     {
                         campus.WalkInDate = vm.WalkInDate;
@@ -111,7 +87,6 @@ namespace QuickCampus_Core.Services
                                     CollegeId = rec.CollegeId,
                                     ExamStartTime = TimeSpan.Parse(rec.ExamStartTime),
                                     ExamEndTime = TimeSpan.Parse(rec.ExamEndTime),
-                                    CollegeCode = rec.CollegeCode,
                                     StartDateTime = rec.StartDateTime,
                                     IsCompleted = null
                                 };
@@ -145,10 +120,9 @@ namespace QuickCampus_Core.Services
                     CountryId = vm.CountryID,
                     IsActive = true,
                     IsDeleted = false,
-                    CreatedBy = userId,
                     CreatedDate = DateTime.Now,
                     Title = vm.Title,
-                    ClientId = clientId == 0 ? 0 : clientId
+                    
                 };
                 _context.WalkIns.Add(sv);
                 _context.SaveChanges();
@@ -164,7 +138,7 @@ namespace QuickCampus_Core.Services
                             CollegeId = rec.CollegeId,
                             ExamStartTime = TimeSpan.Parse(rec.ExamStartTime),
                             ExamEndTime = TimeSpan.Parse(rec.ExamEndTime),
-                            CollegeCode = rec.CollegeCode,
+                           
                             StartDateTime = rec.StartDateTime,
                             IsCompleted = null
                         };
@@ -213,9 +187,9 @@ namespace QuickCampus_Core.Services
                     Title = x.Title,
                     Colleges = x.CampusWalkInColleges.Select(y => new CampusWalkInModel()
                     {
-                        CollegeCode = y.CollegeCode,
+                        
                         CollegeId = y.CollegeId ?? 0,
-                        CollegeName = y.College.CollegeName,
+                       
                         ExamEndTime = y.ExamEndTime.Value.ToString(),
                         ExamStartTime = y.ExamStartTime.Value.ToString()
 
@@ -251,9 +225,8 @@ namespace QuickCampus_Core.Services
                     Title = x.Title,
                     Colleges = x.CampusWalkInColleges.Select(y => new CampusWalkInModel()
                     {
-                        CollegeCode = y.CollegeCode,
+                       
                         CollegeId = y.CollegeId ?? 0,
-                        CollegeName = y.College.CollegeName.Trim(),
                         ExamEndTime = y.ExamEndTime.Value.ToString(),
                         ExamStartTime = y.ExamStartTime.Value.ToString(),
                         StartDateTime = y.StartDateTime,
@@ -291,9 +264,7 @@ namespace QuickCampus_Core.Services
                     Title = x.Title,
                     Colleges = x.CampusWalkInColleges.Where(z=>z.WalkInId==x.WalkInId).Select(y => new CampusWalkInModel()
                     {
-                        CollegeCode = y.CollegeCode,
                         CollegeId = y.CollegeId ?? 0,
-                        CollegeName = y.College.CollegeName,
                         ExamEndTime = y.ExamEndTime.Value.ToString(),
                         ExamStartTime = y.ExamStartTime.Value.ToString()
 
@@ -328,9 +299,7 @@ namespace QuickCampus_Core.Services
                     Title = x.Title,
                     Colleges = x.CampusWalkInColleges.Select(y => new CampusWalkInModel()
                     {
-                        CollegeCode = y.CollegeCode,
                         CollegeId = y.CollegeId ?? 0,
-                        CollegeName = y.College.CollegeName.Trim(),
                         ExamEndTime = y.ExamEndTime.Value.ToString(),
                         ExamStartTime = y.ExamStartTime.Value.ToString(),
                         StartDateTime = y.StartDateTime,
@@ -352,7 +321,6 @@ namespace QuickCampus_Core.Services
             CampusWalkInModel statevm = new CampusWalkInModel();
 
             var cllgdetails = _context.Colleges.Find(collegeid);
-            statevm.CollegeName = cllgdetails.CollegeName;
             statevm.CollegeId = cllgdetails.CollegeId;
 
             return statevm;
@@ -415,13 +383,7 @@ namespace QuickCampus_Core.Services
                     result.Message = "College id " + clg.CollegeId + " is not exist";
                     return result;
                 }
-                var checkstate = allStates.Any(s => s == clg.StateId);
-                if (!checkstate)
-                {
-                    result.IsSuccess = false;
-                    result.Message = "state id " + clg.StateId + " is not exist";
-                    return result;
-                }
+                
             }
 
             if (!isCountryExist)
@@ -471,7 +433,6 @@ namespace QuickCampus_Core.Services
                                     CollegeId = rec.CollegeId,
                                     ExamStartTime = TimeSpan.Parse(rec.ExamStartTime),
                                     ExamEndTime = TimeSpan.Parse(rec.ExamEndTime),
-                                    CollegeCode = rec.CollegeCode,
                                     StartDateTime = rec.StartDateTime,
 
                                     IsCompleted = null
@@ -524,7 +485,6 @@ namespace QuickCampus_Core.Services
                             CollegeId = rec.CollegeId,
                             ExamStartTime = TimeSpan.Parse(rec.ExamStartTime),
                             ExamEndTime = TimeSpan.Parse(rec.ExamEndTime),
-                            CollegeCode = rec.CollegeCode,
                             StartDateTime = rec.StartDateTime,
                             IsCompleted = null
                         };

@@ -19,12 +19,14 @@ namespace QuickCampusAPI.Controllers
         private readonly ICountryRepo _country;
         private readonly IStateRepo _staterepo;
         private IConfiguration _config;
-        public CampusController(IConfiguration configuration, ICampusRepo campusrepo, ICountryRepo countryRepo, IStateRepo stateRepo)
+        private readonly IUserAppRoleRepo _userAppRoleRepo;
+        public CampusController(IConfiguration configuration, ICampusRepo campusrepo, ICountryRepo countryRepo, IStateRepo stateRepo, IUserAppRoleRepo userAppRoleRepo)
         {
             _campusrepo = campusrepo;
             _country = countryRepo;
             _staterepo = stateRepo;
             _config = configuration;
+            _userAppRoleRepo = userAppRoleRepo;
         }
 
         [Authorize(Roles = "ManageCampus")]
@@ -80,29 +82,34 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
-       //[Authorize(Roles = "AddCampus")]
+        //[Authorize(Roles = "AddCampus")]
         [HttpPost]
         [Route("AddCampus")]
 
-        public async Task<IActionResult> AddCampus(CampusGridRequestVM dto, int clientid)
+        public async Task<IActionResult> AddCampus(CampusGridRequestVM dto)
         {
-            int clientId = 0;
-            var _jwtSecretKey = _config["Jwt:Key"];
-            var cId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            IGeneralResult<string> result = new GeneralResult<string>();
+            try
+            {
+                var _jwtSecretKey = _config["Jwt:Key"];
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
+                {
+                    LoggedInUserClientId = LoggedInUserId;
+                }
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                 result = await _campusrepo.AddCampus(dto);
+                
 
-            if (isSuperAdmin)
-            {
-                clientId = clientid;
             }
-            else
+            catch(Exception ex)
             {
-                clientId = string.IsNullOrEmpty(cId) ? 0 : Convert.ToInt32(cId);
+                result.Message= "Server Error " + ex.Message; 
             }
-            var response = await _campusrepo.AddCampus(dto, clientId, string.IsNullOrEmpty(userId) ? 0 : Convert.ToInt32(userId));
-            return Ok(response);
-        }
+            return Ok(result);
+          }
+
         [Authorize(Roles = "UpdateCampus")]
         [HttpPost]
         [Route("UpdateCampus")]

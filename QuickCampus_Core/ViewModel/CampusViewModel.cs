@@ -96,18 +96,9 @@ namespace QuickCampus_Core.ViewModel
 
     public class CampusWalkInModel
     {
-        public int CampusId { get; set; }
         [Required]
         public int? CollegeId { get; set; }
-        [Required]
-        public int City { get; set; }
-        [Required]
-        public int StateId { get; set; }
-        [Required]
-        public string? CollegeName { get; set; }
-
         [Required(ErrorMessage = "Time is required.")]
-        
         public string? ExamStartTime { get; set; }
 
         [Required(ErrorMessage = "Time is required.")]
@@ -116,9 +107,6 @@ namespace QuickCampus_Core.ViewModel
 
         [Required(ErrorMessage = "Time is required.")]
         public bool IsIncludeInWalkIn { get; set; }
-        [Required]
-        public string? CollegeCode { get; set; }
-
         public DateTime? StartDateTime { get; set; }
 
     }

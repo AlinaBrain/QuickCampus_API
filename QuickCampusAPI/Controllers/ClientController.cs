@@ -428,7 +428,6 @@ namespace QuickCampusAPI.Controllers
                 throw new Exception("Error in base64Encode" + ex.Message);
             }
         }
-
     }
 }
 

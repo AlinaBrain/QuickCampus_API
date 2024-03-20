@@ -12,7 +12,6 @@ namespace QuickCampus_Core.ViewModel
     {
 
         [Required(ErrorMessage = "Date is required.")]
-        
         public DateTime? WalkInDate { get; set; }
         [Required(ErrorMessage = "Description is required.")]
         public string JobDescription { get; set; } = String.Empty;

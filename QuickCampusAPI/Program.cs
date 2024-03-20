@@ -137,7 +137,7 @@ if (app.Environment.IsDevelopment())
         // FileProvider = new PhysicalFileProvider(@"D:\Quick Campus\QuickCampusAPI\wwwroot\UploadFiles"),
 
         //FileProvider=new PhysicalFileProvider(@"D:\QuickCampus_01-02-2024\QuickCampus_API\Quick_Campus\QuickCampusAPI\wwwroot\UploadFiles"),
-        FileProvider = new PhysicalFileProvider(@"D:\Quick_Campus\QuickCampusAPI\wwwroot\UploadFiles"),
+        FileProvider = new PhysicalFileProvider(@"D:\QuickCampus_01-02-2024\QuickCampus_API\Quick_Campus\QuickCampusAPI\wwwroot\UploadFiles"),
         // FileProvider = new PhysicalFileProvider(@"C:\Users\shrip\source\repos\AlinaBrain\QuickCampus_API\QuickCampusAPI\wwwroot\UploadFiles\\"),
         // FileProvider = new PhysicalFileProvider(@"E:\\TestImage\\"),
         // FileProvider = new PhysicalFileProvider(@"F:\Quikcampus\QuickCampusAPI\wwwroot\UploadFiles\\"),

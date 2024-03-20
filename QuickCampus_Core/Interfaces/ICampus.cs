@@ -8,7 +8,7 @@ namespace QuickCampus_Core.Interfaces
     {
         Task<IEnumerable<CampusGridViewModel>> GetAllCampus(int clientId, bool isSuperAdmin, int pageStart, int pageSize);
         Task<CampusGridViewModel> GetCampusByID(int id, int clientId, bool isSuperAdmin);
-        Task<IGeneralResult<string>> AddCampus(CampusGridRequestVM vm, int clientId, int userId);
+        Task<IGeneralResult<string>> AddCampus(CampusGridRequestVM vm);
 
         Task<IGeneralResult<string>> UpdateCampus(CampusGridRequestVM vm, int clientId, int userId);
         Task<IGeneralResult<CampusGridViewModel>> UpdateCampusStatus(int id, int clientId, bool status, bool isSuperAdmin);
