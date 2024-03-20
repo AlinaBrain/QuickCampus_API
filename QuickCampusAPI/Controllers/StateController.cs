@@ -33,7 +33,7 @@ namespace QuickCampusAPI.Controllers
         {
             IGeneralResult<List<StateVM>> result = new GeneralResult<List<StateVM>>();
             
-            List<MstCity_State> stateList = new List<MstCity_State>();
+            List<MstCityState> stateList = new List<MstCityState>();
             try
             {
                 stateList = (await _stateRepo.GetAll()).Where(x => x.IsDeleted == false && x.CountryId == countryID).ToList();

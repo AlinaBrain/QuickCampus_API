@@ -39,7 +39,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
     public virtual DbSet<Company> Companies { get; set; }
 
-    public virtual DbSet<MstCity_State_Country> Countries { get; set; }
+    public virtual DbSet<MstCityStateCountry> Countries { get; set; }
 
     public virtual DbSet<Error> Errors { get; set; }
 
@@ -55,7 +55,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
     public virtual DbSet<Section> Sections { get; set; }
 
-    public virtual DbSet<MstCity_State> States { get; set; }
+    public virtual DbSet<MstCityState> States { get; set; }
 
     public virtual DbSet<Status> Statuses { get; set; }
 
@@ -338,7 +338,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
             entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
         });
 
-        modelBuilder.Entity<MstCity_State_Country>(entity =>
+        modelBuilder.Entity<MstCityStateCountry>(entity =>
         {
             entity.ToTable("MstCity_State_Country", "dbo");
 
@@ -452,7 +452,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
                 .HasColumnName("Section");
         });
 
-        modelBuilder.Entity<MstCity_State>(entity =>
+        modelBuilder.Entity<MstCityState>(entity =>
         {
             entity.ToTable("MstCity_State", "dbo");
 
@@ -461,7 +461,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
                 .HasMaxLength(150)
                 .UseCollation("SQL_Latin1_General_CP1_CI_AS");
 
-            entity.HasOne(d => d.Country).WithMany(p => p.States)
+            entity.HasOne(d => d.Country).WithMany(p => p.MstCityStates)
                 .HasForeignKey(d => d.CountryId)
                 .HasConstraintName("FK_State_Country");
         });

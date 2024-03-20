@@ -37,7 +37,7 @@ namespace QuickCampusAPI.Controllers
                 if (res != null && res.Count() > 0)
                 {
                     result.IsSuccess = true;
-                    result.Message = "MstCity_State_Country fetched successfully.";
+                    result.Message = "Country fetched successfully.";
                     result.Data = res;
                     result.TotalRecordCount = res.Count();
                 }
