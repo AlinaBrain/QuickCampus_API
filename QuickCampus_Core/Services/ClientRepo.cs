@@ -50,6 +50,27 @@ namespace QuickCampus_Core.Services
             return res;
         }
 
+        public string GetClientRoleName(int ClientId)
+        {
+            string RoleName = "";
+            int UserId = _context.TblClients.Include(x => x.User).Where(x => x.Id == ClientId).FirstOrDefault().User.Id;
+            if(UserId  > 0)
+            {
+                RoleName = _context.TblUserRoles.Include(y=>y.Role).Where(x => x.UserId == UserId).FirstOrDefault().Role.Name;
+            }
+            return RoleName;
+        }
+
+        public string GetClientAppRoleName(int ClientId)
+        {
+            string RoleName = "";
+            int UserId = _context.TblClients.Include(x => x.User).Where(x => x.Id == ClientId).FirstOrDefault().User.Id;
+            if (UserId > 0)
+            {
+                RoleName = _context.TblUserAppRoles.Include(y => y.Role).Where(x => x.UserId == UserId).FirstOrDefault().Role.AppRoleName;
+            }
+            return RoleName;
+        }
         //public IGeneralResult<string> GetLoggedInUserMenu(int loggedInUser)
         //{
         //    GeneralResult<string> res = new GeneralResult<string>();
@@ -60,13 +81,13 @@ namespace QuickCampus_Core.Services
         //            TblMenuItemUserPermission data = new TblMenuItemUserPermission();
         //            var getRole = _context.TblMenuItemUserPermissions.Where(x=>x.UserId == loggedInUser).FirstOrDefault();
         //            var menuList = JsonSerializer.Deserialize<MenuRoleVm>(getRole != null ? getRole.Items  : "");
-                   
+
         //            if (menuList.MenuItem.Count > 0)
         //            {
         //                res.IsSuccess = true;
         //                res.Message = "Role fetched Successfully";
         //                res.Data = menuList
-                      
+
         //            }
         //            else
         //            {

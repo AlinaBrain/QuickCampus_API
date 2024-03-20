@@ -27,7 +27,7 @@ namespace QuickCampusAPI.Controllers
             {
                 var statuslist = (await _statusrepo.GetAll()).Where(x => x.IsDeleted == false && x.IsActive==true).ToList().OrderByDescending(x => x.StatusId);
 
-                // var clientList = (await _countryrepo.GetAll()).Where(x => x.IsDeleted != true && x.CountryName.Contains(countryName)).ToList();
+                // var clientList = (await _countryRepo.GetAll()).Where(x => x.IsDeleted != true && x.CountryName.Contains(countryName)).ToList();
 
 
                 var res = statuslist.Select(x => ((StatusVm)x)).ToList();

@@ -32,7 +32,7 @@ namespace QuickCampusAPI.Controllers
             {
                 var companylist = (await _companyRepo.GetAll()).Where(x => x.Isdeleted != true) .ToList().OrderByDescending(x => x.CompanyId);
 
-                // var clientList = (await _countryrepo.GetAll()).Where(x => x.IsDeleted != true && x.CountryName.Contains(countryName)).ToList();
+                // var clientList = (await _countryRepo.GetAll()).Where(x => x.IsDeleted != true && x.CountryName.Contains(countryName)).ToList();
 
 
                 var res = companylist.Select(x => ((CompanyVm)x)).ToList();

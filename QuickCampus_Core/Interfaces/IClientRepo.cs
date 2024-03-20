@@ -7,5 +7,7 @@ namespace QuickCampus_Core.Interfaces
     public interface IClientRepo : IGenericRepository<TblClient>
     {
         IGeneralResult<string> AddMenuRoles(MenuRoleVm vm, int loggedInUser);
+        string GetClientRoleName(int ClientId);
+        string GetClientAppRoleName(int ClientId);
     }
 }

@@ -9,6 +9,7 @@ using QuickCampus_Core.Common.Enum;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
+using System.ComponentModel.DataAnnotations;
 using static QuickCampus_Core.Common.common;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -47,107 +48,111 @@ namespace QuickCampusAPI.Controllers
             IGeneralResult<ClientResponseViewModel> result = new GeneralResult<ClientResponseViewModel>();
             try
             {
-                if (ModelState.IsValid)
+                var _jwtSecretKey = _config["Jwt:Key"];
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                 {
-                    await _context.Database.BeginTransactionAsync();
-                    var _jwtSecretKey = _config["Jwt:Key"];
-                    var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-                    if (_clientRepo.Any(x => x.Email == vm.Email && x.IsActive == true))
+                    if (ModelState.IsValid)
                     {
-                        result.Message = "Email Already Registered!";
-                        return Ok(result);
-                    }
-                    else if (_clientRepo.Any(x => x.UserName == vm.Email && x.IsActive == true))
-                    {
-                        result.Message = "Username Already Registered!";
-                        return Ok(result);
-                    }
-                    else
-                    {
-                        vm.Password = EncodePasswordToBase64(vm.Password);
-                        ClientVM clientVM = new ClientVM
+                        if (_clientRepo.Any(x => x.Email == vm.Email && x.IsActive == true))
                         {
-                            Name = vm.Name.Trim(),
-                            Email = vm.Email.Trim(),
-                            Phone = vm.Phone.Trim(),
-                            Address = vm.Address.Trim(),
-                            CreatedBy = Convert.ToInt32(userId),
-                            CreatedDate = DateTime.Now,
-                            SubscriptionPlan = vm.SubscriptionPlan.Trim(),
-                            Latitude = vm.Latitude,
-                            Longitude = vm.Longitude,
-                            UserName = vm.Email.Trim(),
-                            Password = vm.Password.Trim(),
-                        };
-
-                        var clientdata = await _clientRepo.Add(clientVM.ToClientDbModel());
-
-                        UserVm userVm = new UserVm()
+                            result.Message = "Email Already Registered!";
+                            return Ok(result);
+                        }
+                        else if (_clientRepo.Any(x => x.UserName == vm.Email && x.IsActive == true))
                         {
-                            Name = clientdata.Name,
-                            Password = clientdata.Password,
-                            Email = clientdata.UserName,
-                            ClientId = clientdata.Id,
-                            Mobile = clientdata.Phone,
-                        };
-                        var userdetails = await _userRepo.Add(userVm.ToUserDbModel());
-                        if (userdetails.Id > 0)
+                            result.Message = "Username Already Registered!";
+                            return Ok(result);
+                        }
+                        else
                         {
-                            TblUserAppRole userAppRole = new TblUserAppRole()
+                            vm.Password = EncodePasswordToBase64(vm.Password);
+                            ClientVM clientVM = new ClientVM
                             {
-                                UserId = userdetails.Id,
-                                RoleId = (int)common.AppRole.Client
+                                Name = vm.Name?.Trim(),
+                                Email = vm.Email?.Trim(),
+                                Phone = vm.Phone?.Trim(),
+                                Address = vm.Address?.Trim(),
+                                CreatedBy = Convert.ToInt32(LoggedInUserId),
+                                CreatedDate = DateTime.Now,
+                                SubscriptionPlan = vm.SubscriptionPlan?.Trim(),
+                                Latitude = vm.Latitude,
+                                Longitude = vm.Longitude,
+                                UserName = vm.Email?.Trim(),
+                                Password = vm.Password.Trim(),
                             };
-                            var roleAdd = await _userAppRoleRepo.Add(userAppRole);
-                            if (roleAdd.Id > 0)
+
+                            var clientData = await _clientRepo.Add(clientVM.ToClientDbModel());
+
+                            UserVm userVm = new UserVm()
                             {
-                                bool ClientRoleCheck = await _roleRepo.AnyAsync(x => x.Id == vm.RoleId);
-                                if (ClientRoleCheck)
+                                Name = clientData.Name,
+                                Password = clientData.Password,
+                                Email = clientData.UserName,
+                                ClientId = clientData.Id,
+                                Mobile = clientData.Phone,
+                            };
+                            var userDetails = await _userRepo.Add(userVm.ToUserDbModel());
+                            if (userDetails.Id > 0)
+                            {
+                                TblUserAppRole userAppRole = new TblUserAppRole()
                                 {
-                                    TblUserRole userRole = new TblUserRole
+                                    UserId = userDetails.Id,
+                                    RoleId = (int)common.AppRole.Client
+                                };
+                                var roleAdd = await _userAppRoleRepo.Add(userAppRole);
+                                if (roleAdd.Id > 0)
+                                {
+                                    bool ClientRoleCheck = await _roleRepo.AnyAsync(x => x.Id == vm.RoleId);
+                                    if (ClientRoleCheck)
                                     {
-                                        RoleId = vm.RoleId,
-                                        UserId = userdetails.Id
-                                    };
-                                    var userRoleData = await _UserRoleRepo.Add(userRole);
-                                    if (userRoleData.Id > 0)
-                                    {
-                                        ClientResponseViewModel clientresponse = new ClientResponseViewModel
+                                        TblUserRole userRole = new TblUserRole
                                         {
-                                            Id = clientdata.Id,
-                                            Name = clientdata.Name,
-                                            Email = clientdata.Email,
-                                            Phone = clientdata.Phone,
-                                            SubscriptionPlan = clientdata.SubscriptionPlan,
-                                            Address = clientdata.Address,
-                                            Latitude = clientdata.Latitude,
-                                            Longitude = clientdata.Longitude,
-                                            RoleName = _roleRepo.GetAllQuerable().Where(x => x.Id == vm.RoleId).Select(x => x.Name).First(),
-                                            AppRoleName = ((common.AppRole)userAppRole.RoleId).ToString(),
-                                            IsActive = clientdata.IsActive
+                                            RoleId = vm.RoleId,
+                                            UserId = userDetails.Id
                                         };
-                                        result.Data = clientresponse;
-                                        result.Message = "Client added successfully";
-                                        result.IsSuccess = true;
-                                        await _context.Database.CommitTransactionAsync();
-                                        return Ok(result);
+                                        var userRoleData = await _UserRoleRepo.Add(userRole);
+                                        if (userRoleData.Id > 0)
+                                        {
+                                            ClientResponseViewModel clientResponse = new ClientResponseViewModel
+                                            {
+                                                Id = clientData.Id,
+                                                Name = clientData.Name,
+                                                Email = clientData.Email,
+                                                Phone = clientData.Phone,
+                                                SubscriptionPlan = clientData.SubscriptionPlan,
+                                                Address = clientData.Address,
+                                                Latitude = clientData.Latitude,
+                                                Longitude = clientData.Longitude,
+                                                RoleName = _roleRepo.GetAllQuerable().Where(x => x.Id == vm.RoleId).Select(x => x.Name).First(),
+                                                AppRoleName = ((common.AppRole)userAppRole.RoleId).ToString(),
+                                                IsActive = clientData.IsActive
+                                            };
+                                            result.Data = clientResponse;
+                                            result.Message = "Client added successfully";
+                                            result.IsSuccess = true;
+                                            return Ok(result);
+                                        }
                                     }
                                 }
                             }
                         }
-                        await _context.Database.RollbackTransactionAsync();
+                    }
+                    else
+                    {
+                        result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
                     }
                 }
                 else
                 {
-                    result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
+                    result.Message = "Access denied";
                 }
             }
 
             catch (Exception ex)
             {
-                result.Message = ex.Message;
-                await _context.Database.RollbackTransactionAsync();
+                result.Message = "Server error " + ex.Message;
             }
             return Ok(result);
         }
@@ -159,77 +164,82 @@ namespace QuickCampusAPI.Controllers
             IGeneralResult<ClientResponseViewModel> result = new GeneralResult<ClientResponseViewModel>();
             try
             {
-                if (ModelState.IsValid)
+                var _jwtSecretKey = _config["Jwt:Key"];
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                 {
-                    var _jwtSecretKey = _config["Jwt:Key"];
-                    var userId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-                    var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-                    if (_clientRepo.Any(x => x.Email == vm.Email.Trim() && x.IsDeleted != true && x.Id != vm.Id))
+                    if (ModelState.IsValid)
                     {
-                        result.Message = "Email Already Registered!";
-                    }
-                    else
-                    {
-                        _context.Database.BeginTransaction();
-                        var res = await _clientRepo.GetById(vm.Id);
-                        bool isDeleted = (bool)res.IsDeleted ? true : false;
-                        if (isDeleted)
+                        if (_clientRepo.Any(x => x.Email == vm.Email.Trim() && x.IsDeleted != true && x.Id != vm.Id))
                         {
-                            result.Message = "Client does Not Exist";
-                            return Ok(result);
-                        }
-                        res.Name = vm.Name;
-                        res.Email = vm.Email.Trim();
-                        res.Phone = vm.Phone.Trim();
-                        res.Address = vm.Address.Trim();
-                        res.SubscriptionPlan = vm.SubscriptionPlan.Trim();
-                        res.Longitude = vm.Longitude;
-                        res.Latitude = vm.Latitude;
-                        res.ModofiedDate = DateTime.Now;
-                        await _clientRepo.Update(res);
-                        bool ClientRoleCheck = await _roleRepo.AnyAsync(x => x.Id == vm.RoleId);
-                        if (ClientRoleCheck)
-                        {
-                            TblUserRole userRole = new TblUserRole
-                            {
-                                RoleId = vm.RoleId,
-                                UserId = _userRepo.GetAll(x => x.ClientId == vm.Id).Result.FirstOrDefault().Id
-                            };
-                            var userRoleData = await _UserRoleRepo.Add(userRole);
-                            result.Message = "Client updated successfully";
-
-                            result.IsSuccess = true;
+                            result.Message = "Email Already Registered!";
                         }
                         else
                         {
-                            result.Message = "Role does not exists!";
+                            var res = (await _clientRepo.GetAll(x => x.Id == vm.Id && x.IsDeleted == false)).FirstOrDefault();
+                            if (res == null)
+                            {
+                                result.Message = "Client does Not Exist";
+                                return Ok(result);
+                            }
+                            res.Name = vm.Name;
+                            res.Email = vm.Email?.Trim();
+                            res.Phone = vm.Phone?.Trim();
+                            res.Address = vm.Address?.Trim();
+                            res.SubscriptionPlan = vm.SubscriptionPlan?.Trim();
+                            res.Longitude = vm.Longitude;
+                            res.Latitude = vm.Latitude;
+                            res.ModifiedBy = Convert.ToInt32(LoggedInUserId);
+                            res.ModofiedDate = DateTime.Now;
+                            await _clientRepo.Update(res);
+                            bool ClientRoleCheck = await _roleRepo.AnyAsync(x => x.Id == vm.RoleId);
+                            if (ClientRoleCheck)
+                            {
+                                TblUserRole userRole = new TblUserRole
+                                {
+                                    RoleId = vm.RoleId,
+                                    UserId = _userRepo.GetAll(x => x.ClientId == vm.Id).Result.FirstOrDefault().Id
+                                };
+                                var userRoleData = await _UserRoleRepo.Add(userRole);
+                                result.Message = "Client updated successfully";
+
+                                result.IsSuccess = true;
+                            }
+                            else
+                            {
+                                result.Message = "Role does not exists!";
+                            }
                         }
+                    }
+                    else
+                    {
+                        result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
                     }
                 }
                 else
                 {
-                    result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
+                    result.Message = "Access denied";
                 }
             }
             catch (Exception ex)
             {
                 result.Message = ex.Message;
-                await _context.Database.RollbackTransactionAsync();
             }
             return Ok(result);
         }
 
         [HttpGet]
         [Route("GetAllClient")]
-        public async Task<IActionResult> GetAllClient( string? search, int Datatype, int pageStart = 1, int pageSize = 10)
+        public async Task<IActionResult> GetAllClient(string? search, DataTypeFilter Datatype, int pageStart = 1, int pageSize = 10)
         {
             IGeneralResult<List<ClientResponseViewModel>> result = new GeneralResult<List<ClientResponseViewModel>>();
             try
             {
                 var _jwtSecretKey = _config["Jwt:Key"];
-                var userid = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-                var userrole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(userid))).FirstOrDefault();
-                if (userrole.RoleId == (int)AppRole.Admin)
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                 {
                     var newPageStart = 0;
                     if (pageStart > 0)
@@ -237,27 +247,16 @@ namespace QuickCampusAPI.Controllers
                         var startPage = 1;
                         newPageStart = (pageStart - startPage) * pageSize;
 
-                        List<TblClient> tblclient = new List<TblClient>();
-                        if (Datatype == (int)GetClientFilter.All)
-                        {
-                            tblclient = await _clientRepo.GetAll(x => x.IsDeleted == false);
+                        List<TblClient> ClientList = new List<TblClient>();
 
-                        }
-                        else if (Datatype == (int)GetClientFilter.OnlyInActive)
-                        {
-                            tblclient = await _clientRepo.GetAll(x => x.IsActive == true && x.IsDeleted == false);
+                        ClientList = await _clientRepo.GetAll(x => x.IsDeleted == false && (Datatype == DataTypeFilter.OnlyInActive ? x.IsActive == true : (Datatype == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)));
 
-                        }
-                        else
-                        {
-                            tblclient = await _clientRepo.GetAll(x => x.IsActive == false && x.IsDeleted == false);
-                        }
-                        var clienttotalcount = tblclient.Count();
-                        var roledata = _roleRepo.GetAll(x => x.IsActive == true && x.IsDeleted == false).Result.FirstOrDefault();
-                        var userapprole = _userAppRoleRepo.GetAll(x => x.UserId == x.Id).Result.FirstOrDefault();
-                        var userapproleid = userapprole != null ? userapprole.RoleId : 0;
+                        int clientTotalCount = ClientList.Count;
+                        //var roleData = _roleRepo.GetAll(x => x.IsActive == true && x.IsDeleted == false).Result.FirstOrDefault();
+                        //var userAppRole = _userAppRoleRepo.GetAll(x => x.UserId == x.Id).Result.FirstOrDefault();
+                        //var userAppRoleId = userAppRole != null ? userAppRole.RoleId : 0;
                         List<ClientResponseViewModel> data = new List<ClientResponseViewModel>();
-                        data.AddRange(tblclient.Select(x => new ClientResponseViewModel
+                        data.AddRange(ClientList.Select(x => new ClientResponseViewModel
                         {
                             Id = x.Id,
                             Name = x.Name,
@@ -268,12 +267,12 @@ namespace QuickCampusAPI.Controllers
                             Latitude = x.Latitude,
                             Longitude = x.Longitude,
                             IsActive = x.IsActive,
-                            RoleName = _roleRepo.GetAllQuerable().Where(y => y.Id == roledata.Id).Select(x => x.Name).First(),
-                            AppRoleName = ((common.AppRole)userapproleid).ToString(),
+                            RoleName = _clientRepo.GetClientRoleName(x.Id),
+                            AppRoleName = _clientRepo.GetClientAppRoleName(x.Id)
                         }).ToList().Where(x => (x.Name.Contains(search ?? "") || x.Email.Contains(search ?? "") || x.Address.Contains(search ?? "") || x.Phone.Contains(search ?? ""))).OrderByDescending(x => x.Id).ToList());
                         result.Data = data;
                         result.Message = "Client Get Successfully";
-                        result.TotalRecordCount = clienttotalcount;
+                        result.TotalRecordCount = clientTotalCount;
                         return Ok(result);
                     }
                     else
@@ -282,14 +281,14 @@ namespace QuickCampusAPI.Controllers
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 result.Message = "Server Error " + ex.Message;
             }
-           
+
             return Ok(result);
         }
-        
+
         [HttpDelete]
         [Route("DeleteClient")]
         public async Task<IActionResult> DeleteClient(int Id)
@@ -297,67 +296,65 @@ namespace QuickCampusAPI.Controllers
             IGeneralResult<ClientVM> result = new GeneralResult<ClientVM>();
             try
             {
-            var _jwtSecretKey = _config["Jwt:Key"];
-            var userid = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            var userrole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(userid))).FirstOrDefault();
-            if (userrole.RoleId == (int)AppRole.Admin)
-            {
-                var res = _clientRepo.GetAllQuerable().Where(x => x.Id == Id && x.IsDeleted == false).FirstOrDefault();
-            //if (res.IsDeleted == false)
-            if (res != null)
-            {
+                var _jwtSecretKey = _config["Jwt:Key"];
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
+                {
+                    var res = _clientRepo.GetAllQuerable().Where(x => x.Id == Id && x.IsDeleted == false).FirstOrDefault();
+                    //if (res.IsDeleted == false)
+                    if (res != null)
+                    {
 
-                res.IsActive = false;
-                res.IsDeleted = true;
-                await _clientRepo.Update(res);
-                result.IsSuccess = true;
-                result.Message = "Client Deleted Successfully";
+                        res.IsActive = false;
+                        res.IsDeleted = true;
+                        await _clientRepo.Update(res);
+                        result.IsSuccess = true;
+                        result.Message = "Client Deleted Successfully";
+                    }
+                    else
+                    {
+                        result.Message = "Client does not exist";
+                    }
+                    return Ok(result);
+                }
+                else
+                {
+                    result.Message = "Access Denied";
+                }
             }
-            else
-            {
-                result.Message = "Client does not exist";
-            }
-            return Ok(result);
-            }
-            else
-            {
-                result.Message = "Access Denied";
-            }
-        }
             catch (Exception ex)
             {
                 result.Message = "Server Error " + ex.Message;
             }
 
-         return Ok(result);
+            return Ok(result);
         }
 
         [HttpGet]
-        [Route("activeAndInactive")]
-        public async Task<IActionResult> ActiveAndInactive(bool isActive, int id)
+        [Route("ClientActiveInactive")]
+        public async Task<IActionResult> ActiveAndInactive(int id)
         {
             IGeneralResult<ActiveInactivevm> result = new GeneralResult<ActiveInactivevm>();
             try
             {
                 var _jwtSecretKey = _config["Jwt:Key"];
-                var userid = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-                var userrole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(userid))).FirstOrDefault();
-                if (userrole.RoleId == (int)AppRole.Admin)
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                 {
                     var res = _clientRepo.GetAllQuerable().Where(x => x.Id == id && x.IsDeleted == false).FirstOrDefault();
-            var clienttotalCount = 0;
-            clienttotalCount = _clientRepo.GetAllQuerable().Where(x => x.Id == id && x.IsDeleted == false).Count();
-            //if (res.IsDeleted == false)
-            if (res != null)
-            {
-                res.IsActive = isActive;
-                res.IsDeleted = false;
-                var data = await _clientRepo.Update(res);
-                result.Data = (ActiveInactivevm)data;
-                result.IsSuccess = true;
-                result.TotalRecordCount = clienttotalCount;
-                result.Message = "Client status changed successfully";
-            }
+                    int clientTotalCount = 0;
+                    clientTotalCount = _clientRepo.GetAllQuerable().Where(x => x.Id == id && x.IsDeleted == false).Count();
+                    if (res != null)
+                    {
+                        res.IsActive = !res.IsActive;
+                        var data = await _clientRepo.Update(res);
+                        result.Data = (ActiveInactivevm)data;
+                        result.IsSuccess = true;
+                        result.TotalRecordCount = clientTotalCount;
+                        result.Message = "Client status changed successfully";
+                    }
                 }
                 else
                 {
@@ -369,21 +366,21 @@ namespace QuickCampusAPI.Controllers
                 result.Message = "Server Error " + ex.Message;
             }
             return Ok(result);
-}
+        }
 
         [HttpGet]
         [Route("GetIdByClient")]
-        public async Task<IActionResult> GetIdByClient(int clientid)
+        public async Task<IActionResult> GetIdByClient(int clientId)
         {
             IGeneralResult<GetClientById> result = new GeneralResult<GetClientById>();
             try
             {
                 var _jwtSecretKey = _config["Jwt:Key"];
-                var userid = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-                var userrole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(userid))).FirstOrDefault();
-                if (userrole.RoleId == (int)AppRole.Admin)
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                 {
-                    var res = await _clientRepo.GetById(clientid);
+                    var res = await _clientRepo.GetById(clientId);
                     if (res.IsDeleted == false && res.IsActive == true)
                     {
                         result.Data = (GetClientById)res;
@@ -393,8 +390,12 @@ namespace QuickCampusAPI.Controllers
                     }
                     else
                     {
-                        result.Message = "Access Denied";
+                        result.Message = "No record found!";
                     }
+                }
+                else
+                {
+                    result.Message = "Access Denied";
                 }
             }
             catch (Exception ex)
@@ -419,64 +420,6 @@ namespace QuickCampusAPI.Controllers
             }
         }
 
-        //[Authorize(Roles = "GetAllActiveClient")]
-        //[HttpGet]
-        //[Route("GetAllActiveClient")]
-        //public async Task<IActionResult> GetAllActiveClient(int clientid)
-        //{
-        //    IGeneralResult<List<ClientResponseVm>> result = new GeneralResult<List<ClientResponseVm>>();
-        //    int cid = 0;
-        //    var _jwtSecretKey = _config["Jwt:Key"];
-        //    var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-        //    var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
-        //    cid = isSuperAdmin ? clientid : (string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId));
-        //    try
-        //    {
-        //        var clientListCount = (await _clientRepo.GetAll()).Where(x => x.IsActive == true && (cid == 0 ? true : x.Id == cid)).Count();
-        //        var clientList = (await _clientRepo.GetAll()).Where(x => x.IsActive == true && (cid == 0 ? true : x.Id == cid)).OrderByDescending(x => x.Id).ToList();
-
-        //        var res = clientList.Select(x => ((ClientResponseVm)x)).ToList();
-        //        if (res != null && res.Count() > 0)
-        //        {
-        //            result.IsSuccess = true;
-        //            result.Message = "ActiveclientList";
-        //            result.Data = res;
-        //            result.TotalRecordCount = clientListCount;
-        //        }
-        //        else
-        //        {
-        //            result.Message = " Active Client List Not Found";
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        result.Message = ex.Message;
-        //    }
-        //    return Ok(result);
-        //}
-                
-
-        //[Authorize]
-        //[HttpPost]
-        //[Route("AddPermission")]
-        //public IActionResult AddPermission(MenuRoleVm vm)
-        //{
-        //    var _jwtSecretKey = _config["Jwt:Key"];
-        //    var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-        //    var res = _clientRepo.AddMenuRoles(vm, Convert.ToInt32(LoggedInUserId));
-        //    return Ok(res);
-        //}
-
-        //[Authorize]
-        //[HttpPost]
-        //[Route("GetPermission")]
-        //public IActionResult GetLoggedInUserPermission()
-        //{
-        //    var _jwtSecretKey = _config["Jwt:Key"];
-        //    var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-        //    var res = _clientRepo.AddMenuRoles(vm, Convert.ToInt32(LoggedInUserId));
-        //    return Ok(res);
-        //}
     }
 }
 
