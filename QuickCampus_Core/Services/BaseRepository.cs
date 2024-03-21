@@ -19,6 +19,7 @@ namespace QuickCampus_Core.Services
             List<T> query = await dbContext.Set<T>().ToListAsync();
             return query;
         }
+        
         public async virtual Task<T> GetById(int Id)
         {
             return await dbContext.Set<T>().FindAsync(Id);

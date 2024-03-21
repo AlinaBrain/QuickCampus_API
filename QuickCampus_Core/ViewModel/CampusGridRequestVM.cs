@@ -15,9 +15,11 @@ namespace QuickCampus_Core.ViewModel
         public DateTime? WalkInDate { get; set; }
         [Required(ErrorMessage = "Description is required.")]
         public string JobDescription { get; set; } = String.Empty;
-        public string Address1 { get; set; }=String.Empty;
-        public string Address2 { get; set; } = String.Empty;
+        [Required(ErrorMessage = "Address1 is required"), MaxLength(60)]
+        public string Address1 { get; set; }
+        public string Address2 { get; set; } 
         public int WalkInID { get; set; }
+        [Required]
         public int City { get; set; } 
         [Required]
         public int? StateID { get; set; }

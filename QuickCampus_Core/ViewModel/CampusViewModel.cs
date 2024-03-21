@@ -16,14 +16,11 @@ namespace QuickCampus_Core.ViewModel
                 Address2 = x.Address2,
                 City = x.City,
                 IsActive = x.IsActive,
-                CreatedDate = x.CreatedDate,
                 WalkInDate = x.WalkInDate,
                 JobDescription = x.JobDescription,
                 Title = x.Title,
-                Colleges = x.CampusWalkInColleges,
                 StateId=x.StateId,
                 CountryId=x.CountryId,
-               
                 
             };
         }
@@ -40,13 +37,8 @@ namespace QuickCampus_Core.ViewModel
         public DateTime? WalkInDate { get; set; }
         public string? JobDescription { get; set; }
         public string? Title { get; set; }
-        public object Colleges { get; set; }
-        public object StateId { get; set; }
-        
         public int? CountryId { get; set; }
-
-       
-
+        public int? StateId { get; set; }
     }
     public class CampusGridViewModel
     {
@@ -63,14 +55,6 @@ namespace QuickCampus_Core.ViewModel
         //[Required( ErrorMessage = "MstCity_State is required." )]
         public int? StateID { get; set; }
 
-        public string? StateName { get; set; }
-
-        public IEnumerable<SelectListItem> States { get; set; }
-
-        public string? CountryName { get; set; }
-
-        public IEnumerable<SelectListItem> Countries { get; set; }
-
         //[Required( ErrorMessage = "MstCity_State_Country is required." )]
         public int? CountryID { get; set; }
 
@@ -85,17 +69,15 @@ namespace QuickCampus_Core.ViewModel
         //[DisplayFormat( DataFormatString = "hh:mm tt" )]
         //public string WalkInStartTime { get; set; }
         public bool IsActive { get; set; }
-        public bool IsDelete { get; set; }
-        public DateTime? CreatedDate { get; set; }
         [Required(ErrorMessage = "Title is required.")]
         public string? Title { get; set; }
-        public int CreatedBy { get; set; }
         public List<CampusWalkInModel> Colleges { get; set; }
 
     }
 
     public class CampusWalkInModel
     {
+        public int CampusId { get; set; }
         [Required]
         public int? CollegeId { get; set; }
         [Required(ErrorMessage = "Time is required.")]
@@ -108,7 +90,7 @@ namespace QuickCampus_Core.ViewModel
         [Required(ErrorMessage = "Time is required.")]
         public bool IsIncludeInWalkIn { get; set; }
         public DateTime? StartDateTime { get; set; }
-
+        
     }
     public class CollegeFilter
     {
