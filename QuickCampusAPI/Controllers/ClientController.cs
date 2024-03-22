@@ -268,10 +268,10 @@ namespace QuickCampusAPI.Controllers
                         data.AddRange(ClientList.Select(x => new ClientResponseViewModel
                         {
                             Id = x.Id,
-                            Name = x.Name,
-                            Address = x.Address,
+                            Name = x.Name?.Trim(),
+                            Address = x.Address?.Trim(),
                             SubscriptionPlan = x.SubscriptionPlan,
-                            Email = x.Email,
+                            Email = x.Email?.Trim(),
                             Phone = x.Phone,
                             Latitude = x.Latitude,
                             Longitude = x.Longitude,
@@ -279,8 +279,9 @@ namespace QuickCampusAPI.Controllers
                             RoleName = _clientRepo.GetClientRoleName((int)x.Id),
                             AppRoleName = _clientRepo.GetClientAppRoleName(x.Id)
                         }).ToList().Where(x => (x.Name.Contains(search ?? "") || x.Email.Contains(search ?? "") || x.Address.Contains(search ?? "") || x.Phone.Contains(search ?? ""))).OrderByDescending(x => x.Id).ToList());
-                        result.Data = data;
-                        result.Message = "Client Get Successfully";
+                        result.Data = data.Skip(newPageStart).Take(pageSize).ToList();
+                        result.IsSuccess = true;
+                        result.Message = "Client fetched Successfully";
                         result.TotalRecordCount = clientTotalCount;
                         return Ok(result);
                     }

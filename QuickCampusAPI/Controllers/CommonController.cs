@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting.Internal;
 using QuickCampus_Core.Common;
+using QuickCampus_Core.Common.Helper;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
-
 namespace QuickCampusAPI.Controllers
 {
     [Authorize]
@@ -16,14 +17,20 @@ namespace QuickCampusAPI.Controllers
         private readonly IStateRepo _stateRepo;
         private readonly ICityRepo _cityRepo;
         private readonly IConfiguration _configuration;
+        private readonly ProcessUploadFile _uploadFile;
+        private readonly Microsoft.AspNetCore.Hosting.IHostingEnvironment _hostingEnvironment;
+        private string baseUrl;
 
         public CommonController(ICountryRepo countryRepo, IStateRepo stateRepo,
-            ICityRepo cityRepo, IConfiguration configuration)
+            ICityRepo cityRepo, IConfiguration configuration, ProcessUploadFile uploadFile, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment)
         {
             _countryRepo = countryRepo;
             _stateRepo = stateRepo;
             _cityRepo = cityRepo;
             _configuration = configuration;
+            _uploadFile = uploadFile;
+            _hostingEnvironment = hostingEnvironment;
+            baseUrl = _configuration.GetSection("APISitePath").Value ?? "";
         }
 
         [HttpGet]
@@ -114,6 +121,46 @@ namespace QuickCampusAPI.Controllers
                 }
             }
             catch (Exception ex)
+            {
+                result.Message = "Server error " + ex.Message;
+            }
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("UploadFiles")]
+        public IActionResult ProcessUploadFile(List<IFormFile> Files)
+        {
+            IGeneralResult<List<string>> result = new GeneralResult<List<string>>();
+            try
+            {
+                List<string> url = new List<string>();
+                if (Files.Count > 0)
+                {
+                  
+                    int UploadFileCount = 0;
+                    foreach (IFormFile file in Files)
+                    {
+                        var res =_uploadFile.GetUploadFile(file);
+                        if (res.IsSuccess)
+                        {
+                            UploadFileCount += 1;
+                            url.Add(Path.Combine(baseUrl, res.Data));
+                        }
+                    }
+                    result.IsSuccess = true;
+                    result.Message = "Files upload successfully.";
+                    result.Data = url;
+                    result.TotalRecordCount = UploadFileCount;
+                    return Ok(result);
+
+                }
+                else
+                {
+                    result.Message = "Please add atleast one File to upload.";
+                }
+            }
+            catch(Exception ex)
             {
                 result.Message = "Server error " + ex.Message;
             }

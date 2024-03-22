@@ -1,4 +1,6 @@
 ﻿
+using Microsoft.AspNetCore.Cors;
+
 namespace QuickCampus_Core.Common
 {
     public static class common

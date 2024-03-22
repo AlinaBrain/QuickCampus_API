@@ -22,7 +22,7 @@ namespace QuickCampus_Core.Services
         private readonly Microsoft.AspNetCore.Hosting.IHostingEnvironment _hostingEnvironment;
         private readonly string basepath;
         private string baseUrl;
-        private readonly ProcessUploadFile _processUploadFile;
+        private readonly ProcessUploadFile _uploadFile;
 
         public QuestionService(BtprojecQuickcampusContext context, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, IConfiguration config, ProcessUploadFile processUploadFile)
         {
@@ -30,7 +30,7 @@ namespace QuickCampus_Core.Services
             _context = context;
             _hostingEnvironment = hostingEnvironment;
             baseUrl = _config.GetSection("APISitePath").Value;
-            _processUploadFile = processUploadFile;
+            _uploadFile = processUploadFile;
         }
         public async Task<IGeneralResult<List<QuestionViewModelAdmin>>> GetAllQuestion(int clientid, bool issuperadmin, int pageStart, int pageSize)
         {
@@ -465,13 +465,19 @@ namespace QuickCampus_Core.Services
                     questionTakeView.QuestionId = question.Entity.QuestionId;
                     foreach (var option in questionTakeView.QuestionssoptionVm)
                     {
-                        var questionoptiondata = _context.QuestionOptions.Where(x => x.OptionId == option.OptionId).FirstOrDefault();
-                        questionoptiondata.OptionText = option.OptionText;
-                        questionoptiondata.IsCorrect = option.IsCorrect;
-                        questionoptiondata.Imagepath = _processUploadFile.GetUploadFile(option.Image);
-                        var questionoptions = _context.QuestionOptions.Update(questionoptiondata);
+                      
+                        var questionOptionData = _context.QuestionOptions.Where(x => x.OptionId == option.OptionId).FirstOrDefault();
+                        questionOptionData.OptionText = option.OptionText;
+                        questionOptionData.IsCorrect = option.IsCorrect;
+                        var UploadImage = _uploadFile.GetUploadFile(option.Image);
+                        if (UploadImage.IsSuccess)
+                        {
+                            questionOptionData.Imagepath =  UploadImage.Data;
+                        }
+                        var questionOptions = _context.QuestionOptions.Update(questionOptionData);
                         _context.SaveChanges();
-                        option.OptionId = questionoptions.Entity.OptionId;
+                        option.OptionId = questionOptions.Entity.OptionId;
+                        option.Imagepath = Path.Combine(baseUrl, questionOptionData.Imagepath);
                     }
                     res.Data = questionTakeView;
                     res.IsSuccess = true;
@@ -495,17 +501,21 @@ namespace QuickCampus_Core.Services
                     questionTakeView.QuestionId = question.Entity.QuestionId;
                     foreach (var option in questionTakeView.QuestionssoptionVm)
                     {
-                        QuestionOption questionoption = new QuestionOption
+                        QuestionOption questionOption = new QuestionOption
                         {
                             QuestionId = questionTakeView.QuestionId,
                             OptionText = option.OptionText,
                             IsCorrect = option.IsCorrect,
-                            Imagepath = _processUploadFile.GetUploadFile(option.Image),
                         };
-                        var questionoptions = _context.QuestionOptions.Add(questionoption);
+                        var UploadImage = _uploadFile.GetUploadFile(option.Image);
+                        if (UploadImage.IsSuccess)
+                        {
+                            questionOption.Imagepath = UploadImage.Data;
+                        }
+                        var addQuestionOptions = _context.QuestionOptions.Add(questionOption);
                         _context.SaveChanges();
-                        option.OptionId = questionoptions.Entity.OptionId;
-                        option.Imagepath = baseUrl + questionoption.Imagepath;
+                        option.OptionId = addQuestionOptions.Entity.OptionId;
+                        option.Imagepath = Path.Combine(baseUrl, questionOption.Imagepath);
                         option.Image = null;
                     }
                     res.Data = questionTakeView;
