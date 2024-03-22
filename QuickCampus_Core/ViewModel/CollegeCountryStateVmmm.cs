@@ -28,7 +28,7 @@ namespace QuickCampus_Core.ViewModel
                 ContectEmail = items.ContectEmail,
                 //ModifiedBy = items.ModifiedBy,
                 ClientId = items.ClientId,
-                //IsActive = items.IsActive,
+                IsActive = items.IsActive,
                 //IsDeleted = items.IsDeleted,
                 //CreatedBy = items.CreatedBy
 
@@ -49,7 +49,7 @@ namespace QuickCampus_Core.ViewModel
         public int? StateId { get; set; }
         [Required(ErrorMessage = "MstCity_State_Country is required.")]
         public int? CountryId { get; set; }
-        //public bool? IsActive { get; set; }
+        public bool? IsActive { get; set; }
 
         //public int? CreatedBy { get; set; }
         [Required(ErrorMessage = "CollegeCode is required.")]

@@ -136,7 +136,7 @@ if (app.Environment.IsDevelopment())
     {
         // FileProvider = new PhysicalFileProvider(@"D:\Quick Campus\QuickCampusAPI\wwwroot\UploadFiles"),
         //FileProvider=new PhysicalFileProvider(@"D:\QuickCampus_01-02-2024\QuickCampus_API\Quick_Campus\QuickCampusAPI\wwwroot\UploadFiles"),
-        FileProvider = new PhysicalFileProvider(@"D:\Quick_Campus\QuickCampusAPI\wwwroot\UploadFiles"),
+        FileProvider = new PhysicalFileProvider(@"D:\QuickCampus_01-02-2024\QuickCampus_API\Quick_Campus\QuickCampusAPI\wwwroot\UploadFiles"),
         
         RequestPath = new PathString("/UploadFiles"),
         EnableDirectoryBrowsing = false

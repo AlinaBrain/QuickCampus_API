@@ -45,6 +45,7 @@ public partial class Applicant
 
     public int? HighestQualification { get; set; }
 
+
     public virtual ICollection<ApplicantComment> ApplicantComments { get; set; } = new List<ApplicantComment>();
 
     public virtual ICollection<ApplicantTest> ApplicantTests { get; set; } = new List<ApplicantTest>();

@@ -22,16 +22,18 @@ namespace QuickCampusAPI.Controllers
         private readonly IConfiguration _config;
         private readonly IMstQualificationRepo _qualificationRepo;
         private readonly ICollegeRepo _collegeRepo;
+        private readonly IUserRepo _userRepo;
         private string _jwtSecretKey;
 
         public ApplicantController(IConfiguration configuration, IMstQualificationRepo qualificationRepo, ICollegeRepo collegeRepo, IApplicantRepo applicantRepo
-            ,IUserAppRoleRepo userAppRoleRepo)
+            ,IUserAppRoleRepo userAppRoleRepo,IUserRepo userRepo)
         {
             _applicantRepo = applicantRepo;
             _userAppRoleRepo = userAppRoleRepo;
             _config = configuration;
             _qualificationRepo = qualificationRepo;
             _collegeRepo = collegeRepo;
+            _userRepo = userRepo;
             _jwtSecretKey = _config["Jwt:Key"] ?? "";
         }
 
@@ -47,7 +49,8 @@ namespace QuickCampusAPI.Controllers
                 var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
-                    LoggedInUserClientId = LoggedInUserId;
+                    var user =await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = user.ClientId.ToString();
                 }
                 var newPageStart = 0;
                 if (pageStart > 0)
@@ -67,20 +70,31 @@ namespace QuickCampusAPI.Controllers
                 {
                     applicantData = _applicantRepo.GetAllQuerable().Where(x => x.ClientId == Convert.ToInt32(LoggedInUserClientId) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
                 }
-                applicantTotalCount = applicantData.Count();
-                applicantList = applicantData.Where(x => (x.FirstName.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.LastName.Contains(search ?? "", StringComparison.OrdinalIgnoreCase)  || x.EmailAddress.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.PhoneNumber.Contains(search ?? ""))).OrderByDescending(x => x.ApplicantId).ToList();
-                applicantList = applicantList.Skip(newPageStart).Take(pageSize).ToList();
-
                 var collegeList = _collegeRepo.GetAllQuerable().Where(x => x.IsActive == true && x.IsDeleted == false).ToList();
-                foreach(var item in applicantList)
+                var qualificationlist=_qualificationRepo.GetAllQuerable().Where(x=>x.IsActive==true && x.IsDeleted==false).ToList();
+                foreach (var item in applicantData)
                 {
                     if (collegeList.Any(x => x.CollegeId == item.CollegeId))
                     {
                         item.CollegeName = collegeList.Where(x => x.CollegeId == item.CollegeId).First()?.CollegeName;
                     }
                 }
+                if (!string.IsNullOrEmpty(search))
+                {
+                    search = search.Trim();
 
+                }
+                applicantList = applicantData.Where(x => (x.FirstName.Contains(search?? "", StringComparison.OrdinalIgnoreCase) || x.LastName.Trim().Contains(search ?? "", StringComparison.OrdinalIgnoreCase)  || x.EmailAddress.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.PhoneNumber.Contains(search ?? "") || x.CollegeName.Contains(search ?? "", StringComparison.OrdinalIgnoreCase))).OrderByDescending(x => x.ApplicantId).ToList();
+                applicantTotalCount = applicantList.Count;
+                applicantList = applicantList.Skip(newPageStart).Take(pageSize).ToList();
                 var response = applicantList.Select(x => (ApplicantViewModel)x).ToList();
+                foreach (var item in response)
+                {
+                    if (qualificationlist.Any(x => x.QualId == item.HighestQualification))
+                    {
+                        item.HighestQualificationName = qualificationlist.Where(x => x.QualId == item.HighestQualification).First()?.QualName;
+                    }
+                }
                 if (applicantList.Count > 0)
                 {
                     result.IsSuccess = true;
@@ -111,7 +125,8 @@ namespace QuickCampusAPI.Controllers
                 var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
-                    LoggedInUserClientId = LoggedInUserId;
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = user.ClientId.ToString();
                 }
                 var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
                 if(LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin && (vm.ClientId.ToString() == "" || vm.ClientId == 0))
@@ -160,6 +175,7 @@ namespace QuickCampusAPI.Controllers
                     vm.EmailAddress = vm.EmailAddress?.Trim();
                     vm.PhoneNumber = vm.PhoneNumber?.Trim();
                     vm.Comment = vm.Comment?.Trim();
+                    vm.HighestQualification = vm.HighestQualification;
                     //ApplicantViewModel applicantViewModel = new ApplicantViewModel
                     //{
                     //    FirstName = vm.FirstName?.Trim(),
@@ -214,11 +230,36 @@ namespace QuickCampusAPI.Controllers
             {
                 var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                 var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
-                    LoggedInUserClientId = LoggedInUserId;
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = user.ClientId.ToString();
                 }
-                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (_applicantRepo.Any(x => x.EmailAddress == vm.EmailAddress &&x.ApplicantId!=vm.ApplicantID && x.IsActive == true && x.IsDeleted == false))
+                {
+                    result.Message = "Email Address Already Registered!";
+                    return Ok(result);
+                }
+                bool isPhoneNumberExist = _applicantRepo.Any(x => x.PhoneNumber == vm.PhoneNumber && x.ApplicantId != vm.ApplicantID && x.IsDeleted == false);
+                if (isPhoneNumberExist)
+                {
+                    result.Message = "Phone Number is Already Exist";
+                    return Ok(result);
+                }
+                bool isCollegeExist = _collegeRepo.Any(x => x.CollegeId == vm.CollegeId && x.IsDeleted == false && x.IsActive == true);
+                if (!isCollegeExist)
+                {
+                    result.Message = "College does not Exist";
+                    return Ok(result);
+                }
+                var isQualificationExists = _qualificationRepo.Any(x => x.QualId == vm.HighestQualification && x.IsActive == true && x.IsDeleted == false);
+                if (!isQualificationExists)
+                {
+                    result.Message = "Qualification Does Not Exist";
+                    return Ok(result);
+                }
 
                 if (ModelState.IsValid)
                 {
@@ -230,7 +271,8 @@ namespace QuickCampusAPI.Controllers
                         result.Message = "Only alphabetic characters are allowed in the name.";
                         return Ok(result);
                     }
-                    if (vm.StatusId > 0 && vm.AssignedToCompany > 0 && vm.ApplicantID > 0)
+                    
+                        if (vm.StatusId > 0 && vm.AssignedToCompany > 0 && vm.ApplicantID > 0)
                     {
                         Applicant applicant = new Applicant();
 
@@ -252,8 +294,9 @@ namespace QuickCampusAPI.Controllers
                         applicant.FirstName = vm.FirstName?.Trim();
                         applicant.LastName = vm.LastName?.Trim();
                         applicant.EmailAddress = vm.EmailAddress?.Trim();
-                    
+                        
                         applicant.IntermediatePercentage = vm.IntermediatePercentage;
+                        applicant.HighestQualification = vm.HighestQualification;
                         applicant.HigestQualificationPercentage = vm.HighestQualificationPercentage;
                         applicant.Skills = vm.Skills?.Trim();
                         applicant.MatricPercentage = vm.MatricPercentage;
@@ -299,13 +342,17 @@ namespace QuickCampusAPI.Controllers
                 var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
-                    LoggedInUserClientId = LoggedInUserId;
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = user.ClientId.ToString();
                 }
                 var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
 
                 if (applicantId > 0)
                 {
                     Applicant applicant = new Applicant();
+                    var collegeList = _collegeRepo.GetAllQuerable().Where(x => x.IsActive == true && x.IsDeleted == false).ToList();
+                    
+
 
                     if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                     {
@@ -324,6 +371,17 @@ namespace QuickCampusAPI.Controllers
                         result.IsSuccess = true;
                         result.Message = "Applicant fetched successfully.";
                         result.Data = (ApplicantViewModel)applicant;
+                        var qualificationlist = _qualificationRepo.GetAllQuerable().Where(x => x.IsActive == true && x.IsDeleted == false && x.QualId == applicant.HighestQualification).FirstOrDefault();
+                        var collegelist=_collegeRepo.GetAllQuerable().Where(x=>x.IsActive==true && x.IsDeleted == false && x.CollegeId==applicant.CollegeId).FirstOrDefault();
+                        if (qualificationlist != null)
+                        {
+                            result.Data.HighestQualificationName = qualificationlist.QualName;
+                        }
+                        if (collegelist != null)
+                        {
+                            result.Data.CollegeName = collegelist.CollegeName;
+                        }
+
                     }
                     return Ok(result);
                 }
@@ -350,7 +408,8 @@ namespace QuickCampusAPI.Controllers
                 var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
-                    LoggedInUserClientId = LoggedInUserId;
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = user.ClientId.ToString();
                 }
                 var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
 
@@ -406,7 +465,8 @@ namespace QuickCampusAPI.Controllers
                 var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
-                    LoggedInUserClientId = LoggedInUserId;
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = user.ClientId.ToString();
                 }
                 var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
 

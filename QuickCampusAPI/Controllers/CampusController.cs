@@ -20,19 +20,21 @@ namespace QuickCampusAPI.Controllers
         private readonly IStateRepo _staterepo;
         private IConfiguration _config;
         private readonly IUserAppRoleRepo _userAppRoleRepo;
-        public CampusController(IConfiguration configuration, ICampusRepo campusrepo, ICountryRepo countryRepo, IStateRepo stateRepo, IUserAppRoleRepo userAppRoleRepo)
+        private readonly IUserRepo _userRepo;
+
+        public CampusController(IConfiguration configuration, ICampusRepo campusrepo, ICountryRepo countryRepo, IStateRepo stateRepo, IUserAppRoleRepo userAppRoleRepo,IUserRepo userRepo)
         {
             _campusrepo = campusrepo;
             _country = countryRepo;
             _staterepo = stateRepo;
             _config = configuration;
             _userAppRoleRepo = userAppRoleRepo;
+            _userRepo = userRepo;
         }
-
         [HttpGet]
         [Route("ManageCampus")]
 
-        public async Task<IActionResult> ManageCampus()
+        public async Task<IActionResult> GetAllCampus()
         {
             IGeneralResult<List<CampusGridViewModel>> result = new GeneralResult<List<CampusGridViewModel>>();
             try
@@ -42,7 +44,8 @@ namespace QuickCampusAPI.Controllers
                 var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
-                    LoggedInUserClientId = LoggedInUserId;
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = user.ClientId.ToString();
                 }
                 var res = await _campusrepo.GetAllCampus();
                 return Ok(res);
@@ -68,7 +71,8 @@ namespace QuickCampusAPI.Controllers
                 var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
-                    LoggedInUserClientId = LoggedInUserId;
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = user.ClientId.ToString();
                 }
                 if (ModelState.IsValid)
                 {
@@ -99,7 +103,8 @@ namespace QuickCampusAPI.Controllers
                 var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
-                    LoggedInUserClientId = LoggedInUserId;
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = user.ClientId.ToString();
                 }
                 if (ModelState.IsValid)
                 {
@@ -131,7 +136,8 @@ namespace QuickCampusAPI.Controllers
                 var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
-                    LoggedInUserClientId = LoggedInUserId;
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = user.ClientId.ToString();
                 }
                 var res = await _campusrepo.GetCampusByID(campusId);
                 if (res.Data.WalkInID > 0)
@@ -188,7 +194,8 @@ namespace QuickCampusAPI.Controllers
                 var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
-                    LoggedInUserClientId = LoggedInUserId;
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = user.ClientId.ToString();
                 }
                 var res = await _campusrepo.DeleteCampus(campusId);
                 return Ok(res);

@@ -7,6 +7,7 @@ using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
 using System.Linq.Expressions;
 using System.Security.Cryptography;
+using static QuickCampus_Core.Common.common;
 
 namespace QuickCampus_Core.Services
 {
@@ -178,6 +179,7 @@ namespace QuickCampus_Core.Services
         public async Task <IGeneralResult<List<CampusGridViewModel>>> GetAllCampus()
         {
               IGeneralResult<List<CampusGridViewModel>> result=new GeneralResult<List<CampusGridViewModel>>();
+
                 var campusdata = _context.WalkIns.Where(x => x.IsDeleted == false  )
                 .Include(x => x.CampusWalkInColleges).Include(x => x.State).Include(x => x.Country).OrderByDescending(x => x.WalkInDate).Select(x => new CampusGridViewModel()
                 {
@@ -199,12 +201,13 @@ namespace QuickCampus_Core.Services
                         ExamStartTime = y.ExamStartTime.Value.ToString()
                     }).ToList(),
                 }).ToList();
+
                 if (campusdata.Any())
                 {
                     result.Data=campusdata;
                 
                 return result;
-               
+              
             }
                 else
                 {
@@ -237,7 +240,7 @@ namespace QuickCampus_Core.Services
                         ExamStartTime = y.ExamStartTime.Value.ToString(),
                          IsIncludeInWalkIn=true,
                          StartDateTime=y.StartDateTime
-    }).ToList(),
+                 }).ToList(),
                 }).FirstOrDefault();
                 if (campusData!= null)
                 {

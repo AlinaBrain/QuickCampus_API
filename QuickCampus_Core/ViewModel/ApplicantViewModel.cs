@@ -28,6 +28,8 @@ namespace QuickCampus_Core.ViewModel
                 ClientId = x.ClientId,
                 CollegeId = x.CollegeId,
                 IsActive = x.IsActive,
+                HighestQualification=x.HighestQualification,
+                
                 //IsDeleted = x.IsDeleted,
             };
         }
@@ -49,6 +51,7 @@ namespace QuickCampus_Core.ViewModel
         public string? PhoneNumber { get; set; }
         [Required(ErrorMessage = "You must provide a HighestQualification")]
         public int? HighestQualification { get; set; }
+        public string ? HighestQualificationName { get; set; }
         [Display(Name = "Highest Qualification  Percentage %")]
         [Required(ErrorMessage = "You must provide %.")]
         [Range(1, 100, ErrorMessage = "% should be in 1 - 100 range.")]
@@ -68,10 +71,11 @@ namespace QuickCampus_Core.ViewModel
         public string? Comment { get; set; }
         //public DateTime? CreatedDate { get; set; }
         public DateTime? RegisteredDate { get; set; }
-        //[Required(ErrorMessage = "College Name is Must Required")]
-        public string CollegeName { get; set; }
+       
+        public string ? CollegeName { get; set; }
         public int? ClientId { get; set; }
-
+        
+        
         //public bool? IsDeleted { get; set; }
         [Required(ErrorMessage = "You must provide a AssignedToCompany")]
         public int? AssignedToCompany { get; set; }
@@ -95,7 +99,8 @@ namespace QuickCampus_Core.ViewModel
                 StatusId = StatusId,
                 Comment = Comment,
                 AssignedToCompany = AssignedToCompany,
-                //CollegeName = CollegeName,
+                HighestQualification=HighestQualification,
+          
                 ClientId = ClientId,
                 CreatedDate = DateTime.UtcNow,
                 ModifiedDate = ApplicantID > 0 ? DateTime.UtcNow : null,
@@ -122,6 +127,7 @@ namespace QuickCampus_Core.ViewModel
                 Comment = Comment,
                 AssignedToCompany = AssignedToCompany,
                 //CollegeName = CollegeName,
+
                 ClientId = ClientId,
                 ModifiedDate = DateTime.UtcNow,
                 CreatedDate = ApplicantID > 0 ? DateTime.UtcNow : null,

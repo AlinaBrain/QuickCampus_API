@@ -1,6 +1,7 @@
 ﻿using QuickCampus_Core.Common;
 using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
+using static QuickCampus_Core.Common.common;
 
 namespace QuickCampus_Core.Interfaces
 {
