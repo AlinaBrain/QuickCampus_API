@@ -28,7 +28,7 @@ namespace QuickCampus_Core.ViewModel
                 ClientId = x.ClientId,
                 CollegeId = x.CollegeId,
                 IsActive = x.IsActive,
-                IsDeleted = x.IsDeleted,
+                //IsDeleted = x.IsDeleted,
             };
         }
         public int ApplicantID { get; set; }
@@ -48,7 +48,7 @@ namespace QuickCampus_Core.ViewModel
         [RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Not a valid Contact number.")]
         public string? PhoneNumber { get; set; }
         [Required(ErrorMessage = "You must provide a HighestQualification")]
-        public string? HighestQualification { get; set; }
+        public int? HighestQualification { get; set; }
         [Display(Name = "Highest Qualification  Percentage %")]
         [Required(ErrorMessage = "You must provide %.")]
         [Range(1, 100, ErrorMessage = "% should be in 1 - 100 range.")]
@@ -66,17 +66,18 @@ namespace QuickCampus_Core.ViewModel
         [Required(ErrorMessage = "You must provide a StatusId")]
         public int StatusId { get; set; }
         public string? Comment { get; set; }
-        public DateTime? CreatedDate { get; set; }
+        //public DateTime? CreatedDate { get; set; }
         public DateTime? RegisteredDate { get; set; }
-        [Required(ErrorMessage = "College Name is Must Required")]
+        //[Required(ErrorMessage = "College Name is Must Required")]
         public string CollegeName { get; set; }
         public int? ClientId { get; set; }
 
-        public bool? IsDeleted { get; set; }
+        //public bool? IsDeleted { get; set; }
         [Required(ErrorMessage = "You must provide a AssignedToCompany")]
         public int? AssignedToCompany { get; set; }
+        [Display(Name ="ActiveStatus")]
         public bool? IsActive { get; set; }
-        public DateTime? ModifiedDate { get; set; }
+        //public DateTime? ModifiedDate { get; set; }
         public int? CollegeId { get; set; }
 
         public Applicant ToApplicantDbModel()
@@ -87,7 +88,6 @@ namespace QuickCampus_Core.ViewModel
                 LastName = LastName,
                 EmailAddress = EmailAddress,
                 PhoneNumber = PhoneNumber,
-                
                 HigestQualificationPercentage = HighestQualificationPercentage,
                 MatricPercentage = MatricPercentage,
                 IntermediatePercentage = IntermediatePercentage,
@@ -95,7 +95,7 @@ namespace QuickCampus_Core.ViewModel
                 StatusId = StatusId,
                 Comment = Comment,
                 AssignedToCompany = AssignedToCompany,
-                CollegeName = CollegeName,
+                //CollegeName = CollegeName,
                 ClientId = ClientId,
                 CreatedDate = DateTime.UtcNow,
                 ModifiedDate = ApplicantID > 0 ? DateTime.UtcNow : null,
@@ -121,7 +121,7 @@ namespace QuickCampus_Core.ViewModel
                 StatusId = StatusId,
                 Comment = Comment,
                 AssignedToCompany = AssignedToCompany,
-                CollegeName = CollegeName,
+                //CollegeName = CollegeName,
                 ClientId = ClientId,
                 ModifiedDate = DateTime.UtcNow,
                 CreatedDate = ApplicantID > 0 ? DateTime.UtcNow : null,
@@ -141,8 +141,6 @@ namespace QuickCampus_Core.ViewModel
             [Required(ErrorMessage = "Name is required"), MaxLength(20)]
             [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "Only characters allowed.")]
             public string? LastName { get; set; }
-
-
             public int? CollegeId { get; set; }
             public List<SelectListItem>? Colleges { get; set; }
 
@@ -210,12 +208,7 @@ namespace QuickCampus_Core.ViewModel
         {
             public ApplicantValidator()
             {
-                RuleFor(x => x.CollegeName)
-                     .Cascade(CascadeMode.StopOnFirstFailure)
-                  .NotNull().WithMessage("College Name could not be null")
-                  .NotEmpty().WithMessage("College Name could not be empty")
-            .Matches(@"^[A-Za-z\s]*$").WithMessage("'{PropertyName}' should only contain letters.")
-            .Length(3, 250);
+                
                 RuleFor(x => x.Skills)
                   .Cascade(CascadeMode.StopOnFirstFailure)
                   .NotNull().WithMessage("Skills could not be null")
@@ -245,11 +238,7 @@ namespace QuickCampus_Core.ViewModel
                   .NotEmpty().WithMessage("HighestQualificationPercentage could not be empty");
 
 
-                RuleFor(x => x.HighestQualification)
-                  .Cascade(CascadeMode.StopOnFirstFailure)
-                  .NotNull().WithMessage("HighestQualification could not be null")
-                  .NotEmpty().WithMessage("HighestQualification could not be empty");
-
+                
 
                 RuleFor(x => x.IntermediatePercentage)
                  .Cascade(CascadeMode.StopOnFirstFailure)

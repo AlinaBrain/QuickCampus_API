@@ -13,22 +13,22 @@ namespace QuickCampus_Core.ViewModel
         {
             return new CountryVM
             {
-                ClientId = items.ClientId,
+                //ClientId = items.ClientId,
                 CountryId = items.CountryId,
                 CountryName = items.CountryName,
-                IsActive = items.IsActive,
-                IsDeleted = items.IsDeleted,
+                //IsActive = items.IsActive,
+                //IsDeleted = items.IsDeleted,
             };
         }
         public int CountryId { get; set; }
 
         public string? CountryName { get; set; }
 
-        public bool? IsActive { get; set; }
+        //public bool? IsActive { get; set; }
 
-        public bool? IsDeleted { get; set; }
+        //public bool? IsDeleted { get; set; }
 
-        public int? ClientId { get; set; }
+        //public int? ClientId { get; set; }
 
         public MstCityStateCountry ToCountryDbModel()
         {
@@ -37,7 +37,7 @@ namespace QuickCampus_Core.ViewModel
                 CountryName = CountryName,
                 IsActive = true,
                 IsDeleted = false,
-                ClientId = ClientId
+                //ClientId = ClientId
             };
         }
         public MstCityStateCountry ToUpDateDbModel()
@@ -47,7 +47,7 @@ namespace QuickCampus_Core.ViewModel
                 CountryName = CountryName,
                 IsActive = true,
                 IsDeleted = false,
-                ClientId = ClientId
+                //ClientId = ClientId
             };
         }
     }

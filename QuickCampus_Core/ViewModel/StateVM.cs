@@ -15,22 +15,22 @@ namespace QuickCampus_Core.ViewModel
             {
                 StateId = items.StateId,
                 StateName = items.StateName,
-                CountryId = items.CountryId,
-                IsActive = items.IsActive,
-                IsDeleted   = items.IsDeleted,
-                ClientId = items.ClientId,
+                //CountryId = items.CountryId,
+                //IsActive = items.IsActive,
+                //IsDeleted   = items.IsDeleted,
+                //ClientId = items.ClientId,
             };
         }
         public int? StateId { get; set; }
 
         public string? StateName { get; set; }
 
-        public int? CountryId { get; set; }
+        //public int? CountryId { get; set; }
 
-        public bool? IsActive { get; set; }
+        //public bool? IsActive { get; set; }
 
-        public bool? IsDeleted { get; set; }
-        public int? ClientId { get; set; }
+        //public bool? IsDeleted { get; set; }
+        //public int? ClientId { get; set; }
 
 
         public MstCityState ToStateDbModel()
@@ -38,10 +38,10 @@ namespace QuickCampus_Core.ViewModel
             return new MstCityState
             {
                 StateName = StateName,
-                CountryId = CountryId,
+                //CountryId = CountryId,
                 IsDeleted = false,
                 IsActive=true,
-                ClientId= ClientId,
+                //ClientId= ClientId,
             };
         }
         public MstCityState ToUpdateDbModel()
@@ -52,8 +52,8 @@ namespace QuickCampus_Core.ViewModel
                 StateName = StateName,
                 IsActive = true,
                 IsDeleted = false,
-                CountryId = CountryId,
-                ClientId=ClientId
+                //CountryId = CountryId,
+                //ClientId=ClientId
                 
             };
         }

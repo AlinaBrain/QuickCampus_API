@@ -26,11 +26,11 @@ namespace QuickCampus_Core.ViewModel
                 ContectPerson = items.ContectPerson,
                 ContectPhone = items.ContectPhone,
                 ContectEmail = items.ContectEmail,
-                ModifiedBy = items.ModifiedBy,
+                //ModifiedBy = items.ModifiedBy,
                 ClientId = items.ClientId,
-                IsActive = items.IsActive,
-                IsDeleted = items.IsDeleted,
-                CreatedBy = items.CreatedBy
+                //IsActive = items.IsActive,
+                //IsDeleted = items.IsDeleted,
+                //CreatedBy = items.CreatedBy
 
             };
         }
@@ -49,9 +49,9 @@ namespace QuickCampus_Core.ViewModel
         public int? StateId { get; set; }
         [Required(ErrorMessage = "MstCity_State_Country is required.")]
         public int? CountryId { get; set; }
-        public bool? IsActive { get; set; }
+        //public bool? IsActive { get; set; }
 
-        public int? CreatedBy { get; set; }
+        //public int? CreatedBy { get; set; }
         [Required(ErrorMessage = "CollegeCode is required.")]
         public string? CollegeCode { get; set; }
         [EmailAddress(ErrorMessage = "Enter a valid contact person email.")]
@@ -62,14 +62,14 @@ namespace QuickCampus_Core.ViewModel
 
         [EmailAddress(ErrorMessage = "Enter a valid email.")]
         public string? ContectEmail { get; set; }
-        public int? ModifiedBy { get; set; }
-        public string? CreatedName { get; set; }
-        public string? ModifiedName { get; set; }
-        public string? CountryName { get; set; }
-        public string? StateName { get; set; }
-        public string? CityName { get; set; }
+        //public int? ModifiedBy { get; set; }
+        //public string? CreatedName { get; set; }
+        //public string? ModifiedName { get; set; }
+        //public string? CountryName { get; set; }
+        //public string? StateName { get; set; }
+        //public string? CityName { get; set; }
 
-        public bool? IsDeleted { get; set; }
+        //public bool? IsDeleted { get; set; }
         public int? ClientId { get; set; }
 
        

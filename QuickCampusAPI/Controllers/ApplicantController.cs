@@ -20,20 +20,24 @@ namespace QuickCampusAPI.Controllers
         private readonly IApplicantRepo _applicantRepo;
         private readonly IUserAppRoleRepo _userAppRoleRepo;
         private readonly IConfiguration _config;
+        private readonly IMstQualificationRepo _qualificationRepo;
+        private readonly ICollegeRepo _collegeRepo;
         private string _jwtSecretKey;
 
-        public ApplicantController(IConfiguration configuration, IApplicantRepo applicantRepo
+        public ApplicantController(IConfiguration configuration, IMstQualificationRepo qualificationRepo, ICollegeRepo collegeRepo, IApplicantRepo applicantRepo
             ,IUserAppRoleRepo userAppRoleRepo)
         {
             _applicantRepo = applicantRepo;
             _userAppRoleRepo = userAppRoleRepo;
             _config = configuration;
+            _qualificationRepo = qualificationRepo;
+            _collegeRepo = collegeRepo;
             _jwtSecretKey = _config["Jwt:Key"] ?? "";
         }
 
         [HttpGet]
         [Route("GetAllApplicant")]
-        public async Task<ActionResult> GetAllApplicant(string? search, DataTypeFilter DataType, int pageStart = 1, int pageSize = 10)
+        public async Task<ActionResult> GetAllApplicant(string? search, DataTypeFilter DataType , int pageStart = 1, int pageSize = 10)
         {
             IGeneralResult<List<ApplicantViewModel>> result = new GeneralResult<List<ApplicantViewModel>>();
             try
@@ -64,8 +68,17 @@ namespace QuickCampusAPI.Controllers
                     applicantData = _applicantRepo.GetAllQuerable().Where(x => x.ClientId == Convert.ToInt32(LoggedInUserClientId) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
                 }
                 applicantTotalCount = applicantData.Count();
-                applicantList = applicantData.Skip(newPageStart).Take(pageSize).ToList();
                 applicantList = applicantData.Where(x => (x.FirstName.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.LastName.Contains(search ?? "", StringComparison.OrdinalIgnoreCase)  || x.EmailAddress.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.PhoneNumber.Contains(search ?? ""))).OrderByDescending(x => x.ApplicantId).ToList();
+                applicantList = applicantList.Skip(newPageStart).Take(pageSize).ToList();
+
+                var collegeList = _collegeRepo.GetAllQuerable().Where(x => x.IsActive == true && x.IsDeleted == false).ToList();
+                foreach(var item in applicantList)
+                {
+                    if (collegeList.Any(x => x.CollegeId == item.CollegeId))
+                    {
+                        item.CollegeName = collegeList.Where(x => x.CollegeId == item.CollegeId).First()?.CollegeName;
+                    }
+                }
 
                 var response = applicantList.Select(x => (ApplicantViewModel)x).ToList();
                 if (applicantList.Count > 0)
@@ -101,7 +114,11 @@ namespace QuickCampusAPI.Controllers
                     LoggedInUserClientId = LoggedInUserId;
                 }
                 var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
-
+                if(LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin && (vm.ClientId.ToString() == "" || vm.ClientId == 0))
+                {
+                    result.Message = "Please select a valid Client";
+                    return Ok(result);
+                }
 
                 if (_applicantRepo.Any(x => x.EmailAddress == vm.EmailAddress && x.IsActive == true && x.IsDeleted == false))
                 {
@@ -114,6 +131,19 @@ namespace QuickCampusAPI.Controllers
                     result.Message = "Phone Number is Already Exist";
                     return Ok(result);
                 }
+                bool isCollegeExist = _collegeRepo.Any(x => x.CollegeId == vm.CollegeId && x.IsDeleted == false && x.IsActive == true);
+                if (!isCollegeExist)
+                {
+                    result.Message = "College does not Exist";
+                    return Ok(result);
+                }
+                bool isQualificationExist = _qualificationRepo.Any(x => x.QualId == vm.HighestQualification && x.IsDeleted == false && x.IsActive == true);
+                if (!isCollegeExist)
+                {
+                    result.Message = "Qualification does not Exist";
+                    return Ok(result);
+                }
+
 
                 if (ModelState.IsValid)
                 {
@@ -125,26 +155,32 @@ namespace QuickCampusAPI.Controllers
                         result.Message = "Only alphabetic characters are allowed in the name.";
                         return Ok(result);
                     }
-                    ApplicantViewModel applicantViewModel = new ApplicantViewModel
-                    {
-                        FirstName = vm.FirstName?.Trim(),
-                        LastName = vm.LastName?.Trim(),
-                        EmailAddress = vm.EmailAddress?.Trim(),
-                        PhoneNumber = vm.PhoneNumber?.Trim(),
-                        HighestQualification = vm.HighestQualification,
-                        HighestQualificationPercentage = vm.HighestQualificationPercentage,
-                        MatricPercentage = vm.MatricPercentage,
-                        IntermediatePercentage = vm.IntermediatePercentage,
-                        Skills = vm.Skills,
-                        StatusId = vm.StatusId,
-                        Comment = vm.Comment?.Trim(),
-                        CollegeName = vm.CollegeName.Trim(),
-                        AssignedToCompany = vm.AssignedToCompany,
-                        CollegeId = vm.CollegeId
-                    };
-                    applicantViewModel.ClientId = (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId);
+                    vm.FirstName = vm.FirstName?.Trim();
+                    vm.LastName = vm.LastName?.Trim();
+                    vm.EmailAddress = vm.EmailAddress?.Trim();
+                    vm.PhoneNumber = vm.PhoneNumber?.Trim();
+                    vm.Comment = vm.Comment?.Trim();
+                    //ApplicantViewModel applicantViewModel = new ApplicantViewModel
+                    //{
+                    //    FirstName = vm.FirstName?.Trim(),
+                    //    LastName = vm.LastName?.Trim(),
+                    //    EmailAddress = vm.EmailAddress?.Trim(),
+                    //    PhoneNumber = vm.PhoneNumber?.Trim(),
+                    //    HighestQualification = vm.HighestQualification,
+                    //    HighestQualificationPercentage = vm.HighestQualificationPercentage,
+                    //    MatricPercentage = vm.MatricPercentage,
+                    //    IntermediatePercentage = vm.IntermediatePercentage,
+                    //    Skills = vm.Skills,
+                    //    StatusId = vm.StatusId,
+                    //    Comment = vm.Comment?.Trim(),
+                    //    //CollegeName = vm.CollegeName.Trim(),
+                    //    AssignedToCompany = vm.AssignedToCompany,
+                    //    CollegeId = vm.CollegeId,
+                        
+                    //};
+                    vm.ClientId = (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId);
 
-                    var SaveApplicant = await _applicantRepo.Add(applicantViewModel.ToApplicantDbModel());
+                    var SaveApplicant = await _applicantRepo.Add(vm.ToApplicantDbModel());
                     if (SaveApplicant.ApplicantId > 0)
                     {
                         result.IsSuccess = true;
@@ -212,7 +248,7 @@ namespace QuickCampusAPI.Controllers
                             return Ok(result);
                         }
 
-                        applicant.CollegeName = vm.CollegeName.Trim();
+                        //applicant.CollegeName = vm.CollegeName.Trim();
                         applicant.FirstName = vm.FirstName?.Trim();
                         applicant.LastName = vm.LastName?.Trim();
                         applicant.EmailAddress = vm.EmailAddress?.Trim();

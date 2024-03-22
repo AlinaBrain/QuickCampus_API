@@ -17,22 +17,33 @@ namespace QuickCampus_Core.Common.Helper
         {
           this.hostingEnvironment = hostingEnvironment;
         }
-        public string GetUploadFile(IFormFile file)
-        {
 
-            string uniqueFileName = null;
-            if (file != null)
+        public IGeneralResult<string> GetUploadFile(IFormFile file)
+        {
+            IGeneralResult<string> result = new GeneralResult<string>();
+            try
             {
-                string photoUpload = Path.Combine(hostingEnvironment.WebRootPath, "UploadFiles");
-                uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileName.Replace(" ", String.Empty);
-                string filepath = Path.Combine(photoUpload, uniqueFileName);
-                using (var filename = new FileStream(filepath, FileMode.Create))
+                string uniqueFileName = "";
+                if (file != null)
                 {
-                    file.CopyTo(filename);
+                    string rootPath = Path.Combine(hostingEnvironment.WebRootPath, "UploadFiles");
+                    uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileName.Replace(" ", String.Empty);
+                    string filePath = Path.Combine(rootPath, uniqueFileName);
+                    using (var filename = new FileStream(filePath, FileMode.Create))
+                    {
+                        file.CopyTo(filename);
+                    }
+                    result.IsSuccess = true;
+                    result.Message = "File upload successfully";
+                    result.Data = uniqueFileName;
+
                 }
             }
-            //string basepath = baseUrl + uniqueFileName;
-            return uniqueFileName;
+            catch (Exception ex)
+            {
+                result.Message = "Server error " + ex.Message;
+            }
+            return result;
         }
     }
 }
