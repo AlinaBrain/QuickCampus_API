@@ -101,7 +101,7 @@ public partial class BtprojecQuickcampusContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=103.93.16.117;Database=btprojec_quickcampus;TrustServerCertificate=true;user id=btprojec_admin;password=Bwy0w65ixN*bsE9wy;Integrated Security=false;");
+        => optionsBuilder.UseSqlServer("Server=103.93.16.117;Database=btprojec_QuickCampusTest;TrustServerCertificate=true;user id=btprojec_admin;password=Bwy0w65ixN*bsE9wy;Integrated Security=false;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

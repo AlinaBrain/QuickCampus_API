@@ -277,19 +277,13 @@ namespace QuickCampus_Core.Services
 
             return statevm;
         }
-        public async Task<IGeneralResult<CampusGridViewModel>> UpdateCampusStatus(int id, int clientId, bool status, bool isSuperAdmin)
+        public async Task<IGeneralResult<CampusGridViewModel>> ActiveInActive(int id,  bool status)
         {
             IGeneralResult<CampusGridViewModel> result = new GeneralResult<CampusGridViewModel>();
             result.Data = new CampusGridViewModel();
             WalkIn campus = new WalkIn();
-            if (isSuperAdmin)
-            {
-                campus = _context.WalkIns.Where(x => x.WalkInId == id && x.IsDeleted == false && (clientId == 0 ? true : x.ClientId == clientId)).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
-            }
-            else
-            {
-                campus = _context.WalkIns.Where(x => x.WalkInId == id && x.IsDeleted == false && x.ClientId == clientId).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
-            }
+           campus = _context.WalkIns.Where(x => x.WalkInId == id && x.IsDeleted == false ).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
+            
             if (campus == null)
             {
                 result.IsSuccess = false;

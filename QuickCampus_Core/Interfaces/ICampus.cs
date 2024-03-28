@@ -12,7 +12,7 @@ namespace QuickCampus_Core.Interfaces
         Task<IGeneralResult<CampusGridRequestVM>> AddOrUpdateCampus(CampusGridRequestVM vm);
 
         Task<IGeneralResult<string>> UpdateCampus(CampusGridRequestVM vm, int clientId, int userId);
-        Task<IGeneralResult<CampusGridViewModel>> UpdateCampusStatus(int id, int clientId, bool status, bool isSuperAdmin);
+        Task<IGeneralResult<CampusGridViewModel>> ActiveInActive(int id,bool status);
         Task<IGeneralResult<CampusGridViewModel>> DeleteCampus(int id);
     }
 }
