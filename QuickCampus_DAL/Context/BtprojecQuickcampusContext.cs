@@ -430,6 +430,8 @@ public partial class BtprojecQuickcampusContext : DbContext
 
             entity.ToTable("QuestionOption", "dbo");
 
+           
+
             entity.HasOne(d => d.Question).WithMany(p => p.QuestionOptions)
                 .HasForeignKey(d => d.QuestionId)
                 .HasConstraintName("FK_Answer_Question");
