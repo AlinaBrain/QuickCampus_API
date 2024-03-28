@@ -260,7 +260,6 @@ namespace QuickCampusAPI.Controllers
 
                         ClientList = await _clientRepo.GetAll(x => x.IsDeleted == false && (Datatype == DataTypeFilter.OnlyInActive ? x.IsActive == true : (Datatype == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)));
 
-                        int clientTotalCount = ClientList.Count;
                         //var roleData = _roleRepo.GetAll(x => x.IsActive == true && x.IsDeleted == false).Result.FirstOrDefault();
                         //var userAppRole = _userAppRoleRepo.GetAll(x => x.UserId == x.Id).Result.FirstOrDefault();
                         //var userAppRoleId = userAppRole != null ? userAppRole.RoleId : 0;
@@ -282,7 +281,7 @@ namespace QuickCampusAPI.Controllers
                         result.Data = data.Skip(newPageStart).Take(pageSize).ToList();
                         result.IsSuccess = true;
                         result.Message = "Client fetched Successfully";
-                        result.TotalRecordCount = clientTotalCount;
+                        result.TotalRecordCount = data.Count;
                         return Ok(result);
                     }
                     else
@@ -393,9 +392,12 @@ namespace QuickCampusAPI.Controllers
                     var res = await _clientRepo.GetById(clientId);
                     if (res.IsDeleted == false && res.IsActive == true)
                     {
+                        var userData = _userRepo.GetAllQuerable().Where(x => x.Email == res.Email && x.IsActive == true && x.IsDelete == false && x.ClientId == res.Id).First();
+                        var userRoleData = _UserRoleRepo.GetAllQuerable().Where(x => x.UserId == userData.Id).First();
                         result.Data = (GetClientById)res;
+                        result.Data.RoleId = userRoleData.RoleId;
                         result.IsSuccess = true;
-                        result.Message = "Client details getting succesfully";
+                        result.Message = "Client details getting successfully";
                         return Ok(result);
                     }
                     else

@@ -45,7 +45,7 @@ namespace QuickCampusAPI.Controllers
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-                    LoggedInUserClientId = user.ClientId.ToString();
+                    LoggedInUserClientId = (user.ClientId == null ? "0": user.ClientId.ToString());
                 }
                 var res = await _campusrepo.GetAllCampus();
                 return Ok(res);
@@ -72,7 +72,7 @@ namespace QuickCampusAPI.Controllers
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-                    LoggedInUserClientId = user.ClientId.ToString();
+                    LoggedInUserClientId = (user.ClientId == null ? "0": user.ClientId.ToString());
                 }
                 if (ModelState.IsValid)
                 {
@@ -104,7 +104,7 @@ namespace QuickCampusAPI.Controllers
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-                    LoggedInUserClientId = user.ClientId.ToString();
+                    LoggedInUserClientId = (user.ClientId == null ? "0": user.ClientId.ToString());
                 }
                 if (ModelState.IsValid)
                 {
@@ -137,7 +137,7 @@ namespace QuickCampusAPI.Controllers
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-                    LoggedInUserClientId = user.ClientId.ToString();
+                    LoggedInUserClientId = (user.ClientId == null ? "0": user.ClientId.ToString());
                 }
                 var res = await _campusrepo.GetCampusByID(campusId);
                 if (res.Data.WalkInID > 0)
@@ -195,7 +195,7 @@ namespace QuickCampusAPI.Controllers
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-                    LoggedInUserClientId = user.ClientId.ToString();
+                    LoggedInUserClientId = (user.ClientId == null ? "0": user.ClientId.ToString());
                 }
                 var res = await _campusrepo.DeleteCampus(campusId);
                 return Ok(res);

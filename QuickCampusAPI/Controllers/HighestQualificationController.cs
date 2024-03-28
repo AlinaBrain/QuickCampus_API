@@ -66,10 +66,6 @@ namespace QuickCampusAPI.Controllers
             {
                 var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                 var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
-                {
-                    LoggedInUserClientId = LoggedInUserId;
-                }
                 var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
 
 

@@ -68,7 +68,7 @@ namespace QuickCampusAPI.Controllers
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-                    LoggedInUserClientId = user.ClientId.ToString();
+                    LoggedInUserClientId = (user.ClientId == null ? "0": user.ClientId.ToString());
                 }
                 var newPageStart = 0;
                 if (pageStart > 0)
@@ -82,14 +82,18 @@ namespace QuickCampusAPI.Controllers
                 int collegeListCount = 0;
                 if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                 {
-                    collegeData = _collegeRepo.GetAllQuerable().Where(x => x.IsDeleted == false  && x.IsActive==true && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
+                    collegeData = _collegeRepo.GetAllQuerable().Where(x => x.IsDeleted == false  && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
                 }
                 else
                 {
                     collegeData = _collegeRepo.GetAllQuerable().Where(x => x.ClientId == Convert.ToInt32(LoggedInUserClientId) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
                 }
-                collegeListCount = collegeList.Count;
+                if (!string.IsNullOrEmpty(search))
+                {
+                    search = search.Trim();
+                }
                 collegeList = collegeData.Where(x => (x.ContectPerson.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.CollegeName.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.CollegeCode.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.ContectEmail.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.ContectPhone.Contains(search ?? ""))).OrderBy(x => x.CollegeName).ToList();
+                collegeListCount = collegeList.Count;
                 collegeList = collegeList.Skip(newPageStart).Take(pageSize).ToList();
 
                 var response = collegeList.Select(x => (CollegeCountryStateVmmm)x).ToList();
@@ -114,8 +118,6 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
-
-        
         [HttpGet]
         [Route("GetCollegeDetailsByCollegeId")]
         public async Task<IActionResult> GetCollegeDetailsById(int collegeId)
@@ -129,7 +131,7 @@ namespace QuickCampusAPI.Controllers
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-                    LoggedInUserClientId = user.ClientId.ToString();
+                    LoggedInUserClientId = (user.ClientId == null ? "0": user.ClientId.ToString());
                 }
                 if (collegeId > 0)
                 {
@@ -180,7 +182,7 @@ namespace QuickCampusAPI.Controllers
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-                    LoggedInUserClientId = user.ClientId.ToString();
+                    LoggedInUserClientId = (user.ClientId == null ? "0": user.ClientId.ToString());
                 }
                 bool isCityExits = _cityRepo.Any(x => x.CityId == vm.CityId && x.IsActive == true && x.IsDeleted == false);
                 if (!isCityExits)
@@ -282,7 +284,7 @@ namespace QuickCampusAPI.Controllers
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-                    LoggedInUserClientId = user.ClientId.ToString();
+                    LoggedInUserClientId = (user.ClientId == null ? "0": user.ClientId.ToString());
                 }
                 bool isCityExits = _cityRepo.Any(x => x.CityId == vm.CityId && x.IsActive == true && x.IsDeleted == false);
                 if (!isCityExits)
@@ -391,30 +393,57 @@ namespace QuickCampusAPI.Controllers
 
         [HttpDelete]
         [Route("DeleteCollege")]
-        public async Task<IActionResult> DeleteCollege(int id)
+        public async Task<IActionResult> DeleteCollege(int CollegeId)
         {
             IGeneralResult<CollegeVM> result = new GeneralResult<CollegeVM>();
-            int cid = 0;
-            var jwtSecretKey = _config["Jwt:Key"];
-            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], jwtSecretKey);
-            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], jwtSecretKey);
-            if (isSuperAdmin)
+            try
             {
-               // cid = clientid;
-            }
-            else
-            {
-                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
-
-                if (cid == 0)
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
-                    result.IsSuccess = false;
-                    result.Message = "Invalid College";
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = (user.ClientId == null ? "0": user.ClientId.ToString());
+                }
+                if (CollegeId > 0)
+                {
+                    College college = new College();
+                    if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
+                    {
+                        college = _collegeRepo.GetAllQuerable().Where(x => x.CollegeId == CollegeId && x.IsDeleted == false).FirstOrDefault();
+                    }
+                    else
+                    {
+                        college = _collegeRepo.GetAllQuerable().Where(x => x.CollegeId == CollegeId && x.IsDeleted == false && x.ClientId == Convert.ToInt32(LoggedInUserClientId)).FirstOrDefault();
+                    }
+                    if (college == null)
+                    {
+                        result.Message = " College does Not Exist";
+                    }
+                    else
+                    {
+                        college.IsActive = false;
+                        college.IsDeleted = true;
+                        college.ModifiedDate = DateTime.Now;
+                        await _collegeRepo.Update(college);
+
+                        result.IsSuccess = true;
+                        result.Message = "College deleted successfully.";
+                        result.Data = (CollegeVM)college;
+                    }
                     return Ok(result);
                 }
+                else
+                {
+                    result.Message = "Please enter a valid College Id.";
+                }
             }
-            var res = await _collegeRepo.DeleteCollege(id, cid, isSuperAdmin);
-            return Ok(res);
+            catch (Exception ex)
+            {
+                result.Message = "Server error! " + ex.Message;
+            }
+            return Ok(result);
         }
 
         [HttpGet]
@@ -429,7 +458,7 @@ namespace QuickCampusAPI.Controllers
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-                    LoggedInUserClientId = user.ClientId.ToString();
+                    LoggedInUserClientId = (user.ClientId == null ? "0": user.ClientId.ToString());
                 }
                 var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
 
@@ -469,127 +498,6 @@ namespace QuickCampusAPI.Controllers
             catch (Exception ex)
             {
                 result.Message = "Server error! " + ex.Message;
-            }
-            return Ok(result);
-        }
-
-        private string ProcessUploadFile([FromForm] AddCollegeVm model)
-        {
-            List<string> url = new List<string>();
-            string uniqueFileName = null;
-            if (model.ImagePath != null)
-            {
-                string photoUoload = Path.Combine(_hostingEnvironment.WebRootPath, "UploadFiles");
-                uniqueFileName = Guid.NewGuid().ToString() + "_" + model.ImagePath.FileName;
-                string filepath = Path.Combine(photoUoload, uniqueFileName);
-                using (var filename = new FileStream(filepath, FileMode.Create))
-                {
-                    model.ImagePath.CopyTo(filename);
-                }
-            }
-
-            url.Add(Path.Combine(baseUrl, uniqueFileName));
-            return url.FirstOrDefault();
-        }
-
-        //private CountryTypeVm GetCountryDetails(int countryId, int userId)
-        //{
-        //    CountryTypeVm countryVm = new CountryTypeVm();
-
-        //    var countryDetails = _countryRepo.GetById(countryId).Result;
-        //    countryVm.CountryID = countryDetails.CountryId;
-        //    countryVm.CountryName = countryDetails.CountryName;
-        //    return countryVm;
-        //}
-
-        //private StateTypeVm GetstateDetails(int stateId, int userid)
-        //{
-        //    StateTypeVm statevm = new StateTypeVm();
-
-        //    var stateDetails = _stateRepo.GetById(stateId).Result;
-        //    statevm.StateId = stateDetails.StateId;
-        //    statevm.StateName = stateDetails.StateName;
-
-        //    return statevm;
-        //}
-
-        //private CityTypeVm GetCityDetails(int cityId, int userid)
-        //{
-        //    CityTypeVm cityVm = new CityTypeVm();
-        //    var citydetails = _cityRepo.GetById(cityId).Result;
-        //    cityVm.CityId = citydetails.CityId;
-        //    cityVm.CityName = citydetails.CityName;
-        //    return cityVm;
-        //}
-
-        //[HttpPost]
-        //[Route("ProcessUploadFile")]
-        //public List<string> ProcessUploadFile(List<IFormFile> Files)
-        //{
-        //    List<string> url = new List<string>();
-        //    if (Files.Count > 0)
-        //    {
-        //        foreach (IFormFile file in Files)
-        //        {
-        //            string uniqueFileName = null;
-        //            string photoUpload = Path.Combine(_hostingEnvironment.WebRootPath, "UploadFiles");
-        //            uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileName;
-        //            string filepath = Path.Combine(photoUpload, uniqueFileName);
-        //            using (var filename = new FileStream(filepath, FileMode.Create))
-        //            {
-        //                file.CopyTo(filename);
-        //            }
-        //            url.Add(Path.Combine(basePath, uniqueFileName));
-        //        }
-        //        return url;
-        //    }
-        //    else
-        //    {
-        //        url.Add("Please add atleast one file.");
-        //        return url;
-        //    }
-        //}
-
-        [Authorize(Roles = "GetAllActiveCollege")]
-        [HttpGet]
-        [Route("GetAllActiveCollege")]
-        public async Task<IActionResult> GetAllActiveCollege(int clientid)
-        {
-            IGeneralResult<List<CollegeVM>> result = new GeneralResult<List<CollegeVM>>();
-            int cid = 0;
-            var _jwtSecretKey = _config["Jwt:Key"];
-            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            if (isSuperAdmin)
-            {
-                cid = clientid;
-            }
-            else
-            {
-                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
-            }
-            try
-            {
-
-                var collegeListCount = (await _collegeRepo.GetAll()).Where(x => x.IsActive == true && x.IsDeleted == false && (cid == 0 ? true : x.CollegeId == cid)).Count();
-                var collegetList = (await _collegeRepo.GetAll()).Where(x => x.IsActive == true && x.IsDeleted == false && (cid == 0 ? true : x.CollegeId == cid)).OrderByDescending(x => x.CollegeId).ToList();
-
-                var res = collegetList.Select(x => ((CollegeVM)x)).ToList();
-                if (res != null && res.Count() > 0)
-                {
-                    result.IsSuccess = true;
-                    result.Message = "ActiveCollegeList";
-                    result.Data = res;
-                    result.TotalRecordCount = collegeListCount;
-                }
-                else
-                {
-                    result.Message = " Active College List Not Found";
-                }
-            }
-            catch (Exception ex)
-            {
-                result.Message = ex.Message;
             }
             return Ok(result);
         }

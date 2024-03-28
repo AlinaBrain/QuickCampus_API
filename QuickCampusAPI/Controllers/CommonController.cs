@@ -42,7 +42,7 @@ namespace QuickCampusAPI.Controllers
             {
                 var countryList = (await _countryRepo.GetAll()).Where(x => x.IsDeleted == false && x.IsActive == true).ToList().OrderBy(x => x.CountryName);
                 var res = countryList.Select(x => ((CountryVM)x)).ToList();
-                if (res != null && res.Count() > 0)
+                if (res != null && res.Count > 0)
                 {
                     result.IsSuccess = true;
                     result.Message = "Country fetched successfully.";
