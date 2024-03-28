@@ -18,10 +18,10 @@ namespace QuickCampus_Core.ViewModel
 
         public bool? IsCorrect { get; set; }
 
-        public string? OptionImage { get; set; }
+        public string ImagePath { get; set; } = null;
+        public IFormFile Image { get; set; }
 
-        public IFormFile ImagePath { get; set; } = null;
-        public byte[]? Image { get; set; }
+
 
         public QuestionOption ToQuestionOptionVmDbModel()
         {
@@ -30,7 +30,7 @@ namespace QuickCampus_Core.ViewModel
                 QuestionId= QuestionId,
                 OptionText= OptionText,
                 IsCorrect= true,
-                OptionImage= OptionImage,
+               Imagepath=ImagePath
                 
             };
         }

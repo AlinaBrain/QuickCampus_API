@@ -59,7 +59,6 @@ namespace QuickCampusAPI.Controllers
                     var startPage = 1;
                     newPageStart = (pageStart - startPage) * pageSize;
                 }
-
                 var campusTotalCount = 0;
                 List<WalkIn> campuslist = new List<WalkIn>();
                 List<WalkIn> campusdata = new List<WalkIn>();

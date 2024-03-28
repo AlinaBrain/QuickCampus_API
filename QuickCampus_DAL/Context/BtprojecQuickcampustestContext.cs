@@ -414,9 +414,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
             entity.ToTable("QuestionOption", "dbo");
 
             entity.Property(e => e.Imagepath).UseCollation("SQL_Latin1_General_CP1_CI_AS");
-            entity.Property(e => e.OptionImage)
-                .HasMaxLength(100)
-                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            
             entity.Property(e => e.OptionText).UseCollation("SQL_Latin1_General_CP1_CI_AS");
 
             entity.HasOne(d => d.Question).WithMany(p => p.QuestionOptions)

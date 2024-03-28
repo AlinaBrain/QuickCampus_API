@@ -430,7 +430,7 @@ public partial class BtprojecQuickcampusContext : DbContext
 
             entity.ToTable("QuestionOption", "dbo");
 
-            entity.Property(e => e.OptionImage).HasMaxLength(100);
+           
 
             entity.HasOne(d => d.Question).WithMany(p => p.QuestionOptions)
                 .HasForeignKey(d => d.QuestionId)

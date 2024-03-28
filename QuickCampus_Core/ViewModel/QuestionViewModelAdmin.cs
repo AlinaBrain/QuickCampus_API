@@ -11,6 +11,7 @@ namespace QuickCampus_Core.ViewModel
 {
     public class QuestionViewModelAdmin
     {
+        
 
         public int QuestionId { get; set; }
         [Required(ErrorMessage = "Question Type is required.")]
@@ -42,8 +43,8 @@ namespace QuickCampus_Core.ViewModel
         public int QuestionId { get; set; }
         
         public string OptionText { get; set; }
-        public IFormFile? Imagepath { get; set; } = null;
-        public string? OptionImage { get; set; }
+        public string? Imagepath { get; set; } = null;
+        public IFormFile Image { get; set; }
 
         public bool IsCorrect { get; set; }
         public bool IsNew { get; set; }

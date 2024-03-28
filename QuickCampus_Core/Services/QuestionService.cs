@@ -140,7 +140,7 @@ namespace QuickCampus_Core.Services
                         QuestionId = x.QuestionId,
                         OptionId = y.OptionId,
                         OptionText = y.OptionText,
-                        OptionImage = y.OptionImage,
+                        Imagepath=y.Imagepath,
                         IsCorrect = y.IsCorrect ?? false,
                         IsNew = false
                     }).ToList()
@@ -181,7 +181,7 @@ namespace QuickCampus_Core.Services
                 {
                     OptionId = y.OptionId,
                     OptionText = y.OptionText,
-                    OptionImage = y.OptionImage,
+                    Imagepath=y.Imagepath,
                     IsCorrect = y.IsCorrect ?? false,
                     IsNew = false
                 }).ToList()
@@ -452,6 +452,21 @@ namespace QuickCampus_Core.Services
             IGeneralResult<QuestionTakeViewModel> res = new GeneralResult<QuestionTakeViewModel>();
             try
             {
+                if(!_context.Groupdls.Any(x=>x.GroupId == questionTakeView.GroupId))
+                {
+                    res.Message = "Invalid group.";
+                    return res;
+                }
+                if (!_context.Sections.Any(x => x.SectionId == questionTakeView.SectionId))
+                {
+                    res.Message = "Invalid section.";
+                    return res;
+                }
+                if (!_context.QuestionTypes.Any(x => x.QuestionTypeId == questionTakeView.QuestionTypeId))
+                {
+                    res.Message = "Invalid question type.";
+                    return res;
+                }
                 if (questionTakeView.QuestionId > 0)
                 {
                     var questiondata = _context.Questions.Where(x => x.QuestionId == questionTakeView.QuestionId).FirstOrDefault();
@@ -460,7 +475,7 @@ namespace QuickCampus_Core.Services
                     questiondata.GroupId = questionTakeView.GroupId;
                     questiondata.SectionId = questionTakeView.SectionId;
                     questiondata.Marks = questionTakeView.Marks;
-                    questiondata.ClentId = questionTakeView.ClentId;
+                  
                     var question = _context.Questions.Update(questiondata);
                     questionTakeView.QuestionId = question.Entity.QuestionId;
                     foreach (var option in questionTakeView.QuestionssoptionVm)
@@ -492,7 +507,7 @@ namespace QuickCampus_Core.Services
                         GroupId = questionTakeView.GroupId,
                         SectionId = questionTakeView.SectionId,
                         Marks = questionTakeView.Marks,
-                        ClentId = questionTakeView.ClentId,
+                        
                         IsActive = true,
                         IsDeleted = false
                     };
@@ -516,7 +531,7 @@ namespace QuickCampus_Core.Services
                         _context.SaveChanges();
                         option.OptionId = addQuestionOptions.Entity.OptionId;
                         option.Imagepath = Path.Combine(baseUrl, questionOption.Imagepath);
-                        option.Image = null;
+                        
                     }
                     res.Data = questionTakeView;
                     res.IsSuccess = true;

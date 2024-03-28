@@ -51,10 +51,10 @@ namespace QuickCampusAPI.Controllers
                 {
                    QuestionId=optionvm.QuestionId,
                    OptionId= optionvm.OptionId,
-                   OptionImage = optionvm.ImagePath != null ? ProcessUploadFile(optionvm) :optionvm.OptionImage,
+                   ImagePath = optionvm.ImagePath != null ? ProcessUploadFile(optionvm) :optionvm.ImagePath,
                    OptionText=optionvm.OptionText,
                    IsCorrect =optionvm.IsCorrect,
-                   Image= OptionImage
+                   
                 };
                 var questiondetail = await _optionrepo.Add(optionvmm.ToQuestionOptionVmDbModel());
                 result.IsSuccess = true;
@@ -75,14 +75,14 @@ namespace QuickCampusAPI.Controllers
         {
             List<string> url = new List<string>();
             string uniqueFileName = null;
-            if (model.ImagePath != null)
+            if (model.Image != null)
             {
                 string photoUoload = Path.Combine(_hostingEnvironment.WebRootPath, "UploadFiles");
-                uniqueFileName = Guid.NewGuid().ToString() + "_" + model.ImagePath.FileName;
+                uniqueFileName = Guid.NewGuid().ToString() + "_" + model.Image.FileName;
                 string filepath = Path.Combine(photoUoload, uniqueFileName);
                 using (var filename = new FileStream(filepath, FileMode.Create))
                 {
-                    model.ImagePath.CopyTo(filename);
+                    model.Image.CopyTo(filename);
                 }
             }
 
