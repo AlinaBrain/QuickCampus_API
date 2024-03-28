@@ -131,23 +131,23 @@ builder.Services.Configure<ApiBehaviorOptions>(options
     => options.SuppressModelStateInvalidFilter = true);
 builder.Services.AddScoped<QuickCampus_Core.Common.Helper.ProcessUploadFile>();
 var app = builder.Build();
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
 
-    app.UseFileServer(new FileServerOptions
-    {
-        // FileProvider = new PhysicalFileProvider(@"D:\Quick Campus\QuickCampusAPI\wwwroot\UploadFiles"),
-        //FileProvider=new PhysicalFileProvider(@"D:\QuickCampus_01-02-2024\QuickCampus_API\Quick_Campus\QuickCampusAPI\wwwroot\UploadFiles"),
-        FileProvider = new PhysicalFileProvider(@"D:\QuickCampus_01-02-2024\QuickCampus_API\Quick_Campus\QuickCampusAPI\wwwroot\UploadFiles"),
+//    app.UseFileServer(new FileServerOptions
+//    {
+//        // FileProvider = new PhysicalFileProvider(@"D:\Quick Campus\QuickCampusAPI\wwwroot\UploadFiles"),
+//        //FileProvider=new PhysicalFileProvider(@"D:\QuickCampus_01-02-2024\QuickCampus_API\Quick_Campus\QuickCampusAPI\wwwroot\UploadFiles"),
+//        FileProvider = new PhysicalFileProvider(@"D:\QuickCampus_01-02-2024\QuickCampus_API\Quick_Campus\QuickCampusAPI\wwwroot\UploadFiles"),
         
-        RequestPath = new PathString("/UploadFiles"),
-        EnableDirectoryBrowsing = false
-    });
-}
-else
-{
+//        RequestPath = new PathString("/UploadFiles"),
+//        EnableDirectoryBrowsing = false
+//    });
+//}
+//else
+//{
 
-}
+//}
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseAuthentication();

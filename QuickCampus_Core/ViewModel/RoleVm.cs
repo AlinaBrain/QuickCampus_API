@@ -9,9 +9,9 @@ namespace QuickCampus_Core.ViewModel
         {
             return new RoleVm
             {  
-                ClientId = item.ClientId,
+                Id = item.Id,
                 Name = item.Name,
-                
+                IsActive = item.IsActive,
             };
 
         }
@@ -61,7 +61,7 @@ namespace QuickCampus_Core.ViewModel
                 CreatedBy = item.CreatedBy,
                 ModifiedBy = item.ModifiedBy,
                 CreatedDate = item.CreatedDate,
-                ModofiedDate = item.ModofiedDate,
+                ModifiedDate = item.ModofiedDate,
                 IsDeleted = item.IsDeleted,
                 IsActive = item.IsActive
             };
@@ -76,8 +76,7 @@ namespace QuickCampus_Core.ViewModel
         public int? ModifiedBy { get; set; }
 
         public DateTime CreatedDate { get; set; }
-
-        public DateTime ModofiedDate { get; set; }
+        public DateTime ModifiedDate { get; set; }
         public bool? IsDeleted { get; set; }
 
         public bool? IsActive { get; set; }

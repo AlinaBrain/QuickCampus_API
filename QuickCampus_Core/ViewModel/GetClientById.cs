@@ -33,5 +33,6 @@ namespace QuickCampus_Core.ViewModel
         public string? SubscriptionPlan { get; set; }
         public decimal? Longitude { get; set; }
         public decimal? Latitude { get; set; }
+        public int? RoleId { get; set; }
     }
 }
