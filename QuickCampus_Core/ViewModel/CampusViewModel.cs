@@ -22,17 +22,15 @@ namespace QuickCampus_Core.ViewModel
                 StateId=x.StateId,
                 CountryId=x.CountryId,
                 
+                
             };
         }
 
-        public IEnumerable<CampusGridViewModel> CampusList { get; set; }
+        public List<CampusWalkInModel> CampusList { get; set; }
         public int WalkInID { get; set; }
         public string? Address1 { get; set; }
         public string? Address2 { get; set; }
         public int? City { get; set; }
-        public string? StateName { get;  set; }
-        public string? CountryName { get; set; }
-        public DateTime? CreatedDate { get;  set; }
         public bool? IsActive { get; set; }
         public DateTime? WalkInDate { get; set; }
         public string? JobDescription { get; set; }
@@ -43,19 +41,15 @@ namespace QuickCampus_Core.ViewModel
     public class CampusGridViewModel
     {
         public int WalkInID { get; set; }
-
-
-        //[Required( ErrorMessage = "Address is required." )]
         public string? Address1 { get; set; }
 
         public string? Address2 { get; set; }
-        //[Required( ErrorMessage = "MstCity is required." )]      
+        
         public int? City { get; set; }
 
-        //[Required( ErrorMessage = "MstCity_State is required." )]
         public int? StateID { get; set; }
 
-        //[Required( ErrorMessage = "MstCity_State_Country is required." )]
+        
         public int? CountryID { get; set; }
 
         [Required(ErrorMessage = "Date is required.")]

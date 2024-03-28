@@ -5,8 +5,10 @@ using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.Services;
 using QuickCampus_Core.ViewModel;
+using QuickCampus_DAL.Context;
 using System.Net.Mail;
 using System.Security.Cryptography;
+using static QuickCampus_Core.Common.common;
 
 namespace QuickCampusAPI.Controllers
 {
@@ -21,8 +23,10 @@ namespace QuickCampusAPI.Controllers
         private IConfiguration _config;
         private readonly IUserAppRoleRepo _userAppRoleRepo;
         private readonly IUserRepo _userRepo;
+        private string _jwtSecretKey;
+        private ICampusWalkinCollegeRepo _campusWalkinCollegeRepo;
 
-        public CampusController(IConfiguration configuration, ICampusRepo campusrepo, ICountryRepo countryRepo, IStateRepo stateRepo, IUserAppRoleRepo userAppRoleRepo,IUserRepo userRepo)
+        public CampusController(IConfiguration configuration, ICampusRepo campusrepo, ICountryRepo countryRepo, IStateRepo stateRepo, IUserAppRoleRepo userAppRoleRepo,IUserRepo userRepo,ICampusWalkinCollegeRepo campusWalkinCollegeRepo)
         {
             _campusrepo = campusrepo;
             _country = countryRepo;
@@ -30,29 +34,82 @@ namespace QuickCampusAPI.Controllers
             _config = configuration;
             _userAppRoleRepo = userAppRoleRepo;
             _userRepo = userRepo;
+            _jwtSecretKey = _config["Jwt:Key"] ?? "";
+            _campusWalkinCollegeRepo = campusWalkinCollegeRepo;
         }
         [HttpGet]
-        [Route("ManageCampus")]
+        [Route("GetAllCampus")]
 
-        public async Task<IActionResult> GetAllCampus()
+        public async Task<IActionResult> GetAllCampus(string? search, DataTypeFilter DataType, int pageStart = 1, int pageSize = 10)
         {
-            IGeneralResult<List<CampusGridViewModel>> result = new GeneralResult<List<CampusGridViewModel>>();
+            IGeneralResult<List<CampusViewModel>> result = new GeneralResult<List<CampusViewModel>>();
             try
             {
-                var _jwtSecretKey = _config["Jwt:Key"];
                 var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                 var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
                     LoggedInUserClientId = (user.ClientId == null ? "0": user.ClientId.ToString());
                 }
-                var res = await _campusrepo.GetAllCampus();
-                return Ok(res);
+                var newPageStart = 0;
+                if (pageStart > 0)
+                {
+                    var startPage = 1;
+                    newPageStart = (pageStart - startPage) * pageSize;
+                }
+
+                var campusTotalCount = 0;
+                List<WalkIn> campuslist = new List<WalkIn>();
+                List<WalkIn> campusdata = new List<WalkIn>();
+                if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
+                {
+                    campusdata = _campusrepo.GetAllQuerable().Where(x => x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
+                }
+                else
+                {
+                    campusdata = _campusrepo.GetAllQuerable().Where(x => x.ClientId == Convert.ToInt32(LoggedInUserClientId) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
+                }
+              
+                if (!string.IsNullOrEmpty(search))
+                {
+                    search = search.Trim();
+
+                }
+
+                campuslist = campusdata.Where(x => (x.Address1.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.Address2.Trim().Contains(search ?? "", StringComparison.OrdinalIgnoreCase))).OrderByDescending(x => x.WalkInId).ToList();
+
+                campusTotalCount = campuslist.Count;
+                campuslist = campuslist.Skip(newPageStart).Take(pageSize).ToList();
+                var response = campuslist.Select(x => (CampusViewModel)x).ToList();
+                List<CampusViewModel> record = new List<CampusViewModel>();
+               foreach(var item in response)
+                {
+                    item.CampusList = _campusWalkinCollegeRepo.GetAll(y => y.WalkInId == item.WalkInID).Result.Select(z => new CampusWalkInModel()
+                    {
+                        CampusId = z.CampusId,
+                        StartDateTime = z.StartDateTime,
+                        ExamEndTime = z.ExamEndTime.ToString(),
+                        CollegeId = z.CollegeId
+                    }).ToList();
+                }
+               
+                if (campuslist.Count > 0)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Campus get successfully";
+                    result.Data = response;
+                    result.TotalRecordCount = campusTotalCount;
+                }
+                else
+                {
+                    result.Message = "No Campus found!";
+                }
             }
             catch (Exception ex)
             {
-                result.Message = "Server Error" + ex.Message;
+                result.Message = "server error! " + ex.Message;
             }
             return Ok(result);
         }
@@ -155,33 +212,42 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
         [HttpGet]
-        [Route("UpdateCampusStaus")]
-        public async Task<IActionResult> UpdateCampusStaus(int campusId, bool status, int clientid)
+        [Route("CampusActiveInActive")]
+        public async Task<IActionResult> ActiveInActive(int campusId, bool status)
         {
-            IGeneralResult<string> result = new GeneralResult<string>();
-            int cid = 0;
-            var jwtSecretKey = _config["Jwt:Key"];
-            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], jwtSecretKey);
-            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], jwtSecretKey);
-            if (isSuperAdmin)
+            IGeneralResult<CampusViewModel> result = new GeneralResult<CampusViewModel>();
+            try
             {
-                cid = clientid;
-            }
-            else
-            {
-                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
-
-                if (cid == 0)
+                var _jwtSecretKey = _config["Jwt:Key"];
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                 {
-                    result.IsSuccess = false;
-                    result.Message = "Invalid Client";
-                    return Ok(result);
+                    var res = _campusrepo.GetAllQuerable().Where(x => x.WalkInId == campusId && x.IsDeleted == false).FirstOrDefault();
+                    int campusTotalCount = 0;
+                    campusTotalCount = _campusrepo.GetAllQuerable().Where(x => x.WalkInId == campusId && x.IsDeleted == false).Count();
+                    if (res != null)
+                    {
+                        res.IsActive = !res.IsActive;
+                        var data = await _campusrepo.Update(res);
+                        result.Data = (CampusViewModel)data;
+                        result.IsSuccess = true;
+                        result.TotalRecordCount = campusTotalCount;
+                        result.Message = "Campus status changed successfully";
+                    }
+                }
+                else
+                {
+                    result.Message = "Access Denied";
                 }
             }
-
-            var res = await _campusrepo.UpdateCampusStatus(campusId, cid, status, isSuperAdmin);
-            return Ok(res);
+            catch (Exception ex)
+            {
+                result.Message = "Server Error " + ex.Message;
+            }
+            return Ok(result);
         }
+    
         [HttpDelete]
         [Route("DeleteCampus")]
         public async Task<IActionResult> DeleteCampus(int campusId)

@@ -16,6 +16,5 @@ namespace QuickCampus_Core.ViewModel
         public IFormFile? Image { get; set; }
         public string? Imagepath { get; set; }
         public int SortOrder { get; set; }
-
     }
 }
