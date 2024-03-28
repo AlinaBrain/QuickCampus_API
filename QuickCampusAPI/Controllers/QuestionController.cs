@@ -129,10 +129,6 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-
-
-
-
         [HttpGet]
         [Route("GetQuestionById")]
         public async Task<ActionResult> GetQuestionByid(int questionId)
@@ -464,7 +460,6 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
-
         [HttpGet]
         [Route("GetAllSectionList")]
         public async Task<ActionResult> GetAllSectionList()
@@ -504,9 +499,6 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-
-
-
 
         [HttpPost]
         [Route("UpdateQuestion")]
