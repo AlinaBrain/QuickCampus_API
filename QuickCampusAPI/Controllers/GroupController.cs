@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
+using QuickCampus_Core.Services;
 using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
+using static QuickCampus_Core.Common.common;
 
 namespace QuickCampusAPI.Controllers
 {
@@ -12,62 +14,56 @@ namespace QuickCampusAPI.Controllers
     public class GroupController : ControllerBase
     {
         private readonly IGroupRepo _grouprepo;
+        private readonly IUserRepo _userRepo;
+        private readonly IUserAppRoleRepo _userAppRoleRepo;
         private readonly IConfiguration _config;
+        private string _jwtSecretKey;
 
-        public GroupController( IGroupRepo groupRepo,IConfiguration configuration)
+        public GroupController( IGroupRepo groupRepo, IUserRepo userRepo,IUserAppRoleRepo userAppRoleRepo,IConfiguration configuration)
         {
             _grouprepo=groupRepo;
+            _userRepo = userRepo;
+            _userAppRoleRepo = userAppRoleRepo;
             _config = configuration;
+            _jwtSecretKey = _config["Jwt:Key"] ?? "";
         }
 
         [HttpGet]
-        [Route("GetAllGroup")]
-        public async Task<IActionResult> GetAllGroup(int clientid)
+        [Route("GetAllGroups")]
+        public async Task<IActionResult> GetAllGroup()
         {
             IGeneralResult<List<GroupVm>> result = new GeneralResult<List<GroupVm>>();
-            var _jwtSecretKey = _config["Jwt:Key"];
-
-            int cid = 0;
-            var jwtSecretKey = _config["Jwt:Key"];
-            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            var newPageStart = 0;
-
-            if (isSuperAdmin)
-            {
-                cid = clientid;
-            }
-            else
-            {
-                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
-            }
-            List<Groupdl> grouplist = new List<Groupdl>();
-            var cityTotalCount = 0;
             try
             {
-                if (isSuperAdmin)
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
-                    cityTotalCount = (await _grouprepo.GetAll()).Where(x =>  (cid == 0 ? true : x.ClentId == cid)).Count();
-                    grouplist = (await _grouprepo.GetAll()).Where(x => (cid == 0 ? true : x.ClentId == cid)).ToList();
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
+                }
+                List<Groupdl> groupList = new List<Groupdl>();
+                if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
+                {
+                    groupList = _grouprepo.GetAllQuerable().ToList();
                 }
                 else
                 {
-                    cityTotalCount = (await _grouprepo.GetAll()).Where(x => (cid == 0 ? true : x.ClentId == cid)).Count();
-                    grouplist = (await _grouprepo.GetAll()).Where(x => (cid == 0 ? true : x.ClentId == cid)).ToList();
+                    groupList = _grouprepo.GetAllQuerable().Where(x => x.ClentId == Convert.ToInt32(LoggedInUserClientId)).ToList();
                 }
-                var response = grouplist.Select(x => (GroupVm)x).ToList();
-                if (grouplist.Count > 0)
+                
+                var response = groupList.Select(x => (GroupVm)x).ToList();
+                if (groupList.Count > 0)
                 {
                     result.IsSuccess = true;
-                    result.Message = "Group get successfully";
+                    result.Message = "Groups fetched successfully";
                     result.Data = response;
-                    result.TotalRecordCount = grouplist.Count;
+                    result.TotalRecordCount = groupList.Count;
                 }
                 else
                 {
-                    result.IsSuccess = true;
-                    result.Message = "Group list not found!";
-                    result.Data = null;
+                    result.Message = "Groups not found!";
                 }
             }
             catch (Exception ex)

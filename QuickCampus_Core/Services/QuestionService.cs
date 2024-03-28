@@ -140,7 +140,7 @@ namespace QuickCampus_Core.Services
                         QuestionId = x.QuestionId,
                         OptionId = y.OptionId,
                         OptionText = y.OptionText,
-                        OptionImage = y.OptionImage,
+                        //OptionImage = y.OptionImage,
                         IsCorrect = y.IsCorrect ?? false,
                         IsNew = false
                     }).ToList()
@@ -181,7 +181,7 @@ namespace QuickCampus_Core.Services
                 {
                     OptionId = y.OptionId,
                     OptionText = y.OptionText,
-                    OptionImage = y.OptionImage,
+                    //OptionImage = y.OptionImage,
                     IsCorrect = y.IsCorrect ?? false,
                     IsNew = false
                 }).ToList()

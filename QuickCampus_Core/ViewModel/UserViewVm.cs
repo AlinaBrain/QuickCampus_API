@@ -10,6 +10,7 @@ namespace QuickCampus_Core.ViewModel
     public class UserViewVm
     {
         public int UserId { get; set; }
+        public string? Name { get; set; }
         public string? Email { get; set; }
         public string? Mobile { get; set; }
         public int? ClientId { get; set; }
@@ -20,6 +21,7 @@ namespace QuickCampus_Core.ViewModel
             return new UserViewVm
             {
                 UserId = v.Id,
+                Name = v.Name,
                 Email = v.Email,
                 Mobile = v.Mobile,
                 ClientId = v.ClientId,

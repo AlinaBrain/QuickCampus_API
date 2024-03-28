@@ -19,10 +19,10 @@ namespace QuickCampus_Core.ViewModel
                 WalkInDate = x.WalkInDate,
                 JobDescription = x.JobDescription,
                 Title = x.Title,
-                StateId=x.StateId,
-                CountryId=x.CountryId,
-                
-                
+                StateId = x.StateId,
+                CountryId = x.CountryId,
+
+
             };
         }
 
@@ -44,16 +44,14 @@ namespace QuickCampus_Core.ViewModel
         public string? Address1 { get; set; }
 
         public string? Address2 { get; set; }
-        
+
         public int? City { get; set; }
 
         public int? StateID { get; set; }
 
-        
         public int? CountryID { get; set; }
 
         [Required(ErrorMessage = "Date is required.")]
-        [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}")]
         public DateTime? WalkInDate { get; set; }
 
         [Required(ErrorMessage = "Description is required.")]
@@ -78,13 +76,15 @@ namespace QuickCampus_Core.ViewModel
         public string? ExamStartTime { get; set; }
 
         [Required(ErrorMessage = "Time is required.")]
-       
+
         public string? ExamEndTime { get; set; }
 
         [Required(ErrorMessage = "Time is required.")]
         public bool IsIncludeInWalkIn { get; set; }
         public DateTime? StartDateTime { get; set; }
-        
+        public string? CollegeName { get; set; }
+        public string? CollegeCode { get; set; }
+
     }
     public class CollegeFilter
     {

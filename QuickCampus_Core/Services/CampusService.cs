@@ -27,7 +27,7 @@ namespace QuickCampus_Core.Services
             var allCollages = _context.Colleges.Where(s => s.IsDeleted == false).Select(s => s.CollegeId).ToList();
             var allStates = _context.MstCityStates.Where(w => w.IsDeleted == false).Select(s => s.StateId).ToList();
             var isStateExist = allStates.Any(a => a == vm.StateID);
-            var allCity =await _context.MstCities.Where(m => m.IsDeleted == false).Select(c => c.CityId).ToListAsync();
+            var allCity = await _context.MstCities.Where(m => m.IsDeleted == false).Select(c => c.CityId).ToListAsync();
             var isCityExist = allCity.Any(x => x == vm.City);
 
             foreach (var clg in vm.Colleges)
@@ -74,7 +74,7 @@ namespace QuickCampus_Core.Services
                         campus.CountryId = vm.CountryID;
                         campus.Title = vm.Title;
                         campus.CreatedDate = DateTime.Now;
-                        var walkindata= _context.Update(campus);
+                        var walkindata = _context.Update(campus);
                         vm.WalkInID = walkindata.Entity.WalkInId;
 
                         if (campus.CampusWalkInColleges != null)
@@ -93,18 +93,18 @@ namespace QuickCampus_Core.Services
                                     ExamStartTime = TimeSpan.Parse(rec.ExamStartTime),
                                     ExamEndTime = TimeSpan.Parse(rec.ExamEndTime),
                                     StartDateTime = rec.StartDateTime,
-                                    
+
                                 };
-                              var updatecampus=  _context.CampusWalkInColleges.Add(campusWalkInCollege);
+                                var updatecampus = _context.CampusWalkInColleges.Add(campusWalkInCollege);
                                 rec.CampusId = updatecampus.Entity.CampusId;
                             }
                         }
                     }
                     var UpdateResult = _context.SaveChanges();
-                   
+
                     if (UpdateResult > 0)
                     {
-                        
+
                         result.IsSuccess = true;
                         result.Message = "Record Update Successfully";
                         result.Data = vm;
@@ -132,7 +132,7 @@ namespace QuickCampus_Core.Services
                     Title = vm.Title,
 
                 };
-              var walkin=  _context.WalkIns.Add(sv);
+                var walkin = _context.WalkIns.Add(sv);
                 _context.SaveChanges();
                 vm.WalkInID = walkin.Entity.WalkInId;
 
@@ -176,98 +176,104 @@ namespace QuickCampus_Core.Services
             res = _context.CampusWalkInColleges.Include(i => i.College).Where(w => w.CampusId == id).FirstOrDefault();
             return res;
         }
-        public async Task <IGeneralResult<List<CampusGridViewModel>>> GetAllCampus()
+        public async Task<IGeneralResult<List<CampusGridViewModel>>> GetAllCampus()
         {
-              IGeneralResult<List<CampusGridViewModel>> result=new GeneralResult<List<CampusGridViewModel>>();
+            IGeneralResult<List<CampusGridViewModel>> result = new GeneralResult<List<CampusGridViewModel>>();
 
-                var campusdata = _context.WalkIns.Where(x => x.IsDeleted == false  )
-                .Include(x => x.CampusWalkInColleges).Include(x => x.State).Include(x => x.Country).OrderByDescending(x => x.WalkInDate).Select(x => new CampusGridViewModel()
+            var campusdata = _context.WalkIns.Where(x => x.IsDeleted == false)
+            .Include(x => x.CampusWalkInColleges).Include(x => x.State).Include(x => x.Country).OrderByDescending(x => x.WalkInDate).Select(x => new CampusGridViewModel()
+            {
+                WalkInID = x.WalkInId,
+                Address1 = x.Address1,
+                Address2 = x.Address2,
+                City = x.City,
+                StateID = x.StateId,
+                CountryID = x.CountryId,
+                JobDescription = x.JobDescription,
+                WalkInDate = x.WalkInDate,
+                IsActive = x.IsActive ?? false,
+                Title = x.Title,
+                Colleges = x.CampusWalkInColleges.Select(y => new CampusWalkInModel()
                 {
-                    WalkInID = x.WalkInId,
-                    Address1 = x.Address1,
-                    Address2 = x.Address2,
-                    City = x.City,
-                    StateID = x.StateId,
-                    CountryID = x.CountryId,
-                    JobDescription = x.JobDescription,
-                    WalkInDate = x.WalkInDate,
-                    IsActive = x.IsActive ?? false,
-                    Title = x.Title,
-                    Colleges = x.CampusWalkInColleges.Select(y => new CampusWalkInModel()
-                    {
-         
-                        CollegeId = y.CollegeId ?? 0,
-                        ExamEndTime = y.ExamEndTime.Value.ToString(),
-                        ExamStartTime = y.ExamStartTime.Value.ToString()
-                    }).ToList(),
-                }).ToList();
 
-                if (campusdata.Any())
-                {
-                    result.Data=campusdata;
-                
+                    CampusId = y.CampusId,
+                    CollegeId = y.CollegeId ?? 0,
+                    ExamEndTime = y.ExamEndTime.Value.ToString(),
+                    ExamStartTime = y.ExamStartTime.Value.ToString(),
+                    IsIncludeInWalkIn = true,
+                    StartDateTime = y.StartDateTime.Value,
+                    CollegeName = _context.Colleges.Where(z => z.CollegeId == y.CollegeId).First().CollegeName,
+                    CollegeCode = _context.Colleges.Where(z => z.CollegeId == y.CollegeId).First().CollegeCode,
+                }).ToList(),
+            }).ToList();
+
+            if (campusdata.Any())
+            {
+                result.Data = campusdata;
                 return result;
-              
             }
-                else
-                {
+            else
+            {
                 result.Message = "Something Went Wrong ";
-                }
-            return result;
             }
+            return result;
+        }
 
         public async Task<IGeneralResult<CampusGridViewModel>> GetCampusByID(int id)
         {
-            IGeneralResult<CampusGridViewModel>result=new GeneralResult<CampusGridViewModel>();
+            IGeneralResult<CampusGridViewModel> result = new GeneralResult<CampusGridViewModel>();
 
-                var campusData = _context.WalkIns.Where(x => x.IsDeleted == false && x.IsActive==true && x.WalkInId == id ).Include(x => x.CampusWalkInColleges).Include(x => x.State).Include(x => x.Country).OrderByDescending(x => x.WalkInDate).Select(x => new CampusGridViewModel()
+            var campusData = _context.WalkIns.Where(x => x.IsDeleted == false && x.IsActive == true && x.WalkInId == id).Include(x => x.CampusWalkInColleges).Include(x => x.State).Include(x => x.Country).OrderByDescending(x => x.WalkInDate).Select(x => new CampusGridViewModel()
+            {
+                WalkInID = x.WalkInId,
+                Address1 = x.Address1,
+                Address2 = x.Address2,
+                City = x.City,
+                StateID = x.StateId,
+                CountryID = x.CountryId,
+                JobDescription = x.JobDescription,
+                WalkInDate = x.WalkInDate.Value,
+                IsActive = x.IsActive ?? false,
+                Title = x.Title,
+                Colleges = x.CampusWalkInColleges.Where(z => z.WalkInId == x.WalkInId).Select(y => new CampusWalkInModel()
                 {
-                    WalkInID = x.WalkInId,
-                    Address1 = x.Address1,
-                    Address2 = x.Address2,
-                    City = x.City,
-                    StateID = x.StateId,
-                    CountryID = x.CountryId,
-                    JobDescription = x.JobDescription,
-                    WalkInDate = x.WalkInDate,
-                    IsActive = x.IsActive ?? false,
-                    Title = x.Title,
-                    Colleges = x.CampusWalkInColleges.Where(z=>z.WalkInId==x.WalkInId).Select(y => new CampusWalkInModel()
-                    {
-                        CampusId=y.CampusId,
-                        CollegeId = y.CollegeId ?? 0,
-                        ExamEndTime = y.ExamEndTime.Value.ToString(),
-                        ExamStartTime = y.ExamStartTime.Value.ToString(),
-                         IsIncludeInWalkIn=true,
-                         StartDateTime=y.StartDateTime
-                 }).ToList(),
-                }).FirstOrDefault();
-                if (campusData!= null)
-                {
+                    CampusId = y.CampusId,
+                    CollegeId = y.CollegeId ?? 0,
+                    ExamEndTime = y.ExamEndTime.Value.ToString(),
+                    ExamStartTime = y.ExamStartTime.Value.ToString(),
+                    IsIncludeInWalkIn = true,
+                    StartDateTime = y.StartDateTime.Value,
+                    CollegeName = _context.Colleges.Where(z=>z.CollegeId == y.CollegeId).First().CollegeName,
+                    CollegeCode = _context.Colleges.Where(z => z.CollegeId == y.CollegeId).First().CollegeCode,
+                }).ToList(),
+            }).FirstOrDefault();
+            if (campusData != null)
+            {
                 CampusGridViewModel vmm = new CampusGridViewModel
                 {
                     WalkInID = campusData.WalkInID,
-                    Address1=campusData.Address1,
-                    Address2=campusData.Address2,
-                    City=campusData.City,
-                    StateID=campusData.StateID,
-                    CountryID=campusData.CountryID,
-                    IsActive=campusData.IsActive,
-                    Colleges=campusData?.Colleges,
-                    JobDescription=campusData.JobDescription,
-                    Title=campusData?.Title,
+                    Address1 = campusData.Address1,
+                    Address2 = campusData.Address2,
+                    City = campusData.City,
+                    StateID = campusData.StateID,
+                    CountryID = campusData.CountryID,
+                    IsActive = campusData.IsActive,
+                    Colleges = campusData?.Colleges,
+                    JobDescription = campusData.JobDescription,
+                    Title = campusData?.Title,
+                    WalkInDate = campusData.WalkInDate
                 };
-                  result.Data=vmm;
+                result.Data = vmm;
                 result.IsSuccess = true;
-                result.Message = "Data Getting Successfully";
-                }
-                else
-                {
-                result.Message = "Data Not Fetched Successfully";
-                
-                }
-                return result;
+                result.Message = "Campus fetched Successfully";
             }
+            else
+            {
+                result.Message = "Data Not found";
+
+            }
+            return result;
+        }
         private CampusWalkInModel GetCollegeDetails(int collegeid)
         {
             CampusWalkInModel statevm = new CampusWalkInModel();
@@ -277,13 +283,13 @@ namespace QuickCampus_Core.Services
 
             return statevm;
         }
-        public async Task<IGeneralResult<CampusGridViewModel>> ActiveInActive(int id,  bool status)
+        public async Task<IGeneralResult<CampusGridViewModel>> ActiveInActive(int id, bool status)
         {
             IGeneralResult<CampusGridViewModel> result = new GeneralResult<CampusGridViewModel>();
             result.Data = new CampusGridViewModel();
             WalkIn campus = new WalkIn();
-           campus = _context.WalkIns.Where(x => x.WalkInId == id && x.IsDeleted == false ).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
-            
+            campus = _context.WalkIns.Where(x => x.WalkInId == id && x.IsDeleted == false).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
+
             if (campus == null)
             {
                 result.IsSuccess = false;
@@ -329,7 +335,7 @@ namespace QuickCampus_Core.Services
                     result.Message = "College id " + clg.CollegeId + " is not exist";
                     return result;
                 }
-                
+
             }
 
             if (!isCountryExist)
@@ -465,7 +471,7 @@ namespace QuickCampus_Core.Services
             IGeneralResult<CampusGridViewModel> result = new GeneralResult<CampusGridViewModel>();
             result.Data = new CampusGridViewModel();
             WalkIn campus = new WalkIn();
-                campus = _context.WalkIns.Where(x => x.WalkInId == id && x.IsActive == true && x.IsDeleted == false ).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
+            campus = _context.WalkIns.Where(x => x.WalkInId == id && x.IsActive == true && x.IsDeleted == false).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
             if (campus == null)
             {
                 result.IsSuccess = false;

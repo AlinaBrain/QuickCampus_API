@@ -159,7 +159,7 @@ namespace QuickCampusAPI.Controllers
                 }
                 else
                 {
-                    result.Message = "Please enter a valid College Id.";
+                    result.Message = "Please enter a valid College UserId.";
                 }
             }
             catch (Exception ex)
@@ -382,7 +382,7 @@ namespace QuickCampusAPI.Controllers
                 }
                 else
                 {
-                    result.Message = "Please enter a valid College Id";
+                    result.Message = "Please enter a valid College UserId";
                 }
             }
 
@@ -439,7 +439,7 @@ namespace QuickCampusAPI.Controllers
                 }
                 else
                 {
-                    result.Message = "Please enter a valid College Id.";
+                    result.Message = "Please enter a valid College UserId.";
                 }
             }
             catch (Exception ex)
@@ -495,7 +495,7 @@ namespace QuickCampusAPI.Controllers
                 }
                 else
                 {
-                    result.Message = "Please enter a valid College Id.";
+                    result.Message = "Please enter a valid College UserId.";
                 }
             }
             catch (Exception ex)

@@ -9,30 +9,33 @@ namespace QuickCampus_Core.ViewModel
         {
             return new UserRequestVm
             {
-                Id = item.Id,   
+                UserId = item.Id,   
                 Email = item.Email,
+                Name = item.Name,
                 Mobile=item.Mobile
             };
         }
        
-        public int Id { get; set; }
+        public int UserId { get; set; }
         [Required(ErrorMessage = "Username is required.")]
         public string? Email { get; set; }
+        [Required(ErrorMessage = "Name is required.")]
+        public string? Name { get; set; }
 
         [Required]
         [RegularExpression(@"^[1-9][0-9]{9}$", ErrorMessage = "Please enter a valid 10-digit mobile number that does not start with 0.")]
         public string? Mobile { get; set; }
-        public DateTime? CreateDate { get; set; }
+        //public DateTime? CreateDate { get; set; }
 
-        public DateTime? ModifiedDate { get; set; }
+        //public DateTime? ModifiedDate { get; set; }
         public TblUser ToUpdateDbModel()
         {
             return new TblUser
             {
-                Id = Id,
+                Id = UserId,
                 Email = Email,
                 Mobile = Mobile,
-                CreateDate = Id > 0 ? null : DateTime.UtcNow,
+                CreateDate = UserId > 0 ? null : DateTime.UtcNow,
                 ModifiedDate = DateTime.Now
             };
         }

@@ -38,7 +38,7 @@ namespace QuickCampus_Core.ViewModel
         public bool? IsActive { get; set; }
         [Required, MaxLength(100)]
         [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage = "Invalid email address.")]
-        [Remote("EmailExist", "User", AdditionalFields = "Id", ErrorMessage = ("Email already exist!"))]
+        [Remote("EmailExist", "User", AdditionalFields = "UserId", ErrorMessage = ("Email already exist!"))]
         [EmailAddress(ErrorMessage = "Invalid email address")]
         public string? Email { get; set; }
         [Required, MaxLength(10)]

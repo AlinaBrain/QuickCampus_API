@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using QuickCampus_Core.Common;
@@ -26,7 +27,7 @@ namespace QuickCampusAPI.Controllers
         private string _jwtSecretKey;
         private ICampusWalkinCollegeRepo _campusWalkinCollegeRepo;
 
-        public CampusController(IConfiguration configuration, ICampusRepo campusrepo, ICountryRepo countryRepo, IStateRepo stateRepo, IUserAppRoleRepo userAppRoleRepo,IUserRepo userRepo,ICampusWalkinCollegeRepo campusWalkinCollegeRepo)
+        public CampusController(IConfiguration configuration, ICampusRepo campusrepo, ICountryRepo countryRepo, IStateRepo stateRepo, IUserAppRoleRepo userAppRoleRepo, IUserRepo userRepo, ICampusWalkinCollegeRepo campusWalkinCollegeRepo)
         {
             _campusrepo = campusrepo;
             _country = countryRepo;
@@ -51,7 +52,7 @@ namespace QuickCampusAPI.Controllers
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-                    LoggedInUserClientId = (user.ClientId == null ? "0": user.ClientId.ToString());
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
                 }
                 var newPageStart = 0;
                 if (pageStart > 0)
@@ -61,46 +62,47 @@ namespace QuickCampusAPI.Controllers
                 }
 
                 var campusTotalCount = 0;
-                List<WalkIn> campuslist = new List<WalkIn>();
-                List<WalkIn> campusdata = new List<WalkIn>();
+                List<WalkIn> campusList = new List<WalkIn>();
+                List<WalkIn> campusData = new List<WalkIn>();
                 if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                 {
-                    campusdata = _campusrepo.GetAllQuerable().Where(x => x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
+                    campusData = _campusrepo.GetAllQuerable().Where(x => x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
                 }
                 else
                 {
-                    campusdata = _campusrepo.GetAllQuerable().Where(x => x.ClientId == Convert.ToInt32(LoggedInUserClientId) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
+                    campusData = _campusrepo.GetAllQuerable().Where(x => x.ClientId == Convert.ToInt32(LoggedInUserClientId) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
                 }
-              
+
                 if (!string.IsNullOrEmpty(search))
                 {
                     search = search.Trim();
 
                 }
 
-                campuslist = campusdata.Where(x => (x.Address1.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.Address2.Trim().Contains(search ?? "", StringComparison.OrdinalIgnoreCase))).OrderByDescending(x => x.WalkInId).ToList();
+                campusList = campusData.Where(x => (x.Address1.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.Address2.Trim().Contains(search ?? "", StringComparison.OrdinalIgnoreCase))).OrderByDescending(x => x.WalkInId).ToList();
 
-                campusTotalCount = campuslist.Count;
-                campuslist = campuslist.Skip(newPageStart).Take(pageSize).ToList();
-                var response = campuslist.Select(x => (CampusViewModel)x).ToList();
-                List<CampusViewModel> record = new List<CampusViewModel>();
-               foreach(var item in response)
+                campusTotalCount = campusList.Count;
+                campusList = campusList.Skip(newPageStart).Take(pageSize).ToList();
+                if (campusList.Count > 0)
                 {
-                    item.CampusList = _campusWalkinCollegeRepo.GetAll(y => y.WalkInId == item.WalkInID).Result.Select(z => new CampusWalkInModel()
+                    var response = campusList.Select(x => (CampusViewModel)x).ToList();
+                    List<CampusViewModel> record = new List<CampusViewModel>();
+                    foreach (var item in response)
                     {
-                        CampusId = z.CampusId,
-                        StartDateTime = z.StartDateTime,
-                        ExamEndTime = z.ExamEndTime.ToString(),
-                        CollegeId = z.CollegeId
-                    }).ToList();
-                }
-               
-                if (campuslist.Count > 0)
-                {
-                    result.IsSuccess = true;
-                    result.Message = "Campus get successfully";
-                    result.Data = response;
-                    result.TotalRecordCount = campusTotalCount;
+                        item.CampusList = _campusWalkinCollegeRepo.GetAll(y => y.WalkInId == item.WalkInID).Result.Select(z => new CampusWalkInModel()
+                        {
+                            CampusId = z.CampusId,
+                            StartDateTime = z.StartDateTime,
+                            ExamEndTime = z.ExamEndTime.ToString(),
+                            CollegeId = z.CollegeId
+                        }).ToList();
+                    }
+
+                    
+                        result.IsSuccess = true;
+                        result.Message = "Campus get successfully";
+                        result.Data = response;
+                        result.TotalRecordCount = campusTotalCount;
                 }
                 else
                 {
@@ -129,7 +131,7 @@ namespace QuickCampusAPI.Controllers
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-                    LoggedInUserClientId = (user.ClientId == null ? "0": user.ClientId.ToString());
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
                 }
                 if (ModelState.IsValid)
                 {
@@ -161,7 +163,7 @@ namespace QuickCampusAPI.Controllers
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-                    LoggedInUserClientId = (user.ClientId == null ? "0": user.ClientId.ToString());
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
                 }
                 if (ModelState.IsValid)
                 {
@@ -194,7 +196,7 @@ namespace QuickCampusAPI.Controllers
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-                    LoggedInUserClientId = (user.ClientId == null ? "0": user.ClientId.ToString());
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
                 }
                 var res = await _campusrepo.GetCampusByID(campusId);
                 if (res.Data.WalkInID > 0)
@@ -247,7 +249,7 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-    
+
         [HttpDelete]
         [Route("DeleteCampus")]
         public async Task<IActionResult> DeleteCampus(int campusId)
@@ -261,7 +263,7 @@ namespace QuickCampusAPI.Controllers
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-                    LoggedInUserClientId = (user.ClientId == null ? "0": user.ClientId.ToString());
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
                 }
                 var res = await _campusrepo.DeleteCampus(campusId);
                 return Ok(res);
@@ -274,4 +276,3 @@ namespace QuickCampusAPI.Controllers
         }
     }
 }
-    

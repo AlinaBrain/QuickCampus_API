@@ -30,7 +30,7 @@ namespace QuickCampus_Core.ViewModel
                 QuestionId= QuestionId,
                 OptionText= OptionText,
                 IsCorrect= true,
-                OptionImage= OptionImage,
+                //OptionImage= OptionImage,
                 
             };
         }

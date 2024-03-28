@@ -266,7 +266,7 @@ namespace QuickCampusAPI.Controllers
                 }
                 else
                 {
-                    result.Message = "Please enter a valid Role Id.";
+                    result.Message = "Please enter a valid Role UserId.";
                 }
             }
             catch (Exception ex)
@@ -323,7 +323,7 @@ namespace QuickCampusAPI.Controllers
                 }
                 else
                 {
-                    result.Message = "Please enter a valid Role Id.";
+                    result.Message = "Please enter a valid Role UserId.";
                 }
             }
             catch (Exception ex)
@@ -380,7 +380,7 @@ namespace QuickCampusAPI.Controllers
                 }
                 else
                 {
-                    result.Message = "Please enter a valid Role Id.";
+                    result.Message = "Please enter a valid Role UserId.";
                 }
             }
             catch (Exception ex)

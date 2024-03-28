@@ -53,6 +53,11 @@ namespace QuickCampusAPI.Controllers
                 var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
                 if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                 {
+                    if(vm.RoleId == null || vm.RoleId == 0)
+                    {
+                        result.Message = "Invalid role";
+                        return Ok(result);
+                    }
                     if (ModelState.IsValid)
                     {
                         if (_clientRepo.Any(x => x.Email == vm.Email && x.IsActive == true))
@@ -261,7 +266,7 @@ namespace QuickCampusAPI.Controllers
                         ClientList = await _clientRepo.GetAll(x => x.IsDeleted == false && (Datatype == DataTypeFilter.OnlyInActive ? x.IsActive == true : (Datatype == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)));
 
                         //var roleData = _roleRepo.GetAll(x => x.IsActive == true && x.IsDeleted == false).Result.FirstOrDefault();
-                        //var userAppRole = _userAppRoleRepo.GetAll(x => x.UserId == x.Id).Result.FirstOrDefault();
+                        //var userAppRole = _userAppRoleRepo.GetAll(x => x.UserId == x.UserId).Result.FirstOrDefault();
                         //var userAppRoleId = userAppRole != null ? userAppRole.RoleId : 0;
                         List<ClientResponseViewModel> data = new List<ClientResponseViewModel>();
                         data.AddRange(ClientList.Select(x => new ClientResponseViewModel

@@ -65,7 +65,7 @@ namespace QuickCampusAPI.Controllers
                 {
                     search = search.Trim();
                 }
-                userList = userData.Where(x => (x.Name.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.Mobile.Contains(search ?? "", StringComparison.OrdinalIgnoreCase))).OrderBy(x => x.Name).ToList();
+                userList = userData.Where(x => (x.Email.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.Name.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.Mobile.Contains(search ?? "", StringComparison.OrdinalIgnoreCase))).OrderBy(x => x.Name).ToList();
                 userListCount = userList.Count;
                 userList = userList.Skip(newPageStart).Take(pageSize).ToList();
 
@@ -155,7 +155,7 @@ namespace QuickCampusAPI.Controllers
 
         [HttpPost]
         [Route("EditUser")]
-        public async Task<IActionResult> EditUser(UserModel vm)
+        public async Task<IActionResult> EditUser(UserRequestVm vm)
         {
 
             IGeneralResult<UserViewVm> result = new GeneralResult<UserViewVm>();
@@ -169,7 +169,7 @@ namespace QuickCampusAPI.Controllers
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
                     LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
                 }
-                vm.Password = EncodePasswordToBase64(vm.Password ?? "");
+                //vm.Password = EncodePasswordToBase64(vm.Password ?? "");
 
                 if (vm.UserId != null && vm.UserId > 0)
                 {
@@ -204,7 +204,7 @@ namespace QuickCampusAPI.Controllers
                         user.Name = vm.Name;
                         user.Mobile = vm.Mobile;
                         user.Email = vm.Email;
-                        user.Password = EncodePasswordToBase64(vm.Password);
+                        user.ModifiedDate = DateTime.Now;
 
                         var updateUser = await _userRepo.Update(user);
 
@@ -220,7 +220,7 @@ namespace QuickCampusAPI.Controllers
                 }
                 else
                 {
-                    result.Message = "Please enter a valid User Id.";
+                    result.Message = "Please enter a valid User UserId.";
                 }
             }
             catch (Exception ex)
@@ -275,7 +275,7 @@ namespace QuickCampusAPI.Controllers
                 }
                 else
                 {
-                    result.Message = "Please enter a valid User Id.";
+                    result.Message = "Please enter a valid User UserId.";
                 }
             }
             catch (Exception ex)
@@ -331,7 +331,7 @@ namespace QuickCampusAPI.Controllers
                 }
                 else
                 {
-                    result.Message = "Please enter a valid User Id.";
+                    result.Message = "Please enter a valid User UserId.";
                 }
             }
             catch (Exception ex)
@@ -378,7 +378,7 @@ namespace QuickCampusAPI.Controllers
                 }
                 else
                 {
-                    result.Message = "Please enter a valid User Id.";
+                    result.Message = "Please enter a valid User UserId.";
                 }
             }
             catch (Exception ex)
