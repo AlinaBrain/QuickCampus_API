@@ -17,7 +17,7 @@ using QuickCampus_Core.Common.Helper;
 
 namespace QuickCampusAPI.Controllers
 {
-    [Authorize(Roles="Admin,Client,Client_User")]
+    [Authorize(Roles = "Admin,Client,Client_User")]
     [Route("api/[controller]")]
     [ApiController]
     public class CollegeController : ControllerBase
@@ -38,7 +38,7 @@ namespace QuickCampusAPI.Controllers
 
 
         public CollegeController(ICollegeRepo collegeRepo, IConfiguration config, ProcessUploadFile uploadFile,
-            IUserAppRoleRepo userAppRoleRepo , Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, ICountryRepo countryRepo, IStateRepo stateRepo, ICityRepo cityRepo, BtprojecQuickcampusContext BtprojecQuickcampusContext,IUserRepo userRepo)
+            IUserAppRoleRepo userAppRoleRepo, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, ICountryRepo countryRepo, IStateRepo stateRepo, ICityRepo cityRepo, BtprojecQuickcampusContext BtprojecQuickcampusContext, IUserRepo userRepo)
         {
             _collegeRepo = collegeRepo;
             _config = config;
@@ -54,7 +54,7 @@ namespace QuickCampusAPI.Controllers
             _userRepo = userRepo;
         }
 
-        
+
         [HttpGet]
         [Route("GetAllCollege")]
         public async Task<IActionResult> GetAllCollege(string? search, DataTypeFilter DataType = DataTypeFilter.All, int pageStart = 1, int pageSize = 10)
@@ -68,7 +68,7 @@ namespace QuickCampusAPI.Controllers
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-                    LoggedInUserClientId = (user.ClientId == null ? "0": user.ClientId.ToString());
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
                 }
                 var newPageStart = 0;
                 if (pageStart > 0)
@@ -82,7 +82,7 @@ namespace QuickCampusAPI.Controllers
                 int collegeListCount = 0;
                 if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                 {
-                    collegeData = _collegeRepo.GetAllQuerable().Where(x => x.IsDeleted == false  && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
+                    collegeData = _collegeRepo.GetAllQuerable().Where(x => x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
                 }
                 else
                 {
@@ -113,7 +113,7 @@ namespace QuickCampusAPI.Controllers
             }
             catch (Exception ex)
             {
-                result.Message = "Server error "  + ex.Message;
+                result.Message = "Server error " + ex.Message;
             }
             return Ok(result);
         }
@@ -131,7 +131,7 @@ namespace QuickCampusAPI.Controllers
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-                    LoggedInUserClientId = (user.ClientId == null ? "0": user.ClientId.ToString());
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
                 }
                 if (collegeId > 0)
                 {
@@ -182,7 +182,7 @@ namespace QuickCampusAPI.Controllers
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-                    LoggedInUserClientId = (user.ClientId == null ? "0": user.ClientId.ToString());
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
                 }
                 bool isCityExits = _cityRepo.Any(x => x.CityId == vm.CityId && x.IsActive == true && x.IsDeleted == false);
                 if (!isCityExits)
@@ -242,7 +242,7 @@ namespace QuickCampusAPI.Controllers
                     {
                         college.Logo = Path.Combine(baseUrl, UploadLogo.Data);
                         var addCollege = await _collegeRepo.Add(college.ToCollegeDbModel());
-                        if(addCollege.CollegeId > 0)
+                        if (addCollege.CollegeId > 0)
                         {
                             result.IsSuccess = true;
                             result.Message = "College added successfully";
@@ -284,48 +284,49 @@ namespace QuickCampusAPI.Controllers
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-                    LoggedInUserClientId = (user.ClientId == null ? "0": user.ClientId.ToString());
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
                 }
-                bool isCityExits = _cityRepo.Any(x => x.CityId == vm.CityId && x.IsActive == true && x.IsDeleted == false);
-                if (!isCityExits)
+                if (vm.CollegeId > 0)
                 {
-                    result.Message = " City does not exists";
-                    return Ok(result);
-                }
-                bool isStateExits = _stateRepo.Any(x => x.StateId == vm.StateId && x.IsActive == true && x.IsDeleted == false);
-                if (!isStateExits)
-                {
-                    result.Message = " State does not exists";
-                    return Ok(result);
-                }
-                bool isCountryExits = _countryRepo.Any(x => x.CountryId == vm.CountryId && x.IsActive == true && x.IsDeleted == false);
-                if (!isCountryExits)
-                {
-                    result.Message = " Country does not exists";
-                    return Ok(result);
-                }
-                bool isCollegeNameExists = _collegeRepo.Any(x => x.CollegeName == vm.CollegeName && x.IsDeleted == false && x.CollegeId != vm.CollegeId);
-                if (isCollegeNameExists)
-                {
-                    result.Message = " CollegeName is already exists";
-                    return Ok(result);
-                }
-                bool isCollegeCodeExist = _collegeRepo.Any(x => x.CollegeCode == vm.CollegeCode && x.IsDeleted == false && x.CollegeId != vm.CollegeId);
-                if (isCollegeCodeExist)
-                {
-                    result.Message = "College Code is already exist";
-                    return Ok(result);
-                }
-                bool isContactEmailExists = _collegeRepo.Any(x => x.ContectEmail == vm.ContactEmail && x.IsDeleted == false && x.CollegeId != vm.CollegeId);
-                if (isContactEmailExists)
-                {
-                    result.Message = "Contact Email is Already Exist";
-                    return Ok(result);
-                }
-                if (ModelState.IsValid)
-                {
-                    if (vm.CollegeId > 0)
+                    bool isCityExits = _cityRepo.Any(x => x.CityId == vm.CityId && x.IsActive == true && x.IsDeleted == false);
+                    if (!isCityExits)
                     {
+                        result.Message = " City does not exists";
+                        return Ok(result);
+                    }
+                    bool isStateExits = _stateRepo.Any(x => x.StateId == vm.StateId && x.IsActive == true && x.IsDeleted == false);
+                    if (!isStateExits)
+                    {
+                        result.Message = " State does not exists";
+                        return Ok(result);
+                    }
+                    bool isCountryExits = _countryRepo.Any(x => x.CountryId == vm.CountryId && x.IsActive == true && x.IsDeleted == false);
+                    if (!isCountryExits)
+                    {
+                        result.Message = " Country does not exists";
+                        return Ok(result);
+                    }
+                    bool isCollegeNameExists = _collegeRepo.Any(x => x.CollegeName == vm.CollegeName && x.IsDeleted == false && x.CollegeId != vm.CollegeId);
+                    if (isCollegeNameExists)
+                    {
+                        result.Message = " CollegeName is already exists";
+                        return Ok(result);
+                    }
+                    bool isCollegeCodeExist = _collegeRepo.Any(x => x.CollegeCode == vm.CollegeCode && x.IsDeleted == false && x.CollegeId != vm.CollegeId);
+                    if (isCollegeCodeExist)
+                    {
+                        result.Message = "College Code is already exist";
+                        return Ok(result);
+                    }
+                    bool isContactEmailExists = _collegeRepo.Any(x => x.ContectEmail == vm.ContactEmail && x.IsDeleted == false && x.CollegeId != vm.CollegeId);
+                    if (isContactEmailExists)
+                    {
+                        result.Message = "Contact Email is Already Exist";
+                        return Ok(result);
+                    }
+                    if (ModelState.IsValid)
+                    {
+
                         College college = new College();
 
                         if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
@@ -371,18 +372,20 @@ namespace QuickCampusAPI.Controllers
                                 return Ok(result);
                             }
                         }
+
                     }
                     else
                     {
-                        result.Message = "Please enter a valid College Id";
+                        result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
+                        return Ok(result);
                     }
                 }
                 else
                 {
-                    result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
-                    return Ok(result);
+                    result.Message = "Please enter a valid College Id";
                 }
             }
+
             catch (Exception ex)
             {
                 result.Message = "Server error " + ex.Message;
@@ -404,7 +407,7 @@ namespace QuickCampusAPI.Controllers
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-                    LoggedInUserClientId = (user.ClientId == null ? "0": user.ClientId.ToString());
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
                 }
                 if (CollegeId > 0)
                 {
@@ -458,7 +461,7 @@ namespace QuickCampusAPI.Controllers
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-                    LoggedInUserClientId = (user.ClientId == null ? "0": user.ClientId.ToString());
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
                 }
                 var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
 

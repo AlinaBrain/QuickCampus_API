@@ -5,264 +5,389 @@ using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.Services;
 using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
+using static QuickCampus_Core.Common.common;
 
 namespace QuickCampusAPI.Controllers
 {
+    [Authorize(Roles = "Admin,Client,Client_User")]
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class UserController : ControllerBase
     {
-        private readonly IUserRepo userRepo;
-        private readonly IClientRepo clientRepo;
-        private IConfiguration config;
-        public UserController(IUserRepo userRepo, IClientRepo clientRepo, IConfiguration config)
+        private readonly IUserRepo _userRepo;
+        private readonly IClientRepo _clientRepo;
+        private readonly IUserAppRoleRepo _userAppRoleRepo;
+        private IConfiguration _config;
+        private string _jwtSecretKey;
+        public UserController(IUserRepo userRepo, IClientRepo clientRepo, IUserAppRoleRepo userAppRoleRepo, IConfiguration config)
         {
-            this.userRepo = userRepo;
-            this.clientRepo = clientRepo;
-            this.config = config;
+            _userRepo = userRepo;
+            _clientRepo = clientRepo;
+            _userAppRoleRepo = userAppRoleRepo;
+            _config = config;
+            _jwtSecretKey = _config["Jwt:Key"] ?? "";
         }
 
-        [Authorize(Roles = "AddUser")]
+        [HttpGet]
+        [Route("GetAllUser")]
+        public async Task<IActionResult> UserList(string? search,DataTypeFilter DataType, int pageStart = 1, int pageSize = 10)
+        {
+            IGeneralResult<List<UserViewVm>> result = new GeneralResult<List<UserViewVm>>();
+            try
+            {
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
+                {
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
+                }
+                var newPageStart = 0;
+                if (pageStart > 0)
+                {
+                    var startPage = 1;
+                    newPageStart = (pageStart - startPage) * pageSize;
+                }
+
+                List<TblUser> userList = new List<TblUser>();
+                List<TblUser> userData = new List<TblUser>();
+                int userListCount = 0;
+                if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
+                {
+                    userData = _userRepo.GetAllQuerable().Where(x => x.IsDelete == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
+                }
+                else
+                {
+                    userData = _userRepo.GetAllQuerable().Where(x => x.ClientId == Convert.ToInt32(LoggedInUserClientId) && x.IsDelete == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
+                }
+                if (!string.IsNullOrEmpty(search))
+                {
+                    search = search.Trim();
+                }
+                userList = userData.Where(x => (x.Name.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.Mobile.Contains(search ?? "", StringComparison.OrdinalIgnoreCase))).OrderBy(x => x.Name).ToList();
+                userListCount = userList.Count;
+                userList = userList.Skip(newPageStart).Take(pageSize).ToList();
+
+                var response = userList.Select(x => (UserViewVm)x).ToList();
+
+                if (userList.Count > 0)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Data fetched successfully.";
+                    result.Data = response;
+                    result.TotalRecordCount = userListCount;
+                }
+                else
+                {
+                    result.Message = "No user found!";
+                }
+
+            }
+            catch (Exception ex)
+            {
+                result.Message = "Server error " + ex.Message;
+            }
+            return Ok(result);
+        }
+
         [HttpPost]
         [Route("AddUser")]
-        public async Task<IActionResult> AddUser(UserModel vm, int clientid)
+        public async Task<IActionResult> AddUser(UserModel vm)
         {
-            vm.Password = EncodePasswordToBase64(vm.Password);
-            IGeneralResult<UserResponseVm> result = new GeneralResult<UserResponseVm>();
-            int cid = 0;
-            var _jwtSecretKey = config["Jwt:Key"];
-            var LoggedInUser = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            var clientId = userRepo.GetAllQuerable().Where(x=>x.Id.ToString() == LoggedInUser).Select(x=>x.ClientId).First();
-            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            //if (isSuperAdmin)
-            //{
-            //    cid = clientid;
-            //}
-            //else
-            //{
-            //    cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
-            //}
+            IGeneralResult<UserViewVm> result = new GeneralResult<UserViewVm>();
+            try
+            {
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
+                {
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
+                }
+                vm.Password = EncodePasswordToBase64(vm.Password ?? "");
 
-            if (userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.IsDelete == false))
-            {
-                result.Message = "Email Already Registered!";
-            }
-            else
-            {
+                if (_userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.IsDelete == false))
+                {
+                    result.Message = "Email already Exists";
+                    return Ok(result);
+                }
                 if (ModelState.IsValid)
                 {
-
-                    UserVm userVm = new UserVm
+                    TblUser userVm = new TblUser
                     {
-                        Name = vm.Name.Trim(),
-                        Email = vm.Email.Trim(),
-                        Mobile = vm.Mobile.Trim(),
+                        Name = vm.Name?.Trim(),
+                        Email = vm.Email?.Trim(),
+                        Mobile = vm.Mobile?.Trim(),
                         Password = vm.Password.Trim(),
-                        ClientId = cid == 0 ? null : cid,
-
+                        CreateDate = DateTime.Now,
                     };
-                    var dataWithClientId = await userRepo.Add(userVm.ToUserDbModel());
-                    result.IsSuccess = true;
-                    result.Message = "User added successfully.";
-                    result.Data = (UserResponseVm)dataWithClientId;
-                    return Ok(result);
+                    if (LoggedInUserRole != null && LoggedInUserRole.RoleId != (int)AppRole.Admin)
+                    {
+                        userVm.ClientId = Convert.ToInt32(LoggedInUserClientId);
+                    }
+                    var addUser = await _userRepo.Add(userVm);
+                    if(addUser.Id > 0)
+                    {
+                        result.IsSuccess = true;
+                        result.Message = "User added successfully.";
+                        result.Data = (UserViewVm)addUser;
+                        return Ok(result);
+                    }
+                    else
+                    {
+                        result.Message = "Something went wrong.";
+                    }
                 }
                 else
                 {
                     result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
                 }
             }
-
+            catch (Exception ex)
+            {
+                result.Message = "Server error. " + ex.Message;
+            }
             return Ok(result);
 
         }
 
-        [Authorize(Roles = "EditRole")]
         [HttpPost]
         [Route("EditUser")]
-        public async Task<IActionResult> EditUser(UserRequestVm vm, int clientid)
-        {
-            IGeneralResult<UserResponseVM> result = new GeneralResult<UserResponseVM>();
-            int cid = 0;
-            var _jwtSecretKey = config["Jwt:Key"];
-            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            if (isSuperAdmin)
-            {
-                cid = clientid;
-            }
-            else
-            {
-                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
-            }
-
-
-            {
-                TblUser res = new TblUser();
-                if (userRepo.Any(x => x.Email == vm.Email.Trim() && x.IsDelete != true && x.Id != vm.Id))
-                {
-                    result.Message = "User Email Already Registered!";
-                    return Ok(result);
-                }
-
-                if (isSuperAdmin)
-                {
-                    res = (await userRepo.GetAll()).Where(w => w.Id == vm.Id && w.IsDelete == false && w.IsActive == true && (cid == 0 ? true : w.ClientId == cid)).FirstOrDefault();
-                }
-                else
-                {
-                    res = (await userRepo.GetAll()).Where(w => w.Id == vm.Id && w.IsDelete == false && w.IsActive == true && w.ClientId == cid).FirstOrDefault();
-                }
-                bool isDeleted = (bool)res.IsDelete ? true : false;
-                if (isDeleted)
-                {
-                    result.Message = " User does Not Exist";
-                    return Ok(result);
-                }
-
-                if (ModelState.IsValid && vm.Id > 0)
-                {
-                    res.Email = vm.Email.Trim();
-                    res.Mobile = vm.Mobile.Trim();
-                    try
-                    {
-                        result.Data = (UserResponseVM)await userRepo.Update(res);
-                        result.Message = "User updated successfully";
-                        result.IsSuccess = true;
-                    }
-                    catch (Exception ex)
-                    {
-                        result.Message = ex.Message;
-                    }
-                    return Ok(result);
-                }
-                else
-                {
-                    result.Message = "something Went Wrong";
-                }
-
-            }
-            return Ok(result);
-        }
-
-        [Authorize(Roles = "UserList")]
-        [HttpGet]
-        [Route("UserList")]
-        public async Task<IActionResult> UserList(string? search, int pageStart = 1, int pageSize = 10)
+        public async Task<IActionResult> EditUser(UserModel vm)
         {
 
-            IGeneralResult<List<UserResponseVm>> result = new GeneralResult<List<UserResponseVm>>();
-            var _jwtSecretKey = config["Jwt:Key"];
-            var newPageStart = 0;
-            if (pageStart > 0)
-            {
-                var startPage = 1;
-                newPageStart = (pageStart - startPage) * pageSize;
-            }
-
-            int cid = 0;
-            //var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            //var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            //if (isSuperAdmin)
-            //{
-            //    cid = Convert.ToInt32(clientId);
-            //}
-            //else
-            //{
-            //    cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
-            //}
-            List<TblUser> userList = new List<TblUser>();
+            IGeneralResult<UserViewVm> result = new GeneralResult<UserViewVm>();
             try
             {
-                var clientListCount = 0;
-                var usersData = (await userRepo.GetAll()).Where(x => x.IsDelete == false).OrderByDescending(o => o.Id).ToList();
-                clientListCount = usersData.Count();
-                userList = usersData.Skip(newPageStart).Take(pageSize).ToList();
-                if (!string.IsNullOrEmpty(search))
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
-                    userList = usersData.Where(x => x.IsDelete == false && x.Name.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.Email.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.Mobile.Contains(search ?? "")).OrderByDescending(o => o.Id).Skip(newPageStart).Take(pageSize).ToList();
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
                 }
-                var response = userList.Select(x => (UserResponseVm)x).ToList();
+                vm.Password = EncodePasswordToBase64(vm.Password ?? "");
 
-                if (response.Count() > 0)
+                if (vm.UserId != null && vm.UserId > 0)
                 {
-                    result.IsSuccess = true;
-                    result.Message = "Users List";
-                    result.Data = response;
-                    result.TotalRecordCount = clientListCount;
+                    if (_userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.IsDelete == false && x.Id != vm.UserId))
+                    {
+                        result.Message = "Email already Exists";
+                        return Ok(result);
+                    }
+                    if (_userRepo.Any(x => x.Mobile == vm.Mobile && x.IsActive == true && x.IsDelete == false && x.Id != vm.UserId))
+                    {
+                        result.Message = "Mobile already Exists";
+                        return Ok(result);
+                    }
+                    if (ModelState.IsValid)
+                    {
+                        TblUser user = new TblUser();
+
+                        if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
+                        {
+                            user = _userRepo.GetAllQuerable().Where(x => x.Id == vm.UserId && x.IsDelete == false).FirstOrDefault();
+                        }
+                        else
+                        {
+                            user = _userRepo.GetAllQuerable().Where(x => x.Id == vm.UserId && x.IsDelete == false && x.ClientId == Convert.ToInt32(LoggedInUserClientId)).FirstOrDefault();
+                        }
+                        if (user == null)
+                        {
+                            result.Message = " User does Not Exist";
+                            return Ok(result);
+                        }
+
+                        user.Name = vm.Name;
+                        user.Mobile = vm.Mobile;
+                        user.Email = vm.Email;
+                        user.Password = EncodePasswordToBase64(vm.Password);
+
+                        var updateUser = await _userRepo.Update(user);
+
+                        result.IsSuccess = true;
+                        result.Message = "User updated successfully.";
+                        result.Data = (UserViewVm)updateUser;
+                        return Ok(result);
+                    }
+                    else
+                    {
+                        result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
+                    }
                 }
                 else
                 {
-                    result.IsSuccess = true;
-                    result.Message = "No data found!";
+                    result.Message = "Please enter a valid User Id.";
                 }
             }
             catch (Exception ex)
             {
-                result.Message = ex.Message;
+                result.Message = "Server error. " + ex.Message;
+            }
+            return Ok(result);
+        }
+       
+        [HttpDelete]
+        [Route("DeleteUserById")]
+        public async Task<IActionResult> DeleteUser(int UserId)
+        {
+            IGeneralResult<string> result = new GeneralResult<string>();
+            try
+            {
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
+                {
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
+                }
+                if (UserId > 0)
+                {
+                    TblUser user = new TblUser();
+                    if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
+                    {
+                        user = _userRepo.GetAllQuerable().Where(x => x.Id == UserId && x.IsDelete == false).FirstOrDefault();
+                    }
+                    else
+                    {
+                        user = _userRepo.GetAllQuerable().Where(x => x.Id == UserId && x.IsDelete == false && x.ClientId == Convert.ToInt32(LoggedInUserClientId)).FirstOrDefault();
+                    }
+                    if (user == null)
+                    {
+                        result.Message = " User does Not Exist";
+                        return Ok(result);
+                    }
+                    else
+                    {
+                        user.IsActive = false;
+                        user.IsDelete = true;
+                        user.ModifiedDate = DateTime.Now;
+                        await _userRepo.Update(user);
+
+                        result.IsSuccess = true;
+                        result.Message = "User deleted successfully.";
+                    }
+                   
+                }
+                else
+                {
+                    result.Message = "Please enter a valid User Id.";
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Message = "Server error! " + ex.Message;
             }
             return Ok(result);
         }
 
-        [Authorize(Roles = "DeleteUser")]
-        [HttpDelete]
-        [Route("DeleteUser")]
-        public async Task<IActionResult> DeleteUser(int id, int clientid, bool isDeleted)
-        {
-            IGeneralResult<UserVm> result = new GeneralResult<UserVm>();
-            int cid = 0;
-            var jwtSecretKey = config["Jwt:Key"];
-            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], jwtSecretKey);
-            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], jwtSecretKey);
-            if (isSuperAdmin)
-            {
-                cid = clientid;
-            }
-            else
-            {
-                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
-
-                if (cid == 0)
-                {
-                    result.IsSuccess = false;
-                    result.Message = "Invalid User";
-                    return Ok(result);
-                }
-            }
-            var res = await userRepo.DeleteRole(isDeleted, id, cid, isSuperAdmin);
-            return Ok(res);
-        }
-
-        [Authorize(Roles = "activeAndInActiveUser")]
         [HttpGet]
-        [Route("activeAndInactive")]
-        public async Task<IActionResult> ActiveAndInactive(bool isActive, int id, int clientid)
+        [Route("UserActiveInactive")]
+        public async Task<IActionResult> ActiveAndInactive(int UserId)
         {
-            IGeneralResult<UserResponseVm> result = new GeneralResult<UserResponseVm>();
-            int cid = 0;
-            var jwtSecretKey = config["Jwt:Key"];
-            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], jwtSecretKey);
-            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], jwtSecretKey);
-            if (isSuperAdmin)
+            IGeneralResult<UserViewVm> result = new GeneralResult<UserViewVm>();
+            try
             {
-                cid = clientid;
-            }
-            else
-            {
-                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
-
-                if (cid == 0)
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
-                    result.IsSuccess = false;
-                    result.Message = "Invalid User";
-                    return Ok(result);
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
+                }
+                if (UserId > 0)
+                {
+                    TblUser user = new TblUser();
+                    if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
+                    {
+                        user = _userRepo.GetAllQuerable().Where(x => x.Id == UserId && x.IsDelete == false).FirstOrDefault();
+                    }
+                    else
+                    {
+                        user = _userRepo.GetAllQuerable().Where(x => x.Id == UserId && x.IsDelete == false && x.ClientId == Convert.ToInt32(LoggedInUserClientId)).FirstOrDefault();
+                    }
+                    if (user == null)
+                    {
+                        result.Message = " User does Not Exist";
+                        return Ok(result);
+                    }
+                    else
+                    {
+                        user.IsActive = !user.IsActive;
+                        user.ModifiedDate = DateTime.Now;
+                        await _userRepo.Update(user);
+
+                        result.IsSuccess = true;
+                        result.Message = "User updated successfully.";
+                        result.Data = (UserViewVm)user;
+                        return Ok(result);
+
+                    }
+                }
+                else
+                {
+                    result.Message = "Please enter a valid User Id.";
                 }
             }
-
-            var res = userRepo.ActiveInActiveRole(isActive, id, cid, isSuperAdmin);
-            return Ok(res);
+            catch (Exception ex)
+            {
+                result.Message = "Server error! " + ex.Message;
+            }
+            return Ok(result);
         }
+        
+        [HttpGet]
+        [Route("GetUserById")]
+        public async Task<IActionResult> GetUserDetailsById(int UserId)
+        {
+            IGeneralResult<UserViewVm> result = new GeneralResult<UserViewVm>();
+            try
+            {
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
+                {
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
+                }
+                if (UserId > 0)
+                {
+                    TblUser user = new TblUser();
+                    if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
+                    {
+                        user = _userRepo.GetAllQuerable().Where(x => x.Id == UserId && x.IsDelete == false).FirstOrDefault();
+                    }
+                    else
+                    {
+                        user = _userRepo.GetAllQuerable().Where(x => x.Id == UserId && x.IsDelete == false && x.ClientId == Convert.ToInt32(LoggedInUserClientId)).FirstOrDefault();
+                    }
+                    if (user == null)
+                    {
+                        result.Message = " User does Not Exist";
+                        return Ok(result);
+                    }
+                    result.IsSuccess = true;
+                    result.Message = "User fetched successfully.";
+                    result.Data = (UserViewVm)user;
+                }
+                else
+                {
+                    result.Message = "Please enter a valid User Id.";
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Message = "Server error! " + ex.Message;
+            }
+            return Ok(result);
+        }
+
         private string EncodePasswordToBase64(string password)
         {
             try
@@ -276,37 +401,6 @@ namespace QuickCampusAPI.Controllers
             {
                 throw new Exception("Error in base64Encode" + ex.Message);
             }
-        }
-        [HttpGet]
-        [Route("GetUserDetailsById")]
-        public async Task<IActionResult> GetUserDetailsById(int id, int clientid)
-        {
-            IGeneralResult<UserResponseVm> result = new GeneralResult<UserResponseVm>();
-            var _jwtSecretKey = config["Jwt:Key"];
-            int cid = 0;
-            var clientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            var isSuperAdmin = JwtHelper.isSuperAdminfromToken(Request.Headers["Authorization"], _jwtSecretKey);
-            if (isSuperAdmin)
-            {
-                cid = clientid;
-            }
-            else
-            {
-                cid = string.IsNullOrEmpty(clientId) ? 0 : Convert.ToInt32(clientId);
-            }
-
-            var res = (await userRepo.GetAll(x=>x.IsActive==true && x.IsDelete==false && x.Id==id)).FirstOrDefault();
-            if (res!=null)
-            {
-                result.Data = (UserResponseVm)res;
-                result.IsSuccess = true;
-                result.Message = "User details getting succesfully";
-            }
-            else
-            {
-                result.Message = "User does Not exist";
-            }
-            return Ok(result);
         }
 
     }

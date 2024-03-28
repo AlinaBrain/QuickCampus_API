@@ -1,0 +1,30 @@
+﻿using QuickCampus_DAL.Context;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace QuickCampus_Core.ViewModel
+{
+    public class UserViewVm
+    {
+        public int UserId { get; set; }
+        public string? Email { get; set; }
+        public string? Mobile { get; set; }
+        public int? ClientId { get; set; }
+        public bool? IsActive { get; set; }
+
+        public static explicit operator UserViewVm(TblUser v)
+        {
+            return new UserViewVm
+            {
+                UserId = v.Id,
+                Email = v.Email,
+                Mobile = v.Mobile,
+                ClientId = v.ClientId,
+                IsActive = v.IsActive
+            };
+        }
+    }
+}
