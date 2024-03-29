@@ -12,7 +12,7 @@ using static QuickCampus_Core.Common.common;
 
 namespace QuickCampusAPI.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Client,Client_User")]
     [ApiController]
     [Route("api/[controller]")]
     public class RoleController : Controller
@@ -284,7 +284,7 @@ namespace QuickCampusAPI.Controllers
                     else
                     {
                         result.Data = (RoleViewVm)RoleData;
-                        result.Data.RolesPermission = _accountRepo.GetUserPermission(RoleData.Id);
+                        result.Data.Permission = _accountRepo.GetUserPermission(RoleData.Id);
                         result.IsSuccess = true;
                         result.Message = "Role fetched successfully.";
                     }

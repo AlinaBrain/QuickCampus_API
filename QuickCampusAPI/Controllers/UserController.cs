@@ -127,6 +127,10 @@ namespace QuickCampusAPI.Controllers
                     {
                         userVm.ClientId = Convert.ToInt32(LoggedInUserClientId);
                     }
+                    else
+                    {
+                        userVm.ClientId = vm.ClientId;
+                    }
                     var addUser = await _userRepo.Add(userVm);
                     if(addUser.Id > 0)
                     {

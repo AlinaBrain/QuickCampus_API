@@ -60,7 +60,7 @@ namespace QuickCampus_Core.Services
             else
             {
                 response.IsSuccess = false;
-                response.Message = "User Not Found";
+                response.Message = "UserName or Password is Incorrect";
             }
             return response;
         }
