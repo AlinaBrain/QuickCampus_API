@@ -38,6 +38,7 @@ namespace QuickCampusAPI.Controllers
             _jwtSecretKey = _config["Jwt:Key"] ?? "";
             _campusWalkinCollegeRepo = campusWalkinCollegeRepo;
         }
+       
         [HttpGet]
         [Route("GetAllCampus")]
 

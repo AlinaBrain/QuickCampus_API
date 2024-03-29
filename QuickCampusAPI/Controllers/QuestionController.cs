@@ -101,15 +101,14 @@ namespace QuickCampusAPI.Controllers
                 }));
                 foreach (var item in data)
                 {
-                    var optiondata = _questionOptionRepo.GetAllQuerable().Where(y => y.QuestionId == item.QuestionId).Select(z => new QuestionsOptionVm
+                    var optionData = _questionOptionRepo.GetAllQuerable().Where(y => y.QuestionId == item.QuestionId).Select(z => new QuestionsOptionVm
                     {
                         OptionText = z.OptionText,
                         OptionId = z.OptionId,
-                        Imagepath = Path.Combine(_baseUrl, z.Imagepath),
+                        Imagepath = (string.IsNullOrEmpty(z.Imagepath) ? "" : Path.Combine(_baseUrl, z.Imagepath)),
                         IsCorrect = z.IsCorrect
                     }).ToList();
-                   
-                    item.QuestionssoptionVm = optiondata;
+                    item.QuestionssoptionVm = optionData;
                 }
                 if (questionList.Count > 0)
                 {
@@ -129,6 +128,7 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
+        
         [HttpGet]
         [Route("GetQuestionById")]
         public async Task<ActionResult> GetQuestionByid(int questionId)
@@ -176,7 +176,7 @@ namespace QuickCampusAPI.Controllers
                     {
                         OptionText = z.OptionText,
                         OptionId = z.OptionId,
-                        Imagepath = Path.Combine(_baseUrl, z.Imagepath),
+                        Imagepath = (string.IsNullOrEmpty(z.Imagepath) ? "" : Path.Combine(_baseUrl, z.Imagepath)),
                         IsCorrect = z.IsCorrect
                     }).ToList();
                     result.Data.QuestionssoptionVm = optiondata;
@@ -246,7 +246,7 @@ namespace QuickCampusAPI.Controllers
                     {
                         OptionText = z.OptionText,
                         OptionId = z.OptionId,
-                        Imagepath = Path.Combine(_baseUrl, z.Imagepath),
+                        Imagepath = (string.IsNullOrEmpty(z.Imagepath) ? "" : Path.Combine(_baseUrl, z.Imagepath)),
                         IsCorrect = z.IsCorrect
                     }).ToList();
                     result.Data.QuestionssoptionVm = optiondata;
@@ -318,7 +318,6 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-
 
         [HttpPost]
         [Route("AddQuestion")]
@@ -418,7 +417,117 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        [HttpPost]
+        [Route("UpdateQuestion")]
+        public async Task<ActionResult> UpdateQuestion([FromBody] QuestionTakeViewModel vm)
+        {
 
+            IGeneralResult<QuestionTakeViewModel> result = new GeneralResult<QuestionTakeViewModel>();
+            try
+            {
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
+                {
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
+                }
+                if (!_groupRepo.Any(x => x.GroupId == vm.GroupId))
+                {
+                    result.Message = "Invalid group.";
+                    return Ok(result);
+                }
+                if (!_sectionRepo.Any(x => x.SectionId == vm.SectionId))
+                {
+                    result.Message = "Invalid section.";
+                    return Ok(result);
+                }
+                if (!_questionTypeRepo.Any(x => x.QuestionTypeId == vm.QuestionTypeId))
+                {
+                    result.Message = "Invalid question type.";
+                    return Ok(result);
+                }
+                if (vm.QuestionId > 0)
+                {
+
+                    if (ModelState.IsValid)
+                    {
+                        var questiondata = (await _questionrepo.GetAll(x => x.QuestionId == vm.QuestionId)).FirstOrDefault();
+                        if (questiondata == null)
+                        {
+                            result.Message = "Question does Not Exist";
+                            return Ok(result);
+                        }
+
+                        questiondata.Text = vm.Text;
+                        questiondata.QuestionTypeId = vm.QuestionTypeId;
+                        questiondata.GroupId = vm.GroupId;
+                        questiondata.SectionId = vm.SectionId;
+                        questiondata.Marks = vm.Marks;
+
+                        questiondata.IsActive = true;
+                        questiondata.IsDeleted = false;
+
+                        var question = await _questionrepo.Update(questiondata);
+
+
+                        var questionOptions = _questionOptionRepo.GetAllQuerable().Where(x => x.QuestionId == vm.QuestionId).ToList();
+                        if (questionOptions.Count > 0)
+                        {
+                            foreach (var item in questionOptions)
+                            {
+                                await _questionOptionRepo.Delete(item);
+                            }
+                        }
+
+
+                        foreach (var option in vm.QuestionssoptionVm)
+                        {
+                            QuestionOption questionOption = new QuestionOption
+                            {
+                                QuestionId = vm.QuestionId,
+                                OptionText = option.OptionText,
+                                IsCorrect = option.IsCorrect,
+                            };
+                            if (option.Image != null)
+                            {
+                                var uploadImage = _uploadFile.GetUploadFile(option.Image);
+                                if (!uploadImage.IsSuccess)
+                                {
+                                    result.Message = uploadImage.Message;
+                                    return Ok(result);
+                                }
+                                questionOption.Imagepath = uploadImage.Data;
+                                var addQueOpt = await _questionOptionRepo.Add(questionOption);
+                                if (addQueOpt.OptionId == 0)
+                                {
+                                    result.Message = "something went wrong.";
+                                    return Ok(result);
+                                }
+                                option.OptionId = addQueOpt.OptionId;
+                                questionOption.Imagepath = Path.Combine(_baseUrl, questionOption.Imagepath);
+                            }
+                        }
+                        result.IsSuccess = true;
+                        result.Message = "Question added successfully.";
+                        result.Data = vm;
+                        return Ok(result);
+                    }
+                }
+                else
+                {
+                    result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                result.Message = "Server eroor. " + ex.Message;
+            }
+            return Ok(result);
+        }
 
         [HttpGet]
         [Route("GetAllQuestionTypes")]
@@ -500,12 +609,11 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
-        [HttpPost]
-        [Route("UpdateQuestion")]
-        public async Task<ActionResult> UpdateQuestion([FromBody] QuestionTakeViewModel vm)
+        [HttpGet]
+        [Route("GetAllGroupsList")]
+        public async Task<IActionResult> GetAllGroup()
         {
-
-            IGeneralResult<QuestionTakeViewModel> result = new GeneralResult<QuestionTakeViewModel>();
+            IGeneralResult<List<GroupVm>> result = new GeneralResult<List<GroupVm>>();
             try
             {
                 var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
@@ -516,101 +624,30 @@ namespace QuickCampusAPI.Controllers
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
                     LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
                 }
-                if (!_groupRepo.Any(x => x.GroupId == vm.GroupId))
+                List<Groupdl> groupList = new List<Groupdl>();
+                groupList = _groupRepo.GetAllQuerable().ToList();
+
+                var response = groupList.Select(x => (GroupVm)x).ToList();
+                if (groupList.Count > 0)
                 {
-                    result.Message = "Invalid group.";
-                    return Ok(result);
-                }
-                if (!_sectionRepo.Any(x => x.SectionId == vm.SectionId))
-                {
-                    result.Message = "Invalid section.";
-                    return Ok(result);
-                }
-                if (!_questionTypeRepo.Any(x => x.QuestionTypeId == vm.QuestionTypeId))
-                {
-                    result.Message = "Invalid question type.";
-                    return Ok(result);
-                }
-                if (vm.QuestionId > 0)
-                {
-
-                    if (ModelState.IsValid)
-                    {
-                        var questiondata = (await _questionrepo.GetAll(x => x.QuestionId == vm.QuestionId)).FirstOrDefault();
-                        if (questiondata == null)
-                        {
-                            result.Message = "Question does Not Exist";
-                            return Ok(result);
-                        }
-
-                        questiondata.Text = vm.Text;
-                        questiondata.QuestionTypeId = vm.QuestionTypeId;
-                        questiondata.GroupId = vm.GroupId;
-                        questiondata.SectionId = vm.SectionId;
-                        questiondata.Marks = vm.Marks;
-
-                        questiondata.IsActive = true;
-                        questiondata.IsDeleted = false;
-
-                        var question = await _questionrepo.Update(questiondata);
-
-                        
-                        var questionOptions = _questionOptionRepo.GetAllQuerable().Where(x => x.QuestionId == vm.QuestionId).ToList();
-                        if (questionOptions.Count > 0)
-                        {
-                            foreach (var item in questionOptions)
-                            {
-                                await _questionOptionRepo.Delete(item);
-                            }
-                        }
-
-
-                        foreach (var option in vm.QuestionssoptionVm)
-                        {
-                            QuestionOption questionOption = new QuestionOption
-                            {
-                                QuestionId = vm.QuestionId,
-                                OptionText = option.OptionText,
-                                IsCorrect = option.IsCorrect,
-                            };
-                            if (option.Image != null)
-                            {
-                                var uploadImage = _uploadFile.GetUploadFile(option.Image);
-                                if (!uploadImage.IsSuccess)
-                                {
-                                    result.Message = uploadImage.Message;
-                                    return Ok(result);
-                                }
-                                questionOption.Imagepath = uploadImage.Data;
-                                var addQueOpt = await _questionOptionRepo.Add(questionOption);
-                                if (addQueOpt.OptionId == 0)
-                                {
-                                    result.Message = "something went wrong.";
-                                    return Ok(result);
-                                }
-                                option.OptionId = addQueOpt.OptionId;
-                                questionOption.Imagepath = Path.Combine(_baseUrl,questionOption.Imagepath);
-                            }
-                        }
-                        result.IsSuccess = true;
-                        result.Message = "Question added successfully.";
-                        result.Data = vm;
-                        return Ok(result);
-                    }
+                    result.IsSuccess = true;
+                    result.Message = "Groups fetched successfully";
+                    result.Data = response;
+                    result.TotalRecordCount = groupList.Count;
                 }
                 else
                 {
-                    result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
+                    result.Message = "Groups not found!";
                 }
-
-
             }
             catch (Exception ex)
             {
-                result.Message = "Server eroor. " + ex.Message;
+                result.Message = ex.Message;
             }
             return Ok(result);
         }
+
+       
 
     }
 }
