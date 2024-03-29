@@ -6,6 +6,8 @@ namespace QuickCampus_Core.Interfaces
 {
     public interface IRoleRepo : IGenericRepository<TblRole>
     {
+        Task<IGeneralResult<string>> AddRolePermissions(List<int> permissions, int RoleId);
+        Task<IGeneralResult<string>> UpdateRolePermissions(List<int> permissions, int RoleId);
         Task<IGeneralResult<string>> SetRolePermission(RoleMappingRequest roleMappingRequest);
         Task<IGeneralResult<string>> ActiveInActiveRole(bool isActive, int id, int clientid, bool isSuperAdmin);
         Task<IGeneralResult<string>> DeleteRole(int id, int clientid, bool isSuperAdmin);

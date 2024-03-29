@@ -397,7 +397,8 @@ namespace QuickCampusAPI.Controllers
                     var res = await _clientRepo.GetById(clientId);
                     if (res.IsDeleted == false && res.IsActive == true)
                     {
-                        var userData = _userRepo.GetAllQuerable().Where(x => x.Email == res.Email && x.IsActive == true && x.IsDelete == false && x.ClientId == res.Id).First();
+                        var userData = _userRepo.GetAllQuerable().Where(x => x.IsDelete == false && x.ClientId == res.Id).FirstOrDefault();
+                        
                         var userRoleData = _UserRoleRepo.GetAllQuerable().Where(x => x.UserId == userData.Id).First();
                         result.Data = (GetClientById)res;
                         result.Data.RoleId = userRoleData.RoleId;

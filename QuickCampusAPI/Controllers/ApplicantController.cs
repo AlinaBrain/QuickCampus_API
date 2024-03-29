@@ -176,26 +176,7 @@ namespace QuickCampusAPI.Controllers
                     vm.PhoneNumber = vm.PhoneNumber?.Trim();
                     vm.Comment = vm.Comment?.Trim();
                     vm.HighestQualification = vm.HighestQualification;
-                    //ApplicantViewModel applicantViewModel = new ApplicantViewModel
-                    //{
-                    //    FirstName = vm.FirstName?.Trim(),
-                    //    LastName = vm.LastName?.Trim(),
-                    //    EmailAddress = vm.EmailAddress?.Trim(),
-                    //    PhoneNumber = vm.PhoneNumber?.Trim(),
-                    //    HighestQualification = vm.HighestQualification,
-                    //    HighestQualificationPercentage = vm.HighestQualificationPercentage,
-                    //    MatricPercentage = vm.MatricPercentage,
-                    //    IntermediatePercentage = vm.IntermediatePercentage,
-                    //    Skills = vm.Skills,
-                    //    StatusId = vm.StatusId,
-                    //    Comment = vm.Comment?.Trim(),
-                    //    //CollegeName = vm.CollegeName.Trim(),
-                    //    AssignedToCompany = vm.AssignedToCompany,
-                    //    CollegeId = vm.CollegeId,
-                        
-                    //};
                     vm.ClientId = (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId);
-
                     var SaveApplicant = await _applicantRepo.Add(vm.ToApplicantDbModel());
                     if (SaveApplicant.ApplicantId > 0)
                     {
@@ -289,12 +270,9 @@ namespace QuickCampusAPI.Controllers
                             result.Message = " Applicant does Not Exist";
                             return Ok(result);
                         }
-
-                        //applicant.CollegeName = vm.CollegeName.Trim();
                         applicant.FirstName = vm.FirstName?.Trim();
                         applicant.LastName = vm.LastName?.Trim();
                         applicant.EmailAddress = vm.EmailAddress?.Trim();
-                        
                         applicant.IntermediatePercentage = vm.IntermediatePercentage;
                         applicant.HighestQualification = vm.HighestQualification;
                         applicant.HigestQualificationPercentage = vm.HighestQualificationPercentage;
@@ -306,12 +284,9 @@ namespace QuickCampusAPI.Controllers
                         applicant.CollegeId = vm.CollegeId;
                         applicant.Comment = vm.Comment;
                         applicant.ModifiedDate = DateTime.Now;
-
                         await _applicantRepo.Update(applicant);
-
                         result.Message = "Applicant updated successfully";
                         result.IsSuccess = true;
-
                         return Ok(result);
                     }
                     else
@@ -473,7 +448,6 @@ namespace QuickCampusAPI.Controllers
                 if (applicantId > 0)
                 {
                     Applicant applicant = new Applicant();
-
                     if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                     {
                         applicant = _applicantRepo.GetAllQuerable().Where(x => x.ApplicantId == applicantId && x.IsDeleted == false).FirstOrDefault();

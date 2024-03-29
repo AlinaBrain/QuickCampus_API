@@ -41,7 +41,6 @@ namespace QuickCampusAPI.Controllers
        
         [HttpGet]
         [Route("GetAllCampus")]
-
         public async Task<IActionResult> GetAllCampus(string? search, DataTypeFilter DataType, int pageStart = 1, int pageSize = 10)
         {
             IGeneralResult<List<CampusViewModel>> result = new GeneralResult<List<CampusViewModel>>();
@@ -115,10 +114,8 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-
         [HttpPost]
         [Route("AddCampus")]
-
         public async Task<IActionResult> AddCampus(CampusGridRequestVM dto)
         {
             IGeneralResult<CampusGridRequestVM> result = new GeneralResult<CampusGridRequestVM>();
@@ -181,8 +178,6 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-
-
         [HttpGet]
         [Route("getCampusByCampusId")]
         public async Task<IActionResult> getcampusbyid(int campusId)
@@ -249,7 +244,6 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-
         [HttpDelete]
         [Route("DeleteCampus")]
         public async Task<IActionResult> DeleteCampus(int campusId)

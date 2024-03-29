@@ -18,14 +18,18 @@ namespace QuickCampusAPI.Controllers
     public class RoleController : Controller
     {
         private readonly IRoleRepo _roleRepo;
+        private readonly IUserRoleRepo _userRoleRepo;
+        private readonly IAccount _accountRepo;
         private readonly IClientRepo _clientRepo;
         private readonly IUserRepo _userRepo;
         private IConfiguration _config;
         private readonly IUserAppRoleRepo _userAppRoleRepo;
         private string _jwtSecretKey;
-        public RoleController(IRoleRepo roleRepo, IClientRepo clientRepo, IUserRepo userRepo, IConfiguration config, IUserAppRoleRepo userAppRoleRepo)
+        public RoleController(IRoleRepo roleRepo,IUserRoleRepo userRoleRepo, IAccount accountRepo, IClientRepo clientRepo, IUserRepo userRepo, IConfiguration config, IUserAppRoleRepo userAppRoleRepo)
         {
             _roleRepo = roleRepo;
+            _userRoleRepo = userRoleRepo;
+            _accountRepo = accountRepo;
             _clientRepo = clientRepo;
             _userRepo = userRepo;
             _config = config;
@@ -138,6 +142,16 @@ namespace QuickCampusAPI.Controllers
                     var addRoleData = await _roleRepo.Add(roleVm);
                     if (addRoleData.Id > 0)
                     {
+                        if (vm.RolePermission.Count > 0)
+                        {
+                            var addPermissions = await _roleRepo.AddRolePermissions(vm.RolePermission, addRoleData.Id);
+                            if (!addPermissions.IsSuccess)
+                            {
+                                result.Message = addPermissions.Message;
+                                return Ok(result);
+                            }
+
+                        }
                         result.Message = "Role added successfully.";
                         result.IsSuccess = true;
                         result.Data = (RoleViewVm)addRoleData;
@@ -205,6 +219,16 @@ namespace QuickCampusAPI.Controllers
                     GetRole.ModifiedBy = Convert.ToInt32(LoggedInUserId);
                     GetRole.ModofiedDate = DateTime.Now;
                     await _roleRepo.Update(GetRole);
+                    if (vm.RolePermission.Count > 0)
+                    {
+                        var addPermissions = await _roleRepo.UpdateRolePermissions(vm.RolePermission, GetRole.Id);
+                        if (!addPermissions.IsSuccess)
+                        {
+                            result.Message = addPermissions.Message;
+                            return Ok(result);
+                        }
+
+                    }
                     result.Message = "Role updated successfully.";
                     result.IsSuccess = true;
                     result.Data = (RoleViewVm)GetRole;
@@ -255,12 +279,14 @@ namespace QuickCampusAPI.Controllers
                     if (RoleData == null)
                     {
                         result.Message = " Role does not Exist";
+                        return Ok(result);
                     }
                     else
                     {
+                        result.Data = (RoleViewVm)RoleData;
+                        result.Data.RolesPermission = _accountRepo.GetUserPermission(RoleData.Id);
                         result.IsSuccess = true;
                         result.Message = "Role fetched successfully.";
-                        result.Data = (RoleViewVm)RoleData;
                     }
                     return Ok(result);
                 }
@@ -380,7 +406,7 @@ namespace QuickCampusAPI.Controllers
                 }
                 else
                 {
-                    result.Message = "Please enter a valid Role UserId.";
+                    result.Message = "Please enter a valid Role Id.";
                 }
             }
             catch (Exception ex)
@@ -391,13 +417,13 @@ namespace QuickCampusAPI.Controllers
         }
 
 
-        [HttpPost]
-        [Route("SetRolePermissions")]
-        public async Task<IActionResult> SetRolePermissions(RoleMappingRequest roleMappingRequest)
-        {
-            var response = await _roleRepo.SetRolePermission(roleMappingRequest);
-            return Ok(response);
-        }
+        //[HttpPost]
+        //[Route("SetRolePermissions")]
+        //public async Task<IActionResult> SetRolePermissions(RoleMappingRequest roleMappingRequest)
+        //{
+        //    var response = await _roleRepo.SetRolePermission(roleMappingRequest);
+        //    return Ok(response);
+        //}
 
     }
 

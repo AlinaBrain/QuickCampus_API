@@ -17,6 +17,80 @@ namespace QuickCampus_Core.Services
             _config = config;
             _context = context;
         }
+
+        public async Task<IGeneralResult<string>> AddRolePermissions(List<int> permissions,int RoleId)
+        {
+            IGeneralResult<string> result = new GeneralResult<string>();
+            try
+            {
+                foreach (var permission in permissions)
+                {
+                    if (_context.TblPermissions.Any(x => x.Id == permission))
+                    {
+                        TblRolePermission vm = new TblRolePermission
+                        {
+                            PermissionId = permission,
+                            RoleId = RoleId
+                        };
+                        var addRolePermission = await _context.TblRolePermissions.AddAsync(vm);
+                        _context.SaveChanges();
+                        if (addRolePermission.Entity.Id == 0)
+                        {
+                            result.Message = "Something went wrong.";
+                            return result;
+                        }
+                    }
+                }
+                result.IsSuccess = true;
+                result.Message = "Permission saved successfully.";
+                return result;
+            }
+            catch(Exception ex)
+            {
+                result.Message = "server error. " + ex.Message;
+            }
+            return result;
+        }
+
+        public async Task<IGeneralResult<string>> UpdateRolePermissions(List<int> permissions, int RoleId)
+        {
+            IGeneralResult<string> result = new GeneralResult<string>();
+            try
+            {
+                var LastRolePermissions = _context.TblRolePermissions.Where(x => x.RoleId == RoleId).ToList();
+                _context.TblRolePermissions.RemoveRange(LastRolePermissions);
+                _context.SaveChanges();
+
+                foreach (var permission in permissions)
+                {
+                    if (_context.TblPermissions.Any(x => x.Id == permission))
+                    {
+                        TblRolePermission vm = new TblRolePermission
+                        {
+                            PermissionId = permission,
+                            RoleId = RoleId
+                        };
+                        var addRolePermission = await _context.TblRolePermissions.AddAsync(vm);
+                        _context.SaveChanges();
+                        if (addRolePermission.Entity.Id == 0)
+                        {
+                            result.Message = "Something went wrong.";
+                            return result;
+                        }
+                    }
+                }
+                result.IsSuccess = true;
+                result.Message = "Permission saved successfully.";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.Message = "server error. " + ex.Message;
+            }
+            return result;
+        }
+        
+        
         public async Task<IGeneralResult<string>> SetRolePermission(RoleMappingRequest roleMappingRequest)
         {
             IGeneralResult<string> result = new GeneralResult<string>();

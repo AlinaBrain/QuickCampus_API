@@ -65,7 +65,7 @@ namespace QuickCampus_Core.Services
             return response;
         }
 
-        private List<RolePermissions> GetUserPermission(int RoleId)
+        public List<RolePermissions> GetUserPermission(int RoleId)
         {
             List<RolePermissions> rolePermissions = new List<RolePermissions>();
 

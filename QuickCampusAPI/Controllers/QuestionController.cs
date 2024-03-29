@@ -422,7 +422,7 @@ namespace QuickCampusAPI.Controllers
 
         [HttpPost]
         [Route("UpdateQuestion")]
-        public async Task<ActionResult> UpdateQuestion([FromBody] QuestionTakeViewModel vm)
+        public async Task<ActionResult> UpdateQuestion([FromForm] QuestionTakeViewModel vm)
         {
 
             IGeneralResult<QuestionTakeViewModel> result = new GeneralResult<QuestionTakeViewModel>();

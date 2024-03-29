@@ -12,6 +12,7 @@ namespace QuickCampus_Core.ViewModel
         public int? RoleId { get; set; }
         public string? RoleName { get; set; }
         public bool? IsActive { get; set; }
+        public List<RolePermissions> RolesPermission { get; set; }
 
         public static explicit operator RoleViewVm(TblRole v)
         {
