@@ -387,15 +387,15 @@ namespace QuickCampusAPI.Controllers
                                     return Ok(result);
                                 }
                                 questionOption.Imagepath = uploadImage.Data;
-                                var addQueOpt = await _questionOptionRepo.Add(questionOption);
-                                if (addQueOpt.OptionId == 0)
-                                {
-                                    result.Message = "something went wrong.";
-                                    return Ok(result);
-                                }
-                                option.OptionId = addQueOpt.OptionId;
-                                questionOption.Imagepath = Path.Combine(_baseUrl, questionOption.Imagepath);
                             }
+                            var addQueOpt = await _questionOptionRepo.Add(questionOption);
+                            if (addQueOpt.OptionId == 0)
+                            {
+                                result.Message = "something went wrong.";
+                                return Ok(result);
+                            }
+                            option.OptionId = addQueOpt.OptionId;
+                            questionOption.Imagepath = (string.IsNullOrEmpty(questionOption.Imagepath) ? "" : Path.Combine(_baseUrl, questionOption.Imagepath));
                         }
                         result.IsSuccess = true;
                         result.Message = "Question added successfully.";
@@ -415,7 +415,7 @@ namespace QuickCampusAPI.Controllers
             }
             catch (Exception ex)
             {
-                result.Message = "Server eroor. " + ex.Message;
+                result.Message = "Server error. " + ex.Message;
             }
             return Ok(result);
         }
@@ -483,8 +483,6 @@ namespace QuickCampusAPI.Controllers
                                 await _questionOptionRepo.Delete(item);
                             }
                         }
-
-
                         foreach (var option in vm.QuestionssoptionVm)
                         {
                             QuestionOption questionOption = new QuestionOption
@@ -502,15 +500,15 @@ namespace QuickCampusAPI.Controllers
                                     return Ok(result);
                                 }
                                 questionOption.Imagepath = uploadImage.Data;
-                                var addQueOpt = await _questionOptionRepo.Add(questionOption);
-                                if (addQueOpt.OptionId == 0)
-                                {
-                                    result.Message = "something went wrong.";
-                                    return Ok(result);
-                                }
-                                option.OptionId = addQueOpt.OptionId;
-                                questionOption.Imagepath = Path.Combine(_baseUrl, questionOption.Imagepath);
                             }
+                            var addQueOpt = await _questionOptionRepo.Add(questionOption);
+                            if (addQueOpt.OptionId == 0)
+                            {
+                                result.Message = "something went wrong.";
+                                return Ok(result);
+                            }
+                            option.OptionId = addQueOpt.OptionId;
+                            questionOption.Imagepath = (string.IsNullOrEmpty(questionOption.Imagepath) ? "" : Path.Combine(_baseUrl, questionOption.Imagepath));
                         }
                         result.IsSuccess = true;
                         result.Message = "Question added successfully.";
@@ -527,7 +525,7 @@ namespace QuickCampusAPI.Controllers
             }
             catch (Exception ex)
             {
-                result.Message = "Server eroor. " + ex.Message;
+                result.Message = "Server error. " + ex.Message;
             }
             return Ok(result);
         }
