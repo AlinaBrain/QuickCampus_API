@@ -109,7 +109,7 @@
 //        //                    Section1 = vm.Section1,
 //        //                    SectionId = cid,
 //        //                    SortOrder = vm.SortOrder,
-//        //                    ClentId = cid,
+//        //                    ClientId = cid,
                                
 //        //                    };
 //        //                    try

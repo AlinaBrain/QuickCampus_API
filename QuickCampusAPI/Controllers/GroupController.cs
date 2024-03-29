@@ -50,7 +50,7 @@
 //                }
 //                else
 //                {
-//                    groupList = _grouprepo.GetAllQuerable().Where(x => x.ClentId == Convert.ToInt32(LoggedInUserClientId)).ToList();
+//                    groupList = _grouprepo.GetAllQuerable().Where(x => x.ClientId == Convert.ToInt32(LoggedInUserClientId)).ToList();
 //                }
                 
 //                var response = groupList.Select(x => (GroupVm)x).ToList();

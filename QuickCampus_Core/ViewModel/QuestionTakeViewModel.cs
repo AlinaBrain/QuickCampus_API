@@ -16,6 +16,7 @@ namespace QuickCampus_Core.ViewModel
         public int GroupId { get; set; }
         public string? Text { get; set; }
         public int? Marks { get; set; }
+        public bool? IsActive { get; set; }
         public List<QuestionsOptionVm> QuestionssoptionVm { get; set; }  
         
     }

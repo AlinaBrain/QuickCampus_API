@@ -51,7 +51,7 @@ namespace QuickCampusAPI.Controllers
         [Route("QuestionManage")]
         public async Task<ActionResult> GetAllQuestion(string? search, DataTypeFilter DataType, int pageStart = 1, int pageSize = 10)
         {
-            IGeneralResult<List<GetAllQuestionViewModel>> result = new GeneralResult<List<GetAllQuestionViewModel>>();
+            IGeneralResult<List<QuestionTakeViewModel>> result = new GeneralResult<List<QuestionTakeViewModel>>();
             try
             {
                 var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
@@ -89,15 +89,16 @@ namespace QuickCampusAPI.Controllers
                 questionTotalCount = questionList.Count;
                 questionList = questionList.Skip(newPageStart).Take(pageSize).ToList();
                 //var response = questionList.Select(x => (GetAllQuestionViewModel)x).ToList();
-                List<GetAllQuestionViewModel> data = new List<GetAllQuestionViewModel>();
-                data.AddRange(questionList.Select(x => new GetAllQuestionViewModel
+                List<QuestionTakeViewModel> data = new List<QuestionTakeViewModel>();
+                data.AddRange(questionList.Select(x => new QuestionTakeViewModel
                 {
                     QuestionId = x.QuestionId,
-                    QuestionTypeId = x.QuestionTypeId,
-                    SectionId = x.SectionId,
-                    GroupId = x.GroupId,
+                    QuestionTypeId = x.QuestionTypeId ?? 0,
+                    SectionId = x.SectionId ?? 0,
+                    GroupId = x.GroupId ?? 0,
                     Text = x.Text,
-                    Marks = x.Marks
+                    Marks = x.Marks,
+                    IsActive = x.IsActive
                 }));
                 foreach (var item in data)
                 {
@@ -169,7 +170,8 @@ namespace QuickCampusAPI.Controllers
                         SectionId = question.SectionId ?? 0,
                         GroupId = question.GroupId ?? 0,
                         Text = question.Text,
-                        Marks = question.Marks
+                        Marks = question.Marks,
+                        IsActive = question.IsActive
                     };
 
                     var optiondata = _questionOptionRepo.GetAllQuerable().Where(y => y.QuestionId == question.QuestionId).Select(z => new QuestionsOptionVm
@@ -239,17 +241,18 @@ namespace QuickCampusAPI.Controllers
                         SectionId = question.SectionId ?? 0,
                         GroupId = question.GroupId ?? 0,
                         Text = question.Text,
-                        Marks = question.Marks
+                        Marks = question.Marks,
+                        IsActive = question.IsActive
                     };
 
-                    var optiondata = _questionOptionRepo.GetAllQuerable().Where(y => y.QuestionId == question.QuestionId).Select(z => new QuestionsOptionVm
+                    var optionData = _questionOptionRepo.GetAllQuerable().Where(y => y.QuestionId == question.QuestionId).Select(z => new QuestionsOptionVm
                     {
                         OptionText = z.OptionText,
                         OptionId = z.OptionId,
                         Imagepath = (string.IsNullOrEmpty(z.Imagepath) ? "" : Path.Combine(_baseUrl, z.Imagepath)),
                         IsCorrect = z.IsCorrect
                     }).ToList();
-                    result.Data.QuestionssoptionVm = optiondata;
+                    result.Data.QuestionssoptionVm = optionData;
                     result.IsSuccess = true;
                     result.Message = "Question Updated successfully.";
                     return Ok(result);
@@ -453,23 +456,23 @@ namespace QuickCampusAPI.Controllers
 
                     if (ModelState.IsValid)
                     {
-                        var questiondata = (await _questionrepo.GetAll(x => x.QuestionId == vm.QuestionId)).FirstOrDefault();
-                        if (questiondata == null)
+                        var questionData = (await _questionrepo.GetAll(x => x.QuestionId == vm.QuestionId)).FirstOrDefault();
+                        if (questionData == null)
                         {
                             result.Message = "Question does Not Exist";
                             return Ok(result);
                         }
 
-                        questiondata.Text = vm.Text;
-                        questiondata.QuestionTypeId = vm.QuestionTypeId;
-                        questiondata.GroupId = vm.GroupId;
-                        questiondata.SectionId = vm.SectionId;
-                        questiondata.Marks = vm.Marks;
+                        questionData.Text = vm.Text;
+                        questionData.QuestionTypeId = vm.QuestionTypeId;
+                        questionData.GroupId = vm.GroupId;
+                        questionData.SectionId = vm.SectionId;
+                        questionData.Marks = vm.Marks;
 
-                        questiondata.IsActive = true;
-                        questiondata.IsDeleted = false;
+                        questionData.IsActive = true;
+                        questionData.IsDeleted = false;
 
-                        var question = await _questionrepo.Update(questiondata);
+                        var question = await _questionrepo.Update(questionData);
 
 
                         var questionOptions = _questionOptionRepo.GetAllQuerable().Where(x => x.QuestionId == vm.QuestionId).ToList();
