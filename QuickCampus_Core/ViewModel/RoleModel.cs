@@ -11,6 +11,6 @@ namespace QuickCampus_Core.ViewModel
         [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]*$", ErrorMessage = "Only alphabetic characters are allowed in the name.")]
         public string? RoleName { get; set; }
 
-        public List<int> RolePermission { get; set; }
+        public List<int> Permission { get; set; }
     }
 }

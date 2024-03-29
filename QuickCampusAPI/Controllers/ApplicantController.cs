@@ -84,7 +84,7 @@ namespace QuickCampusAPI.Controllers
                     search = search.Trim();
 
                 }
-                applicantList = applicantData.Where(x => (x.FirstName.Contains(search?? "", StringComparison.OrdinalIgnoreCase) || x.LastName.Trim().Contains(search ?? "", StringComparison.OrdinalIgnoreCase)  || x.EmailAddress.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.PhoneNumber.Contains(search ?? "") || x.CollegeName.Contains(search ?? "", StringComparison.OrdinalIgnoreCase))).OrderByDescending(x => x.ApplicantId).ToList();
+                applicantList = applicantData.Where(x => (x.FirstName.Contains(search?? "", StringComparison.OrdinalIgnoreCase) || x.LastName.Contains(search ??"",StringComparison.OrdinalIgnoreCase) || x.LastName.Trim().Contains(search ?? "", StringComparison.OrdinalIgnoreCase)  || x.EmailAddress.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.PhoneNumber.Contains(search ?? "") || x.CollegeName.Contains(search ?? "", StringComparison.OrdinalIgnoreCase))).OrderByDescending(x => x.ApplicantId).ToList();
                 applicantTotalCount = applicantList.Count;
                 applicantList = applicantList.Skip(newPageStart).Take(pageSize).ToList();
                 var response = applicantList.Select(x => (ApplicantViewModel)x).ToList();

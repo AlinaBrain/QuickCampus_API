@@ -142,9 +142,9 @@ namespace QuickCampusAPI.Controllers
                     var addRoleData = await _roleRepo.Add(roleVm);
                     if (addRoleData.Id > 0)
                     {
-                        if (vm.RolePermission.Count > 0)
+                        if (vm.Permission.Count > 0)
                         {
-                            var addPermissions = await _roleRepo.AddRolePermissions(vm.RolePermission, addRoleData.Id);
+                            var addPermissions = await _roleRepo.AddRolePermissions(vm.Permission, addRoleData.Id);
                             if (!addPermissions.IsSuccess)
                             {
                                 result.Message = addPermissions.Message;
@@ -219,9 +219,9 @@ namespace QuickCampusAPI.Controllers
                     GetRole.ModifiedBy = Convert.ToInt32(LoggedInUserId);
                     GetRole.ModofiedDate = DateTime.Now;
                     await _roleRepo.Update(GetRole);
-                    if (vm.RolePermission.Count > 0)
+                    if (vm.Permission.Count > 0)
                     {
-                        var addPermissions = await _roleRepo.UpdateRolePermissions(vm.RolePermission, GetRole.Id);
+                        var addPermissions = await _roleRepo.UpdateRolePermissions(vm.Permission, GetRole.Id);
                         if (!addPermissions.IsSuccess)
                         {
                             result.Message = addPermissions.Message;
