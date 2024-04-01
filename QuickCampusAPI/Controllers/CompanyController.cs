@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.Services;
@@ -15,10 +16,19 @@ namespace QuickCampusAPI.Controllers
     public class CompanyController : ControllerBase
     {
         private readonly ICompanyRepo _companyRepo;
+        private readonly IConfiguration _config;
+        private IUserAppRoleRepo _userAppRoleRepo;
+        private IUserRepo _userRepo;
+        private string _jwtSecretKey;
 
-        public CompanyController(ICompanyRepo companyRepo)
+        public CompanyController(ICompanyRepo companyRepo, IUserAppRoleRepo userAppRoleRepo, IUserRepo userRepo, IConfiguration configuration)
         {
             _companyRepo=companyRepo;
+            _config = configuration;
+         
+            _userAppRoleRepo = userAppRoleRepo;
+            _userRepo = userRepo;
+            _jwtSecretKey = _config["Jwt:Key"] ?? "";
         }
         //[Authorize(Roles = "GetAllCountry")]
         [HttpGet]
@@ -28,13 +38,15 @@ namespace QuickCampusAPI.Controllers
             IGeneralResult<List<CompanyVm>> result = new GeneralResult<List<CompanyVm>>();
             try
             {
-
-
-
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
+                {
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
+                }
                 var companylist = (await _companyRepo.GetAll()).Where(x => x.Isdeleted != true) .ToList().OrderByDescending(x => x.CompanyId);
-
-                // var clientList = (await _countryRepo.GetAll()).Where(x => x.IsDeleted != true && x.CountryName.Contains(countryName)).ToList();
-
 
                 var res = companylist.Select(x => ((CompanyVm)x)).ToList();
                 if (res != null && res.Count() > 0)

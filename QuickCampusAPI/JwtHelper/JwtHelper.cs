@@ -108,9 +108,6 @@ public class JwtHelper
     
     
   }
-    
-
-
 
     public static string GetuIdFromToken(string token, string secretKey)
     {
@@ -136,8 +133,6 @@ public class JwtHelper
             string nameClaim = string.Empty;
 
             nameClaim = jwtToken.Claims.First(c => c.Type == "UserId").Value;
-
-
             return nameClaim;
         }
         catch (Exception)
@@ -164,22 +159,15 @@ public class JwtHelper
 
         try
         {
-
-
             var claimsPrincipal = tokenHandler.ValidateToken(jwt, tokenValidationParameters, out var validatedToken);
             var jwtToken = (JwtSecurityToken)validatedToken;
-
             // Retrieve the "id" claim value
             string nameClaim = string.Empty;
-
             nameClaim = jwtToken.Claims.First(c => c.Type == "CreatedBy").Value;
-
-
             return nameClaim;
         }
         catch (Exception)
         {
-            // Handle any exceptions, such as token validation failure
             return null;
         }
     }
@@ -203,10 +191,8 @@ public class JwtHelper
         {
             var claimsPrincipal = tokenHandler.ValidateToken(jwt, tokenValidationParameters, out var validatedToken);
             var jwtToken = (JwtSecurityToken)validatedToken;
-
             // Retrieve the "id" claim value
             string nameClaim = string.Empty;
-
             nameClaim = jwtToken.Claims.First(c => c.Type == "IsSuperAdmin").Value;
             return nameClaim=="1"?true:false;
         }

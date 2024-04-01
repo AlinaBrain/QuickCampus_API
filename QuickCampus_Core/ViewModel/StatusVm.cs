@@ -19,16 +19,14 @@ namespace QuickCampus_Core.ViewModel
                 StatusName = items.StatusName,
                 IsActive = items.IsActive,
                 IsDeleted = items.IsDeleted,
-                CreatedDate= items.CreatedDate,
-                ModifiedDate= items.ModifiedDate,
+                
             };
 
         }
         public int StatusId { get; set; }
         public bool? IsActive { get; set; }
         public bool? IsDeleted { get; set; }
-        public DateTime? CreatedDate { get; set; }
-        public DateTime? ModifiedDate { get; set; }
+        
         [Required(ErrorMessage = "MstCity_State Name is required.")]
         [MaxLength(50, ErrorMessage = "Name must be at most 20 characters long.")]
         public string? StatusName { get; set; }
