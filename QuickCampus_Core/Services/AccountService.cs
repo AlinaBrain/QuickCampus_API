@@ -73,7 +73,7 @@ namespace QuickCampus_Core.Services
 
             rolePermissions = _context.TblRolePermissions.Include(i => i.Permission).Where(w => w.RoleId == RoleId).Select(s => new RolePermissions()
             {
-                Id = s.Id,
+                Id = s.PermissionId ?? 0, 
                 PermissionName = s.Permission.PermissionName,
                 DisplayName = s.Permission.PermissionDisplay
             }).ToList();
