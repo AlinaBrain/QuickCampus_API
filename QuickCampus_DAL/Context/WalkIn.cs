@@ -37,6 +37,8 @@ public partial class WalkIn
 
     public virtual ICollection<CampusWalkInCollege> CampusWalkInColleges { get; set; } = new List<CampusWalkInCollege>();
 
+    public virtual MstCity? CityNavigation { get; set; }
+
     public virtual MstCityStateCountry? Country { get; set; }
 
     public virtual MstCityState? State { get; set; }

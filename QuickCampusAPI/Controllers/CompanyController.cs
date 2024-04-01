@@ -26,10 +26,11 @@ namespace QuickCampusAPI.Controllers
         public async Task<IActionResult> GetAllCompany()
         {
             IGeneralResult<List<CompanyVm>> result = new GeneralResult<List<CompanyVm>>();
-           
-           
             try
             {
+
+
+
                 var companylist = (await _companyRepo.GetAll()).Where(x => x.Isdeleted != true) .ToList().OrderByDescending(x => x.CompanyId);
 
                 // var clientList = (await _countryRepo.GetAll()).Where(x => x.IsDeleted != true && x.CountryName.Contains(countryName)).ToList();

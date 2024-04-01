@@ -26,11 +26,11 @@ namespace QuickCampusAPI.Controllers
         private readonly IUserRepo _userRepo;
         private IConfiguration _config;
         private readonly IUserRoleRepo _UserRoleRepo;
-        private readonly BtprojecQuickcampusContext _context;
+        private readonly BtprojecQuickcampustestContext _context;
 
         public ClientController(IUserAppRoleRepo userAppRoleRepo, IRoleRepo roleRepo,
             IClientRepo clientRepo, IConfiguration config, IUserRepo userRepo,
-            IUserRoleRepo userRoleRepo, BtprojecQuickcampusContext BtprojecQuickcampusContext)
+            IUserRoleRepo userRoleRepo, BtprojecQuickcampustestContext BtprojecQuickcampustestContext)
         {
             _userAppRoleRepo = userAppRoleRepo;
             _roleRepo = roleRepo;
@@ -38,7 +38,7 @@ namespace QuickCampusAPI.Controllers
             _config = config;
             _userRepo = userRepo;
             _UserRoleRepo = userRoleRepo;
-            _context = BtprojecQuickcampusContext;
+            _context = BtprojecQuickcampustestContext;
         }
 
         [HttpPost]

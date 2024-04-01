@@ -20,4 +20,10 @@ public partial class MstCity
     public bool? IsDeleted { get; set; }
 
     public int? ClientId { get; set; }
+
+    public virtual ICollection<College> Colleges { get; set; } = new List<College>();
+
+    public virtual MstCityState? State { get; set; }
+
+    public virtual ICollection<WalkIn> WalkIns { get; set; } = new List<WalkIn>();
 }

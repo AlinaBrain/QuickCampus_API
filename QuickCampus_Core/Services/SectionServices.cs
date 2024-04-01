@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace QuickCampus_Core.Services
 {
-    public class SectionServices :BaseRepository<BtprojecQuickcampusContext, Section>, ISectionRepo
+    public class SectionServices :BaseRepository<BtprojecQuickcampustestContext, Section>, ISectionRepo
     {
     }
 }

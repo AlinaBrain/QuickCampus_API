@@ -61,13 +61,13 @@ namespace QuickCampus_Core.ViewModel
         public string? HigestQualification { get; set; }
         [Required(ErrorMessage = "You must provide a HighestQualificationPercentage")]
         [PercentageRange(ErrorMessage = "Percentage must be between 0 and 100.")]
-        public decimal? HigestQualificationPercentage { get; set; }
+        public double? HigestQualificationPercentage { get; set; }
         [Required(ErrorMessage = "You must provide a MatricPercentage")]
         [PercentageRange(ErrorMessage = "Percentage must be between 0 and 100.")]
-        public decimal? MatricPercentage { get; set; }
+        public double? MatricPercentage { get; set; }
         [Required(ErrorMessage = "You must provide a MatricPercentage")]
         [PercentageRange(ErrorMessage = "Percentage must be between 0 and 100.")]
-        public decimal? IntermediatePercentage { get; set; }
+        public double? IntermediatePercentage { get; set; }
         [Required(ErrorMessage = "You must provide a Skills ")]
         public string? Skills { get; set; }
         [Required(ErrorMessage = "You must provide a StatusId")]

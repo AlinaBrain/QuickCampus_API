@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace QuickCampus_Core.Services
 {
-    public class MstQualificationRepo : BaseRepository<BtprojecQuickcampusContext, MstQualification>,IMstQualificationRepo
+    public class MstQualificationRepo : BaseRepository<BtprojecQuickcampustestContext, MstQualification>,IMstQualificationRepo
     {
     }
 }

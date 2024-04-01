@@ -15,11 +15,13 @@ public partial class Applicant
 
     public string? PhoneNumber { get; set; }
 
-    public decimal? HigestQualificationPercentage { get; set; }
+    public string? HigestQualification { get; set; }
 
-    public decimal? MatricPercentage { get; set; }
+    public double? HigestQualificationPercentage { get; set; }
 
-    public decimal? IntermediatePercentage { get; set; }
+    public double? MatricPercentage { get; set; }
+
+    public double? IntermediatePercentage { get; set; }
 
     public string? Skills { get; set; }
 
@@ -44,7 +46,6 @@ public partial class Applicant
     public DateTime? ModifiedDate { get; set; }
 
     public int? HighestQualification { get; set; }
-
 
     public virtual ICollection<ApplicantComment> ApplicantComments { get; set; } = new List<ApplicantComment>();
 

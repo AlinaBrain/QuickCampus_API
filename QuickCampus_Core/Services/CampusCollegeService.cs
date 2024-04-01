@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace QuickCampus_Core.Services
 {
-    public class CampusCollegeService :BaseRepository<BtprojecQuickcampusContext, CampusWalkInCollege>,ICampusWalkinCollegeRepo
+    public class CampusCollegeService :BaseRepository<BtprojecQuickcampustestContext, CampusWalkInCollege>,ICampusWalkinCollegeRepo
     {
     }
 }

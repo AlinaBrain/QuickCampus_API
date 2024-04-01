@@ -31,13 +31,8 @@ namespace QuickCampus_Core.ViewModel
                 IsActive = items.IsActive,
                 IsDeleted = items.IsDeleted,
                 CreatedBy = items.CreatedBy
-
             };
         }
-
-
-
-
         public int CollegeId { get; set; }
         [Required(ErrorMessage = "College Name is required.")]
         public string? CollegeName { get; set; }
@@ -53,7 +48,6 @@ namespace QuickCampus_Core.ViewModel
         [Required(ErrorMessage = "MstCity_State_Country is required.")]
         public int? CountryId { get; set; }
         public bool? IsActive { get; set; }
-      
         public int? CreatedBy { get; set; }
         [Required(ErrorMessage = "CollegeCode is required.")]
         public string? CollegeCode { get; set; }
@@ -62,18 +56,10 @@ namespace QuickCampus_Core.ViewModel
 
         [RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Not a valid phone number.")]
         public string? ContectPhone { get; set; }
-
         [EmailAddress(ErrorMessage = "Enter a valid email.")]
         public string? ContectEmail { get; set; }
         public int? ModifiedBy { get; set; }
-
-       
         public bool? IsDeleted { get; set; }
         public int? ClientId { get; set; }
-
     }
-
-
-
-
 }

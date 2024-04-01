@@ -16,9 +16,9 @@ namespace QuickCampus_Core.Services
     public class AccountService : IAccount
     {
 
-        private readonly BtprojecQuickcampusContext _context;
+        private readonly BtprojecQuickcampustestContext _context;
         private IConfiguration _config;
-        public AccountService(BtprojecQuickcampusContext context, IConfiguration config)
+        public AccountService(BtprojecQuickcampustestContext context, IConfiguration config)
         {
             _config = config;
             _context = context;

@@ -5,12 +5,12 @@ using QuickCampus_DAL.Context;
 
 namespace QuickCampus_Core.Services
 {
-    public class UserRepo : BaseRepository<BtprojecQuickcampusContext, TblUser>, IUserRepo
+    public class UserRepo : BaseRepository<BtprojecQuickcampustestContext, TblUser>, IUserRepo
     {
-        private readonly BtprojecQuickcampusContext _context;
+        private readonly BtprojecQuickcampustestContext _context;
         private IConfiguration _config;
 
-        public UserRepo(BtprojecQuickcampusContext context, IConfiguration config)
+        public UserRepo(BtprojecQuickcampustestContext context, IConfiguration config)
         {
             _config = config;
             _context = context;

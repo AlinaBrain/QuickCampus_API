@@ -19,5 +19,7 @@ public partial class MstCityState
 
     public virtual MstCityStateCountry? Country { get; set; }
 
+    public virtual ICollection<MstCity> MstCities { get; set; } = new List<MstCity>();
+
     public virtual ICollection<WalkIn> WalkIns { get; set; } = new List<WalkIn>();
 }

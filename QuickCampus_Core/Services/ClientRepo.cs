@@ -8,12 +8,12 @@ using System.Text.Json;
 
 namespace QuickCampus_Core.Services
 {
-    public class ClientRepo : BaseRepository<BtprojecQuickcampusContext, TblClient>, IClientRepo
+    public class ClientRepo : BaseRepository<BtprojecQuickcampustestContext, TblClient>, IClientRepo
     {
-        private readonly BtprojecQuickcampusContext _context;
+        private readonly BtprojecQuickcampustestContext _context;
         private readonly IConfiguration _config;
 
-        public ClientRepo(BtprojecQuickcampusContext context, IConfiguration config)
+        public ClientRepo(BtprojecQuickcampustestContext context, IConfiguration config)
         {
             _config = config;
             _context = context;

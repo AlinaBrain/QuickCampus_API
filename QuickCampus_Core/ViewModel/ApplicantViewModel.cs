@@ -38,9 +38,8 @@ namespace QuickCampus_Core.ViewModel
         public string? FirstName { get; set; }
 
         public string? LastName { get; set; }
-
-        [Display(Name = "Email Address")]
         [Required(ErrorMessage = "You must provide an email address.")]
+        [RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$", ErrorMessage = "Only Email allowed.")]
         [MaxLength(100, ErrorMessage = "can't exceed more than 100 characters.")]
         [EmailAddress(ErrorMessage = "Not a valid email address.")]
         public string? EmailAddress { get; set; }
@@ -55,15 +54,15 @@ namespace QuickCampus_Core.ViewModel
         [Display(Name = "Highest Qualification  Percentage %")]
         [Required(ErrorMessage = "You must provide %.")]
         [Range(1, 100, ErrorMessage = "% should be in 1 - 100 range.")]
-        public decimal? HighestQualificationPercentage { get; set; } = null;
+        public double? HighestQualificationPercentage { get; set; } = null;
         [Display(Name = "Matric  Percentage  %")]
         [Required(ErrorMessage = "You must provide %.")]
         [Range(1, 100, ErrorMessage = "% should be in 1 - 100 range.")]
-        public decimal? MatricPercentage { get; set; } = null;
+        public double? MatricPercentage { get; set; } = null;
         [Display(Name = "Intermediate Percentage  %")]
         [Required(ErrorMessage = "You must provide %.")]
         [Range(1, 100, ErrorMessage = "% should be in 1 - 100 range.")]
-        public decimal? IntermediatePercentage { get; set; }
+        public double? IntermediatePercentage { get; set; }
         [Required(ErrorMessage = "You must provide a Skills ")]
         public string? Skills { get; set; }
         [Required(ErrorMessage = "You must provide a StatusId")]
@@ -100,7 +99,6 @@ namespace QuickCampus_Core.ViewModel
                 Comment = Comment,
                 AssignedToCompany = AssignedToCompany,
                 HighestQualification=HighestQualification,
-          
                 ClientId = ClientId,
                 CreatedDate = DateTime.UtcNow,
                 ModifiedDate = ApplicantID > 0 ? DateTime.UtcNow : null,
@@ -126,8 +124,6 @@ namespace QuickCampus_Core.ViewModel
                 StatusId = StatusId,
                 Comment = Comment,
                 AssignedToCompany = AssignedToCompany,
-                //CollegeName = CollegeName,
-
                 ClientId = ClientId,
                 ModifiedDate = DateTime.UtcNow,
                 CreatedDate = ApplicantID > 0 ? DateTime.UtcNow : null,
@@ -173,17 +169,17 @@ namespace QuickCampus_Core.ViewModel
             [Display(Name = "Highest Qualification %")]
             [Required(ErrorMessage = "You must provide %.")]
             [Range(1, 100, ErrorMessage = "% should be in 1 - 100 range.")]
-            public decimal? HighestQualificationPercentage { get; set; }
+            public double? HighestQualificationPercentage { get; set; }
 
             [Display(Name = "10th Class %")]
             [Required(ErrorMessage = "You must provide %.")]
             [Range(1, 100, ErrorMessage = "% should be in 1 - 100 range.")]
-            public decimal? MatricPercentage { get; set; }
+            public double? MatricPercentage { get; set; }
 
             [Display(Name = "12th Class %")]
             [Required(ErrorMessage = "You must provide %.")]
             [Range(1, 100, ErrorMessage = "% should be in 1 - 100 range.")]
-            public decimal? IntermediatePercentage { get; set; }
+            public double? IntermediatePercentage { get; set; }
             public int StatusID { get; set; }
             public int CompanyId { get; set; }
             public string? Company { get; set; }

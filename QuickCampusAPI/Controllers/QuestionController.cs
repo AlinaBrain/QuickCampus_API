@@ -609,7 +609,6 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-
         [HttpGet]
         [Route("GetAllGroupsList")]
         public async Task<IActionResult> GetAllGroup()
@@ -647,8 +646,5 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-
-       
-
     }
 }

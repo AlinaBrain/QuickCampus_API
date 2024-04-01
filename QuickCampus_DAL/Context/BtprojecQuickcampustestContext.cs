@@ -33,19 +33,27 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
     public virtual DbSet<CampusWalkInCollege> CampusWalkInColleges { get; set; }
 
-    public virtual DbSet<MstCity> Cities { get; set; }
-
     public virtual DbSet<College> Colleges { get; set; }
 
     public virtual DbSet<Company> Companies { get; set; }
-
-    public virtual DbSet<MstCityStateCountry> Countries { get; set; }
 
     public virtual DbSet<Error> Errors { get; set; }
 
     public virtual DbSet<Groupdl> Groupdls { get; set; }
 
     public virtual DbSet<MstAppRole> MstAppRoles { get; set; }
+
+    public virtual DbSet<MstCity> MstCities { get; set; }
+
+    public virtual DbSet<MstCityState> MstCityStates { get; set; }
+
+    public virtual DbSet<MstCityStateCountry> MstCityStateCountries { get; set; }
+
+    public virtual DbSet<MstMenuItem> MstMenuItems { get; set; }
+
+    public virtual DbSet<MstMenuSubItem> MstMenuSubItems { get; set; }
+
+    public virtual DbSet<MstQualification> MstQualifications { get; set; }
 
     public virtual DbSet<Question> Questions { get; set; }
 
@@ -54,8 +62,6 @@ public partial class BtprojecQuickcampustestContext : DbContext
     public virtual DbSet<QuestionType> QuestionTypes { get; set; }
 
     public virtual DbSet<Section> Sections { get; set; }
-
-    public virtual DbSet<MstCityState> States { get; set; }
 
     public virtual DbSet<Status> Statuses { get; set; }
 
@@ -66,6 +72,8 @@ public partial class BtprojecQuickcampustestContext : DbContext
     public virtual DbSet<TblDepartment> TblDepartments { get; set; }
 
     public virtual DbSet<TblGoal> TblGoals { get; set; }
+
+    public virtual DbSet<TblMenuItemUserPermission> TblMenuItemUserPermissions { get; set; }
 
     public virtual DbSet<TblParentSkill> TblParentSkills { get; set; }
 
@@ -115,13 +123,12 @@ public partial class BtprojecQuickcampustestContext : DbContext
             entity.Property(e => e.FirstName)
                 .HasMaxLength(100)
                 .UseCollation("SQL_Latin1_General_CP1_CI_AS");
-         
-            entity.Property(e => e.HigestQualificationPercentage).HasColumnType("decimal(18, 0)");
-            entity.Property(e => e.IntermediatePercentage).HasColumnType("decimal(18, 0)");
+            entity.Property(e => e.HigestQualification)
+                .HasMaxLength(100)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.LastName)
                 .HasMaxLength(100)
                 .UseCollation("SQL_Latin1_General_CP1_CI_AS");
-            entity.Property(e => e.MatricPercentage).HasColumnType("decimal(18, 0)");
             entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
             entity.Property(e => e.PhoneNumber)
                 .HasMaxLength(25)
@@ -132,10 +139,16 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
             entity.HasOne(d => d.AssignedToCompanyNavigation).WithMany(p => p.Applicants)
                 .HasForeignKey(d => d.AssignedToCompany)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_Applicant_Company");
+
+            entity.HasOne(d => d.HighestQualificationNavigation).WithMany(p => p.Applicants)
+                .HasForeignKey(d => d.HighestQualification)
+                .HasConstraintName("FK__Applicant__Highe__5E8A0973");
 
             entity.HasOne(d => d.Status).WithMany(p => p.Applicants)
                 .HasForeignKey(d => d.StatusId)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_Applicant_Status");
         });
 
@@ -274,22 +287,6 @@ public partial class BtprojecQuickcampustestContext : DbContext
                 .HasConstraintName("FK_CampusCollege_CampusWalkIn");
         });
 
-        modelBuilder.Entity<MstCity>(entity =>
-        {
-            entity.HasKey(e => e.CityId).HasName("PK__City__F2D21B760C7D81FB");
-
-            entity.ToTable("MstCity", "dbo");
-
-            entity.Property(e => e.CityName)
-                .HasMaxLength(150)
-                .IsUnicode(false)
-                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
-            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
-            entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
-
-            
-        });
-
         modelBuilder.Entity<College>(entity =>
         {
             entity.ToTable("College", "dbo");
@@ -322,7 +319,9 @@ public partial class BtprojecQuickcampustestContext : DbContext
                 .UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
-           
+            entity.HasOne(d => d.City).WithMany(p => p.Colleges)
+                .HasForeignKey(d => d.CityId)
+                .HasConstraintName("FK__College__CityId__7E37BEF6");
         });
 
         modelBuilder.Entity<Company>(entity =>
@@ -336,16 +335,6 @@ public partial class BtprojecQuickcampustestContext : DbContext
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
             entity.Property(e => e.Isdeleted).HasColumnName("ISDeleted");
             entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
-        });
-
-        modelBuilder.Entity<MstCityStateCountry>(entity =>
-        {
-            entity.ToTable("MstCity_State_Country", "dbo");
-
-            entity.Property(e => e.CountryId).ValueGeneratedNever();
-            entity.Property(e => e.CountryName)
-                .HasMaxLength(50)
-                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
         });
 
         modelBuilder.Entity<Error>(entity =>
@@ -388,6 +377,97 @@ public partial class BtprojecQuickcampustestContext : DbContext
             entity.Property(e => e.IsDeleted).HasDefaultValueSql("((0))");
         });
 
+        modelBuilder.Entity<MstCity>(entity =>
+        {
+            entity.HasKey(e => e.CityId).HasName("PK__City__F2D21B760C7D81FB");
+
+            entity.ToTable("MstCity", "dbo");
+
+            entity.Property(e => e.CityName)
+                .HasMaxLength(150)
+                .IsUnicode(false)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+            entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
+
+            entity.HasOne(d => d.State).WithMany(p => p.MstCities)
+                .HasForeignKey(d => d.StateId)
+                .HasConstraintName("FK__City__StateId__7D439ABD");
+        });
+
+        modelBuilder.Entity<MstCityState>(entity =>
+        {
+            entity.HasKey(e => e.StateId).HasName("PK_State");
+
+            entity.ToTable("MstCity_State", "dbo");
+
+            entity.Property(e => e.StateId).ValueGeneratedNever();
+            entity.Property(e => e.StateName)
+                .HasMaxLength(150)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+
+            entity.HasOne(d => d.Country).WithMany(p => p.MstCityStates)
+                .HasForeignKey(d => d.CountryId)
+                .HasConstraintName("FK_State_Country");
+        });
+
+        modelBuilder.Entity<MstCityStateCountry>(entity =>
+        {
+            entity.HasKey(e => e.CountryId).HasName("PK_Country");
+
+            entity.ToTable("MstCity_State_Country", "dbo");
+
+            entity.Property(e => e.CountryId).ValueGeneratedNever();
+            entity.Property(e => e.CountryName)
+                .HasMaxLength(50)
+                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+        });
+
+        modelBuilder.Entity<MstMenuItem>(entity =>
+        {
+            entity.HasKey(e => e.ItemId).HasName("PK__MstMenuI__727E838BD5B99911");
+
+            entity.ToTable("MstMenuItems", "dbo");
+
+            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+            entity.Property(e => e.IsActive).HasDefaultValueSql("((1))");
+            entity.Property(e => e.IsDeleted).HasDefaultValueSql("((0))");
+            entity.Property(e => e.ItemDisplayName).HasMaxLength(1000);
+            entity.Property(e => e.ItemName).HasMaxLength(100);
+            entity.Property(e => e.ModifiedAt).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<MstMenuSubItem>(entity =>
+        {
+            entity.HasKey(e => e.SubItemId).HasName("PK__MstMenuS__8A6B7585D74A99CF");
+
+            entity.ToTable("MstMenuSubItems", "dbo");
+
+            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+            entity.Property(e => e.IsActive).HasDefaultValueSql("((1))");
+            entity.Property(e => e.IsDeleted).HasDefaultValueSql("((0))");
+            entity.Property(e => e.ModifiedAt).HasColumnType("datetime");
+            entity.Property(e => e.SubItemDisplayName).HasMaxLength(1000);
+            entity.Property(e => e.SubItemName).HasMaxLength(100);
+
+            entity.HasOne(d => d.Item).WithMany(p => p.MstMenuSubItems)
+                .HasForeignKey(d => d.ItemId)
+                .HasConstraintName("FK__MstMenuSu__ItemI__531856C7");
+        });
+
+        modelBuilder.Entity<MstQualification>(entity =>
+        {
+            entity.HasKey(e => e.QualId).HasName("PK__MstQuali__B8C9022335534D56");
+
+            entity.ToTable("MstQualification", "dbo");
+
+            entity.Property(e => e.CreateAt).HasColumnType("datetime");
+            entity.Property(e => e.IsActive).HasDefaultValueSql("((1))");
+            entity.Property(e => e.IsDeleted).HasDefaultValueSql("((0))");
+            entity.Property(e => e.ModifiedAt).HasColumnType("datetime");
+            entity.Property(e => e.QualName).HasMaxLength(200);
+        });
+
         modelBuilder.Entity<Question>(entity =>
         {
             entity.ToTable("Question", "dbo");
@@ -414,7 +494,6 @@ public partial class BtprojecQuickcampustestContext : DbContext
             entity.ToTable("QuestionOption", "dbo");
 
             entity.Property(e => e.Imagepath).UseCollation("SQL_Latin1_General_CP1_CI_AS");
-            
             entity.Property(e => e.OptionText).UseCollation("SQL_Latin1_General_CP1_CI_AS");
 
             entity.HasOne(d => d.Question).WithMany(p => p.QuestionOptions)
@@ -448,20 +527,6 @@ public partial class BtprojecQuickcampustestContext : DbContext
                 .HasMaxLength(50)
                 .UseCollation("SQL_Latin1_General_CP1_CI_AS")
                 .HasColumnName("Section");
-        });
-
-        modelBuilder.Entity<MstCityState>(entity =>
-        {
-            entity.ToTable("MstCity_State", "dbo");
-
-            entity.Property(e => e.StateId).ValueGeneratedNever();
-            entity.Property(e => e.StateName)
-                .HasMaxLength(150)
-                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
-
-            entity.HasOne(d => d.Country).WithMany(p => p.MstCityStates)
-                .HasForeignKey(d => d.CountryId)
-                .HasConstraintName("FK_State_Country");
         });
 
         modelBuilder.Entity<Status>(entity =>
@@ -608,6 +673,22 @@ public partial class BtprojecQuickcampustestContext : DbContext
             entity.HasOne(d => d.ModefiedByNavigation).WithMany(p => p.TblGoalModefiedByNavigations)
                 .HasForeignKey(d => d.ModefiedBy)
                 .HasConstraintName("FK__tbl_Goal__Modefi__0F624AF8");
+        });
+
+        modelBuilder.Entity<TblMenuItemUserPermission>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__tblMenuI__3214EC07ECB77D04");
+
+            entity.ToTable("tblMenuItemUserPermission", "dbo");
+
+            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+            entity.Property(e => e.IsActive).HasDefaultValueSql("((1))");
+            entity.Property(e => e.IsDeleted).HasDefaultValueSql("((0))");
+            entity.Property(e => e.ModifiedAt).HasColumnType("datetime");
+
+            entity.HasOne(d => d.User).WithMany(p => p.TblMenuItemUserPermissions)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK__tblMenuIt__UserI__57DD0BE4");
         });
 
         modelBuilder.Entity<TblParentSkill>(entity =>
@@ -867,15 +948,16 @@ public partial class BtprojecQuickcampustestContext : DbContext
             entity.Property(e => e.Address2)
                 .HasMaxLength(100)
                 .UseCollation("SQL_Latin1_General_CP1_CI_AS");
-            entity.Property(e => e.City)
-                .HasMaxLength(50)
-                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
             entity.Property(e => e.JobDescription).UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.Title)
                 .HasMaxLength(250)
                 .UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.WalkInDate).HasColumnType("datetime");
+
+            entity.HasOne(d => d.CityNavigation).WithMany(p => p.WalkIns)
+                .HasForeignKey(d => d.City)
+                .HasConstraintName("FK__WalkIn__City__3A4CA8FD");
 
             entity.HasOne(d => d.Country).WithMany(p => p.WalkIns)
                 .HasForeignKey(d => d.CountryId)

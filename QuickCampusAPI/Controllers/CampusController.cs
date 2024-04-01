@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.Services;
@@ -22,17 +23,19 @@ namespace QuickCampusAPI.Controllers
         private readonly ICountryRepo _country;
         private readonly IStateRepo _staterepo;
         private IConfiguration _config;
+        private readonly ICollegeRepo _collegeRepo;
         private readonly IUserAppRoleRepo _userAppRoleRepo;
         private readonly IUserRepo _userRepo;
         private string _jwtSecretKey;
         private ICampusWalkinCollegeRepo _campusWalkinCollegeRepo;
 
-        public CampusController(IConfiguration configuration, ICampusRepo campusrepo, ICountryRepo countryRepo, IStateRepo stateRepo, IUserAppRoleRepo userAppRoleRepo, IUserRepo userRepo, ICampusWalkinCollegeRepo campusWalkinCollegeRepo)
+        public CampusController(IConfiguration configuration,ICollegeRepo collegeRepo, ICampusRepo campusrepo, ICountryRepo countryRepo, IStateRepo stateRepo, IUserAppRoleRepo userAppRoleRepo, IUserRepo userRepo, ICampusWalkinCollegeRepo campusWalkinCollegeRepo)
         {
             _campusrepo = campusrepo;
             _country = countryRepo;
             _staterepo = stateRepo;
             _config = configuration;
+            this._collegeRepo = collegeRepo;
             _userAppRoleRepo = userAppRoleRepo;
             _userRepo = userRepo;
             _jwtSecretKey = _config["Jwt:Key"] ?? "";
@@ -75,10 +78,9 @@ namespace QuickCampusAPI.Controllers
                 if (!string.IsNullOrEmpty(search))
                 {
                     search = search.Trim();
-
                 }
 
-                campusList = campusData.Where(x => (x.Address1.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.Address2.Trim().Contains(search ?? "", StringComparison.OrdinalIgnoreCase))).OrderByDescending(x => x.WalkInId).ToList();
+                campusList = campusData.Where(x => ((x.Address1 + " " + x.Address2).Contains(search ?? "", StringComparison.OrdinalIgnoreCase) ||x.Title.Contains(search ?? "",StringComparison.OrdinalIgnoreCase) ||x.JobDescription.Contains(search?? "",StringComparison.OrdinalIgnoreCase) || x.Address2.Trim().Contains(search ?? "", StringComparison.OrdinalIgnoreCase))).OrderByDescending(x => x.WalkInId).ToList();
 
                 campusTotalCount = campusList.Count;
                 campusList = campusList.Skip(newPageStart).Take(pageSize).ToList();
@@ -93,7 +95,9 @@ namespace QuickCampusAPI.Controllers
                             CampusId = z.CampusId,
                             StartDateTime = z.StartDateTime,
                             ExamEndTime = z.ExamEndTime.ToString(),
-                            CollegeId = z.CollegeId
+                            CollegeId = z.CollegeId,
+                            CollegeName = (z.CollegeId != null ? _collegeRepo.GetAllQuerable().Where(x => x.CollegeId == z.CollegeId).First().CollegeName : "") ,
+                            CollegeCode = (z.CollegeId != null ? _collegeRepo.GetAllQuerable().Where(x => x.CollegeId == z.CollegeId).First().CollegeCode : ""),
                         }).ToList();
                     }
 

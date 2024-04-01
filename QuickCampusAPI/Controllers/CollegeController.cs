@@ -33,12 +33,12 @@ namespace QuickCampusAPI.Controllers
         private readonly ICityRepo _cityRepo;
         private string baseUrl;
         private IUserRepo _userRepo;
-        private readonly BtprojecQuickcampusContext _context;
+        private readonly BtprojecQuickcampustestContext _context;
         private string _jwtSecretKey;
 
 
         public CollegeController(ICollegeRepo collegeRepo, IConfiguration config, ProcessUploadFile uploadFile,
-            IUserAppRoleRepo userAppRoleRepo, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, ICountryRepo countryRepo, IStateRepo stateRepo, ICityRepo cityRepo, BtprojecQuickcampusContext BtprojecQuickcampusContext, IUserRepo userRepo)
+            IUserAppRoleRepo userAppRoleRepo, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, ICountryRepo countryRepo, IStateRepo stateRepo, ICityRepo cityRepo, BtprojecQuickcampustestContext BtprojecQuickcampustestContext, IUserRepo userRepo)
         {
             _collegeRepo = collegeRepo;
             _config = config;
@@ -48,7 +48,7 @@ namespace QuickCampusAPI.Controllers
             _countryRepo = countryRepo;
             _stateRepo = stateRepo;
             _cityRepo = cityRepo;
-            _context = BtprojecQuickcampusContext;
+            _context = BtprojecQuickcampustestContext;
             _jwtSecretKey = _config["Jwt:Key"] ?? "";
             baseUrl = _config.GetSection("APISitePath").Value;
             _userRepo = userRepo;

@@ -208,8 +208,6 @@ public class JwtHelper
             string nameClaim = string.Empty;
 
             nameClaim = jwtToken.Claims.First(c => c.Type == "IsSuperAdmin").Value;
-
-            
             return nameClaim=="1"?true:false;
         }
         catch (Exception)
