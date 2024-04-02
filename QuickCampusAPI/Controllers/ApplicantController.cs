@@ -40,7 +40,7 @@ namespace QuickCampusAPI.Controllers
 
         [HttpGet]
         [Route("GetAllApplicant")]
-        public async Task<ActionResult> GetAllApplicant(string? search, DataTypeFilter DataType , int pageStart = 1, int pageSize = 10)
+        public async Task<ActionResult> GetAllApplicant(string? search, int? ClientId, DataTypeFilter DataType , int pageStart = 1, int pageSize = 10)
         {
             IGeneralResult<List<ApplicantViewModel>> result = new GeneralResult<List<ApplicantViewModel>>();
             try
@@ -65,7 +65,7 @@ namespace QuickCampusAPI.Controllers
                 List<Applicant> applicantData = new List<Applicant>();
                 if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                 {
-                    applicantData = _applicantRepo.GetAllQuerable().Where(x => x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
+                    applicantData = _applicantRepo.GetAllQuerable().Where(x => (ClientId != null && ClientId > 0 ? x.ClientId == ClientId : true) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
                 }
                 else
                 {

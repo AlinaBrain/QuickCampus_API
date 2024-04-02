@@ -10,6 +10,5 @@ namespace QuickCampus_Core.Interfaces
 {
     public interface IUserRoleRepo : IGenericRepository<TblUserRole> 
     {
-        //Task<IGeneralResult<string>> SetClientAdminRole(int userId);
     }
 }

@@ -49,7 +49,7 @@ namespace QuickCampusAPI.Controllers
 
         [HttpGet]
         [Route("QuestionManage")]
-        public async Task<ActionResult> GetAllQuestion(string? search, DataTypeFilter DataType, int pageStart = 1, int pageSize = 10)
+        public async Task<ActionResult> GetAllQuestion(string? search, int? ClientId, DataTypeFilter DataType, int pageStart = 1, int pageSize = 10)
         {
             IGeneralResult<List<QuestionTakeViewModel>> result = new GeneralResult<List<QuestionTakeViewModel>>();
             try
@@ -74,7 +74,7 @@ namespace QuickCampusAPI.Controllers
                 List<Question> questionData = new List<Question>();
                 if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                 {
-                    questionData = _questionrepo.GetAllQuerable().Where(x => x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
+                    questionData = _questionrepo.GetAllQuerable().Where(x => (ClientId != null && ClientId > 0 ? x.ClentId == ClientId : true) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
                 }
                 else
                 {

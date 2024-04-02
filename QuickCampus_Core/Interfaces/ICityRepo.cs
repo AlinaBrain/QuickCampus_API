@@ -10,6 +10,6 @@ namespace QuickCampus_Core.Interfaces
 {
     public interface ICityRepo :IGenericRepository<MstCity>
     {
-        Task<IGeneralResult<string>> DeleteCity(bool isDeleted, int id, int clientid, bool isSuperAdmin);
+       
     }
 }

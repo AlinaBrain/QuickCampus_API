@@ -18,37 +18,7 @@ namespace QuickCampus_Core.Services
             _config = config;
             _context = context;
         }
-        public  IGeneralResult<string> AddMenuRoles(MenuRoleVm vm, int loggedInUser)
-        {
-            GeneralResult<string> res = new GeneralResult<string>();
-            try
-            {
-                if (vm != null)
-                {
-                    TblMenuItemUserPermission data = new TblMenuItemUserPermission();
-                    data.UserId = loggedInUser;
-                    data.Items = JsonSerializer.Serialize(vm.MenuItem);
-                    data.CreatedAt = DateTime.Now;
-                    data.CreatedBy = vm.UserId;
-                    var saveRole = _context.TblMenuItemUserPermissions.Add(data);
-                    _context.SaveChanges();
-                    if (saveRole.Entity.Id > 0)
-                    {
-                        res.IsSuccess = true;
-                        res.Message = "Role Added Successfully";
-                    }
-                    else
-                    {
-                        res.Message = "Something went wrong!";
-                    }
-                }
-            }
-            catch(Exception ex)
-            {
-                res.Message = "server error";
-            }
-            return res;
-        }
+       
 
         public string GetClientRoleName(int ClientId)
         {

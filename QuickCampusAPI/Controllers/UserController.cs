@@ -30,7 +30,7 @@ namespace QuickCampusAPI.Controllers
 
         [HttpGet]
         [Route("GetAllUser")]
-        public async Task<IActionResult> UserList(string? search,DataTypeFilter DataType, int pageStart = 1, int pageSize = 10)
+        public async Task<IActionResult> UserList(string? search, int? ClientId, DataTypeFilter DataType, int pageStart = 1, int pageSize = 10)
         {
             IGeneralResult<List<UserViewVm>> result = new GeneralResult<List<UserViewVm>>();
             try
@@ -55,7 +55,7 @@ namespace QuickCampusAPI.Controllers
                 int userListCount = 0;
                 if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                 {
-                    userData = _userRepo.GetAllQuerable().Where(x => x.IsDelete == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
+                    userData = _userRepo.GetAllQuerable().Where(x => (ClientId != null && ClientId > 0 ? x.ClientId == ClientId : true) && x.IsDelete == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
                 }
                 else
                 {

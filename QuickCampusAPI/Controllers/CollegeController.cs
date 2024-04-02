@@ -57,7 +57,7 @@ namespace QuickCampusAPI.Controllers
 
         [HttpGet]
         [Route("GetAllCollege")]
-        public async Task<IActionResult> GetAllCollege(string? search, DataTypeFilter DataType = DataTypeFilter.All, int pageStart = 1, int pageSize = 10)
+        public async Task<IActionResult> GetAllCollege(string? search,int? ClientId, DataTypeFilter DataType = DataTypeFilter.All, int pageStart = 1, int pageSize = 10)
         {
             IGeneralResult<List<CollegeCountryStateVmmm>> result = new GeneralResult<List<CollegeCountryStateVmmm>>();
             try
@@ -82,7 +82,7 @@ namespace QuickCampusAPI.Controllers
                 int collegeListCount = 0;
                 if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                 {
-                    collegeData = _collegeRepo.GetAllQuerable().Where(x => x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
+                    collegeData = _collegeRepo.GetAllQuerable().Where(x => (ClientId != null && ClientId > 0 ? x.ClientId == ClientId : true) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
                 }
                 else
                 {

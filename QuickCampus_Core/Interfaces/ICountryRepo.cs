@@ -5,6 +5,5 @@ namespace QuickCampus_Core.Interfaces
 {
     public interface ICountryRepo : IGenericRepository<MstCityStateCountry>
     {
-        Task<IEnumerable<CountryVM>> GetAllCountries();
     }
 }

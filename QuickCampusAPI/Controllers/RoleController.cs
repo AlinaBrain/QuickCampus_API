@@ -39,7 +39,7 @@ namespace QuickCampusAPI.Controllers
 
         [HttpGet]
         [Route("RoleList")]
-        public async Task<IActionResult> RoleList(string? search, DataTypeFilter DataType, int pageStart = 1, int pageSize = 10)
+        public async Task<IActionResult> RoleList(string? search, int? ClientId, DataTypeFilter DataType, int pageStart = 1, int pageSize = 10)
         {
             IGeneralResult<List<RoleViewVm>> result = new GeneralResult<List<RoleViewVm>>();
             try
@@ -63,7 +63,7 @@ namespace QuickCampusAPI.Controllers
                 List<TblRole> roleData = new List<TblRole>();
                 if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                 {
-                    roleData = _roleRepo.GetAllQuerable().Where(x => x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
+                    roleData = _roleRepo.GetAllQuerable().Where(x => (ClientId != null && ClientId > 0 ? x.ClientId == ClientId : true) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
                 }
                 else
                 {

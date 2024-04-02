@@ -384,7 +384,7 @@ namespace QuickCampusAPI.Controllers
 
         [HttpGet]
         [Route("GetClientById")]
-        public async Task<IActionResult> GetClientById(int clientId)
+        public async Task<IActionResult> GetClientById(int ClientId)
         {
             IGeneralResult<GetClientById> result = new GeneralResult<GetClientById>();
             try
@@ -394,7 +394,7 @@ namespace QuickCampusAPI.Controllers
                 var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
                 if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                 {
-                    var res = await _clientRepo.GetById(clientId);
+                    var res = await _clientRepo.GetById(ClientId);
                     if (res.IsDeleted == false && res.IsActive == true)
                     {
                         var userData = _userRepo.GetAllQuerable().Where(x => x.IsDelete == false && x.ClientId == res.Id).FirstOrDefault();

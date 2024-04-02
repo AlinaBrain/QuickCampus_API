@@ -6,6 +6,5 @@ namespace QuickCampus_Core.Interfaces
 {
     public interface ICollegeRepo : IGenericRepository<College>
     {
-        Task<IGeneralResult<string>> DeleteCollege(int id, int clientid, bool isSuperAdmin);
     }
 }

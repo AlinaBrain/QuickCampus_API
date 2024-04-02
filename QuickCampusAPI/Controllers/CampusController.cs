@@ -44,7 +44,7 @@ namespace QuickCampusAPI.Controllers
        
         [HttpGet]
         [Route("GetAllCampus")]
-        public async Task<IActionResult> GetAllCampus(string? search, DataTypeFilter DataType, int pageStart = 1, int pageSize = 10)
+        public async Task<IActionResult> GetAllCampus(string? search, int? ClientId, DataTypeFilter DataType, int pageStart = 1, int pageSize = 10)
         {
             IGeneralResult<List<CampusViewModel>> result = new GeneralResult<List<CampusViewModel>>();
             try
