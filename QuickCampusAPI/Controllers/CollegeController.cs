@@ -154,6 +154,7 @@ namespace QuickCampusAPI.Controllers
                         result.IsSuccess = true;
                         result.Message = "College fetched successfully.";
                         result.Data = (CollegeCountryStateVmmm)college;
+                        result.Data.Logo = Path.Combine(baseUrl, result.Data.Logo);
                     }
                     return Ok(result);
                 }
@@ -240,13 +241,14 @@ namespace QuickCampusAPI.Controllers
                     var UploadLogo = _uploadFile.GetUploadFile(vm.ImagePath);
                     if (UploadLogo.IsSuccess)
                     {
-                        college.Logo = Path.Combine(baseUrl, UploadLogo.Data);
+                        college.Logo = UploadLogo.Data;
                         var addCollege = await _collegeRepo.Add(college.ToCollegeDbModel());
                         if (addCollege.CollegeId > 0)
                         {
                             result.IsSuccess = true;
                             result.Message = "College added successfully";
                             result.Data = (CollegeVM)addCollege;
+                            result.Data.Logo = Path.Combine(baseUrl, result.Data.Logo);
                         }
                         else
                         {
