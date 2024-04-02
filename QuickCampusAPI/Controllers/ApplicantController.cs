@@ -25,9 +25,10 @@ namespace QuickCampusAPI.Controllers
         private readonly ICollegeRepo _collegeRepo;
         private readonly IUserRepo _userRepo;
         private string _jwtSecretKey;
+        private readonly ISkillsRepo _skillsRepo;
 
         public ApplicantController(IConfiguration configuration, IMstQualificationRepo qualificationRepo, ICollegeRepo collegeRepo, IApplicantRepo applicantRepo
-            ,IUserAppRoleRepo userAppRoleRepo,IUserRepo userRepo)
+            ,IUserAppRoleRepo userAppRoleRepo,IUserRepo userRepo,ISkillsRepo skillsRepo)
         {
             _applicantRepo = applicantRepo;
             _userAppRoleRepo = userAppRoleRepo;
@@ -36,6 +37,7 @@ namespace QuickCampusAPI.Controllers
             _collegeRepo = collegeRepo;
             _userRepo = userRepo;
             _jwtSecretKey = _config["Jwt:Key"] ?? "";
+            _skillsRepo = skillsRepo;
         }
 
         [HttpGet]
@@ -177,13 +179,28 @@ namespace QuickCampusAPI.Controllers
                     vm.PhoneNumber = vm.PhoneNumber?.Trim();
                     vm.Comment = vm.Comment?.Trim();
                     vm.HighestQualification = vm.HighestQualification;
+                    
                     vm.ClientId = (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId);
                     var SaveApplicant = await _applicantRepo.Add(vm.ToApplicantDbModel());
+
+                    foreach (var item in vm.skilltype)
+                    {
+                        SkillsVm skillVm = new SkillsVm()
+                        {
+                            
+                            SkillName=item.SkillName,
+                            SkillId=item.SkillId,
+                            ApplicantId=SaveApplicant.ApplicantId,
+                        };
+                        var SaveSkills = await _skillsRepo.Add(skillVm.ToSkillDbModel());
+                        item.SkillId = SaveSkills.SkillId;
+                    }
                     if (SaveApplicant.ApplicantId > 0)
                     {
                         result.IsSuccess = true;
                         result.Message = "Applicant added successfully.";
                         result.Data = (ApplicantViewModel)SaveApplicant;
+                        result.Data.skilltype = vm.skilltype;
                     }
                     else
                     {

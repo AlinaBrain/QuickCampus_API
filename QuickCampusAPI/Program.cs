@@ -126,6 +126,7 @@ builder.Services.AddScoped<IUserRoleRepo, UserRoleService>();
 builder.Services.AddScoped<IMstQualificationRepo, MstQualificationRepo>();
 builder.Services.AddScoped<ICampusWalkinCollegeRepo, CampusCollegeService>();
 builder.Services.AddScoped<QuestionTypeRepo, QuestionTypeService>();
+builder.Services.AddScoped<ISkillsRepo, SkillRepo>();
 builder.Services.AddTransient<ValidationFilterAttribute>();
 builder.Services.Configure<ApiBehaviorOptions>(options
     => options.SuppressModelStateInvalidFilter = true);

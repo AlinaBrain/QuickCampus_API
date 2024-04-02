@@ -55,5 +55,7 @@ public partial class Applicant
 
     public virtual MstQualification? HighestQualificationNavigation { get; set; }
 
+    public virtual ICollection<Skill> SkillsNavigation { get; set; } = new List<Skill>();
+
     public virtual Status? Status { get; set; }
 }
