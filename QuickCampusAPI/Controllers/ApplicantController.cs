@@ -25,9 +25,10 @@ namespace QuickCampusAPI.Controllers
         private readonly ICollegeRepo _collegeRepo;
         private readonly IUserRepo _userRepo;
         private string _jwtSecretKey;
+        private readonly ISkillsRepo _skillsRepo;
 
         public ApplicantController(IConfiguration configuration, IMstQualificationRepo qualificationRepo, ICollegeRepo collegeRepo, IApplicantRepo applicantRepo
-            ,IUserAppRoleRepo userAppRoleRepo,IUserRepo userRepo)
+            ,IUserAppRoleRepo userAppRoleRepo,IUserRepo userRepo,ISkillsRepo skillsRepo)
         {
             _applicantRepo = applicantRepo;
             _userAppRoleRepo = userAppRoleRepo;
@@ -36,6 +37,7 @@ namespace QuickCampusAPI.Controllers
             _collegeRepo = collegeRepo;
             _userRepo = userRepo;
             _jwtSecretKey = _config["Jwt:Key"] ?? "";
+            _skillsRepo = skillsRepo;
         }
 
         [HttpGet]
@@ -73,6 +75,7 @@ namespace QuickCampusAPI.Controllers
                 }
                 var collegeList = _collegeRepo.GetAllQuerable().Where(x => x.IsActive == true && x.IsDeleted == false).ToList();
                 var qualificationList = _qualificationRepo.GetAllQuerable().Where(x => x.IsActive == true && x.IsDeleted == false).ToList();
+                
                 foreach (var item in applicantData)
                 {
                     if (collegeList.Any(x => x.CollegeId == item.CollegeId))
@@ -83,7 +86,6 @@ namespace QuickCampusAPI.Controllers
                 if (!string.IsNullOrEmpty(search))
                 {
                     search = search.Trim();
-
                 }
                 applicantList = applicantData.Where(x => ((x.FirstName + " " + x.LastName).Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.FirstName.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.LastName.Trim().Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.EmailAddress.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.PhoneNumber.Contains(search ?? "") || x.CollegeName.Contains(search ?? "", StringComparison.OrdinalIgnoreCase))).OrderByDescending(x => x.ApplicantId).ToList();
                 applicantTotalCount = applicantList.Count;
@@ -95,7 +97,14 @@ namespace QuickCampusAPI.Controllers
                     {
                         item.HighestQualificationName = qualificationList.Where(x => x.QualId == item.HighestQualification).First()?.QualName;
                     }
+                    var skillsdata = _skillsRepo.GetAllQuerable().Where(x => x.IsActive == true && x.IsDeleted == false &&x.ApplicantId==item.ApplicantID).ToList();
+                    item.skilltype = skillsdata.Select(x => new SkillVmm
+                    {
+                      SkillId=  x.SkillId,
+                       SkillName= x.SkillName
+                    }).ToList(); 
                 }
+               
                 if (applicantList.Count > 0)
                 {
                     result.IsSuccess = true;
@@ -177,13 +186,28 @@ namespace QuickCampusAPI.Controllers
                     vm.PhoneNumber = vm.PhoneNumber?.Trim();
                     vm.Comment = vm.Comment?.Trim();
                     vm.HighestQualification = vm.HighestQualification;
+                    
                     vm.ClientId = (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId);
                     var SaveApplicant = await _applicantRepo.Add(vm.ToApplicantDbModel());
+
+                    foreach (var item in vm.skilltype)
+                    {
+                        SkillsVm skillVm = new SkillsVm()
+                        {
+                            
+                            SkillName=item.SkillName,
+                            SkillId=item.SkillId,
+                            ApplicantId=SaveApplicant.ApplicantId,
+                        };
+                        var SaveSkills = await _skillsRepo.Add(skillVm.ToSkillDbModel());
+                        item.SkillId = SaveSkills.SkillId;
+                    }
                     if (SaveApplicant.ApplicantId > 0)
                     {
                         result.IsSuccess = true;
                         result.Message = "Applicant added successfully.";
                         result.Data = (ApplicantViewModel)SaveApplicant;
+                        result.Data.skilltype = vm.skilltype;
                     }
                     else
                     {
@@ -327,8 +351,6 @@ namespace QuickCampusAPI.Controllers
                 {
                     Applicant applicant = new Applicant();
                     var collegeList = _collegeRepo.GetAllQuerable().Where(x => x.IsActive == true && x.IsDeleted == false).ToList();
-                    
-
 
                     if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                     {
@@ -349,10 +371,20 @@ namespace QuickCampusAPI.Controllers
                         result.Data = (ApplicantViewModel)applicant;
                         var qualificationlist = _qualificationRepo.GetAllQuerable().Where(x => x.IsActive == true && x.IsDeleted == false && x.QualId == applicant.HighestQualification).FirstOrDefault();
                         var collegelist=_collegeRepo.GetAllQuerable().Where(x=>x.IsActive==true && x.IsDeleted == false && x.CollegeId==applicant.CollegeId).FirstOrDefault();
+                       var skillslist=  _skillsRepo.GetAllQuerable().Where(x=>x.IsActive==true && x.IsDeleted==false && x.ApplicantId== applicantId).ToList();
                         if (qualificationlist != null)
                         {
                             result.Data.HighestQualificationName = qualificationlist.QualName;
                         }
+                        if (skillslist != null)
+                        {
+                            result.Data.skilltype = skillslist.Select(x => new SkillVmm
+                            {
+                                SkillId = x.SkillId,
+                                SkillName = x.SkillName
+                            }).ToList();
+                        }
+                    
                         if (collegelist != null)
                         {
                             result.Data.CollegeName = collegelist.CollegeName;

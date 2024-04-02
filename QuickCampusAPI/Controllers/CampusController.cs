@@ -100,8 +100,6 @@ namespace QuickCampusAPI.Controllers
                             CollegeCode = (z.CollegeId != null ? _collegeRepo.GetAllQuerable().Where(x => x.CollegeId == z.CollegeId).First().CollegeCode : ""),
                         }).ToList();
                     }
-
-                    
                         result.IsSuccess = true;
                         result.Message = "Campus get successfully";
                         result.Data = response;

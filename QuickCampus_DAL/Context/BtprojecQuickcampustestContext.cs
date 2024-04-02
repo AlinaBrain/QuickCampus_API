@@ -63,6 +63,8 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
     public virtual DbSet<Section> Sections { get; set; }
 
+    public virtual DbSet<Skill> Skills { get; set; }
+
     public virtual DbSet<Status> Statuses { get; set; }
 
     public virtual DbSet<TblClient> TblClients { get; set; }
@@ -178,6 +180,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
             entity.HasOne(d => d.Applicant).WithMany(p => p.ApplicantComments)
                 .HasForeignKey(d => d.ApplicantId)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_ApplicantComment_Applicant");
         });
 
@@ -191,6 +194,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
             entity.HasOne(d => d.Applicant).WithMany(p => p.ApplicantTests)
                 .HasForeignKey(d => d.ApplicantId)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_ApplicantExamination_Applicant");
 
             entity.HasOne(d => d.Campus).WithMany(p => p.ApplicantTests)
@@ -527,6 +531,22 @@ public partial class BtprojecQuickcampustestContext : DbContext
                 .HasMaxLength(50)
                 .UseCollation("SQL_Latin1_General_CP1_CI_AS")
                 .HasColumnName("Section");
+        });
+
+        modelBuilder.Entity<Skill>(entity =>
+        {
+            entity.HasKey(e => e.SkillId).HasName("PK__Skill__DFA091873B15CBFE");
+
+            entity.ToTable("Skill", "dbo");
+
+            entity.Property(e => e.ApplicantId).HasColumnName("Applicant_Id");
+            entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+            entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.SkillName).HasMaxLength(200);
+
+            entity.HasOne(d => d.Applicant).WithMany(p => p.SkillsNavigation)
+                .HasForeignKey(d => d.ApplicantId)
+                .HasConstraintName("FK__Skill__Applicant__793DFFAF");
         });
 
         modelBuilder.Entity<Status>(entity =>

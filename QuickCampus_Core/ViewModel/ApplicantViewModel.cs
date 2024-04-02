@@ -82,6 +82,8 @@ namespace QuickCampus_Core.ViewModel
         public bool? IsActive { get; set; }
         //public DateTime? ModifiedDate { get; set; }
         public int? CollegeId { get; set; }
+   
+        public List<SkillVmm> skilltype { get; set; }
 
         public Applicant ToApplicantDbModel()
         {
