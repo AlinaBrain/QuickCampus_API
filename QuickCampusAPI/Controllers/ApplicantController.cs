@@ -75,6 +75,7 @@ namespace QuickCampusAPI.Controllers
                 }
                 var collegeList = _collegeRepo.GetAllQuerable().Where(x => x.IsActive == true && x.IsDeleted == false).ToList();
                 var qualificationList = _qualificationRepo.GetAllQuerable().Where(x => x.IsActive == true && x.IsDeleted == false).ToList();
+                
                 foreach (var item in applicantData)
                 {
                     if (collegeList.Any(x => x.CollegeId == item.CollegeId))
@@ -85,7 +86,6 @@ namespace QuickCampusAPI.Controllers
                 if (!string.IsNullOrEmpty(search))
                 {
                     search = search.Trim();
-
                 }
                 applicantList = applicantData.Where(x => ((x.FirstName + " " + x.LastName).Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.FirstName.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.LastName.Trim().Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.EmailAddress.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.PhoneNumber.Contains(search ?? "") || x.CollegeName.Contains(search ?? "", StringComparison.OrdinalIgnoreCase))).OrderByDescending(x => x.ApplicantId).ToList();
                 applicantTotalCount = applicantList.Count;
@@ -97,7 +97,14 @@ namespace QuickCampusAPI.Controllers
                     {
                         item.HighestQualificationName = qualificationList.Where(x => x.QualId == item.HighestQualification).First()?.QualName;
                     }
+                    var skillsdata = _skillsRepo.GetAllQuerable().Where(x => x.IsActive == true && x.IsDeleted == false &&x.ApplicantId==item.ApplicantID).ToList();
+                    item.skilltype = skillsdata.Select(x => new SkillVmm
+                    {
+                      SkillId=  x.SkillId,
+                       SkillName= x.SkillName
+                    }).ToList(); 
                 }
+               
                 if (applicantList.Count > 0)
                 {
                     result.IsSuccess = true;
@@ -344,8 +351,6 @@ namespace QuickCampusAPI.Controllers
                 {
                     Applicant applicant = new Applicant();
                     var collegeList = _collegeRepo.GetAllQuerable().Where(x => x.IsActive == true && x.IsDeleted == false).ToList();
-                    
-
 
                     if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                     {
@@ -366,10 +371,20 @@ namespace QuickCampusAPI.Controllers
                         result.Data = (ApplicantViewModel)applicant;
                         var qualificationlist = _qualificationRepo.GetAllQuerable().Where(x => x.IsActive == true && x.IsDeleted == false && x.QualId == applicant.HighestQualification).FirstOrDefault();
                         var collegelist=_collegeRepo.GetAllQuerable().Where(x=>x.IsActive==true && x.IsDeleted == false && x.CollegeId==applicant.CollegeId).FirstOrDefault();
+                       var skillslist=  _skillsRepo.GetAllQuerable().Where(x=>x.IsActive==true && x.IsDeleted==false && x.ApplicantId== applicantId).ToList();
                         if (qualificationlist != null)
                         {
                             result.Data.HighestQualificationName = qualificationlist.QualName;
                         }
+                        if (skillslist != null)
+                        {
+                            result.Data.skilltype = skillslist.Select(x => new SkillVmm
+                            {
+                                SkillId = x.SkillId,
+                                SkillName = x.SkillName
+                            }).ToList();
+                        }
+                    
                         if (collegelist != null)
                         {
                             result.Data.CollegeName = collegelist.CollegeName;
