@@ -67,7 +67,7 @@ namespace QuickCampus_Core.ViewModel
         public string? Skills { get; set; }
         [Required(ErrorMessage = "You must provide a StatusId")]
         public int StatusId { get; set; }
-        public string? Comment { get; set; }
+        public string Comment { get; set; } = "";
         //public DateTime? CreatedDate { get; set; }
         public DateTime? RegisteredDate { get; set; }
        
@@ -217,11 +217,7 @@ namespace QuickCampus_Core.ViewModel
                   .NotEmpty().WithMessage("Skills could not be empty")
                   .Length(3, 200).WithMessage("Skills length 3 to 200 Characters");
 
-                RuleFor(x => x.Comment)
-                  .Cascade(CascadeMode.StopOnFirstFailure)
-                  .NotNull().WithMessage("Comments could not be null")
-                  .NotEmpty().WithMessage("Comments could not be empty");
-
+              
                 RuleFor(x => x.FirstName)
                  .Cascade(CascadeMode.StopOnFirstFailure)
                  .NotNull().WithMessage("FirstName could not be null")

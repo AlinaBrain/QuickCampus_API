@@ -120,7 +120,7 @@ namespace QuickCampusAPI.Controllers
                 }
                 else
                 {
-                    result.Message = "No applicant found!";
+                    result.Message = "No Question found!";
                 }
             }
             catch (Exception ex)
