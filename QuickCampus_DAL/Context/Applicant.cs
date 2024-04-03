@@ -23,8 +23,6 @@ public partial class Applicant
 
     public double? IntermediatePercentage { get; set; }
 
-    public string? Skills { get; set; }
-
     public int? StatusId { get; set; }
 
     public string? Comment { get; set; }
@@ -55,7 +53,7 @@ public partial class Applicant
 
     public virtual MstQualification? HighestQualificationNavigation { get; set; }
 
-    public virtual ICollection<Skill> SkillsNavigation { get; set; } = new List<Skill>();
+    public virtual ICollection<Skill> Skills { get; set; } = new List<Skill>();
 
     public virtual Status? Status { get; set; }
 }

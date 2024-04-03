@@ -223,7 +223,7 @@ namespace QuickCampus_Core.Services
         {
             IGeneralResult<CampusGridViewModel> result = new GeneralResult<CampusGridViewModel>();
 
-            var campusData = _context.WalkIns.Where(x => x.IsDeleted == false && x.IsActive == true && x.WalkInId == id).Include(x => x.CampusWalkInColleges).Include(x => x.State).Include(x => x.Country).OrderByDescending(x => x.WalkInDate).Select(x => new CampusGridViewModel()
+            var campusData = _context.WalkIns.Where(x => x.IsDeleted == false && x.WalkInId == id).Include(x => x.CampusWalkInColleges).Include(x => x.State).Include(x => x.Country).OrderByDescending(x => x.WalkInDate).Select(x => new CampusGridViewModel()
             {
                 WalkInID = x.WalkInId,
                 Address1 = x.Address1,
@@ -471,7 +471,7 @@ namespace QuickCampus_Core.Services
             IGeneralResult<CampusGridViewModel> result = new GeneralResult<CampusGridViewModel>();
             result.Data = new CampusGridViewModel();
             WalkIn campus = new WalkIn();
-            campus = _context.WalkIns.Where(x => x.WalkInId == id && x.IsActive == true && x.IsDeleted == false).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
+            campus = _context.WalkIns.Where(x => x.WalkInId == id  && x.IsDeleted == false).Include(x => x.State).Include(x => x.Country).Include(x => x.CampusWalkInColleges).FirstOrDefault();
             if (campus == null)
             {
                 result.IsSuccess = false;

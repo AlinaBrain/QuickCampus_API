@@ -395,7 +395,7 @@ namespace QuickCampusAPI.Controllers
                 if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                 {
                     var res = await _clientRepo.GetById(ClientId);
-                    if (res.IsDeleted == false && res.IsActive == true)
+                    if (res.IsDeleted == false )
                     {
                         var userData = _userRepo.GetAllQuerable().Where(x => x.IsDelete == false && x.ClientId == res.Id).FirstOrDefault();
                         

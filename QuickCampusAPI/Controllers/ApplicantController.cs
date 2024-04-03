@@ -139,7 +139,7 @@ namespace QuickCampusAPI.Controllers
                     LoggedInUserClientId = (user.ClientId == null ? "0": user.ClientId.ToString());
                 }
                 var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
-                if(LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin && (vm.ClientId.ToString() == "" || vm.ClientId == 0))
+                if(LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin && (vm.ClientId==null || vm.ClientId.ToString() == "" || vm.ClientId == 0))
                 {
                     result.Message = "Please select a valid Client";
                     return Ok(result);
@@ -295,13 +295,13 @@ namespace QuickCampusAPI.Controllers
                             result.Message = " Applicant does Not Exist";
                             return Ok(result);
                         }
+
                         applicant.FirstName = vm.FirstName?.Trim();
                         applicant.LastName = vm.LastName?.Trim();
                         applicant.EmailAddress = vm.EmailAddress?.Trim();
                         applicant.IntermediatePercentage = vm.IntermediatePercentage;
                         applicant.HighestQualification = vm.HighestQualification;
                         applicant.HigestQualificationPercentage = vm.HighestQualificationPercentage;
-                        applicant.Skills = vm.Skills?.Trim();
                         applicant.MatricPercentage = vm.MatricPercentage;
                         applicant.PhoneNumber = vm.PhoneNumber?.Trim();
                         applicant.StatusId = vm.StatusId;
@@ -309,7 +309,29 @@ namespace QuickCampusAPI.Controllers
                         applicant.CollegeId = vm.CollegeId;
                         applicant.Comment = vm.Comment;
                         applicant.ModifiedDate = DateTime.Now;
+                       
                         await _applicantRepo.Update(applicant);
+                        var skilltype= _skillsRepo.GetAllQuerable().Where(x=>x.ApplicantId==applicant.ApplicantId).ToList();
+                        if(skilltype.Count> 0)
+                        {
+                            foreach (var item in skilltype)
+                            {
+                                await _skillsRepo.Delete(item);
+                            }
+                        }
+                        foreach (var item in vm.skilltype)
+                        {
+                            SkillsVm skillVm = new SkillsVm()
+                            {
+
+                                SkillName = item.SkillName,
+                                SkillId = item.SkillId,
+                                ApplicantId = applicant.ApplicantId,
+                            };
+                            var SaveSkills = await _skillsRepo.Add(skillVm.ToSkillDbModel());
+                            item.SkillId = SaveSkills.SkillId;
+                        }
+
                         result.Message = "Applicant updated successfully";
                         result.IsSuccess = true;
                         return Ok(result);

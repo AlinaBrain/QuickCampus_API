@@ -55,6 +55,8 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
     public virtual DbSet<MstQualification> MstQualifications { get; set; }
 
+    public virtual DbSet<MstSkill> MstSkills { get; set; }
+
     public virtual DbSet<Question> Questions { get; set; }
 
     public virtual DbSet<QuestionOption> QuestionOptions { get; set; }
@@ -134,9 +136,6 @@ public partial class BtprojecQuickcampustestContext : DbContext
             entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
             entity.Property(e => e.PhoneNumber)
                 .HasMaxLength(25)
-                .UseCollation("SQL_Latin1_General_CP1_CI_AS");
-            entity.Property(e => e.Skills)
-                .HasMaxLength(500)
                 .UseCollation("SQL_Latin1_General_CP1_CI_AS");
 
             entity.HasOne(d => d.AssignedToCompanyNavigation).WithMany(p => p.Applicants)
@@ -472,6 +471,19 @@ public partial class BtprojecQuickcampustestContext : DbContext
             entity.Property(e => e.QualName).HasMaxLength(200);
         });
 
+        modelBuilder.Entity<MstSkill>(entity =>
+        {
+            entity.HasKey(e => e.SkillId).HasName("PK__mst_Skil__DFA0918741539A92");
+
+            entity.ToTable("mst_Skill", "dbo");
+
+            entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+            entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.SkillName)
+                .HasMaxLength(200)
+                .IsUnicode(false);
+        });
+
         modelBuilder.Entity<Question>(entity =>
         {
             entity.ToTable("Question", "dbo");
@@ -544,7 +556,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
             entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
             entity.Property(e => e.SkillName).HasMaxLength(200);
 
-            entity.HasOne(d => d.Applicant).WithMany(p => p.SkillsNavigation)
+            entity.HasOne(d => d.Applicant).WithMany(p => p.Skills)
                 .HasForeignKey(d => d.ApplicantId)
                 .HasConstraintName("FK__Skill__Applicant__793DFFAF");
         });

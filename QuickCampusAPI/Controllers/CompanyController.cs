@@ -73,7 +73,7 @@ namespace QuickCampusAPI.Controllers
         public async Task<IActionResult> GetCompanyById(int companyid)
         {
             IGeneralResult<CompanyVm> result = new GeneralResult<CompanyVm>();
-            var res = (await _companyRepo.GetAll(x=>x.Isdeleted==false && x.IsActive==true && x.CompanyId== companyid)).FirstOrDefault();
+            var res = (await _companyRepo.GetAll(x=>x.Isdeleted==false  && x.CompanyId== companyid)).FirstOrDefault();
             if (res!=null)
             {
                 result.Data = (CompanyVm)res;

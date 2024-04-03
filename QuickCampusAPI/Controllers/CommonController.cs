@@ -1,11 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting.Internal;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Common.Helper;
 using QuickCampus_Core.Interfaces;
+using QuickCampus_Core.Services;
 using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
+using static QuickCampus_Core.Common.common;
 namespace QuickCampusAPI.Controllers
 {
     [Authorize]
@@ -16,21 +19,34 @@ namespace QuickCampusAPI.Controllers
         private readonly ICountryRepo _countryRepo;
         private readonly IStateRepo _stateRepo;
         private readonly ICityRepo _cityRepo;
-        private readonly IConfiguration _configuration;
+        private readonly IConfiguration _config;
         private readonly ProcessUploadFile _uploadFile;
         private readonly Microsoft.AspNetCore.Hosting.IHostingEnvironment _hostingEnvironment;
         private string baseUrl;
+        private readonly IMstSkillsRepo _mstSkillsRepo;
+        private IUserRepo _userRepo;
+        private readonly IUserAppRoleRepo _userAppRoleRepo;
+        private string _jwtSecretKey;
 
         public CommonController(ICountryRepo countryRepo, IStateRepo stateRepo,
-            ICityRepo cityRepo, IConfiguration configuration, ProcessUploadFile uploadFile, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment)
+            ICityRepo cityRepo, IConfiguration configuration, ProcessUploadFile uploadFile, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, 
+            IMstSkillsRepo mstSkillsRepo, IUserRepo userRepo, IUserAppRoleRepo userAppRoleRepo
+
+
+            )
         {
             _countryRepo = countryRepo;
             _stateRepo = stateRepo;
             _cityRepo = cityRepo;
-            _configuration = configuration;
+            _config = configuration;
             _uploadFile = uploadFile;
             _hostingEnvironment = hostingEnvironment;
-            baseUrl = _configuration.GetSection("APISitePath").Value ?? "";
+            baseUrl = _config.GetSection("APISitePath").Value ?? "";
+            _mstSkillsRepo=mstSkillsRepo;
+            _userRepo=userRepo;
+            _userAppRoleRepo=userAppRoleRepo;
+            baseUrl = _config.GetSection("APISitePath").Value;
+            _jwtSecretKey = _config["Jwt:Key"] ?? "";
         }
 
         [HttpGet]
@@ -76,7 +92,7 @@ namespace QuickCampusAPI.Controllers
                 {
                     result.IsSuccess = true;
                     result.Message = "States fetched successfully";
-                    result.Data = response;
+                    result.Data = response.OrderBy(x=>x.StateName).ToList();
                     result.TotalRecordCount = response.Count();
                 }
                 else
@@ -112,7 +128,7 @@ namespace QuickCampusAPI.Controllers
                 {
                     result.IsSuccess = true;
                     result.Message = "Cities fetched successfully.";
-                    result.Data = response;
+                    result.Data = response.OrderBy(x=>x.CityName).ToList();
                     result.TotalRecordCount = cityTotalCount;
                 }
                 else
@@ -166,5 +182,105 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
+        [HttpPost]
+        [Route("AddSkills")]
+        public async Task<IActionResult> AddSkills(MstSkillsVm Vm)
+        {
+            IGeneralResult<MstSkillsVm> result = new GeneralResult<MstSkillsVm>();
+            try
+            {
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
+                {
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
+                }
+                if (ModelState.IsValid)
+                {
+                    MstSkillsVm mstskills = new MstSkillsVm
+                    {
+                        SkillName=Vm.SkillName,
+                        ClientId= Convert.ToInt32(LoggedInUserClientId)
+                    };
+                    var mstskillsdata =await _mstSkillsRepo.Add(mstskills.ToMstSkillDbMOdel());
+                    if(mstskillsdata.SkillId >0)
+                    {
+                        result.IsSuccess = true;
+                        result.Message = "Skills added successfully";
+                        result.Data = (MstSkillsVm)mstskillsdata;
+                    }
+                    else
+                    {
+                        result.Message = "Something went wrong.";
+                    }
+                }
+                else
+                {
+                    result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
+                }
+
+            }
+            catch(Exception ex)
+            {
+                result.Message = "Server Error" + ex.Message;
+            }
+            return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("GetAllSkill")]
+        public async Task<IActionResult> GetAllSkill(int ClientId,string? search, DataTypeFilter Datatype, int pageStart = 1, int pageSize = 10)
+        {
+            IGeneralResult<List<GetMstSkillVm>> result = new GeneralResult<List<GetMstSkillVm>>();
+            try
+            {
+                var _jwtSecretKey = _config["Jwt:Key"];
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
+                {
+                    var newPageStart = 0;
+                    if (pageStart > 0)
+                    {
+                        var startPage = 1;
+                        newPageStart = (pageStart - startPage) * pageSize;
+
+                        List<MstSkill> Mstdata = new List<MstSkill>();
+
+                        Mstdata = await _mstSkillsRepo.GetAll(x => x.IsDelete == false && (Datatype == DataTypeFilter.OnlyInActive ? x.IsActive == true : (Datatype == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)));
+
+                        //var roleData = _roleRepo.GetAll(x => x.IsActive == true && x.IsDeleted == false).Result.FirstOrDefault();
+                        //var userAppRole = _userAppRoleRepo.GetAll(x => x.UserId == x.UserId).Result.FirstOrDefault();
+                        //var userAppRoleId = userAppRole != null ? userAppRole.RoleId : 0;
+                        List<GetMstSkillVm> data = new List<GetMstSkillVm>();
+                        data.AddRange(Mstdata.Select(x => new GetMstSkillVm
+                        {
+                            SkillId = x.SkillId,
+                            SkillName = x.SkillName,
+                            IsActive = x.IsActive,
+                            ClientId = x.ClientId,
+                        }).ToList().Where(x=>(x.SkillName.Contains(search ?? ""))).OrderByDescending(x => x.SkillId).ToList());
+                        result.Data = data.Skip(newPageStart).Take(pageSize).ToList();
+                        result.IsSuccess = true;
+                        result.Message = "Client fetched Successfully";
+                        result.TotalRecordCount = data.Count;
+                        return Ok(result);
+                       
+                    }
+                    else
+                    {
+                        result.Message = "Access Denied";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Message = "Server Error " + ex.Message;
+            }
+            return Ok(result);
+        }
+
     }
 }

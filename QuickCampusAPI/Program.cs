@@ -39,7 +39,7 @@ builder.Services.AddDbContext<BtprojecQuickcampustestContext>(
 builder.Services.AddControllers();
 builder.Services.AddScoped<IValidator<AdminLogin>, AdminLoginValidator>();
 builder.Services.AddScoped<IValidator<UserVm>, UserValidator>();
-builder.Services.AddScoped<IValidator<ClientUpdateRequest>, ClientValidatorRequest>();
+//builder.Services.AddScoped<IValidator<ClientUpdateRequest>, ClientValidatorRequest>();
 builder.Services.AddScoped<IValidator<CollegeVM>, CollegeValidator>();
 builder.Services.AddScoped<IValidator<ApplicantViewModel>, ApplicantValidator>();
 builder.Services.AddControllers()
@@ -127,6 +127,7 @@ builder.Services.AddScoped<IMstQualificationRepo, MstQualificationRepo>();
 builder.Services.AddScoped<ICampusWalkinCollegeRepo, CampusCollegeService>();
 builder.Services.AddScoped<QuestionTypeRepo, QuestionTypeService>();
 builder.Services.AddScoped<ISkillsRepo, SkillRepo>();
+builder.Services.AddScoped<IMstSkillsRepo,MstSkillRepo>();
 builder.Services.AddTransient<ValidationFilterAttribute>();
 builder.Services.Configure<ApiBehaviorOptions>(options
     => options.SuppressModelStateInvalidFilter = true);

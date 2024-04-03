@@ -20,7 +20,7 @@ namespace QuickCampus_Core.ViewModel
                 HighestQualificationPercentage = x.HigestQualificationPercentage,
                 MatricPercentage = x.MatricPercentage,
                 IntermediatePercentage = x.IntermediatePercentage,
-                Skills = x.Skills,
+                
                 StatusId = x.StatusId ?? 0,
                 Comment = x.Comment,
                 AssignedToCompany = x.AssignedToCompany,
@@ -34,9 +34,15 @@ namespace QuickCampus_Core.ViewModel
             };
         }
         public int ApplicantID { get; set; }
-
+        [Required(ErrorMessage = "You must provide an email address.")]
+        [RegularExpression(@"/^[A-Za-z]*$/", ErrorMessage = "Only Email allowed.")]
+        [MaxLength(20, ErrorMessage = "can't exceed more than 20 characters.")]
+       
         public string? FirstName { get; set; }
-
+        [Required(ErrorMessage = "You must provide an email address.")]
+        [RegularExpression(@"/^[A-Za-z]*$/", ErrorMessage = "Only Email allowed.")]
+        [MaxLength(20, ErrorMessage = "can't exceed more than 20 characters.")]
+       
         public string? LastName { get; set; }
         [Required(ErrorMessage = "You must provide an email address.")]
         [RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$", ErrorMessage = "Only Email allowed.")]
@@ -63,8 +69,7 @@ namespace QuickCampus_Core.ViewModel
         [Required(ErrorMessage = "You must provide %.")]
         [Range(1, 100, ErrorMessage = "% should be in 1 - 100 range.")]
         public double? IntermediatePercentage { get; set; }
-        [Required(ErrorMessage = "You must provide a Skills ")]
-        public string? Skills { get; set; }
+       
         [Required(ErrorMessage = "You must provide a StatusId")]
         public int StatusId { get; set; }
         public string Comment { get; set; } = "";
@@ -96,7 +101,7 @@ namespace QuickCampus_Core.ViewModel
                 HigestQualificationPercentage = HighestQualificationPercentage,
                 MatricPercentage = MatricPercentage,
                 IntermediatePercentage = IntermediatePercentage,
-                Skills = Skills,
+                
                 StatusId = StatusId,
                 Comment = Comment,
                 AssignedToCompany = AssignedToCompany,
@@ -122,7 +127,7 @@ namespace QuickCampus_Core.ViewModel
                 HigestQualificationPercentage = HighestQualificationPercentage,
                 MatricPercentage = MatricPercentage,
                 IntermediatePercentage = IntermediatePercentage,
-                Skills = Skills,
+                
                 StatusId = StatusId,
                 Comment = Comment,
                 AssignedToCompany = AssignedToCompany,
@@ -164,9 +169,7 @@ namespace QuickCampus_Core.ViewModel
             [MaxLength(100, ErrorMessage = "can't exceed more than 100 characters.")]
             public string? HighestQualification { get; set; }
 
-            [Display(Name = "Best 3 Skills")]
-            [MaxLength(100, ErrorMessage = "can't exceed more than 100 characters.")]
-            public string? Skills { get; set; }
+           
 
             [Display(Name = "Highest Qualification %")]
             [Required(ErrorMessage = "You must provide %.")]
@@ -200,7 +203,7 @@ namespace QuickCampus_Core.ViewModel
             public string? HighestQualificationPercentage { get; set; }
             public string? MatricPercentage { get; set; }
             public string? IntermediatePercentage { get; set; }
-            public string? Skills { get; set; }
+           
         }
 
         public class ApplicantFilter
@@ -213,13 +216,6 @@ namespace QuickCampus_Core.ViewModel
             public ApplicantValidator()
             {
                 
-                RuleFor(x => x.Skills)
-                  .Cascade(CascadeMode.StopOnFirstFailure)
-                  .NotNull().WithMessage("Skills could not be null")
-                  .NotEmpty().WithMessage("Skills could not be empty")
-                  .Length(3, 200).WithMessage("Skills length 3 to 200 Characters");
-
-              
                 RuleFor(x => x.FirstName)
                  .Cascade(CascadeMode.StopOnFirstFailure)
                  .NotNull().WithMessage("FirstName could not be null")
@@ -236,9 +232,6 @@ namespace QuickCampus_Core.ViewModel
                   .Cascade(CascadeMode.StopOnFirstFailure)
 
                   .NotEmpty().WithMessage("HighestQualificationPercentage could not be empty");
-
-
-                
 
                 RuleFor(x => x.IntermediatePercentage)
                  .Cascade(CascadeMode.StopOnFirstFailure)

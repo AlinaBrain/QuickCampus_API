@@ -49,14 +49,14 @@ namespace QuickCampusAPI.Controllers
             var res = await _account.ListRoles(clientId ?? 0, Convert.ToInt32(LoggedInUser));
             return Ok(res);
         }
-        private ApplicationUserVM Authenticate(AdminLogin adminLogin)
-        {
-            var currentUser = _applicationUserRepo.FirstOrDefault(o => o.UserName.ToLower() == adminLogin.UserName.ToLower() && o.Password == adminLogin.Password);
-            if (currentUser != null)
-            {
-                return (ApplicationUserVM)currentUser;
-            }
-            return null;
-        }
+        //private ApplicationUserVM Authenticate(AdminLogin adminLogin)
+        //{
+        //    var currentUser = _applicationUserRepo.FirstOrDefault(o => o.UserName.ToLower() == adminLogin.UserName.ToLower() && o.Password == adminLogin.Password);
+        //    if (currentUser != null)
+        //    {
+        //        return (ApplicationUserVM)currentUser;
+        //    }
+        //    return null;
+        //}
     }
 }
