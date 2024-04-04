@@ -34,15 +34,13 @@ namespace QuickCampus_Core.ViewModel
             };
         }
         public int ApplicantID { get; set; }
-        [Required(ErrorMessage = "You must provide an email address.")]
-        [RegularExpression(@"/^[A-Za-z]*$/", ErrorMessage = "Only Email allowed.")]
+        [Required(ErrorMessage = "You must provide an FirstName.")]
+        [RegularExpression(@"/^[A-Za-z]*$/", ErrorMessage = "Only FirstName allowed.")]
         [MaxLength(20, ErrorMessage = "can't exceed more than 20 characters.")]
-       
         public string? FirstName { get; set; }
-        [Required(ErrorMessage = "You must provide an email address.")]
-        [RegularExpression(@"/^[A-Za-z]*$/", ErrorMessage = "Only Email allowed.")]
+        [Required(ErrorMessage = "You must provide an LastName .")]
+        [RegularExpression(@"/^[A-Za-z]*$/", ErrorMessage = "Only LastName allowed.")]
         [MaxLength(20, ErrorMessage = "can't exceed more than 20 characters.")]
-       
         public string? LastName { get; set; }
         [Required(ErrorMessage = "You must provide an email address.")]
         [RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$", ErrorMessage = "Only Email allowed.")]
@@ -101,7 +99,6 @@ namespace QuickCampus_Core.ViewModel
                 HigestQualificationPercentage = HighestQualificationPercentage,
                 MatricPercentage = MatricPercentage,
                 IntermediatePercentage = IntermediatePercentage,
-                
                 StatusId = StatusId,
                 Comment = Comment,
                 AssignedToCompany = AssignedToCompany,
@@ -127,7 +124,6 @@ namespace QuickCampus_Core.ViewModel
                 HigestQualificationPercentage = HighestQualificationPercentage,
                 MatricPercentage = MatricPercentage,
                 IntermediatePercentage = IntermediatePercentage,
-                
                 StatusId = StatusId,
                 Comment = Comment,
                 AssignedToCompany = AssignedToCompany,
@@ -168,9 +164,6 @@ namespace QuickCampus_Core.ViewModel
             [Required(ErrorMessage = "You must provide your highest qualification.")]
             [MaxLength(100, ErrorMessage = "can't exceed more than 100 characters.")]
             public string? HighestQualification { get; set; }
-
-           
-
             [Display(Name = "Highest Qualification %")]
             [Required(ErrorMessage = "You must provide %.")]
             [Range(1, 100, ErrorMessage = "% should be in 1 - 100 range.")]
@@ -215,22 +208,9 @@ namespace QuickCampus_Core.ViewModel
         {
             public ApplicantValidator()
             {
-                
-                RuleFor(x => x.FirstName)
-                 .Cascade(CascadeMode.StopOnFirstFailure)
-                 .NotNull().WithMessage("FirstName could not be null")
-                 .NotEmpty().WithMessage("FirstName could not be empty")
-                  .Length(4, 50).WithMessage("FirstName length could 4 to 50 character");
-
-                RuleFor(x => x.LastName)
-                 .Cascade(CascadeMode.StopOnFirstFailure)
-                 .NotNull().WithMessage("LastName could not be null")
-                 .NotEmpty().WithMessage("LastName could not be empty")
-                  .Length(3, 50).WithMessage("FirstName length could 3 to 50 character");
 
                 RuleFor(x => x.HighestQualificationPercentage)
                   .Cascade(CascadeMode.StopOnFirstFailure)
-
                   .NotEmpty().WithMessage("HighestQualificationPercentage could not be empty");
 
                 RuleFor(x => x.IntermediatePercentage)
