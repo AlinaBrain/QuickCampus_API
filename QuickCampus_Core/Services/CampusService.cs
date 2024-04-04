@@ -74,8 +74,10 @@ namespace QuickCampus_Core.Services
                         campus.CountryId = vm.CountryID;
                         campus.Title = vm.Title;
                         campus.CreatedDate = DateTime.Now;
+                        campus.PassingYear = vm.PassingYear;
                         var walkindata = _context.Update(campus);
                         vm.WalkInID = walkindata.Entity.WalkInId;
+                        
 
                         if (campus.TblWalkInColleges != null)
                         {
@@ -130,6 +132,7 @@ namespace QuickCampus_Core.Services
                     IsDeleted = false,
                     CreatedDate = DateTime.Now,
                     Title = vm.Title,
+                    PassingYear=vm.PassingYear
 
                 };
                 var walkin = _context.TblWalkIns.Add(sv);

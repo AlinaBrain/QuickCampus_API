@@ -380,6 +380,16 @@ namespace QuickCampusAPI.Controllers
                             };
                             if (option.Image != null)
                             {
+                                string[] ImageExList = { "jpeg", "jpg", "png" };
+                                string ImageEx = option.Image.FileName.Split(".")[1];
+                                if (!ImageExList.Any(x => x == ImageEx))
+                                {
+                                    result.Message = "Image should be in jpeg, png or jpg format.";
+                                    return Ok(result);
+                                }
+                            }
+                            if (option.Image != null)
+                            {
                                 var uploadImage = _uploadFile.GetUploadFile(option.Image);
                                 if (!uploadImage.IsSuccess)
                                 {

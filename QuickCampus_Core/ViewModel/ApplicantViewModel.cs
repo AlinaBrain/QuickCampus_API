@@ -20,7 +20,7 @@ namespace QuickCampus_Core.ViewModel
                 HighestQualificationPercentage = x.HigestQualificationPercentage,
                 MatricPercentage = x.MatricPercentage,
                 IntermediatePercentage = x.IntermediatePercentage,
-                
+                PassingYear = x.PassingYear,
                 StatusId = x.StatusId ?? 0,
                 Comment = x.Comment,
                 CollegeName = x.CollegeName,
@@ -84,7 +84,7 @@ namespace QuickCampus_Core.ViewModel
         public bool? IsActive { get; set; }
         //public DateTime? ModifiedDate { get; set; }
         public int? CollegeId { get; set; }
-   
+        public string? PassingYear { get; set; }
         public List<SkillVmm> skilltype { get; set; }
 
         public TblApplicant ToApplicantDbModel()
@@ -107,6 +107,7 @@ namespace QuickCampus_Core.ViewModel
                 IsActive = true,
                 IsDeleted = false,
                 CollegeId = CollegeId,
+                PassingYear=PassingYear,
             };
         }
 
@@ -130,6 +131,7 @@ namespace QuickCampus_Core.ViewModel
                 IsActive = true,
                 IsDeleted = false,
                 CollegeId = CollegeId,
+                PassingYear = PassingYear,
             };
         }
         public class ApplicantGridViewModel

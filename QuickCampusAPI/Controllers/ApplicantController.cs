@@ -185,6 +185,7 @@ namespace QuickCampusAPI.Controllers
                     vm.EmailAddress = vm.EmailAddress?.Trim();
                     vm.PhoneNumber = vm.PhoneNumber?.Trim();
                     vm.Comment = vm.Comment?.Trim();
+                    vm.PassingYear = vm.PassingYear;
                     vm.HighestQualification = vm.HighestQualification;
                     
                     vm.ClientId = (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId);
@@ -307,6 +308,7 @@ namespace QuickCampusAPI.Controllers
                         applicant.StatusId = vm.StatusId;
                         applicant.CollegeId = vm.CollegeId;
                         applicant.Comment = vm.Comment;
+                        applicant.PassingYear = vm.PassingYear;
                         applicant.ModifiedDate = DateTime.Now;
                        
                         await _applicantRepo.Update(applicant);

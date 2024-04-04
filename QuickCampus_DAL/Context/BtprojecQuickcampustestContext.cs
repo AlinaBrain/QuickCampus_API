@@ -75,7 +75,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.UseCollation("Latin1_General_CI_AI");
+        modelBuilder.HasDefaultSchema("btprojec_admin");
 
         modelBuilder.Entity<MstAppRole>(entity =>
         {
