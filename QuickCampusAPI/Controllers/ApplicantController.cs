@@ -101,7 +101,7 @@ namespace QuickCampusAPI.Controllers
                     item.skilltype = skillsdata.Select(x => new SkillVmm
                     {
                       SkillId=  x.SkillId,
-                       SkillName= x.ApplicantSkillId.ToString()
+                       ApplicantSkillId= x.ApplicantSkillId
                     }).ToList(); 
                 }
                
@@ -196,7 +196,7 @@ namespace QuickCampusAPI.Controllers
                         SkillsVm skillVm = new SkillsVm()
                         {
                             
-                            ApplicantSkillId=item.SkillName,
+                            ApplicantSkillId=item.ApplicantSkillId,
                             SkillId=item.SkillId,
                             ApplicantId=SaveApplicant.ApplicantId,
                         };
@@ -325,7 +325,7 @@ namespace QuickCampusAPI.Controllers
                             SkillsVm skillVm = new SkillsVm()
                             {
 
-                                ApplicantSkillId = item.SkillName,
+                                ApplicantSkillId = item.ApplicantSkillId,
                                 SkillId = item.SkillId,
                                 ApplicantId = applicant.ApplicantId,
                             };
@@ -404,7 +404,7 @@ namespace QuickCampusAPI.Controllers
                             result.Data.skilltype = skillslist.Select(x => new SkillVmm
                             {
                                 SkillId = x.SkillId,
-                                SkillName = x.ApplicantSkillId.ToString()
+                                ApplicantSkillId = x.ApplicantSkillId
                             }).ToList();
                         }
                     

@@ -10,6 +10,6 @@ namespace QuickCampus_Core.ViewModel
     {
         public int SkillId { get; set; }
 
-        public string? SkillName { get; set; }
+        public int? ApplicantSkillId { get; set; }
     }
 }

@@ -11,14 +11,13 @@ namespace QuickCampusAPI.Controllers
     [Authorize]
     public class AccountController : ControllerBase
     {
-        private readonly IApplicationUserRepo _applicationUserRepo;
         private readonly IUserRepo userRepo;
         private IConfiguration _config;
         private readonly IAccount _account;
-        public AccountController(IApplicationUserRepo applicationUserRepo,IUserRepo userRepo, IConfiguration config, IAccount account)
+        public AccountController(IUserRepo userRepo, IConfiguration config, IAccount account)
         {
             _config = config;
-            _applicationUserRepo = applicationUserRepo;
+           
             this.userRepo = userRepo;
             _account = account;
         }
