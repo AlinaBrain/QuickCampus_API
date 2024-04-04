@@ -28,6 +28,8 @@ namespace QuickCampus_Core.ViewModel
         [Required(ErrorMessage = "Title is required.")]
         public string Title { get; set; } = String.Empty;
 
+        public string? PassingYear { get; set; }
+
         public List<CampusWalkInModel>? Colleges { get; set; }
     }
 }

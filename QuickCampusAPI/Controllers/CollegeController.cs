@@ -185,13 +185,13 @@ namespace QuickCampusAPI.Controllers
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
                     LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
                 }
-                bool isCityExits = _cityRepo.Any(x => x.CityId == vm.CityId && x.IsActive == true && x.IsDeleted == false);
+                bool isCityExits = _cityRepo.Any(x => x.CityId == vm.CityId && x.IsActive == true && x.IsDeleted == false && x.StateId==vm.StateId);
                 if (!isCityExits)
                 {
                     result.Message = " City does not exists";
                     return Ok(result);
                 }
-                bool isStateExits = _stateRepo.Any(x => x.StateId == vm.StateId && x.IsActive == true && x.IsDeleted == false);
+                bool isStateExits = _stateRepo.Any(x => x.StateId == vm.StateId && x.IsActive == true && x.IsDeleted == false && x.CountryId==vm.CountryId);
                 if (!isStateExits)
                 {
                     result.Message = " State does not exists";
@@ -220,6 +220,16 @@ namespace QuickCampusAPI.Controllers
                 {
                     result.Message = "Contact Email is Already Exist";
                     return Ok(result);
+                }
+                if (vm.ImagePath != null)
+                {
+                    string[] ImageExList = { "jpeg", "jpg", "png" };
+                    string ImageEx = vm.ImagePath.FileName.Split(".")[1];
+                    if (!ImageExList.Any(x => x == ImageEx))
+                    {
+                        result.Message = "Image should be in jpeg, png or jpg format.";
+                        return Ok(result);
+                    }
                 }
                 if (ModelState.IsValid)
                 {
@@ -290,13 +300,13 @@ namespace QuickCampusAPI.Controllers
                 }
                 if (vm.CollegeId > 0)
                 {
-                    bool isCityExits = _cityRepo.Any(x => x.CityId == vm.CityId && x.IsActive == true && x.IsDeleted == false);
+                    bool isCityExits = _cityRepo.Any(x => x.CityId == vm.CityId && x.IsActive == true && x.IsDeleted == false && x.StateId==vm.StateId);
                     if (!isCityExits)
                     {
                         result.Message = " City does not exists";
                         return Ok(result);
                     }
-                    bool isStateExits = _stateRepo.Any(x => x.StateId == vm.StateId && x.IsActive == true && x.IsDeleted == false);
+                    bool isStateExits = _stateRepo.Any(x => x.StateId == vm.StateId && x.IsActive == true && x.IsDeleted == false && x.CountryId==vm.CountryId);
                     if (!isStateExits)
                     {
                         result.Message = " State does not exists";

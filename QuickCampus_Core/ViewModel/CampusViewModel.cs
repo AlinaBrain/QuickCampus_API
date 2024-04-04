@@ -21,8 +21,7 @@ namespace QuickCampus_Core.ViewModel
                 Title = x.Title,
                 StateId = x.StateId,
                 CountryId = x.CountryId,
-
-
+                PassingYear= x.PassingYear,
             };
         }
 
@@ -37,6 +36,7 @@ namespace QuickCampus_Core.ViewModel
         public string? Title { get; set; }
         public int? CountryId { get; set; }
         public int? StateId { get; set; }
+        public string? PassingYear { get; set; }
     }
     public class CampusGridViewModel
     {
@@ -63,6 +63,7 @@ namespace QuickCampus_Core.ViewModel
         public bool IsActive { get; set; }
         [Required(ErrorMessage = "Title is required.")]
         public string? Title { get; set; }
+        public string? PassingYear { get; set; }
         public List<CampusWalkInModel> Colleges { get; set; }
 
     }

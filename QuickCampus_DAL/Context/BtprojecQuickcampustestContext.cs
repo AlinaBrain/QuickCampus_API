@@ -105,15 +105,15 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=103.93.16.117;Database=btprojec_quickcampustest;TrustServerCertificate=true;user id=btprojec_admin;password=Bwy0w65ixN*bsE9wy;Integrated Security=false;");
+        => optionsBuilder.UseSqlServer("Server=SYS69\\SQLEXPRESS;Database=btprojec_quickcampustest;TrustServerCertificate=true;Integrated Security=true;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.HasDefaultSchema("btprojec_admin");
+        modelBuilder.UseCollation("Latin1_General_CI_AI");
 
         modelBuilder.Entity<Applicant>(entity =>
         {
-            entity.ToTable("Applicant", "dbo");
+            entity.ToTable("Applicant");
 
             entity.Property(e => e.ClientId).HasColumnName("ClientID");
             entity.Property(e => e.CollegeName)
@@ -157,7 +157,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.AnswerSummaryId);
 
-            entity.ToTable("ApplicantAnswerSummary", "dbo");
+            entity.ToTable("ApplicantAnswerSummary");
 
             entity.HasOne(d => d.Answer).WithMany(p => p.ApplicantAnswerSummaries)
                 .HasForeignKey(d => d.AnswerId)
@@ -172,7 +172,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.CommentId);
 
-            entity.ToTable("ApplicantComment", "dbo");
+            entity.ToTable("ApplicantComment");
 
             entity.Property(e => e.CommentedOn).HasColumnType("datetime");
             entity.Property(e => e.Description).UseCollation("SQL_Latin1_General_CP1_CI_AS");
@@ -187,7 +187,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.TestId).HasName("PK_ApplicantExamination");
 
-            entity.ToTable("ApplicantTest", "dbo");
+            entity.ToTable("ApplicantTest");
 
             entity.Property(e => e.TestDate).HasColumnType("datetime");
 
@@ -209,7 +209,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.SummaryId).HasName("PK_ExaminationDetail");
 
-            entity.ToTable("ApplicantTestSummary", "dbo");
+            entity.ToTable("ApplicantTestSummary");
 
             entity.Property(e => e.Answer).UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.SubmittedOn).HasColumnType("datetime");
@@ -225,7 +225,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
         modelBuilder.Entity<ApplicationRole>(entity =>
         {
-            entity.ToTable("ApplicationRole", "dbo");
+            entity.ToTable("ApplicationRole");
 
             entity.Property(e => e.ApplicationRoleId).ValueGeneratedNever();
             entity.Property(e => e.Description)
@@ -238,7 +238,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
         modelBuilder.Entity<ApplicationUser>(entity =>
         {
-            entity.ToTable("ApplicationUser", "dbo");
+            entity.ToTable("ApplicationUser");
 
             entity.HasIndex(e => e.UserName, "UK_UserName_User").IsUnique();
 
@@ -256,7 +256,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
         modelBuilder.Entity<ApplicationUserRole>(entity =>
         {
-            entity.ToTable("ApplicationUserRole", "dbo");
+            entity.ToTable("ApplicationUserRole");
 
             entity.HasOne(d => d.ApplicationRole).WithMany(p => p.ApplicationUserRoles)
                 .HasForeignKey(d => d.ApplicationRoleId)
@@ -273,7 +273,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.CampusId).HasName("PK_CampusCollege");
 
-            entity.ToTable("CampusWalkInCollege", "dbo");
+            entity.ToTable("CampusWalkInCollege");
 
             entity.Property(e => e.CollegeCode)
                 .HasMaxLength(255)
@@ -292,7 +292,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
         modelBuilder.Entity<College>(entity =>
         {
-            entity.ToTable("College", "dbo");
+            entity.ToTable("College");
 
             entity.Property(e => e.Address1)
                 .HasMaxLength(50)
@@ -329,7 +329,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
         modelBuilder.Entity<Company>(entity =>
         {
-            entity.ToTable("Company", "dbo");
+            entity.ToTable("Company");
 
             entity.Property(e => e.CompanyId).ValueGeneratedNever();
             entity.Property(e => e.CompanyName)
@@ -342,7 +342,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
         modelBuilder.Entity<Error>(entity =>
         {
-            entity.ToTable("Error", "dbo");
+            entity.ToTable("Error");
 
             entity.Property(e => e.Date).HasColumnType("datetime");
             entity.Property(e => e.Error1)
@@ -355,7 +355,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.GroupId).HasName("PK_Group");
 
-            entity.ToTable("Groupdl", "dbo");
+            entity.ToTable("Groupdl");
 
             entity.Property(e => e.GroupId).ValueGeneratedNever();
             entity.Property(e => e.GroupName)
@@ -371,7 +371,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.AppRoleId).HasName("PK__MstAppRo__E66DD698EDF1A5D6");
 
-            entity.ToTable("MstAppRole", "dbo");
+            entity.ToTable("MstAppRole");
 
             entity.Property(e => e.AppRoleName)
                 .HasMaxLength(100)
@@ -384,7 +384,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.CityId).HasName("PK__City__F2D21B760C7D81FB");
 
-            entity.ToTable("MstCity", "dbo");
+            entity.ToTable("MstCity");
 
             entity.Property(e => e.CityName)
                 .HasMaxLength(150)
@@ -402,7 +402,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.StateId).HasName("PK_State");
 
-            entity.ToTable("MstCity_State", "dbo");
+            entity.ToTable("MstCity_State");
 
             entity.Property(e => e.StateId).ValueGeneratedNever();
             entity.Property(e => e.StateName)
@@ -418,7 +418,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.CountryId).HasName("PK_Country");
 
-            entity.ToTable("MstCity_State_Country", "dbo");
+            entity.ToTable("MstCity_State_Country");
 
             entity.Property(e => e.CountryId).ValueGeneratedNever();
             entity.Property(e => e.CountryName)
@@ -429,8 +429,6 @@ public partial class BtprojecQuickcampustestContext : DbContext
         modelBuilder.Entity<MstMenuItem>(entity =>
         {
             entity.HasKey(e => e.ItemId).HasName("PK__MstMenuI__727E838BD5B99911");
-
-            entity.ToTable("MstMenuItems", "dbo");
 
             entity.Property(e => e.CreatedAt).HasColumnType("datetime");
             entity.Property(e => e.IsActive).HasDefaultValueSql("((1))");
@@ -443,8 +441,6 @@ public partial class BtprojecQuickcampustestContext : DbContext
         modelBuilder.Entity<MstMenuSubItem>(entity =>
         {
             entity.HasKey(e => e.SubItemId).HasName("PK__MstMenuS__8A6B7585D74A99CF");
-
-            entity.ToTable("MstMenuSubItems", "dbo");
 
             entity.Property(e => e.CreatedAt).HasColumnType("datetime");
             entity.Property(e => e.IsActive).HasDefaultValueSql("((1))");
@@ -462,7 +458,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.QualId).HasName("PK__MstQuali__B8C9022335534D56");
 
-            entity.ToTable("MstQualification", "dbo");
+            entity.ToTable("MstQualification");
 
             entity.Property(e => e.CreateAt).HasColumnType("datetime");
             entity.Property(e => e.IsActive).HasDefaultValueSql("((1))");
@@ -475,7 +471,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.SkillId).HasName("PK__mst_Skil__DFA0918741539A92");
 
-            entity.ToTable("mst_Skill", "dbo");
+            entity.ToTable("mst_Skill");
 
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
             entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
@@ -486,7 +482,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
         modelBuilder.Entity<Question>(entity =>
         {
-            entity.ToTable("Question", "dbo");
+            entity.ToTable("Question");
 
             entity.Property(e => e.Text).UseCollation("SQL_Latin1_General_CP1_CI_AS");
 
@@ -507,7 +503,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.OptionId).HasName("PK_Answer");
 
-            entity.ToTable("QuestionOption", "dbo");
+            entity.ToTable("QuestionOption");
 
             entity.Property(e => e.Imagepath).UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.OptionText).UseCollation("SQL_Latin1_General_CP1_CI_AS");
@@ -519,7 +515,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
         modelBuilder.Entity<QuestionType>(entity =>
         {
-            entity.ToTable("QuestionType", "dbo");
+            entity.ToTable("QuestionType");
 
             entity.Property(e => e.QuestionTypeId).ValueGeneratedNever();
             entity.Property(e => e.QuestionType1)
@@ -536,7 +532,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.SectionId).HasName("PK_ExaminationSection");
 
-            entity.ToTable("Section", "dbo");
+            entity.ToTable("Section");
 
             entity.Property(e => e.SectionId).ValueGeneratedNever();
             entity.Property(e => e.Section1)
@@ -549,7 +545,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.SkillId).HasName("PK__Skill__DFA091873B15CBFE");
 
-            entity.ToTable("Skill", "dbo");
+            entity.ToTable("Skill");
 
             entity.Property(e => e.ApplicantId).HasColumnName("Applicant_Id");
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
@@ -563,7 +559,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
         modelBuilder.Entity<Status>(entity =>
         {
-            entity.ToTable("Status", "dbo");
+            entity.ToTable("Status");
 
             entity.Property(e => e.StatusId).ValueGeneratedNever();
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
@@ -577,7 +573,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__tbl_Clie__3214EC0728D8A50C");
 
-            entity.ToTable("tbl_Client", "dbo");
+            entity.ToTable("tbl_Client");
 
             entity.Property(e => e.Address).UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
@@ -606,7 +602,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Tbl_Cont__3214EC07C3575B93");
 
-            entity.ToTable("Tbl_Content", "dbo");
+            entity.ToTable("Tbl_Content");
 
             entity.Property(e => e.CreatedOn).HasColumnType("datetime");
             entity.Property(e => e.Description)
@@ -663,7 +659,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Tbl_Depa__3214EC0731C5B2A4");
 
-            entity.ToTable("Tbl_Department", "dbo");
+            entity.ToTable("Tbl_Department");
 
             entity.Property(e => e.CreatedOn).HasColumnType("datetime");
             entity.Property(e => e.DepartmentName)
@@ -683,7 +679,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__tbl_Goal__3214EC07134B0881");
 
-            entity.ToTable("tbl_Goal", "dbo");
+            entity.ToTable("tbl_Goal");
 
             entity.Property(e => e.CreatedOn).HasColumnType("datetime");
             entity.Property(e => e.Goal)
@@ -711,7 +707,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__tblMenuI__3214EC07ECB77D04");
 
-            entity.ToTable("tblMenuItemUserPermission", "dbo");
+            entity.ToTable("tblMenuItemUserPermission");
 
             entity.Property(e => e.CreatedAt).HasColumnType("datetime");
             entity.Property(e => e.IsActive).HasDefaultValueSql("((1))");
@@ -727,7 +723,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Tbl_Pare__3214EC07C1B6BE7C");
 
-            entity.ToTable("Tbl_ParentSkill", "dbo");
+            entity.ToTable("Tbl_ParentSkill");
 
             entity.Property(e => e.CreatedOn).HasColumnType("datetime");
             entity.Property(e => e.Description)
@@ -756,7 +752,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Tbl_perm__3214EC07F1375A94");
 
-            entity.ToTable("Tbl_permission", "dbo");
+            entity.ToTable("Tbl_permission");
 
             entity.Property(e => e.PermissionDisplay)
                 .HasMaxLength(100)
@@ -770,7 +766,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__tbl_Role__3214EC07D22FB3FE");
 
-            entity.ToTable("tbl_Role", "dbo");
+            entity.ToTable("tbl_Role");
 
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
             entity.Property(e => e.ModifiedBy).HasColumnName("modifiedBy");
@@ -792,7 +788,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__tbl_Role__3214EC0723025571");
 
-            entity.ToTable("tbl_RolePermission", "dbo");
+            entity.ToTable("tbl_RolePermission");
 
             entity.HasOne(d => d.Permission).WithMany(p => p.TblRolePermissions)
                 .HasForeignKey(d => d.PermissionId)
@@ -807,7 +803,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Tbl_Tags__3214EC070332C303");
 
-            entity.ToTable("Tbl_Tags", "dbo");
+            entity.ToTable("Tbl_Tags");
 
             entity.Property(e => e.CreatedOn).HasColumnType("datetime");
             entity.Property(e => e.ModefiedOn).HasColumnType("datetime");
@@ -833,7 +829,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Tbl_Topi__3214EC077434B10E");
 
-            entity.ToTable("Tbl_Topic_P_C_ChildSkill", "dbo");
+            entity.ToTable("Tbl_Topic_P_C_ChildSkill");
 
             entity.Property(e => e.CreatedOn).HasColumnType("datetime");
             entity.Property(e => e.Description)
@@ -866,7 +862,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Tbl_Topi__3214EC070687A866");
 
-            entity.ToTable("Tbl_Topic_P_ChildSkill", "dbo");
+            entity.ToTable("Tbl_Topic_P_ChildSkill");
 
             entity.Property(e => e.CreatedOn).HasColumnType("datetime");
             entity.Property(e => e.Description)
@@ -899,7 +895,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__tbl_User__3214EC073AFA6D64");
 
-            entity.ToTable("tbl_User", "dbo");
+            entity.ToTable("tbl_User");
 
             entity.Property(e => e.CreateDate).HasColumnType("datetime");
             entity.Property(e => e.Email)
@@ -927,7 +923,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__tblUserA__3214EC0734D6D21C");
 
-            entity.ToTable("tblUserAppRole", "dbo");
+            entity.ToTable("tblUserAppRole");
 
             entity.HasOne(d => d.Role).WithMany(p => p.TblUserAppRoles)
                 .HasForeignKey(d => d.RoleId)
@@ -942,7 +938,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Tbl_User__3214EC07BF879BE9");
 
-            entity.ToTable("Tbl_UserRole", "dbo");
+            entity.ToTable("Tbl_UserRole");
 
             entity.HasOne(d => d.Role).WithMany(p => p.TblUserRoles)
                 .HasForeignKey(d => d.RoleId)
@@ -957,7 +953,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity
                 .HasNoKey()
-                .ToTable("temp_table", "dbo");
+                .ToTable("temp_table");
 
             entity.Property(e => e.Age).HasColumnName("age");
             entity.Property(e => e.Id).HasColumnName("id");
@@ -972,7 +968,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.WalkInId).HasName("PK_CampusWalkIn");
 
-            entity.ToTable("WalkIn", "dbo");
+            entity.ToTable("WalkIn");
 
             entity.Property(e => e.Address1)
                 .HasMaxLength(100)

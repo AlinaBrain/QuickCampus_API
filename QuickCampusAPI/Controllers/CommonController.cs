@@ -31,8 +31,6 @@ namespace QuickCampusAPI.Controllers
         public CommonController(ICountryRepo countryRepo, IStateRepo stateRepo,
             ICityRepo cityRepo, IConfiguration configuration, ProcessUploadFile uploadFile, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, 
             IMstSkillsRepo mstSkillsRepo, IUserRepo userRepo, IUserAppRoleRepo userAppRoleRepo
-
-
             )
         {
             _countryRepo = countryRepo;

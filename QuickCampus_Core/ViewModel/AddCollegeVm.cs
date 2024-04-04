@@ -11,9 +11,10 @@ namespace QuickCampus_Core.ViewModel
     public class AddCollegeVm
     {
         public int? CollegeId { get; set; }
-
         [Required(ErrorMessage = "College Name is required.")]
         public string? CollegeName { get; set; }
+        [Required]
+        [FileExtensions(Extensions = "jpg,png,jpeg", ErrorMessage = "Only JPG and PNG and jpeg files are allowed.")]
         public IFormFile? ImagePath { get; set; }
         [Required(ErrorMessage = "Address1 is required.")]
         public string? Address1 { get; set; }
@@ -26,12 +27,10 @@ namespace QuickCampus_Core.ViewModel
         public int? CountryId { get; set; }
         [Required(ErrorMessage = "College Code is required.")]
         public string? CollegeCode { get; set; }
-        [EmailAddress(ErrorMessage = "Enter a valid contact person email.")]
+        [Required(ErrorMessage ="Contact Person Name is required ")]
         public string? ContactPerson { get; set; }
-
         [RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Not a valid phone number.")]
         public string? ContactPhone { get; set; }
-
         [EmailAddress(ErrorMessage = "Enter a valid email.")]
         public string? ContactEmail { get; set; }
 

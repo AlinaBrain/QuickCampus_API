@@ -33,6 +33,8 @@ public partial class WalkIn
 
     public int? City { get; set; }
 
+    public string? PassingYear { get; set; }
+
     public virtual ICollection<ApplicantTest> ApplicantTests { get; set; } = new List<ApplicantTest>();
 
     public virtual ICollection<CampusWalkInCollege> CampusWalkInColleges { get; set; } = new List<CampusWalkInCollege>();

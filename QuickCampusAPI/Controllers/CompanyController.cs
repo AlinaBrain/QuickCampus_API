@@ -30,8 +30,7 @@ namespace QuickCampusAPI.Controllers
             _userRepo = userRepo;
             _jwtSecretKey = _config["Jwt:Key"] ?? "";
         }
-        //[Authorize(Roles = "GetAllCountry")]
-        [HttpGet]
+                                                                                              [HttpGet]
         [Route("GetAllCompany")]
         public async Task<IActionResult> GetAllCompany()
         {
@@ -67,7 +66,7 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-        //[Authorize(Roles = "GetCountryById")]
+        
         [HttpGet]
         [Route("GetCompanyById")]
         public async Task<IActionResult> GetCompanyById(int companyid)
@@ -86,7 +85,7 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-        //[Authorize(Roles = "AddCountry")]
+        
         [HttpPost]
         [Route("AddCompany")]
         public async Task<IActionResult> AddCompany(CompanyVm companyVM)
@@ -153,62 +152,7 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-        //[Authorize(Roles = "EditCountry")]
-        //[HttpPost]
-        //[Route("EditCompany")]
-        //public async Task<IActionResult> EditCompany(CompanyVm vm)
-        //{
-        //    IGeneralResult<CompanyVm> result = new GeneralResult<CompanyVm>();
-            
-        //    if (_companyRepo.Any(x => x.CompanyName == vm.CompanyName && x.IsActive == true && x.CompanyId != vm.CompanyId))
-        //    {
-        //        result.Message = "Email Already Registered!";
-        //    }
-        //    else
-        //    {
-        //        var res = await _companyRepo.GetById(vm.CompanyId);
-        //        bool isDeleted = (bool)res.Isdeleted ? true : false;
-        //        if (isDeleted)
-        //        {
-        //            result.Message = " Company does Not Exist";
-        //            return Ok(result);
-        //        }
-
-        //        if (ModelState.IsValid && vm.CompanyId > 0 && res.Isdeleted == false)
-        //        {
-        //            string pattern = @"^[a-zA-Z][a-zA-Z\s]*$";
-        //            string input = vm.CompanyName;
-        //            Match m = Regex.Match(input, pattern, RegexOptions.IgnoreCase);
-        //            if (!m.Success)
-        //            {
-        //                result.Message = "Only alphabetic characters are allowed in the name.";
-        //                return Ok(result);
-        //            }
-        //            res.CompanyName = vm.CompanyName.Trim();
-        //            res.IsActive = true;
-        //            res.CompanyId = vm.CompanyId;
-        //            res.Isdeleted = false;
-
-        //            try
-        //            {
-        //                result.Data = (CompanyVm)await _companyRepo.Update(res);
-        //                result.Message = "Company updated successfully";
-        //                result.IsSuccess = true;
-        //            }
-        //            catch (Exception ex)
-        //            {
-        //                result.Message = ex.Message;
-        //            }
-        //            return Ok(result);
-        //        }
-        //        else
-        //        {
-        //            result.Message = "something Went Wrong";
-        //        }
-        //    }
-        //    return Ok(result);
-        //}
-        //[Authorize(Roles = "DeleteCountry")]
+        
         [HttpDelete]
         [Route("DeleteCompany")]
         public async Task<IActionResult> DeleteCompany(int companyid)
