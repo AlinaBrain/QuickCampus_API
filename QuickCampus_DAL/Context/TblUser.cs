@@ -29,10 +29,6 @@ public partial class TblUser
 
     public virtual ICollection<TblMenuItemUserPermission> TblMenuItemUserPermissions { get; set; } = new List<TblMenuItemUserPermission>();
 
-    public virtual ICollection<TblRole> TblRoleCreatedByNavigations { get; set; } = new List<TblRole>();
-
-    public virtual ICollection<TblRole> TblRoleModifiedByNavigations { get; set; } = new List<TblRole>();
-
     public virtual ICollection<TblUserAppRole> TblUserAppRoles { get; set; } = new List<TblUserAppRole>();
 
     public virtual ICollection<TblUserRole> TblUserRoles { get; set; } = new List<TblUserRole>();

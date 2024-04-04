@@ -75,7 +75,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.HasDefaultSchema("btprojec_admin");
+        modelBuilder.UseCollation("Latin1_General_CI_AI");
 
         modelBuilder.Entity<MstAppRole>(entity =>
         {
@@ -438,18 +438,10 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
             entity.Property(e => e.ModifiedBy).HasColumnName("modifiedBy");
-            entity.Property(e => e.ModofiedDate).HasColumnType("datetime");
+            entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
                 .UseCollation("SQL_Latin1_General_CP1_CI_AS");
-
-            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.TblRoleCreatedByNavigations)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__tbl_Role__Create__1332DBDC");
-
-            entity.HasOne(d => d.ModifiedByNavigation).WithMany(p => p.TblRoleModifiedByNavigations)
-                .HasForeignKey(d => d.ModifiedBy)
-                .HasConstraintName("FK__tbl_Role__modifi__14270015");
         });
 
         modelBuilder.Entity<TblRolePermission>(entity =>

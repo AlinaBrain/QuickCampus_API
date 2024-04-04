@@ -27,7 +27,7 @@ namespace QuickCampus_Core.ViewModel
 
         public DateTime CreatedDate { get; set; }
 
-        public DateTime ModofiedDate { get; set; }
+        public DateTime ModifiedDate { get; set; }
         public bool? IsDeleted { get; set; }
 
         public bool? IsActive { get; set; }
@@ -40,9 +40,7 @@ namespace QuickCampus_Core.ViewModel
                 ClientId= ClientId,
                 Name = Name,
                 CreatedBy = CreatedBy,
-                ModifiedBy = ModifiedBy,
                 CreatedDate = DateTime.Now,
-                ModofiedDate = DateTime.Now,
                 IsActive = true,
                 IsDeleted = false
             };
@@ -61,7 +59,7 @@ namespace QuickCampus_Core.ViewModel
                 CreatedBy = item.CreatedBy,
                 ModifiedBy = item.ModifiedBy,
                 CreatedDate = item.CreatedDate,
-                ModifiedDate = item.ModofiedDate,
+                ModifiedDate = item.ModifiedDate,
                 IsDeleted = item.IsDeleted,
                 IsActive = item.IsActive
             };
@@ -76,7 +74,7 @@ namespace QuickCampus_Core.ViewModel
         public int? ModifiedBy { get; set; }
 
         public DateTime CreatedDate { get; set; }
-        public DateTime ModifiedDate { get; set; }
+        public DateTime? ModifiedDate { get; set; }
         public bool? IsDeleted { get; set; }
 
         public bool? IsActive { get; set; }

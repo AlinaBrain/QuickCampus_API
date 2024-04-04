@@ -11,11 +11,7 @@ public partial class TblRole
 
     public int? CreatedBy { get; set; }
 
-    public int? ModifiedBy { get; set; }
-
     public DateTime CreatedDate { get; set; }
-
-    public DateTime ModofiedDate { get; set; }
 
     public int? ClientId { get; set; }
 
@@ -23,9 +19,9 @@ public partial class TblRole
 
     public bool? IsActive { get; set; }
 
-    public virtual TblUser? CreatedByNavigation { get; set; }
+    public DateTime? ModifiedDate { get; set; }
 
-    public virtual TblUser? ModifiedByNavigation { get; set; }
+    public int? ModifiedBy { get; set; }
 
     public virtual ICollection<TblRolePermission> TblRolePermissions { get; set; } = new List<TblRolePermission>();
 

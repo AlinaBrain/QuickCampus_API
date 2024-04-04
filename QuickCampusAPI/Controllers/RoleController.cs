@@ -135,7 +135,6 @@ namespace QuickCampusAPI.Controllers
                         CreatedDate = DateTime.Now,
                         IsActive = true,
                         IsDeleted = false,
-                        ModofiedDate = DateTime.Now
                     };
 
                     roleVm.ClientId = LoggedInUserClientId == "0" ? null : Convert.ToInt32(LoggedInUserClientId);
@@ -217,7 +216,7 @@ namespace QuickCampusAPI.Controllers
 
                     GetRole.Name = vm.RoleName;
                     GetRole.ModifiedBy = Convert.ToInt32(LoggedInUserId);
-                    GetRole.ModofiedDate = DateTime.Now;
+                    GetRole.ModifiedDate = DateTime.Now;
                     await _roleRepo.Update(GetRole);
                     if (vm.Permission.Count > 0)
                     {
@@ -338,7 +337,7 @@ namespace QuickCampusAPI.Controllers
                     {
                         RoleData.IsActive = false;
                         RoleData.IsDeleted = true;
-                        RoleData.ModofiedDate = DateTime.Now;
+                        RoleData.ModifiedDate = DateTime.Now;
                         RoleData.ModifiedBy = Convert.ToInt32(LoggedInUserId);
                         await _roleRepo.Update(RoleData);
 
@@ -394,7 +393,7 @@ namespace QuickCampusAPI.Controllers
                     else
                     {
                         RoleData.IsActive = !RoleData.IsActive;
-                        RoleData.ModofiedDate = DateTime.Now;
+                        RoleData.ModifiedDate = DateTime.Now;
                         RoleData.ModifiedBy = Convert.ToInt32(LoggedInUserId);
                         await _roleRepo.Update(RoleData);
 
