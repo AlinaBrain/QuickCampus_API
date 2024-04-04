@@ -10,7 +10,7 @@ namespace QuickCampus_Core.ViewModel
 {
     public class CollegeCountryStateVmmm
     {
-        public static explicit operator CollegeCountryStateVmmm(College items)
+        public static explicit operator CollegeCountryStateVmmm(TblCollege items)
         {
             return new CollegeCountryStateVmmm
             {
@@ -36,7 +36,7 @@ namespace QuickCampus_Core.ViewModel
         }
 
         public int CollegeId { get; set; }
-        [Required(ErrorMessage = "College Name is required.")]
+        [Required(ErrorMessage = "TblCollege Name is required.")]
         public string? CollegeName { get; set; }
         public string? Logo { get; set; }
         [Required(ErrorMessage = "Address1 is required.")]

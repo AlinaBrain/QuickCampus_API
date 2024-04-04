@@ -104,7 +104,7 @@ namespace QuickCampus_Core.Services
             IGeneralResult<List<PermissionVM>> lst = new GeneralResult<List<PermissionVM>>();
             lst.Data = new List<PermissionVM>();
 
-            var record = await _context.TblPermissions.Select(s => new PermissionVM()
+            var record = await _context.MstPermissions.Select(s => new PermissionVM()
             {
                 Id = s.Id,
                 PermissionDisplay = s.PermissionDisplay,

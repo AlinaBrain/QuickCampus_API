@@ -6,7 +6,7 @@ using QuickCampus_DAL.Context;
 
 namespace QuickCampus_Core.Services
 {
-    public class CollegeRepo : BaseRepository<BtprojecQuickcampustestContext, College>, ICollegeRepo
+    public class CollegeRepo : BaseRepository<BtprojecQuickcampustestContext, TblCollege>, ICollegeRepo
     {
         private readonly BtprojecQuickcampustestContext _context;
         private IConfiguration _config;

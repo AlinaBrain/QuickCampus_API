@@ -9,7 +9,7 @@ namespace QuickCampus_Core.ViewModel
 {
      public  class QuestionVmm
     {
-        public static explicit operator QuestionVmm(Question items)
+        public static explicit operator QuestionVmm(TblQuestion items)
         {
             return new QuestionVmm()
             {
@@ -21,7 +21,7 @@ namespace QuickCampus_Core.ViewModel
                 IsActive = items.IsActive,
                 Marks = items.Marks,
                 IsDeleted = items.IsDeleted,
-                ClientId = items.ClentId,
+                ClientId = items.ClientId,
             };
         }
 
@@ -43,9 +43,9 @@ namespace QuickCampus_Core.ViewModel
 
         public int? ClientId { get; set; }
 
-        public Question ToQuestionDbModel()
+        public TblQuestion ToQuestionDbModel()
         {
-            return new Question
+            return new TblQuestion
             {
                 QuestionTypeId = QuestionTypeId,
                 Text = Text,
@@ -54,13 +54,13 @@ namespace QuickCampus_Core.ViewModel
                 IsActive = true,
                 Marks = Marks,
                 IsDeleted = false,
-                ClentId = ClientId,
+                ClientId = ClientId,
             };
         }
 
-        public Question ToUpdateDbModel()
+        public TblQuestion ToUpdateDbModel()
         {
-            return new Question
+            return new TblQuestion
             {
                 QuestionId = QuestionId,
                 QuestionTypeId = QuestionTypeId,
@@ -70,7 +70,7 @@ namespace QuickCampus_Core.ViewModel
                 IsActive = true,
                 Marks = Marks,
                 IsDeleted = false,
-                ClentId = ClientId,
+                ClientId = ClientId,
             };
         }
     }

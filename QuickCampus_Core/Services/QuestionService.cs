@@ -15,7 +15,7 @@ using System.Linq.Expressions;
 
 namespace QuickCampus_Core.Services
 {
-    public class QuestionService : BaseRepository<BtprojecQuickcampustestContext, Question>, IQuestion
+    public class QuestionService : BaseRepository<BtprojecQuickcampustestContext, TblQuestion>, IQuestion
     {
         private readonly IConfiguration _config;
         private readonly BtprojecQuickcampustestContext _context;

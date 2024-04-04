@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QuickCampus_DAL.Context;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,21 @@ namespace QuickCampus_Core.ViewModel
 {
     public class ClientResponseViewModel
     {
+        public static explicit operator ClientResponseViewModel(TblClient item)
+        {
+            return new ClientResponseViewModel
+            {
+                Id = item.Id,
+                Name = item.Name,
+                IsActive = item.IsActive,
+                Address = item.Address,
+                Email = item.Email,
+                Phone = item.Phone,
+                SubscriptionPlan = item.SubscriptionPlan,
+                Longitude = item.Longitude,
+                Latitude = item.Latitude,
+            };
+        }
         public int Id { get; set; }
 
         public string? Name { get; set; }

@@ -7,7 +7,7 @@ using static QuickCampus_Core.ViewModel.ApplicantViewModel;
 
 namespace QuickCampus_Core.Services
 {
-    public class ApplicantRepoServices : BaseRepository<BtprojecQuickcampustestContext, Applicant>, IApplicantRepo
+    public class ApplicantRepoServices : BaseRepository<BtprojecQuickcampustestContext, TblApplicant>, IApplicantRepo
     {
         private readonly BtprojecQuickcampustestContext _context;
         private IConfiguration _config;

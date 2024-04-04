@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace QuickCampus_DAL.Context;
 
-public partial class QuestionOption
+public partial class TblQuestionOption
 {
     public int OptionId { get; set; }
 
@@ -15,7 +15,5 @@ public partial class QuestionOption
 
     public string? Imagepath { get; set; }
 
-    public virtual ICollection<ApplicantAnswerSummary> ApplicantAnswerSummaries { get; set; } = new List<ApplicantAnswerSummary>();
-
-    public virtual Question? Question { get; set; }
+    public virtual TblQuestion? Question { get; set; }
 }

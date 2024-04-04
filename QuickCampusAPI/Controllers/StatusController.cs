@@ -50,7 +50,7 @@ namespace QuickCampusAPI.Controllers
                 if (res != null && res.Count() > 0)
                 {
                     result.IsSuccess = true;
-                    result.Message = "Status fetched successfully.";
+                    result.Message = "MstApplicantStatus fetched successfully.";
                     result.Data = res;
                     result.TotalRecordCount = res.Count();
                 }

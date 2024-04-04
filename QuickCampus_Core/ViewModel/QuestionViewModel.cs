@@ -9,7 +9,7 @@ namespace QuickCampus_Core.ViewModel
 {
     public  class QuestionViewModel
     {
-        public static explicit operator QuestionViewModel(Question item)
+        public static explicit operator QuestionViewModel(TblQuestion item)
         {
             return new QuestionViewModel
             {

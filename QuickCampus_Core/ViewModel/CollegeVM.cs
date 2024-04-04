@@ -8,7 +8,7 @@ namespace QuickCampus_Core.ViewModel
 {
     public class CollegeVM
     {
-        public static explicit operator CollegeVM(College items)
+        public static explicit operator CollegeVM(TblCollege items)
         {
             return new CollegeVM
             {
@@ -35,7 +35,7 @@ namespace QuickCampus_Core.ViewModel
             };
         }
         public int CollegeId { get; set; }
-        [Required(ErrorMessage = "College Name is required.")]
+        [Required(ErrorMessage = "TblCollege Name is required.")]
         public string? CollegeName { get; set; }
         public string ? Logo { get; set; }
         [Required(ErrorMessage = "Address1 is required.")]
@@ -67,9 +67,9 @@ namespace QuickCampus_Core.ViewModel
         public bool? IsDeleted { get; set; }
         public int? ClientId { get; set; }
 
-        public College ToCollegeDbModel()
+        public TblCollege ToCollegeDbModel()
         {
-            return new College
+            return new TblCollege
             {
                 CollegeName = CollegeName,
                 Logo = Logo,
@@ -93,9 +93,9 @@ namespace QuickCampus_Core.ViewModel
             };
         }
 
-        public College ToUpdateDbModel()
+        public TblCollege ToUpdateDbModel()
         {
-            return new College
+            return new TblCollege
             {
                 CollegeId = CollegeId,
                 CollegeName = CollegeName,
@@ -123,8 +123,8 @@ namespace QuickCampus_Core.ViewModel
             {
                 RuleFor(x => x.CollegeName)
                      .Cascade(CascadeMode.StopOnFirstFailure)
-                  .NotNull().WithMessage("College Name could not be null")
-                  .NotEmpty().WithMessage("College Name could not be empty")
+                  .NotNull().WithMessage("TblCollege Name could not be null")
+                  .NotEmpty().WithMessage("TblCollege Name could not be empty")
             .Matches(@"^[A-Za-z\s]*$").WithMessage("'{PropertyName}' should only contain letters.")
             .Length(3, 250);
                 RuleFor(x => x.Address1)

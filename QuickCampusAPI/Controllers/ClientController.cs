@@ -26,11 +26,10 @@ namespace QuickCampusAPI.Controllers
         private readonly IUserRepo _userRepo;
         private IConfiguration _config;
         private readonly IUserRoleRepo _UserRoleRepo;
-        private readonly BtprojecQuickcampustestContext _context;
 
         public ClientController(IUserAppRoleRepo userAppRoleRepo, IRoleRepo roleRepo,
             IClientRepo clientRepo, IConfiguration config, IUserRepo userRepo,
-            IUserRoleRepo userRoleRepo, BtprojecQuickcampustestContext BtprojecQuickcampustestContext)
+            IUserRoleRepo userRoleRepo)
         {
             _userAppRoleRepo = userAppRoleRepo;
             _roleRepo = roleRepo;
@@ -38,7 +37,6 @@ namespace QuickCampusAPI.Controllers
             _config = config;
             _userRepo = userRepo;
             _UserRoleRepo = userRoleRepo;
-            _context = BtprojecQuickcampustestContext;
         }
 
         [HttpPost]
@@ -53,24 +51,14 @@ namespace QuickCampusAPI.Controllers
                 var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
                 if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                 {
-                    if(vm.RoleId == null || vm.RoleId == 0)
-                    {
-                        result.Message = "Invalid role";
-                        return Ok(result);
-                    }
                     if (ModelState.IsValid)
                     {
-                        if (_clientRepo.Any(x => x.Email == vm.Email && x.IsActive == true))
+                        if (_clientRepo.Any(x => x.Email == vm.Email && x.IsDeleted == false))
                         {
                             result.Message = "Email Already Registered!";
                             return Ok(result);
                         }
-                        else if (_clientRepo.Any(x => x.UserName == vm.Email && x.IsActive == true))
-                        {
-                            result.Message = "Username Already Registered!";
-                            return Ok(result);
-                        }
-                        else if (_clientRepo.Any(x => x.Phone == vm.Phone && x.IsActive==true))
+                        else if (_clientRepo.Any(x => x.Phone == vm.Phone && x.IsDeleted == false))
                         {
                             result.Message = "Phone Number Already Register";
                             return Ok(result);
@@ -99,7 +87,7 @@ namespace QuickCampusAPI.Controllers
                             {
                                 Name = clientData.Name,
                                 Password = clientData.Password,
-                                Email = clientData.UserName,
+                                Email = clientData.Email,
                                 ClientId = clientData.Id,
                                 Mobile = clientData.Phone,
                             };
@@ -114,12 +102,12 @@ namespace QuickCampusAPI.Controllers
                                 var roleAdd = await _userAppRoleRepo.Add(userAppRole);
                                 if (roleAdd.Id > 0)
                                 {
-                                    bool ClientRoleCheck = await _roleRepo.AnyAsync(x => x.Id == vm.RoleId);
-                                    if (ClientRoleCheck)
+                                    var ClientRoleCheck = _roleRepo.GetAllQuerable().Where(x => x.Name == "Client Admin").FirstOrDefault();
+                                    if (ClientRoleCheck != null)
                                     {
                                         TblUserRole userRole = new TblUserRole
                                         {
-                                            RoleId = vm.RoleId,
+                                            RoleId = ClientRoleCheck.Id,
                                             UserId = userDetails.Id
                                         };
                                         var userRoleData = await _UserRoleRepo.Add(userRole);
@@ -135,7 +123,7 @@ namespace QuickCampusAPI.Controllers
                                                 Address = clientData.Address,
                                                 Latitude = clientData.Latitude,
                                                 Longitude = clientData.Longitude,
-                                                RoleName = _roleRepo.GetAllQuerable().Where(x => x.Id == vm.RoleId).Select(x => x.Name).First(),
+                                                RoleName = _roleRepo.GetAllQuerable().Where(x => x.Id == ClientRoleCheck.Id).Select(x => x.Name).First(),
                                                 AppRoleName = ((common.AppRole)userAppRole.RoleId).ToString(),
                                                 IsActive = clientData.IsActive
                                             };
@@ -144,6 +132,11 @@ namespace QuickCampusAPI.Controllers
                                             result.IsSuccess = true;
                                             return Ok(result);
                                         }
+                                    }
+                                    else
+                                    {
+                                        result.Message = "Error occur, when try to add client role.";
+                                        return Ok(result);
                                     }
                                 }
                             }
@@ -207,23 +200,9 @@ namespace QuickCampusAPI.Controllers
                             res.ModifiedBy = Convert.ToInt32(LoggedInUserId);
                             res.ModofiedDate = DateTime.Now;
                             await _clientRepo.Update(res);
-                            bool ClientRoleCheck = await _roleRepo.AnyAsync(x => x.Id == vm.RoleId);
-                            if (ClientRoleCheck)
-                            {
-                                TblUserRole userRole = new TblUserRole
-                                {
-                                    RoleId = vm.RoleId,
-                                    UserId = _userRepo.GetAll(x => x.ClientId == vm.Id).Result.FirstOrDefault().Id
-                                };
-                                var userRoleData = await _UserRoleRepo.Add(userRole);
-                                result.Message = "Client updated successfully";
-
-                                result.IsSuccess = true;
-                            }
-                            else
-                            {
-                                result.Message = "Role does not exists!";
-                            }
+                            result.Message = "Client updated successfully";
+                            result.IsSuccess = true;
+                            return Ok(result);
                         }
                     }
                     else
@@ -263,7 +242,7 @@ namespace QuickCampusAPI.Controllers
 
                         List<TblClient> ClientList = new List<TblClient>();
 
-                        ClientList = await _clientRepo.GetAll(x => x.IsDeleted == false && (Datatype == DataTypeFilter.OnlyInActive ? x.IsActive == true : (Datatype == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)));
+                        ClientList = await _clientRepo.GetAll(x => x.IsDeleted == false && (Datatype == DataTypeFilter.All ? true : (Datatype == DataTypeFilter.OnlyInActive ? x.IsActive == false : x.IsActive == true)));
 
                         //var roleData = _roleRepo.GetAll(x => x.IsActive == true && x.IsDeleted == false).Result.FirstOrDefault();
                         //var userAppRole = _userAppRoleRepo.GetAll(x => x.UserId == x.UserId).Result.FirstOrDefault();
@@ -289,10 +268,10 @@ namespace QuickCampusAPI.Controllers
                         result.TotalRecordCount = data.Count;
                         return Ok(result);
                     }
-                    else
-                    {
-                        result.Message = "Access Denied";
-                    }
+                }
+                else
+                {
+                    result.Message = "Access denied";
                 }
             }
             catch (Exception ex)
@@ -319,12 +298,14 @@ namespace QuickCampusAPI.Controllers
                     //if (res.IsDeleted == false)
                     if (res != null)
                     {
-
                         res.IsActive = false;
                         res.IsDeleted = true;
+                        res.ModofiedDate = DateTime.Now;
+                        res.ModifiedBy = Convert.ToInt32(LoggedInUserId);
                         await _clientRepo.Update(res);
                         result.IsSuccess = true;
                         result.Message = "Client Deleted Successfully";
+                        result.TotalRecordCount = 0;
                     }
                     else
                     {
@@ -349,7 +330,7 @@ namespace QuickCampusAPI.Controllers
         [Route("ClientActiveInactive")]
         public async Task<IActionResult> ActiveAndInactive(int id)
         {
-            IGeneralResult<ActiveInactivevm> result = new GeneralResult<ActiveInactivevm>();
+            IGeneralResult<ClientResponseViewModel> result = new GeneralResult<ClientResponseViewModel>();
             try
             {
                 var _jwtSecretKey = _config["Jwt:Key"];
@@ -358,15 +339,15 @@ namespace QuickCampusAPI.Controllers
                 if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                 {
                     var res = _clientRepo.GetAllQuerable().Where(x => x.Id == id && x.IsDeleted == false).FirstOrDefault();
-                    int clientTotalCount = 0;
-                    clientTotalCount = _clientRepo.GetAllQuerable().Where(x => x.Id == id && x.IsDeleted == false).Count();
                     if (res != null)
                     {
                         res.IsActive = !res.IsActive;
+                        res.ModofiedDate = DateTime.Now;
+                        res.ModifiedBy = Convert.ToInt32(LoggedInUserId);
                         var data = await _clientRepo.Update(res);
-                        result.Data = (ActiveInactivevm)data;
+                        result.Data = (ClientResponseViewModel)data;
                         result.IsSuccess = true;
-                        result.TotalRecordCount = clientTotalCount;
+                        result.TotalRecordCount = 1;
                         result.Message = "Client status changed successfully";
                     }
                 }
@@ -386,7 +367,7 @@ namespace QuickCampusAPI.Controllers
         [Route("GetClientById")]
         public async Task<IActionResult> GetClientById(int ClientId)
         {
-            IGeneralResult<GetClientById> result = new GeneralResult<GetClientById>();
+            IGeneralResult<ClientResponseViewModel> result = new GeneralResult<ClientResponseViewModel>();
             try
             {
                 var _jwtSecretKey = _config["Jwt:Key"];
@@ -400,10 +381,10 @@ namespace QuickCampusAPI.Controllers
                         var userData = _userRepo.GetAllQuerable().Where(x => x.IsDelete == false && x.ClientId == res.Id).FirstOrDefault();
                         
                         var userRoleData = _UserRoleRepo.GetAllQuerable().Where(x => x.UserId == userData.Id).First();
-                        result.Data = (GetClientById)res;
-                        result.Data.RoleId = userRoleData.RoleId;
+                        result.Data = (ClientResponseViewModel)res;
                         result.IsSuccess = true;
-                        result.Message = "Client details getting successfully";
+                        result.TotalRecordCount = 1;
+                        result.Message = "Client details fetched successfully.";
                         return Ok(result);
                     }
                     else

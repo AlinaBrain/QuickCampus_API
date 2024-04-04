@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace QuickCampus_Core.Interfaces
 {
-    public interface ICampusWalkinCollegeRepo :IGenericRepository<CampusWalkInCollege>
+    public interface ICampusWalkinCollegeRepo :IGenericRepository<TblWalkInCollege>
     {
     }
 }

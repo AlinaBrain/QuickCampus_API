@@ -21,9 +21,9 @@ public partial class MstCity
 
     public int? ClientId { get; set; }
 
-    public virtual ICollection<College> Colleges { get; set; } = new List<College>();
-
     public virtual MstCityState? State { get; set; }
 
-    public virtual ICollection<WalkIn> WalkIns { get; set; } = new List<WalkIn>();
+    public virtual ICollection<TblCollege> TblColleges { get; set; } = new List<TblCollege>();
+
+    public virtual ICollection<TblWalkIn> TblWalkIns { get; set; } = new List<TblWalkIn>();
 }

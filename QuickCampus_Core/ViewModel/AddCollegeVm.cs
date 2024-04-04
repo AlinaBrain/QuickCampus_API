@@ -12,7 +12,7 @@ namespace QuickCampus_Core.ViewModel
     {
         public int? CollegeId { get; set; }
 
-        [Required(ErrorMessage = "College Name is required.")]
+        [Required(ErrorMessage = "TblCollege Name is required.")]
         public string? CollegeName { get; set; }
         public IFormFile? ImagePath { get; set; }
         [Required(ErrorMessage = "Address1 is required.")]
@@ -24,7 +24,7 @@ namespace QuickCampus_Core.ViewModel
         public int? StateId { get; set; }
         [Required(ErrorMessage = "Country is required.")]
         public int? CountryId { get; set; }
-        [Required(ErrorMessage = "College Code is required.")]
+        [Required(ErrorMessage = "TblCollege Code is required.")]
         public string? CollegeCode { get; set; }
         [EmailAddress(ErrorMessage = "Enter a valid contact person email.")]
         public string? ContactPerson { get; set; }

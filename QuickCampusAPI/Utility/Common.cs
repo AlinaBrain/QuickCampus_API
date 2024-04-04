@@ -65,7 +65,7 @@ namespace QuickCampus_Core.Utility
         //            #endregion
         //            public static class CollegeLogo
         //            {
-        //                # region -- College Logo Folder Path ---
+        //                # region -- TblCollege Logo Folder Path ---
         //                public static string Physical_Path
         //                {
         //                    get

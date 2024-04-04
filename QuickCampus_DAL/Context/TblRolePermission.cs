@@ -11,7 +11,7 @@ public partial class TblRolePermission
 
     public int? PermissionId { get; set; }
 
-    public virtual TblPermission? Permission { get; set; }
+    public virtual MstPermission? Permission { get; set; }
 
     public virtual TblRole? Role { get; set; }
 }

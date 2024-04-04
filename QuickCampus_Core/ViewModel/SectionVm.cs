@@ -9,29 +9,29 @@ namespace QuickCampus_Core.ViewModel
 {
     public class SectionVm
     {
-        public static explicit operator SectionVm(Section items)
+        public static explicit operator SectionVm(MstSection items)
         {
             return new SectionVm()
             {
                 SectionId=items.SectionId,
-                Section1=items.Section1,
+                Section=items.Section,
                 SortOrder=items.SortOrder,
                 ClentId=items.ClentId,
             };
         }
         public int SectionId { get; set; }
 
-        public string? Section1 { get; set; }
+        public string? Section { get; set; }
 
         public int? SortOrder { get; set; }
 
         public int? ClentId { get; set; }
 
-        public Section ToSectionDbModel()
+        public MstSection ToSectionDbModel()
         {
-            return new Section
+            return new MstSection
             {
-                Section1=Section1,
+                Section=Section,
                 SortOrder = SortOrder,
                 ClentId=ClentId,
             };

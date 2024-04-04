@@ -4,7 +4,7 @@ using QuickCampus_DAL.Context;
 
 namespace QuickCampus_Core.Interfaces
 {
-    public interface ICollegeRepo : IGenericRepository<College>
+    public interface ICollegeRepo : IGenericRepository<TblCollege>
     {
     }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace QuickCampus_Core.Interfaces
 {
-    public  interface IStatusRepo :IGenericRepository<Status>
+    public  interface IStatusRepo :IGenericRepository<MstApplicantStatus>
     {
     }
 }

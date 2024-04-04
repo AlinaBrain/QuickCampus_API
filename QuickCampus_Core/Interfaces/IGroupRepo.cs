@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace QuickCampus_Core.Interfaces
 {
-    public interface IGroupRepo :IGenericRepository<Groupdl>
+    public interface IGroupRepo :IGenericRepository<MstGroupdl>
     {
     }
 }

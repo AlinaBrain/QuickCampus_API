@@ -70,15 +70,15 @@ namespace QuickCampusAPI.Controllers
                 }
 
                 var questionTotalCount = 0;
-                List<Question> questionList = new List<Question>();
-                List<Question> questionData = new List<Question>();
+                List<TblQuestion> questionList = new List<TblQuestion>();
+                List<TblQuestion> questionData = new List<TblQuestion>();
                 if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                 {
-                    questionData = _questionrepo.GetAllQuerable().Where(x => (ClientId != null && ClientId > 0 ? x.ClentId == ClientId : true) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
+                    questionData = _questionrepo.GetAllQuerable().Where(x => (ClientId != null && ClientId > 0 ? x.ClientId == ClientId : true) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
                 }
                 else
                 {
-                    questionData = _questionrepo.GetAllQuerable().Where(x => x.ClentId == Convert.ToInt32(LoggedInUserClientId) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
+                    questionData = _questionrepo.GetAllQuerable().Where(x => x.ClientId == Convert.ToInt32(LoggedInUserClientId) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
                 }
 
                 if (!string.IsNullOrEmpty(search))
@@ -114,13 +114,13 @@ namespace QuickCampusAPI.Controllers
                 if (questionList.Count > 0)
                 {
                     result.IsSuccess = true;
-                    result.Message = "Question get successfully";
+                    result.Message = "TblQuestion get successfully";
                     result.Data = data;
                     result.TotalRecordCount = questionTotalCount;
                 }
                 else
                 {
-                    result.Message = "No Question found!";
+                    result.Message = "No TblQuestion found!";
                 }
             }
             catch (Exception ex)
@@ -147,7 +147,7 @@ namespace QuickCampusAPI.Controllers
                 }
                 if (questionId > 0)
                 {
-                    Question question = new Question();
+                    TblQuestion question = new TblQuestion();
 
                     if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                     {
@@ -155,12 +155,12 @@ namespace QuickCampusAPI.Controllers
                     }
                     else
                     {
-                        question = _questionrepo.GetAllQuerable().Where(x => x.QuestionId == questionId && x.IsDeleted == false && x.ClentId == Convert.ToInt32(LoggedInUserClientId)).FirstOrDefault();
+                        question = _questionrepo.GetAllQuerable().Where(x => x.QuestionId == questionId && x.IsDeleted == false && x.ClientId == Convert.ToInt32(LoggedInUserClientId)).FirstOrDefault();
                     }
 
                     if (question == null)
                     {
-                        result.Message = " Question does not exist";
+                        result.Message = " TblQuestion does not exist";
                         return Ok(result);
                     }
                     result.Data = new QuestionTakeViewModel
@@ -183,12 +183,12 @@ namespace QuickCampusAPI.Controllers
                     }).ToList();
                     result.Data.QuestionssoptionVm = optiondata;
                     result.IsSuccess = true;
-                    result.Message = "Question fetched successfully.";
+                    result.Message = "TblQuestion fetched successfully.";
                     return Ok(result);
                 }
                 else
                 {
-                    result.Message = "Please enter a valid Question Id.";
+                    result.Message = "Please enter a valid TblQuestion Id.";
                 }
             }
             catch (Exception ex)
@@ -216,7 +216,7 @@ namespace QuickCampusAPI.Controllers
                 }
                 if (QuestionId > 0)
                 {
-                    Question question = new Question();
+                    TblQuestion question = new TblQuestion();
 
                     if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                     {
@@ -224,12 +224,12 @@ namespace QuickCampusAPI.Controllers
                     }
                     else
                     {
-                        question = _questionrepo.GetAllQuerable().Where(x => x.QuestionId == QuestionId && x.IsDeleted == false && x.ClentId == Convert.ToInt32(LoggedInUserClientId)).FirstOrDefault();
+                        question = _questionrepo.GetAllQuerable().Where(x => x.QuestionId == QuestionId && x.IsDeleted == false && x.ClientId == Convert.ToInt32(LoggedInUserClientId)).FirstOrDefault();
                     }
 
                     if (question == null)
                     {
-                        result.Message = " Question does not exist";
+                        result.Message = " TblQuestion does not exist";
                         return Ok(result);
                     }
                     question.IsActive = !question.IsActive;
@@ -254,12 +254,12 @@ namespace QuickCampusAPI.Controllers
                     }).ToList();
                     result.Data.QuestionssoptionVm = optionData;
                     result.IsSuccess = true;
-                    result.Message = "Question Updated successfully.";
+                    result.Message = "TblQuestion Updated successfully.";
                     return Ok(result);
                 }
                 else
                 {
-                    result.Message = "Please enter a valid Question Id.";
+                    result.Message = "Please enter a valid TblQuestion Id.";
                 }
             }
             catch (Exception ex)
@@ -286,7 +286,7 @@ namespace QuickCampusAPI.Controllers
                 }
                 if (QuestionId > 0)
                 {
-                    Question question = new Question();
+                    TblQuestion question = new TblQuestion();
 
                     if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                     {
@@ -294,12 +294,12 @@ namespace QuickCampusAPI.Controllers
                     }
                     else
                     {
-                        question = _questionrepo.GetAllQuerable().Where(x => x.QuestionId == QuestionId && x.IsDeleted == false && x.ClentId == Convert.ToInt32(LoggedInUserClientId)).FirstOrDefault();
+                        question = _questionrepo.GetAllQuerable().Where(x => x.QuestionId == QuestionId && x.IsDeleted == false && x.ClientId == Convert.ToInt32(LoggedInUserClientId)).FirstOrDefault();
                     }
 
                     if (question == null)
                     {
-                        result.Message = " Question does not exist";
+                        result.Message = " TblQuestion does not exist";
                         return Ok(result);
                     }
                     question.IsActive = false;
@@ -307,12 +307,12 @@ namespace QuickCampusAPI.Controllers
                     await _questionrepo.Update(question);
 
                     result.IsSuccess = true;
-                    result.Message = "Question Deleted successfully.";
+                    result.Message = "TblQuestion Deleted successfully.";
                     return Ok(result);
                 }
                 else
                 {
-                    result.Message = "Please enter a valid Question Id.";
+                    result.Message = "Please enter a valid TblQuestion Id.";
                 }
             }
             catch (Exception ex)
@@ -355,14 +355,14 @@ namespace QuickCampusAPI.Controllers
 
                 if (ModelState.IsValid)
                 {
-                    Question addQue = new Question
+                    TblQuestion addQue = new TblQuestion
                     {
                         Text = vm.Text,
                         QuestionTypeId = vm.QuestionTypeId,
                         GroupId = vm.GroupId,
                         SectionId = vm.SectionId,
                         Marks = vm.Marks,
-                        ClentId = Convert.ToInt32(LoggedInUserClientId),
+                        ClientId = Convert.ToInt32(LoggedInUserClientId),
                         IsActive = true,
                         IsDeleted = false,
                     };
@@ -372,7 +372,7 @@ namespace QuickCampusAPI.Controllers
                         vm.QuestionId = question.QuestionId;
                         foreach (var option in vm.QuestionssoptionVm)
                         {
-                            QuestionOption questionOption = new QuestionOption
+                            TblQuestionOption questionOption = new TblQuestionOption
                             {
                                 QuestionId = vm.QuestionId,
                                 OptionText = option.OptionText,
@@ -398,7 +398,7 @@ namespace QuickCampusAPI.Controllers
                             questionOption.Imagepath = (string.IsNullOrEmpty(questionOption.Imagepath) ? "" : Path.Combine(_baseUrl, questionOption.Imagepath));
                         }
                         result.IsSuccess = true;
-                        result.Message = "Question added successfully.";
+                        result.Message = "TblQuestion added successfully.";
                         result.Data = vm;
                         return Ok(result);
                     }
@@ -459,7 +459,7 @@ namespace QuickCampusAPI.Controllers
                         var questionData = (await _questionrepo.GetAll(x => x.QuestionId == vm.QuestionId)).FirstOrDefault();
                         if (questionData == null)
                         {
-                            result.Message = "Question does Not Exist";
+                            result.Message = "TblQuestion does Not Exist";
                             return Ok(result);
                         }
 
@@ -485,7 +485,7 @@ namespace QuickCampusAPI.Controllers
                         }
                         foreach (var option in vm.QuestionssoptionVm)
                         {
-                            QuestionOption questionOption = new QuestionOption
+                            TblQuestionOption questionOption = new TblQuestionOption
                             {
                                 QuestionId = vm.QuestionId,
                                 OptionText = option.OptionText,
@@ -511,7 +511,7 @@ namespace QuickCampusAPI.Controllers
                             questionOption.Imagepath = (string.IsNullOrEmpty(questionOption.Imagepath) ? "" : Path.Combine(_baseUrl, questionOption.Imagepath));
                         }
                         result.IsSuccess = true;
-                        result.Message = "Question added successfully.";
+                        result.Message = "TblQuestion added successfully.";
                         result.Data = vm;
                         return Ok(result);
                     }
@@ -551,11 +551,11 @@ namespace QuickCampusAPI.Controllers
                     result.Data = questionTypes.Select(x => new
                     {
                         x.QuestionTypeId,
-                        x.QuestionType1,
+                        x.QuestionType,
 
                     });
                     result.IsSuccess = true;
-                    result.Message = "Question type fetched Successfully";
+                    result.Message = "TblQuestion type fetched Successfully";
                     return Ok(result);
                 }
                 else
@@ -591,11 +591,11 @@ namespace QuickCampusAPI.Controllers
                     result.Data = sectionList.Select(x => new
                     {
                         x.SectionId,
-                        x.Section1,
+                        x.Section,
 
                     });
                     result.IsSuccess = true;
-                    result.Message = "Section fetched Successfully";
+                    result.Message = "MstSection fetched Successfully";
                     return Ok(result);
                 }
                 else
@@ -624,7 +624,7 @@ namespace QuickCampusAPI.Controllers
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
                     LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
                 }
-                List<Groupdl> groupList = new List<Groupdl>();
+                List<MstGroupdl> groupList = new List<MstGroupdl>();
                 groupList = _groupRepo.GetAllQuerable().ToList();
 
                 var response = groupList.Select(x => (GroupVm)x).ToList();

@@ -17,7 +17,7 @@ namespace QuickCampus_Core.ViewModel
         [Required]
         public int GroupId { get; set; }
         [Required]
-        [Display(Name = "Question Name")]
+        [Display(Name = "TblQuestion Name")]
         [MaxLength(1000, ErrorMessage = "can't exceed more than 1000 characters.")]
         public string? Text { get; set; }
         [Required]

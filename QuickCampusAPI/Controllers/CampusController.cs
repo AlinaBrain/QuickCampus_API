@@ -64,8 +64,8 @@ namespace QuickCampusAPI.Controllers
                     newPageStart = (pageStart - startPage) * pageSize;
                 }
                 var campusTotalCount = 0;
-                List<WalkIn> campusList = new List<WalkIn>();
-                List<WalkIn> campusData = new List<WalkIn>();
+                List<TblWalkIn> campusList = new List<TblWalkIn>();
+                List<TblWalkIn> campusData = new List<TblWalkIn>();
                 if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                 {
                     campusData = _campusrepo.GetAllQuerable().Where(x => x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();

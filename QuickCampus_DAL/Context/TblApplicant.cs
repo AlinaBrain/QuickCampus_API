@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace QuickCampus_DAL.Context;
 
-public partial class Applicant
+public partial class TblApplicant
 {
     public int ApplicantId { get; set; }
 
@@ -27,13 +27,9 @@ public partial class Applicant
 
     public string? Comment { get; set; }
 
-    public int? AssignedToCompany { get; set; }
-
     public int? CollegeId { get; set; }
 
     public string? CollegeName { get; set; }
-
-    public int? ClientId { get; set; }
 
     public bool? IsDeleted { get; set; }
 
@@ -45,15 +41,15 @@ public partial class Applicant
 
     public int? HighestQualification { get; set; }
 
-    public virtual ICollection<ApplicantComment> ApplicantComments { get; set; } = new List<ApplicantComment>();
+    public string? PassingYear { get; set; }
 
-    public virtual ICollection<ApplicantTest> ApplicantTests { get; set; } = new List<ApplicantTest>();
+    public int? ClientId { get; set; }
 
-    public virtual Company? AssignedToCompanyNavigation { get; set; }
+    public virtual TblClient? Client { get; set; }
 
     public virtual MstQualification? HighestQualificationNavigation { get; set; }
 
-    public virtual ICollection<Skill> Skills { get; set; } = new List<Skill>();
+    public virtual MstApplicantStatus? Status { get; set; }
 
-    public virtual Status? Status { get; set; }
+    public virtual ICollection<TblApplicantSkill> TblApplicantSkills { get; set; } = new List<TblApplicantSkill>();
 }

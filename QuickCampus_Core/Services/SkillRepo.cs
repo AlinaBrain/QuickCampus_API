@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace QuickCampus_Core.Services
 {
-    public class SkillRepo :BaseRepository<BtprojecQuickcampustestContext,Skill>,ISkillsRepo
+    public class SkillRepo :BaseRepository<BtprojecQuickcampustestContext,TblApplicantSkill>,ISkillsRepo
     {
     }
 }

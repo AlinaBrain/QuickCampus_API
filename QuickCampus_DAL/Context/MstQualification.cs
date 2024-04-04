@@ -21,5 +21,5 @@ public partial class MstQualification
 
     public DateTime? ModifiedAt { get; set; }
 
-    public virtual ICollection<Applicant> Applicants { get; set; } = new List<Applicant>();
+    public virtual ICollection<TblApplicant> TblApplicants { get; set; } = new List<TblApplicant>();
 }

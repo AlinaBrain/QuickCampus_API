@@ -3,15 +3,15 @@ using System.Collections.Generic;
 
 namespace QuickCampus_DAL.Context;
 
-public partial class MstSkill
+public partial class TblApplicantSkill
 {
     public int SkillId { get; set; }
 
-    public string? SkillName { get; set; }
+    public int? ApplicantId { get; set; }
 
     public bool? IsActive { get; set; }
 
-    public bool? IsDelete { get; set; }
+    public bool? IsDeleted { get; set; }
 
     public DateTime? CreatedDate { get; set; }
 
@@ -19,5 +19,9 @@ public partial class MstSkill
 
     public int? ClientId { get; set; }
 
-    public virtual ICollection<TblApplicantSkill> TblApplicantSkills { get; set; } = new List<TblApplicantSkill>();
+    public int? ApplicantSkillId { get; set; }
+
+    public virtual TblApplicant? Applicant { get; set; }
+
+    public virtual MstSkill? ApplicantSkill { get; set; }
 }

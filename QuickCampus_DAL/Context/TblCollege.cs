@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace QuickCampus_DAL.Context;
 
-public partial class College
+public partial class TblCollege
 {
     public int CollegeId { get; set; }
 
@@ -43,7 +43,7 @@ public partial class College
 
     public int? CityId { get; set; }
 
-    public virtual ICollection<CampusWalkInCollege> CampusWalkInColleges { get; set; } = new List<CampusWalkInCollege>();
-
     public virtual MstCity? City { get; set; }
+
+    public virtual ICollection<TblWalkInCollege> TblWalkInColleges { get; set; } = new List<TblWalkInCollege>();
 }

@@ -23,9 +23,9 @@ namespace QuickCampus_Core.ViewModel
 
 
 
-        public QuestionOption ToQuestionOptionVmDbModel()
+        public TblQuestionOption ToQuestionOptionVmDbModel()
         {
-            return new QuestionOption
+            return new TblQuestionOption
             {
                 QuestionId= QuestionId,
                 OptionText= OptionText,

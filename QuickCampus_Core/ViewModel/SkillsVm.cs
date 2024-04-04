@@ -11,7 +11,7 @@ namespace QuickCampus_Core.ViewModel
     {
         public int SkillId { get; set; }
 
-        public string? SkillName { get; set; }
+        public int? ApplicantSkillId { get; set; }
 
         public int? ApplicantId { get; set; }
 
@@ -25,13 +25,13 @@ namespace QuickCampus_Core.ViewModel
 
         public int? ClientId { get; set; }
 
-        public virtual Applicant? Applicant { get; set; }
+        public virtual TblApplicant? Applicant { get; set; }
     
-        public Skill ToSkillDbModel()
+        public TblApplicantSkill ToSkillDbModel()
         {
-            return new Skill
+            return new TblApplicantSkill
             { 
-                SkillName=SkillName,
+                ApplicantSkillId= ApplicantSkillId,
                 ApplicantId=ApplicantId,
                 IsActive=true,
                 IsDeleted=false,

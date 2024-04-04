@@ -11,7 +11,7 @@ namespace QuickCampus_Core.ViewModel
 {
     public class StatusVm
     {
-        public static explicit operator StatusVm(Status items)
+        public static explicit operator StatusVm(MstApplicantStatus items)
         {
             return new StatusVm
             {
@@ -30,9 +30,9 @@ namespace QuickCampus_Core.ViewModel
         [Required(ErrorMessage = "MstCity_State Name is required.")]
         [MaxLength(50, ErrorMessage = "Name must be at most 20 characters long.")]
         public string? StatusName { get; set; }
-        public Status ToDbModel()
+        public MstApplicantStatus ToDbModel()
         {
-            return new Status
+            return new MstApplicantStatus
             {
                 StatusName = StatusName,
                 IsActive = true,

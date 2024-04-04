@@ -7,7 +7,7 @@ namespace QuickCampus_Core.ViewModel
 {
     public class CampusViewModel
     {
-        public static explicit operator CampusViewModel(WalkIn x)
+        public static explicit operator CampusViewModel(TblWalkIn x)
         {
             return new CampusViewModel
             {

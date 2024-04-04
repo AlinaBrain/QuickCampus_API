@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace QuickCampus_Core.Interfaces
 {
-    public interface ISectionRepo :IGenericRepository<Section>
+    public interface ISectionRepo :IGenericRepository<MstSection>
     {
     }
 }

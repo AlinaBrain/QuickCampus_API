@@ -77,8 +77,8 @@ namespace QuickCampusAPI.Controllers
                     newPageStart = (pageStart - startPage) * pageSize;
                 }
 
-                List<College> collegeList = new List<College>();
-                List<College> collegeData = new List<College>();
+                List<TblCollege> collegeList = new List<TblCollege>();
+                List<TblCollege> collegeData = new List<TblCollege>();
                 int collegeListCount = 0;
                 if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                 {
@@ -107,7 +107,7 @@ namespace QuickCampusAPI.Controllers
                 }
                 else
                 {
-                    result.Message = "College list not found!";
+                    result.Message = "TblCollege list not found!";
                 }
 
             }
@@ -135,7 +135,7 @@ namespace QuickCampusAPI.Controllers
                 }
                 if (collegeId > 0)
                 {
-                    College college = new College();
+                    TblCollege college = new TblCollege();
 
                     if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                     {
@@ -147,12 +147,12 @@ namespace QuickCampusAPI.Controllers
                     }
                     if (college == null)
                     {
-                        result.Message = " College does Not Exist";
+                        result.Message = " TblCollege does Not Exist";
                     }
                     else
                     {
                         result.IsSuccess = true;
-                        result.Message = "College fetched successfully.";
+                        result.Message = "TblCollege fetched successfully.";
                         result.Data = (CollegeCountryStateVmmm)college;
                         result.Data.Logo = Path.Combine(baseUrl, result.Data.Logo);
                     }
@@ -160,7 +160,7 @@ namespace QuickCampusAPI.Controllers
                 }
                 else
                 {
-                    result.Message = "Please enter a valid College UserId.";
+                    result.Message = "Please enter a valid TblCollege UserId.";
                 }
             }
             catch (Exception ex)
@@ -206,13 +206,13 @@ namespace QuickCampusAPI.Controllers
                 bool isNameExits = _collegeRepo.Any(x => x.CollegeName == vm.CollegeName && x.IsDeleted == false);
                 if (isNameExits)
                 {
-                    result.Message = " College Name is already exists";
+                    result.Message = " TblCollege Name is already exists";
                     return Ok(result);
                 }
                 bool isCodeExist = _collegeRepo.Any(x => x.CollegeCode == vm.CollegeCode && x.IsDeleted == false);
                 if (isCodeExist)
                 {
-                    result.Message = "College Code is already exist";
+                    result.Message = "TblCollege Code is already exist";
                     return Ok(result);
                 }
                 bool isContactEmailExist = _collegeRepo.Any(x => x.ContectEmail == vm.ContactEmail && x.IsDeleted == false);
@@ -220,6 +220,16 @@ namespace QuickCampusAPI.Controllers
                 {
                     result.Message = "Contact Email is Already Exist";
                     return Ok(result);
+                }
+                if(vm.ImagePath != null)
+                {
+                    string[] ImageExList =  { "jpeg", "jpg", "png" };
+                    string ImageEx = vm.ImagePath.FileName.Split(".")[1];
+                    if(!ImageExList.Any(x=>x == ImageEx))
+                    {
+                        result.Message = "Image should be in jpeg, png or jpg format.";
+                        return Ok(result);
+                    }
                 }
                 if (ModelState.IsValid)
                 {
@@ -246,7 +256,7 @@ namespace QuickCampusAPI.Controllers
                         if (addCollege.CollegeId > 0)
                         {
                             result.IsSuccess = true;
-                            result.Message = "College added successfully";
+                            result.Message = "TblCollege added successfully";
                             result.Data = (CollegeVM)addCollege;
                             result.Data.Logo = Path.Combine(baseUrl, result.Data.Logo);
                         }
@@ -317,7 +327,7 @@ namespace QuickCampusAPI.Controllers
                     bool isCollegeCodeExist = _collegeRepo.Any(x => x.CollegeCode == vm.CollegeCode && x.IsDeleted == false && x.CollegeId != vm.CollegeId);
                     if (isCollegeCodeExist)
                     {
-                        result.Message = "College Code is already exist";
+                        result.Message = "TblCollege Code is already exist";
                         return Ok(result);
                     }
                     bool isContactEmailExists = _collegeRepo.Any(x => x.ContectEmail == vm.ContactEmail && x.IsDeleted == false && x.CollegeId != vm.CollegeId);
@@ -329,7 +339,7 @@ namespace QuickCampusAPI.Controllers
                     if (ModelState.IsValid)
                     {
 
-                        College college = new College();
+                        TblCollege college = new TblCollege();
 
                         if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                         {
@@ -341,7 +351,7 @@ namespace QuickCampusAPI.Controllers
                         }
                         if (college == null)
                         {
-                            result.Message = " College does Not Exist";
+                            result.Message = " TblCollege does Not Exist";
                             return Ok(result);
                         }
                         else
@@ -365,7 +375,7 @@ namespace QuickCampusAPI.Controllers
                                 college.Logo = UploadLogo.Data;
                                 await _collegeRepo.Update(college);
                                 result.IsSuccess = true;
-                                result.Message = "College Updated successfully.";
+                                result.Message = "TblCollege Updated successfully.";
                                 result.Data = vm;
                             }
                             else
@@ -384,7 +394,7 @@ namespace QuickCampusAPI.Controllers
                 }
                 else
                 {
-                    result.Message = "Please enter a valid College UserId";
+                    result.Message = "Please enter a valid TblCollege UserId";
                 }
             }
 
@@ -413,7 +423,7 @@ namespace QuickCampusAPI.Controllers
                 }
                 if (CollegeId > 0)
                 {
-                    College college = new College();
+                    TblCollege college = new TblCollege();
                     if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                     {
                         college = _collegeRepo.GetAllQuerable().Where(x => x.CollegeId == CollegeId && x.IsDeleted == false).FirstOrDefault();
@@ -424,7 +434,7 @@ namespace QuickCampusAPI.Controllers
                     }
                     if (college == null)
                     {
-                        result.Message = " College does Not Exist";
+                        result.Message = " TblCollege does Not Exist";
                     }
                     else
                     {
@@ -434,14 +444,14 @@ namespace QuickCampusAPI.Controllers
                         await _collegeRepo.Update(college);
 
                         result.IsSuccess = true;
-                        result.Message = "College deleted successfully.";
+                        result.Message = "TblCollege deleted successfully.";
                         result.Data = (CollegeVM)college;
                     }
                     return Ok(result);
                 }
                 else
                 {
-                    result.Message = "Please enter a valid College UserId.";
+                    result.Message = "Please enter a valid TblCollege UserId.";
                 }
             }
             catch (Exception ex)
@@ -469,7 +479,7 @@ namespace QuickCampusAPI.Controllers
 
                 if (CollegeId > 0)
                 {
-                    College college = new College();
+                    TblCollege college = new TblCollege();
 
                     if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                     {
@@ -481,7 +491,7 @@ namespace QuickCampusAPI.Controllers
                     }
                     if (college == null)
                     {
-                        result.Message = " College does Not Exist";
+                        result.Message = " TblCollege does Not Exist";
                     }
                     else
                     {
@@ -490,14 +500,14 @@ namespace QuickCampusAPI.Controllers
                         await _collegeRepo.Update(college);
 
                         result.IsSuccess = true;
-                        result.Message = "Applicant Updated successfully.";
+                        result.Message = "TblApplicant Updated successfully.";
                         result.Data = (CollegeVM)college;
                     }
                     return Ok(result);
                 }
                 else
                 {
-                    result.Message = "Please enter a valid College UserId.";
+                    result.Message = "Please enter a valid TblCollege UserId.";
                 }
             }
             catch (Exception ex)

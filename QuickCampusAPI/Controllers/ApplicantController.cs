@@ -63,8 +63,8 @@ namespace QuickCampusAPI.Controllers
                 }
 
                 var applicantTotalCount = 0;
-                List<Applicant> applicantList = new List<Applicant>();
-                List<Applicant> applicantData = new List<Applicant>();
+                List<TblApplicant> applicantList = new List<TblApplicant>();
+                List<TblApplicant> applicantData = new List<TblApplicant>();
                 if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                 {
                     applicantData = _applicantRepo.GetAllQuerable().Where(x => (ClientId != null && ClientId > 0 ? x.ClientId == ClientId : true) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
@@ -101,14 +101,14 @@ namespace QuickCampusAPI.Controllers
                     item.skilltype = skillsdata.Select(x => new SkillVmm
                     {
                       SkillId=  x.SkillId,
-                       SkillName= x.SkillName
+                       SkillName= x.ApplicantSkillId.ToString()
                     }).ToList(); 
                 }
                
                 if (applicantList.Count > 0)
                 {
                     result.IsSuccess = true;
-                    result.Message = "Applicant get successfully";
+                    result.Message = "TblApplicant get successfully";
                     result.Data = response;
                     result.TotalRecordCount = applicantTotalCount;
                 }
@@ -159,7 +159,7 @@ namespace QuickCampusAPI.Controllers
                 bool isCollegeExist = _collegeRepo.Any(x => x.CollegeId == vm.CollegeId && x.IsDeleted == false && x.IsActive == true);
                 if (!isCollegeExist)
                 {
-                    result.Message = "College does not Exist";
+                    result.Message = "TblCollege does not Exist";
                     return Ok(result);
                 }
                 bool isQualificationExist = _qualificationRepo.Any(x => x.QualId == vm.HighestQualification && x.IsDeleted == false && x.IsActive == true);
@@ -195,7 +195,7 @@ namespace QuickCampusAPI.Controllers
                         SkillsVm skillVm = new SkillsVm()
                         {
                             
-                            SkillName=item.SkillName,
+                            ApplicantSkillId=item.SkillName,
                             SkillId=item.SkillId,
                             ApplicantId=SaveApplicant.ApplicantId,
                         };
@@ -205,13 +205,13 @@ namespace QuickCampusAPI.Controllers
                     if (SaveApplicant.ApplicantId > 0)
                     {
                         result.IsSuccess = true;
-                        result.Message = "Applicant added successfully.";
+                        result.Message = "TblApplicant added successfully.";
                         result.Data = (ApplicantViewModel)SaveApplicant;
                         result.Data.skilltype = vm.skilltype;
                     }
                     else
                     {
-                        result.Message = "Applicant not saved. Please try again.";
+                        result.Message = "TblApplicant not saved. Please try again.";
                     }
 
                 }
@@ -257,7 +257,7 @@ namespace QuickCampusAPI.Controllers
                 bool isCollegeExist = _collegeRepo.Any(x => x.CollegeId == vm.CollegeId && x.IsDeleted == false && x.IsActive == true);
                 if (!isCollegeExist)
                 {
-                    result.Message = "College does not Exist";
+                    result.Message = "TblCollege does not Exist";
                     return Ok(result);
                 }
                 var isQualificationExists = _qualificationRepo.Any(x => x.QualId == vm.HighestQualification && x.IsActive == true && x.IsDeleted == false);
@@ -280,7 +280,7 @@ namespace QuickCampusAPI.Controllers
                     
                         if (vm.StatusId > 0 && vm.AssignedToCompany > 0 && vm.ApplicantID > 0)
                     {
-                        Applicant applicant = new Applicant();
+                        TblApplicant applicant = new TblApplicant();
 
                         if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                         {
@@ -292,7 +292,7 @@ namespace QuickCampusAPI.Controllers
                         }
                         if (applicant == null)
                         {
-                            result.Message = " Applicant does Not Exist";
+                            result.Message = " TblApplicant does Not Exist";
                             return Ok(result);
                         }
 
@@ -305,7 +305,6 @@ namespace QuickCampusAPI.Controllers
                         applicant.MatricPercentage = vm.MatricPercentage;
                         applicant.PhoneNumber = vm.PhoneNumber?.Trim();
                         applicant.StatusId = vm.StatusId;
-                        applicant.AssignedToCompany = vm.AssignedToCompany;
                         applicant.CollegeId = vm.CollegeId;
                         applicant.Comment = vm.Comment;
                         applicant.ModifiedDate = DateTime.Now;
@@ -324,7 +323,7 @@ namespace QuickCampusAPI.Controllers
                             SkillsVm skillVm = new SkillsVm()
                             {
 
-                                SkillName = item.SkillName,
+                                ApplicantSkillId = item.SkillName,
                                 SkillId = item.SkillId,
                                 ApplicantId = applicant.ApplicantId,
                             };
@@ -332,13 +331,13 @@ namespace QuickCampusAPI.Controllers
                             item.SkillId = SaveSkills.SkillId;
                         }
 
-                        result.Message = "Applicant updated successfully";
+                        result.Message = "TblApplicant updated successfully";
                         result.IsSuccess = true;
                         return Ok(result);
                     }
                     else
                     {
-                        result.Message = "Applicant, Status or Assigned to Company can't be null or Zero.";
+                        result.Message = "TblApplicant, MstApplicantStatus or Assigned to TblCompany can't be null or Zero.";
                     }
                 }
                 else
@@ -371,7 +370,7 @@ namespace QuickCampusAPI.Controllers
 
                 if (applicantId > 0)
                 {
-                    Applicant applicant = new Applicant();
+                    TblApplicant applicant = new TblApplicant();
                     var collegeList = _collegeRepo.GetAllQuerable().Where(x => x.IsActive == true && x.IsDeleted == false).ToList();
 
                     if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
@@ -384,12 +383,12 @@ namespace QuickCampusAPI.Controllers
                     }
                     if (applicant == null)
                     {
-                        result.Message = " Applicant does Not Exist";
+                        result.Message = " TblApplicant does Not Exist";
                     }
                     else
                     {
                         result.IsSuccess = true;
-                        result.Message = "Applicant fetched successfully.";
+                        result.Message = "TblApplicant fetched successfully.";
                         result.Data = (ApplicantViewModel)applicant;
                         var qualificationlist = _qualificationRepo.GetAllQuerable().Where(x => x.IsActive == true && x.IsDeleted == false && x.QualId == applicant.HighestQualification).FirstOrDefault();
                         var collegelist=_collegeRepo.GetAllQuerable().Where(x=>x.IsActive==true && x.IsDeleted == false && x.CollegeId==applicant.CollegeId).FirstOrDefault();
@@ -403,7 +402,7 @@ namespace QuickCampusAPI.Controllers
                             result.Data.skilltype = skillslist.Select(x => new SkillVmm
                             {
                                 SkillId = x.SkillId,
-                                SkillName = x.SkillName
+                                SkillName = x.ApplicantSkillId.ToString()
                             }).ToList();
                         }
                     
@@ -417,7 +416,7 @@ namespace QuickCampusAPI.Controllers
                 }
                 else
                 {
-                    result.Message = "Please enter a valid Applicant UserId.";
+                    result.Message = "Please enter a valid TblApplicant UserId.";
                 }
             }
             catch(Exception ex)
@@ -445,7 +444,7 @@ namespace QuickCampusAPI.Controllers
 
                 if (applicantId > 0)
                 {
-                    Applicant applicant = new Applicant();
+                    TblApplicant applicant = new TblApplicant();
 
                     if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                     {
@@ -457,7 +456,7 @@ namespace QuickCampusAPI.Controllers
                     }
                     if (applicant == null)
                     {
-                        result.Message = " Applicant does Not Exist";
+                        result.Message = " TblApplicant does Not Exist";
                     }
                     else
                     {
@@ -467,14 +466,14 @@ namespace QuickCampusAPI.Controllers
                         await _applicantRepo.Update(applicant);
 
                         result.IsSuccess = true;
-                        result.Message = "Applicant deleted successfully.";
+                        result.Message = "TblApplicant deleted successfully.";
                         result.Data = (ApplicantViewModel)applicant;
                     }
                     return Ok(result);
                 }
                 else
                 {
-                    result.Message = "Please enter a valid Applicant UserId.";
+                    result.Message = "Please enter a valid TblApplicant UserId.";
                 }
             }
             catch (Exception ex)
@@ -502,7 +501,7 @@ namespace QuickCampusAPI.Controllers
 
                 if (applicantId > 0)
                 {
-                    Applicant applicant = new Applicant();
+                    TblApplicant  applicant = new TblApplicant ();
                     if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                     {
                         applicant = _applicantRepo.GetAllQuerable().Where(x => x.ApplicantId == applicantId && x.IsDeleted == false).FirstOrDefault();
@@ -513,7 +512,7 @@ namespace QuickCampusAPI.Controllers
                     }
                     if (applicant == null)
                     {
-                        result.Message = " Applicant does Not Exist";
+                        result.Message = " TblApplicant does Not Exist";
                     }
                     else
                     {
@@ -522,14 +521,14 @@ namespace QuickCampusAPI.Controllers
                         await _applicantRepo.Update(applicant);
 
                         result.IsSuccess = true;
-                        result.Message = "Applicant Updated successfully.";
+                        result.Message = "TblApplicant Updated successfully.";
                         result.Data = (ApplicantViewModel)applicant;
                     }
                     return Ok(result);
                 }
                 else
                 {
-                    result.Message = "Please enter a valid Applicant UserId.";
+                    result.Message = "Please enter a valid TblApplicant UserId.";
                 }
             }
             catch (Exception ex)

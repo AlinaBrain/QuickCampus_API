@@ -3,7 +3,7 @@ using QuickCampus_DAL.Context;
 
 namespace QuickCampus_Core.Interfaces
 {
-    public interface IApplicantRepo : IGenericRepository<Applicant>
+    public interface IApplicantRepo : IGenericRepository<TblApplicant>
     {
        
     }

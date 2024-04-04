@@ -3,13 +3,9 @@ using System.Collections.Generic;
 
 namespace QuickCampus_DAL.Context;
 
-public partial class Skill
+public partial class MstApplicantStatus
 {
-    public int SkillId { get; set; }
-
-    public string? SkillName { get; set; }
-
-    public int? ApplicantId { get; set; }
+    public int StatusId { get; set; }
 
     public bool? IsActive { get; set; }
 
@@ -19,7 +15,7 @@ public partial class Skill
 
     public DateTime? ModifiedDate { get; set; }
 
-    public int? ClientId { get; set; }
+    public string? StatusName { get; set; }
 
-    public virtual Applicant? Applicant { get; set; }
+    public virtual ICollection<TblApplicant> TblApplicants { get; set; } = new List<TblApplicant>();
 }

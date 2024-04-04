@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace QuickCampus_Core.Interfaces
 {
-    public interface ISkillsRepo :IGenericRepository<Skill>
+    public interface ISkillsRepo :IGenericRepository<TblApplicantSkill>
     {
     }
 }

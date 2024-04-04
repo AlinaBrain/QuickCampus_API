@@ -5,14 +5,14 @@ namespace QuickCampus_Core.Interfaces
     public interface IApplicantRepository
 
     {
-        Task<Applicant> GetAsync(int? categoryId);
+        Task<TblApplicant> GetAsync(int? categoryId);
 
-        Task<List<Applicant>> GetAllAsync();
+        Task<List<TblApplicant>> GetAllAsync();
 
-        Task<Applicant> CreateAsync(Applicant applicant);
+        Task<TblApplicant> CreateAsync(TblApplicant applicant);
 
         Task DeleteAsync(int ApplicantId);
 
-        Task UpdateAsync(Applicant applicant);
+        Task UpdateAsync(TblApplicant applicant);
     }
 }

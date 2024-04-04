@@ -13,5 +13,5 @@ public partial class TblQualification
 
     public bool? IsDeleted { get; set; }
 
-    public virtual ICollection<Applicant> Applicants { get; set; } = new List<Applicant>();
+    public virtual ICollection<TblApplicant> Applicants { get; set; } = new List<TblApplicant>();
 }

@@ -8,7 +8,7 @@ namespace QuickCampus_Core.ViewModel
 {
     public class ApplicantViewModel
     {
-        public static explicit operator ApplicantViewModel(Applicant x)
+        public static explicit operator ApplicantViewModel(TblApplicant x)
         {
             return new ApplicantViewModel
             {
@@ -23,7 +23,6 @@ namespace QuickCampus_Core.ViewModel
                 
                 StatusId = x.StatusId ?? 0,
                 Comment = x.Comment,
-                AssignedToCompany = x.AssignedToCompany,
                 CollegeName = x.CollegeName,
                 ClientId = x.ClientId,
                 CollegeId = x.CollegeId,
@@ -88,9 +87,9 @@ namespace QuickCampus_Core.ViewModel
    
         public List<SkillVmm> skilltype { get; set; }
 
-        public Applicant ToApplicantDbModel()
+        public TblApplicant ToApplicantDbModel()
         {
-            return new Applicant
+            return new TblApplicant
             {
                 FirstName = FirstName,
                 LastName = LastName,
@@ -101,7 +100,6 @@ namespace QuickCampus_Core.ViewModel
                 IntermediatePercentage = IntermediatePercentage,
                 StatusId = StatusId,
                 Comment = Comment,
-                AssignedToCompany = AssignedToCompany,
                 HighestQualification=HighestQualification,
                 ClientId = ClientId,
                 CreatedDate = DateTime.UtcNow,
@@ -112,9 +110,9 @@ namespace QuickCampus_Core.ViewModel
             };
         }
 
-        public Applicant ToUpdateDbModel()
+        public TblApplicant ToUpdateDbModel()
         {
-            return new Applicant
+            return new TblApplicant
             {
                 ApplicantId = ApplicantID,
                 FirstName = FirstName,
@@ -126,7 +124,6 @@ namespace QuickCampus_Core.ViewModel
                 IntermediatePercentage = IntermediatePercentage,
                 StatusId = StatusId,
                 Comment = Comment,
-                AssignedToCompany = AssignedToCompany,
                 ClientId = ClientId,
                 ModifiedDate = DateTime.UtcNow,
                 CreatedDate = ApplicantID > 0 ? DateTime.UtcNow : null,

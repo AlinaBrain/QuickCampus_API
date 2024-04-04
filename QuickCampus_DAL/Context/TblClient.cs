@@ -37,25 +37,11 @@ public partial class TblClient
 
     public string? Password { get; set; }
 
-    public int? UserId { get; set; }
+    public virtual ICollection<TblApplicant> TblApplicants { get; set; } = new List<TblApplicant>();
 
-    public virtual ICollection<Groupdl> Groupdls { get; set; } = new List<Groupdl>();
-
-    public virtual ICollection<QuestionType> QuestionTypes { get; set; } = new List<QuestionType>();
-
-    public virtual ICollection<TblContent> TblContents { get; set; } = new List<TblContent>();
-
-    public virtual ICollection<TblGoal> TblGoals { get; set; } = new List<TblGoal>();
-
-    public virtual ICollection<TblParentSkill> TblParentSkills { get; set; } = new List<TblParentSkill>();
-
-    public virtual ICollection<TblTag> TblTags { get; set; } = new List<TblTag>();
-
-    public virtual ICollection<TblTopicPCChildSkill> TblTopicPCChildSkills { get; set; } = new List<TblTopicPCChildSkill>();
-
-    public virtual ICollection<TblTopicPChildSkill> TblTopicPChildSkills { get; set; } = new List<TblTopicPChildSkill>();
+    public virtual ICollection<TblQuestion> TblQuestions { get; set; } = new List<TblQuestion>();
 
     public virtual ICollection<TblUser> TblUsers { get; set; } = new List<TblUser>();
 
-    public virtual TblUser? User { get; set; }
+    public virtual ICollection<TblWalkIn> TblWalkIns { get; set; } = new List<TblWalkIn>();
 }

@@ -9,19 +9,17 @@ namespace QuickCampus_Core.ViewModel
 {
     public class GroupVm
     {
-        public static explicit operator GroupVm(Groupdl items)
+        public static explicit operator GroupVm(MstGroupdl items)
         {
             return new GroupVm()
             {
                 GroupId= items.GroupId,
                 GroupName= items.GroupName,
-                ClentId= items.ClentId,
             };
         }
         public int GroupId { get; set; }
 
         public string? GroupName { get; set; }
 
-        public int? ClentId { get; set; }
     }
 }

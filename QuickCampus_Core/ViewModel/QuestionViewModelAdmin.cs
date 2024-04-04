@@ -14,16 +14,16 @@ namespace QuickCampus_Core.ViewModel
         
 
         public int QuestionId { get; set; }
-        [Required(ErrorMessage = "Question Type is required.")]
+        [Required(ErrorMessage = "TblQuestion Type is required.")]
         [Display(Name = "Questiton Type")]
         public int QuestionTypeId { get; set; }
-        [Required(ErrorMessage = "Section is required.")]
-        [Display(Name = "Section")]
+        [Required(ErrorMessage = "MstSection is required.")]
+        [Display(Name = "MstSection")]
         public int SectionId { get; set; }
         [Display(Name = "Group")]
         public int GroupId { get; set; }
-        [Required(ErrorMessage = "Question is required.")]
-        [Display(Name = "Question")]
+        [Required(ErrorMessage = "TblQuestion is required.")]
+        [Display(Name = "TblQuestion")]
         public string Text { get; set; }
         public string QuestionTypeName { get; set; }
         public string QuestionSection { get; set; }
