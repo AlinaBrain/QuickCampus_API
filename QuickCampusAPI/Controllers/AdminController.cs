@@ -32,7 +32,7 @@ namespace QuickCampusAPI.Controllers
             _UserRoleRepo = userRoleRepo;
         }
         [HttpPost]
-        [Route("AddClient")]
+        [Route("AddAdmin")]
         public async Task<IActionResult> AddClient([FromBody] ClientViewModel vm)
         {
             IGeneralResult<ClientResponseViewModel> result = new GeneralResult<ClientResponseViewModel>();
@@ -61,7 +61,6 @@ namespace QuickCampusAPI.Controllers
                             Address = vm.Address?.Trim(),
                             CreatedBy = 0,
                             CreatedDate = DateTime.Now,
-                            SubscriptionPlan = vm.SubscriptionPlan?.Trim(),
                             Latitude = vm.Latitude,
                             Longitude = vm.Longitude,
                             UserName = vm.Email?.Trim(),
@@ -89,7 +88,7 @@ namespace QuickCampusAPI.Controllers
                             var roleAdd = await _userAppRoleRepo.Add(userAppRole);
                             if (roleAdd.Id > 0)
                             {
-                                var ClientRoleCheck = _roleRepo.GetAllQuerable().Where(x => x.Name == "Client Admin").FirstOrDefault();
+                                var ClientRoleCheck = _roleRepo.GetAllQuerable().Where(x => x.Name == "Admin").FirstOrDefault();
                                 if (ClientRoleCheck != null)
                                 {
                                     TblUserRole userRole = new TblUserRole
@@ -106,7 +105,6 @@ namespace QuickCampusAPI.Controllers
                                             Name = clientData.Name,
                                             Email = clientData.Email,
                                             Phone = clientData.Phone,
-                                            SubscriptionPlan = clientData.SubscriptionPlan,
                                             Address = clientData.Address,
                                             Latitude = clientData.Latitude,
                                             Longitude = clientData.Longitude,
