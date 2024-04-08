@@ -12,6 +12,9 @@ namespace QuickCampus_Core.ViewModel
         [Required(ErrorMessage = "Name is required"), MaxLength(20)]
         [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "Only characters allowed.")]
         public string? Name { get; set; }
+        [Required(ErrorMessage = "Company Name is required"), MaxLength(100)]
+        [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "Only characters allowed.")]
+        public string? CompanyName { get; set; }
         [Required(ErrorMessage="Address is required"),MaxLength(60)]
         public string? Address { get; set; }
         [Required]
@@ -33,8 +36,8 @@ namespace QuickCampus_Core.ViewModel
         [RegularExpression(@"^\d+(\.\d{1,2})?$",ErrorMessage ="Please Enter a Valid Latitude")]
         public decimal? Latitude { get; set; }
         
-        [Required(ErrorMessage = "Name is required"), MaxLength(20)]
-        [RegularExpression(@"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$", ErrorMessage = "Only Password allowed.")]
+        [Required(ErrorMessage = "Password is required"), MaxLength(20)]
+        [RegularExpression(@"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$", ErrorMessage = "A minimum 8 characters password contains a combination of uppercase and lowercase letter and number are required.")]
         public string? Password { get; set; }
         [Required]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]

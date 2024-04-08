@@ -28,11 +28,12 @@ namespace QuickCampus_Core.ViewModel
         [Required(ErrorMessage = "TblCollege Code is required.")]
         public string? CollegeCode { get; set; }
         [Required(ErrorMessage ="Contact Person Name is required ")]
-        public string? ContactPerson { get; set; }
+        public string? ContactPersonName { get; set; }
         [RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Not a valid phone number.")]
         public string? ContactPhone { get; set; }
         [EmailAddress(ErrorMessage = "Enter a valid email.")]
         public string? ContactEmail { get; set; }
+        public int? ClientId { get; set; }
 
     }
 }

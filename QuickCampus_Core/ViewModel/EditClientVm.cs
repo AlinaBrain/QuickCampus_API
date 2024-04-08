@@ -14,6 +14,9 @@ namespace QuickCampus_Core.ViewModel
         [Required(ErrorMessage = "Name is required"), MaxLength(20)]
         [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "Only characters allowed.")]
         public string? Name { get; set; }
+        [Required(ErrorMessage = "Company Name is required"), MaxLength(100)]
+        [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "Only characters allowed.")]
+        public string? CompanyName { get; set; }
         public string? Address { get; set; }
         [Required]
         [RegularExpression(@"^[1-9][0-9]{9}$", ErrorMessage = "Please enter a valid 10-digit mobile number that does not start with 0.")]

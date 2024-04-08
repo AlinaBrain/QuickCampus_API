@@ -28,7 +28,7 @@ namespace QuickCampusAPI.Controllers
         private readonly ISkillsRepo _skillsRepo;
 
         public ApplicantController(IConfiguration configuration, IMstQualificationRepo qualificationRepo, ICollegeRepo collegeRepo, IApplicantRepo applicantRepo
-            ,IUserAppRoleRepo userAppRoleRepo,IUserRepo userRepo,ISkillsRepo skillsRepo)
+            , IUserAppRoleRepo userAppRoleRepo, IUserRepo userRepo, ISkillsRepo skillsRepo)
         {
             _applicantRepo = applicantRepo;
             _userAppRoleRepo = userAppRoleRepo;
@@ -42,7 +42,7 @@ namespace QuickCampusAPI.Controllers
 
         [HttpGet]
         [Route("GetAllApplicant")]
-        public async Task<ActionResult> GetAllApplicant(string? search, int? ClientId, DataTypeFilter DataType , int pageStart = 1, int pageSize = 10)
+        public async Task<ActionResult> GetAllApplicant(string? search, int? ClientId, DataTypeFilter DataType, int pageStart = 1, int pageSize = 10)
         {
             IGeneralResult<List<ApplicantViewModel>> result = new GeneralResult<List<ApplicantViewModel>>();
             try
@@ -52,8 +52,8 @@ namespace QuickCampusAPI.Controllers
                 var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
-                    var user =await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-                    LoggedInUserClientId = (user.ClientId == null ? "0": user.ClientId.ToString());
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
                 }
                 var newPageStart = 0;
                 if (pageStart > 0)
@@ -67,15 +67,15 @@ namespace QuickCampusAPI.Controllers
                 List<TblApplicant> applicantData = new List<TblApplicant>();
                 if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                 {
-                    applicantData = _applicantRepo.GetAllQuerable().Where(x => (ClientId != null && ClientId > 0 ? x.ClientId == ClientId : true) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
+                    applicantData = _applicantRepo.GetAllQuerable().Where(x => (ClientId != null && ClientId > 0 ? x.ClientId == ClientId : true) && x.IsDeleted == false && ((DataType == DataTypeFilter.All ? true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : x.IsActive == true)))).ToList();
                 }
                 else
                 {
-                    applicantData = _applicantRepo.GetAllQuerable().Where(x => x.ClientId == Convert.ToInt32(LoggedInUserClientId) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
+                    applicantData = _applicantRepo.GetAllQuerable().Where(x => x.ClientId == Convert.ToInt32(LoggedInUserClientId) && x.IsDeleted == false && ((DataType == DataTypeFilter.All ? true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : x.IsActive == true)))).ToList();
                 }
-                var collegeList = _collegeRepo.GetAllQuerable().Where(x => x.IsActive == true && x.IsDeleted == false).ToList();
+                var collegeList = _collegeRepo.GetAllQuerable().Where(x => x.IsDeleted == false && (LoggedInUserRole.RoleId == (int)AppRole.Admin) ? true : x.ClientId == Convert.ToInt32(LoggedInUserClientId)).ToList();
                 var qualificationList = _qualificationRepo.GetAllQuerable().Where(x => x.IsActive == true && x.IsDeleted == false).ToList();
-                
+
                 foreach (var item in applicantData)
                 {
                     if (collegeList.Any(x => x.CollegeId == item.CollegeId))
@@ -97,18 +97,18 @@ namespace QuickCampusAPI.Controllers
                     {
                         item.HighestQualificationName = qualificationList.Where(x => x.QualId == item.HighestQualification).First()?.QualName;
                     }
-                    var skillsdata = _skillsRepo.GetAllQuerable().Where(x => x.IsActive == true && x.IsDeleted == false &&x.ApplicantId==item.ApplicantID).ToList();
-                    item.skilltype = skillsdata.Select(x => new SkillVmm
+                    var skillsData = _skillsRepo.GetAllQuerable().Where(x => x.IsActive == true && x.IsDeleted == false && x.ApplicantId == item.ApplicantID).ToList();
+                    item.skilltype = skillsData.Select(x => new SkillVmm
                     {
-                      SkillId=  x.SkillId,
-                       ApplicantSkillId= x.ApplicantSkillId
-                    }).ToList(); 
+                        SkillId = x.SkillId,
+                        ApplicantSkillId = x.ApplicantSkillId
+                    }).ToList();
                 }
-               
+
                 if (applicantList.Count > 0)
                 {
                     result.IsSuccess = true;
-                    result.Message = "TblApplicant get successfully";
+                    result.Message = "Applicants fetched successfully";
                     result.Data = response;
                     result.TotalRecordCount = applicantTotalCount;
                 }
@@ -119,7 +119,7 @@ namespace QuickCampusAPI.Controllers
             }
             catch (Exception ex)
             {
-                result.Message = "server error! "+ ex.Message;
+                result.Message = "server error! " + ex.Message;
             }
             return Ok(result);
         }
@@ -136,30 +136,30 @@ namespace QuickCampusAPI.Controllers
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-                    LoggedInUserClientId = (user.ClientId == null ? "0": user.ClientId.ToString());
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
                 }
                 var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
-                if(LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin && (vm.ClientId==null || vm.ClientId.ToString() == "" || vm.ClientId == 0))
+                if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin && (vm.ClientId == null || vm.ClientId.ToString() == "" || vm.ClientId == 0))
                 {
                     result.Message = "Please select a valid Client";
                     return Ok(result);
                 }
 
-                if (_applicantRepo.Any(x => x.EmailAddress == vm.EmailAddress && x.IsActive == true && x.IsDeleted == false))
+                if (_applicantRepo.Any(x => x.EmailAddress == vm.EmailAddress && x.IsDeleted == false && x.ClientId == ((LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId))))
                 {
                     result.Message = "Email Address Already Registered!";
                     return Ok(result);
                 }
-                bool isPhoneNumberExist = _applicantRepo.Any(x => x.PhoneNumber == vm.PhoneNumber && x.IsDeleted == false);
+                bool isPhoneNumberExist = _applicantRepo.Any(x => x.PhoneNumber == vm.PhoneNumber && x.IsDeleted == false && x.ClientId == ((LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId)));
                 if (isPhoneNumberExist)
                 {
                     result.Message = "Phone Number is Already Exist";
                     return Ok(result);
                 }
-                bool isCollegeExist = _collegeRepo.Any(x => x.CollegeId == vm.CollegeId && x.IsDeleted == false && x.IsActive == true);
+                bool isCollegeExist = _collegeRepo.Any(x => x.CollegeId == vm.CollegeId && x.IsDeleted == false && x.IsActive == true && x.ClientId == ((LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId)));
                 if (!isCollegeExist)
                 {
-                    result.Message = "TblCollege does not Exist";
+                    result.Message = "College does not Exist";
                     return Ok(result);
                 }
                 bool isQualificationExist = _qualificationRepo.Any(x => x.QualId == vm.HighestQualification && x.IsDeleted == false && x.IsActive == true);
@@ -185,9 +185,7 @@ namespace QuickCampusAPI.Controllers
                     vm.EmailAddress = vm.EmailAddress?.Trim();
                     vm.PhoneNumber = vm.PhoneNumber?.Trim();
                     vm.Comment = vm.Comment?.Trim();
-                    vm.PassingYear = vm.PassingYear;
-                    vm.HighestQualification = vm.HighestQualification;
-                    
+
                     vm.ClientId = (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId);
                     var SaveApplicant = await _applicantRepo.Add(vm.ToApplicantDbModel());
 
@@ -195,10 +193,10 @@ namespace QuickCampusAPI.Controllers
                     {
                         SkillsVm skillVm = new SkillsVm()
                         {
-                            
-                            ApplicantSkillId=item.ApplicantSkillId,
-                            SkillId=item.SkillId,
-                            ApplicantId=SaveApplicant.ApplicantId,
+
+                            ApplicantSkillId = item.ApplicantSkillId,
+                            SkillId = item.SkillId,
+                            ApplicantId = SaveApplicant.ApplicantId,
                         };
                         var SaveSkills = await _skillsRepo.Add(skillVm.ToSkillDbModel());
                         item.SkillId = SaveSkills.SkillId;
@@ -206,13 +204,13 @@ namespace QuickCampusAPI.Controllers
                     if (SaveApplicant.ApplicantId > 0)
                     {
                         result.IsSuccess = true;
-                        result.Message = "TblApplicant added successfully.";
+                        result.Message = "Applicant added successfully.";
                         result.Data = (ApplicantViewModel)SaveApplicant;
                         result.Data.skilltype = vm.skilltype;
                     }
                     else
                     {
-                        result.Message = "TblApplicant not saved. Please try again.";
+                        result.Message = "Applicant not saved. Please try again.";
                     }
 
                 }
@@ -242,23 +240,23 @@ namespace QuickCampusAPI.Controllers
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-                    LoggedInUserClientId = (user.ClientId == null ? "0": user.ClientId.ToString());
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
                 }
-                if (_applicantRepo.Any(x => x.EmailAddress == vm.EmailAddress &&x.ApplicantId!=vm.ApplicantID && x.IsActive == true && x.IsDeleted == false))
+                if (_applicantRepo.Any(x => x.EmailAddress == vm.EmailAddress && x.ApplicantId != vm.ApplicantID && x.IsActive == true && x.IsDeleted == false && x.ClientId == ((LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId))))
                 {
                     result.Message = "Email Address Already Registered!";
                     return Ok(result);
                 }
-                bool isPhoneNumberExist = _applicantRepo.Any(x => x.PhoneNumber == vm.PhoneNumber && x.ApplicantId != vm.ApplicantID && x.IsDeleted == false);
+                bool isPhoneNumberExist = _applicantRepo.Any(x => x.PhoneNumber == vm.PhoneNumber && x.ApplicantId != vm.ApplicantID && x.IsDeleted == false && x.ClientId == ((LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId)));
                 if (isPhoneNumberExist)
                 {
                     result.Message = "Phone Number is Already Exist";
                     return Ok(result);
                 }
-                bool isCollegeExist = _collegeRepo.Any(x => x.CollegeId == vm.CollegeId && x.IsDeleted == false && x.IsActive == true);
+                bool isCollegeExist = _collegeRepo.Any(x => x.CollegeId == vm.CollegeId && x.IsDeleted == false && x.IsActive == true && x.ClientId == ((LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId)));
                 if (!isCollegeExist)
                 {
-                    result.Message = "TblCollege does not Exist";
+                    result.Message = "College does not Exist";
                     return Ok(result);
                 }
                 var isQualificationExists = _qualificationRepo.Any(x => x.QualId == vm.HighestQualification && x.IsActive == true && x.IsDeleted == false);
@@ -278,8 +276,8 @@ namespace QuickCampusAPI.Controllers
                         result.Message = "Only alphabetic characters are allowed in the name.";
                         return Ok(result);
                     }
-                    
-                        if (vm.StatusId > 0 && vm.AssignedToCompany > 0 && vm.ApplicantID > 0)
+
+                    if (vm.StatusId > 0 && vm.ApplicantID > 0)
                     {
                         TblApplicant applicant = new TblApplicant();
 
@@ -293,7 +291,7 @@ namespace QuickCampusAPI.Controllers
                         }
                         if (applicant == null)
                         {
-                            result.Message = " TblApplicant does Not Exist";
+                            result.Message = "Applicant does Not Exist";
                             return Ok(result);
                         }
 
@@ -310,10 +308,10 @@ namespace QuickCampusAPI.Controllers
                         applicant.Comment = vm.Comment;
                         applicant.PassingYear = vm.PassingYear;
                         applicant.ModifiedDate = DateTime.Now;
-                       
+
                         await _applicantRepo.Update(applicant);
-                        var skilltype= _skillsRepo.GetAllQuerable().Where(x=>x.ApplicantId==applicant.ApplicantId).ToList();
-                        if(skilltype.Count> 0)
+                        var skilltype = _skillsRepo.GetAllQuerable().Where(x => x.ApplicantId == applicant.ApplicantId).ToList();
+                        if (skilltype.Count > 0)
                         {
                             foreach (var item in skilltype)
                             {
@@ -333,13 +331,13 @@ namespace QuickCampusAPI.Controllers
                             item.SkillId = SaveSkills.SkillId;
                         }
 
-                        result.Message = "TblApplicant updated successfully";
+                        result.Message = "Applicant updated successfully";
                         result.IsSuccess = true;
                         return Ok(result);
                     }
                     else
                     {
-                        result.Message = "TblApplicant, MstApplicantStatus or Assigned to TblCompany can't be null or Zero.";
+                        result.Message = "Applicant id or Applicant Status can't be null or Zero.";
                     }
                 }
                 else
@@ -366,7 +364,7 @@ namespace QuickCampusAPI.Controllers
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-                    LoggedInUserClientId = (user.ClientId == null ? "0": user.ClientId.ToString());
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
                 }
                 var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
 
@@ -393,8 +391,8 @@ namespace QuickCampusAPI.Controllers
                         result.Message = "TblApplicant fetched successfully.";
                         result.Data = (ApplicantViewModel)applicant;
                         var qualificationlist = _qualificationRepo.GetAllQuerable().Where(x => x.IsActive == true && x.IsDeleted == false && x.QualId == applicant.HighestQualification).FirstOrDefault();
-                        var collegelist=_collegeRepo.GetAllQuerable().Where(x=>x.IsActive==true && x.IsDeleted == false && x.CollegeId==applicant.CollegeId).FirstOrDefault();
-                       var skillslist=  _skillsRepo.GetAllQuerable().Where(x=>x.IsActive==true && x.IsDeleted==false && x.ApplicantId== applicantId).ToList();
+                        var collegelist = _collegeRepo.GetAllQuerable().Where(x => x.IsActive == true && x.IsDeleted == false && x.CollegeId == applicant.CollegeId).FirstOrDefault();
+                        var skillslist = _skillsRepo.GetAllQuerable().Where(x => x.IsActive == true && x.IsDeleted == false && x.ApplicantId == applicantId).ToList();
                         if (qualificationlist != null)
                         {
                             result.Data.HighestQualificationName = qualificationlist.QualName;
@@ -407,7 +405,7 @@ namespace QuickCampusAPI.Controllers
                                 ApplicantSkillId = x.ApplicantSkillId
                             }).ToList();
                         }
-                    
+
                         if (collegelist != null)
                         {
                             result.Data.CollegeName = collegelist.CollegeName;
@@ -421,7 +419,7 @@ namespace QuickCampusAPI.Controllers
                     result.Message = "Please enter a valid TblApplicant UserId.";
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 result.Message = "Server error! " + ex.Message;
             }
@@ -440,7 +438,7 @@ namespace QuickCampusAPI.Controllers
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-                    LoggedInUserClientId = (user.ClientId == null ? "0": user.ClientId.ToString());
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
                 }
                 var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
 
@@ -497,13 +495,13 @@ namespace QuickCampusAPI.Controllers
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                 {
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-                    LoggedInUserClientId = (user.ClientId == null ? "0": user.ClientId.ToString());
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
                 }
                 var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
 
                 if (applicantId > 0)
                 {
-                    TblApplicant  applicant = new TblApplicant ();
+                    TblApplicant applicant = new TblApplicant();
                     if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                     {
                         applicant = _applicantRepo.GetAllQuerable().Where(x => x.ApplicantId == applicantId && x.IsDeleted == false).FirstOrDefault();

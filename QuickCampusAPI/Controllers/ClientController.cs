@@ -69,6 +69,7 @@ namespace QuickCampusAPI.Controllers
                             ClientVM clientVM = new ClientVM
                             {
                                 Name = vm.Name?.Trim(),
+                                CompanyName = vm.CompanyName?.Trim(),
                                 Email = vm.Email?.Trim(),
                                 Phone = vm.Phone?.Trim(),
                                 Address = vm.Address?.Trim(),
@@ -102,7 +103,7 @@ namespace QuickCampusAPI.Controllers
                                 var roleAdd = await _userAppRoleRepo.Add(userAppRole);
                                 if (roleAdd.Id > 0)
                                 {
-                                    var ClientRoleCheck = _roleRepo.GetAllQuerable().Where(x => x.Name == "Client Admin").FirstOrDefault();
+                                    var ClientRoleCheck = _roleRepo.GetAllQuerable().Where(x => x.Name == "Client").FirstOrDefault();
                                     if (ClientRoleCheck != null)
                                     {
                                         TblUserRole userRole = new TblUserRole
@@ -117,6 +118,7 @@ namespace QuickCampusAPI.Controllers
                                             {
                                                 Id = clientData.Id,
                                                 Name = clientData.Name,
+                                                CompanyName = clientData.CompanyName,
                                                 Email = clientData.Email,
                                                 Phone = clientData.Phone,
                                                 SubscriptionPlan = clientData.SubscriptionPlan,
@@ -176,11 +178,11 @@ namespace QuickCampusAPI.Controllers
                     {
                         if (_clientRepo.Any(x => x.Email == vm.Email.Trim() && x.IsDeleted != true && x.Id != vm.Id))
                         {
-                            result.Message = "Email Already Registered!";
+                            result.Message = "Email already exists!";
                         }
                         else if(_clientRepo.Any(y=>y.Phone==vm.Phone.Trim() && y.IsDeleted!=true && y.Id != vm.Id))
                         {
-                            result.Message = "Phone Number Already";
+                            result.Message = "Phone Number already exists";
                         }
                         else
                         {
@@ -190,7 +192,8 @@ namespace QuickCampusAPI.Controllers
                                 result.Message = "Client does Not Exist";
                                 return Ok(result);
                             }
-                            res.Name = vm.Name;
+                            res.Name = vm.Name?.Trim();
+                            res.CompanyName = vm.CompanyName?.Trim();
                             res.Email = vm.Email?.Trim();
                             res.Phone = vm.Phone?.Trim();
                             res.Address = vm.Address?.Trim();
@@ -244,14 +247,12 @@ namespace QuickCampusAPI.Controllers
 
                         ClientList = await _clientRepo.GetAll(x => x.IsDeleted == false && (Datatype == DataTypeFilter.All ? true : (Datatype == DataTypeFilter.OnlyInActive ? x.IsActive == false : x.IsActive == true)));
 
-                        //var roleData = _roleRepo.GetAll(x => x.IsActive == true && x.IsDeleted == false).Result.FirstOrDefault();
-                        //var userAppRole = _userAppRoleRepo.GetAll(x => x.UserId == x.UserId).Result.FirstOrDefault();
-                        //var userAppRoleId = userAppRole != null ? userAppRole.RoleId : 0;
                         List<ClientResponseViewModel> data = new List<ClientResponseViewModel>();
                         data.AddRange(ClientList.Select(x => new ClientResponseViewModel
                         {
                             Id = x.Id,
                             Name = x.Name?.Trim(),
+                            CompanyName = x.CompanyName?.Trim(),
                             Address = x.Address?.Trim(),
                             SubscriptionPlan = x.SubscriptionPlan,
                             Email = x.Email?.Trim(),

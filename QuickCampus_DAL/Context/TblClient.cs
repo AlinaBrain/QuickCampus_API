@@ -8,6 +8,7 @@ public partial class TblClient
     public int Id { get; set; }
 
     public string? Name { get; set; }
+    public string? CompanyName { get; set; }
 
     public int? CraetedBy { get; set; }
 

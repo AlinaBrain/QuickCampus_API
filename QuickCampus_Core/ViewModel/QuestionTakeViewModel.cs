@@ -23,7 +23,8 @@ namespace QuickCampus_Core.ViewModel
         [Required]
         public int? Marks { get; set; }
         public bool? IsActive { get; set; }
-        public List<QuestionsOptionVm> QuestionssoptionVm { get; set; }  
-        
+        public List<QuestionsOptionVm> QuestionssoptionVm { get; set; }
+        public int? ClientId { get; set; }
+
     }
 }

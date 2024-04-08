@@ -69,7 +69,7 @@ namespace QuickCampus_Core.ViewModel
        
         [Required(ErrorMessage = "You must provide a StatusId")]
         public int StatusId { get; set; }
-        public string Comment { get; set; } = "";
+        public string? Comment { get; set; } = "";
         //public DateTime? CreatedDate { get; set; }
         public DateTime? RegisteredDate { get; set; }
        
