@@ -13,8 +13,7 @@ namespace QuickCampus_Core.ViewModel
         public int? CollegeId { get; set; }
         [Required(ErrorMessage = "College Name is required.")]
         public string? CollegeName { get; set; }
-        [Required]
-        [FileExtensions(Extensions = "jpg,png,jpeg", ErrorMessage = "Only JPG and PNG and jpeg files are allowed.")]
+        
         public IFormFile? ImagePath { get; set; }
         [Required(ErrorMessage = "Address1 is required.")]
         public string? Address1 { get; set; }

@@ -30,7 +30,7 @@ namespace QuickCampusAPI.Controllers
 
         [HttpGet]
         [Route("GetAllQualification")]
-        public async Task<ActionResult> GetAllQualifications()
+        public async Task<ActionResult> GetAllQualifications()                                                                                     
         {
             IGeneralResult<dynamic> result = new GeneralResult<dynamic>();
             try

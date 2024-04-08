@@ -14,7 +14,7 @@ namespace QuickCampus_Core.ViewModel
         public int? QuestionId { get; set; }
         public string? OptionText { get; set; }
         public bool? IsCorrect { get; set; }
-        [FileExtensions(Extensions = "jpg,png,jpeg", ErrorMessage = "Only JPG and PNG and jpeg files are allowed.")]
+        
         public IFormFile? Image { get; set; }
         public string? ImagePath { get; set; }
         public int SortOrder { get; set; }

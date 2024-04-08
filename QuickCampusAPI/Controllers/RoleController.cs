@@ -135,6 +135,7 @@ namespace QuickCampusAPI.Controllers
                         CreatedDate = DateTime.Now,
                         IsActive = true,
                         IsDeleted = false,
+                        ClientId = (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId)
                     };
 
                     roleVm.ClientId = LoggedInUserClientId == "0" ? null : Convert.ToInt32(LoggedInUserClientId);

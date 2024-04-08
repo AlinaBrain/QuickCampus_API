@@ -106,14 +106,5 @@ namespace QuickCampus_Core.Services
             }
         }
 
-        Task IGenericRepository<T>.AddApplicantAsync(ApplicantViewModel model)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ApplicantViewModel.ApplicantGridViewModel UpdateApplicant(ApplicantViewModel.ApplicantGridViewModel model)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

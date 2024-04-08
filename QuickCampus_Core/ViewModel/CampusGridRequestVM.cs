@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using QuickCampus_DAL.Context;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -27,9 +28,45 @@ namespace QuickCampus_Core.ViewModel
         public int? CountryID { get; set; }
         [Required(ErrorMessage = "Title is required.")]
         public string Title { get; set; } = String.Empty;
-
+        [Required]
         public string? PassingYear { get; set; }
+        [Required]
+        public int? ClientId { get; set; }
 
         public List<CampusWalkInModel>? Colleges { get; set; }
+
+        public TblWalkIn ToCampusAddDbModel()
+        {
+            return new TblWalkIn
+            {
+                WalkInDate = WalkInDate,
+                JobDescription = JobDescription,
+                Address1=Address1,
+                Address2=Address2,
+                City=City,
+                ClientId=ClientId,  
+                CountryId=CountryID,
+                StateId=StateID,
+                Title=Title, 
+                PassingYear=PassingYear,
+            };
+        }
+        public TblWalkIn ToCampusUpdateDbModel()
+        {
+            return new TblWalkIn
+            {
+                WalkInId = WalkInID,
+                WalkInDate = WalkInDate,
+                JobDescription = JobDescription,
+                Address1 = Address1,
+                Address2 = Address2,
+                City = City,
+                ClientId = ClientId,
+                CountryId = CountryID,
+                StateId = StateID,
+                Title = Title,
+                PassingYear = PassingYear,
+            };
+        }
     }
 }

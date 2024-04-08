@@ -416,6 +416,41 @@ namespace QuickCampusAPI.Controllers
                                 questionOption.Imagepath = (string.IsNullOrEmpty(questionOption.Imagepath) ? "" : Path.Combine(_baseUrl, questionOption.Imagepath));
                             }
                         }
+                            TblQuestionOption questionOption = new TblQuestionOption
+                            {
+                                QuestionId = vm.QuestionId,
+                                OptionText = option.OptionText,
+                                IsCorrect = option.IsCorrect,
+                            };
+                            
+                            if (option.Image != null)
+                            {
+                                if (option.Image != null)
+                                {
+                                    var CheckImg = _uploadFile.CheckImage(option.Image);
+                                    if (!CheckImg.IsSuccess)
+                                    {
+                                        result.Message = CheckImg.Message;
+                                        return Ok(result);
+                                    }
+                                }
+                                var uploadImage = _uploadFile.GetUploadFile(option.Image);
+                                if (!uploadImage.IsSuccess)
+                                {
+                                    result.Message = uploadImage.Message;
+                                    return Ok(result);
+                                }
+                                questionOption.Imagepath = uploadImage.Data;
+                            }
+                            var addQueOpt = await _questionOptionRepo.Add(questionOption);
+                            if (addQueOpt.OptionId == 0)
+                            {
+                                result.Message = "something went wrong.";
+                                return Ok(result);
+                            }
+                            option.OptionId = addQueOpt.OptionId;
+                            questionOption.Imagepath = (string.IsNullOrEmpty(questionOption.Imagepath) ? "" : Path.Combine(_baseUrl, questionOption.Imagepath));
+                        }
                         result.IsSuccess = true;
                         result.Message = "Question added successfully.";
                         result.Data = vm;
@@ -487,19 +522,14 @@ namespace QuickCampusAPI.Controllers
                             result.Message = "Question does Not Exist";
                             return Ok(result);
                         }
-
                         questionData.Text = vm.Text;
                         questionData.QuestionTypeId = vm.QuestionTypeId;
                         questionData.GroupId = vm.GroupId;
                         questionData.SectionId = vm.SectionId;
                         questionData.Marks = vm.Marks;
-
                         questionData.IsActive = true;
                         questionData.IsDeleted = false;
-
                         var question = await _questionrepo.Update(questionData);
-
-
                         var questionOptions = _questionOptionRepo.GetAllQuerable().Where(x => x.QuestionId == vm.QuestionId).ToList();
                         if (questionOptions.Count > 0)
                         {
@@ -510,6 +540,37 @@ namespace QuickCampusAPI.Controllers
                         }
                         foreach (var option in vm.QuestionssoptionVm)
                         {
+                            TblQuestionOption questionOption = new TblQuestionOption
+                            {
+                                QuestionId = vm.QuestionId,
+                                OptionText = option.OptionText,
+                                IsCorrect = option.IsCorrect,
+                            };
+                            if (option.Image != null)
+                            {
+                              var CheckImg=  _uploadFile.CheckImage(option.Image);
+                                if (!CheckImg.IsSuccess)
+                                {
+                                    result.Message = CheckImg.Message;
+                                    return Ok(result);
+                                }
+                               var uploadImage = _uploadFile.GetUploadFile(option.Image);
+                                if (!uploadImage.IsSuccess)
+                                {
+                                    result.Message = uploadImage.Message;
+                                    return Ok(result);
+                                }
+                                questionOption.Imagepath = uploadImage.Data;
+                            }
+                            var addQueOpt = await _questionOptionRepo.Add(questionOption);
+                            if (addQueOpt.OptionId == 0)
+                            {
+                                result.Message = "something went wrong.";
+                                return Ok(result);
+                            }
+                            option.OptionId = addQueOpt.OptionId;
+                            questionOption.Imagepath = (string.IsNullOrEmpty(questionOption.Imagepath) ? "" : Path.Combine(_baseUrl, questionOption.Imagepath));
+                        }
                             if (!string.IsNullOrEmpty(option.OptionText) || option.Image != null)
                             {
                                 TblQuestionOption questionOption = new TblQuestionOption
@@ -683,5 +744,7 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
+
+
     }
 }
