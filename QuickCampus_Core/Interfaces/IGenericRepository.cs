@@ -18,8 +18,7 @@ namespace QuickCampus_Core.Interfaces
         Task Delete(T entity);
         Task<T> Update(T entity);
         Task Save();
-        Task AddApplicantAsync(ApplicantViewModel model);
-        ApplicantViewModel.ApplicantGridViewModel UpdateApplicant(ApplicantViewModel.ApplicantGridViewModel model);
+       
     }
 
 }

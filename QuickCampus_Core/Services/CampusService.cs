@@ -77,13 +77,10 @@ namespace QuickCampus_Core.Services
                         campus.PassingYear = vm.PassingYear;
                         var walkindata = _context.Update(campus);
                         vm.WalkInID = walkindata.Entity.WalkInId;
-                        
-
                         if (campus.TblWalkInColleges != null)
                         {
                             _context.TblWalkInColleges.RemoveRange(campus.TblWalkInColleges);
                         }
-
                         foreach (var rec in vm.Colleges)
                         {
                             if (rec.IsIncludeInWalkIn)
@@ -95,7 +92,6 @@ namespace QuickCampus_Core.Services
                                     ExamStartTime = TimeSpan.Parse(rec.ExamStartTime),
                                     ExamEndTime = TimeSpan.Parse(rec.ExamEndTime),
                                     StartDateTime = rec.StartDateTime,
-
                                 };
                                 var updatecampus = _context.TblWalkInColleges.Add(campusWalkInCollege);
                                 rec.CampusId = updatecampus.Entity.CampusId;

@@ -122,6 +122,7 @@ namespace QuickCampusAPI.Controllers
                         Mobile = vm.Mobile?.Trim(),
                         Password = vm.Password.Trim(),
                         CreateDate = DateTime.Now,
+                        ClientId = (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId)
                     };
                     if (LoggedInUserRole != null && LoggedInUserRole.RoleId != (int)AppRole.Admin)
                     {

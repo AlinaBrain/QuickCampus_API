@@ -378,18 +378,18 @@ namespace QuickCampusAPI.Controllers
                                 OptionText = option.OptionText,
                                 IsCorrect = option.IsCorrect,
                             };
+                            
                             if (option.Image != null)
                             {
-                                string[] ImageExList = { "jpeg", "jpg", "png" };
-                                string ImageEx = option.Image.FileName.Split(".")[1];
-                                if (!ImageExList.Any(x => x == ImageEx))
+                                if (option.Image != null)
                                 {
-                                    result.Message = "Image should be in jpeg, png or jpg format.";
-                                    return Ok(result);
+                                    var CheckImg = _uploadFile.CheckImage(option.Image);
+                                    if (!CheckImg.IsSuccess)
+                                    {
+                                        result.Message = CheckImg.Message;
+                                        return Ok(result);
+                                    }
                                 }
-                            }
-                            if (option.Image != null)
-                            {
                                 var uploadImage = _uploadFile.GetUploadFile(option.Image);
                                 if (!uploadImage.IsSuccess)
                                 {
@@ -472,19 +472,14 @@ namespace QuickCampusAPI.Controllers
                             result.Message = "TblQuestion does Not Exist";
                             return Ok(result);
                         }
-
                         questionData.Text = vm.Text;
                         questionData.QuestionTypeId = vm.QuestionTypeId;
                         questionData.GroupId = vm.GroupId;
                         questionData.SectionId = vm.SectionId;
                         questionData.Marks = vm.Marks;
-
                         questionData.IsActive = true;
                         questionData.IsDeleted = false;
-
                         var question = await _questionrepo.Update(questionData);
-
-
                         var questionOptions = _questionOptionRepo.GetAllQuerable().Where(x => x.QuestionId == vm.QuestionId).ToList();
                         if (questionOptions.Count > 0)
                         {
@@ -503,7 +498,13 @@ namespace QuickCampusAPI.Controllers
                             };
                             if (option.Image != null)
                             {
-                                var uploadImage = _uploadFile.GetUploadFile(option.Image);
+                              var CheckImg=  _uploadFile.CheckImage(option.Image);
+                                if (!CheckImg.IsSuccess)
+                                {
+                                    result.Message = CheckImg.Message;
+                                    return Ok(result);
+                                }
+                               var uploadImage = _uploadFile.GetUploadFile(option.Image);
                                 if (!uploadImage.IsSuccess)
                                 {
                                     result.Message = uploadImage.Message;
@@ -530,8 +531,6 @@ namespace QuickCampusAPI.Controllers
                 {
                     result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
                 }
-
-
             }
             catch (Exception ex)
             {
@@ -656,5 +655,7 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
+
+
     }
 }

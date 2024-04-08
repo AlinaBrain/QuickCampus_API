@@ -223,11 +223,10 @@ namespace QuickCampusAPI.Controllers
                 }
                 if (vm.ImagePath != null)
                 {
-                    string[] ImageExList = { "jpeg", "jpg", "png" };
-                    string ImageEx = vm.ImagePath.FileName.Split(".")[1];
-                    if (!ImageExList.Any(x => x == ImageEx))
+                    var ChecKImg = _uploadFile.CheckImage(vm.ImagePath);
+                    if(!ChecKImg.IsSuccess)
                     {
-                        result.Message = "Image should be in jpeg, png or jpg format.";
+                        result.Message = ChecKImg.Message;
                         return Ok(result);
                     }
                 }
@@ -369,6 +368,15 @@ namespace QuickCampusAPI.Controllers
                             college.ContectEmail = vm.ContactEmail?.Trim();
                             college.ContectPhone = vm.ContactPhone?.Trim();
                             college.ModifiedDate = DateTime.Now;
+                            if (vm.ImagePath != null)
+                            {
+                                var CheckImg = _uploadFile.CheckImage(vm.ImagePath);
+                                if (!CheckImg.IsSuccess)
+                                {
+                                    result.Message = CheckImg.Message;
+                                    return Ok(result);
+                                }
+                            }
                             var UploadLogo = _uploadFile.GetUploadFile(vm.ImagePath);
                             if (UploadLogo.IsSuccess)
                             {
@@ -384,7 +392,6 @@ namespace QuickCampusAPI.Controllers
                                 return Ok(result);
                             }
                         }
-
                     }
                     else
                     {
@@ -442,7 +449,6 @@ namespace QuickCampusAPI.Controllers
                         college.IsDeleted = true;
                         college.ModifiedDate = DateTime.Now;
                         await _collegeRepo.Update(college);
-
                         result.IsSuccess = true;
                         result.Message = "TblCollege deleted successfully.";
                         result.Data = (CollegeVM)college;
@@ -498,7 +504,6 @@ namespace QuickCampusAPI.Controllers
                         college.IsActive = !college.IsActive;
                         college.ModifiedDate = DateTime.Now;
                         await _collegeRepo.Update(college);
-
                         result.IsSuccess = true;
                         result.Message = "TblApplicant Updated successfully.";
                         result.Data = (CollegeVM)college;
