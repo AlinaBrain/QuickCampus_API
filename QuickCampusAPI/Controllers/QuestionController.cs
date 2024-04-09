@@ -388,11 +388,10 @@ namespace QuickCampusAPI.Controllers
                                 };
                                 if (option.Image != null)
                                 {
-                                    string[] ImageExList = { "jpeg", "jpg", "png" };
-                                    string ImageEx = option.Image.FileName.Split(".")[1];
-                                    if (!ImageExList.Any(x => x == ImageEx))
+                                    var CheckImg = _uploadFile.CheckImage(option.Image);
+                                    if (!CheckImg.IsSuccess)
                                     {
-                                        result.Message = "Image should be in jpeg, png or jpg format.";
+                                        result.Message = CheckImg.Message;
                                         return Ok(result);
                                     }
                                 }
@@ -415,41 +414,6 @@ namespace QuickCampusAPI.Controllers
                                 option.OptionId = addQueOpt.OptionId;
                                 questionOption.Imagepath = (string.IsNullOrEmpty(questionOption.Imagepath) ? "" : Path.Combine(_baseUrl, questionOption.Imagepath));
                             }
-                        }
-                            TblQuestionOption questionOption = new TblQuestionOption
-                            {
-                                QuestionId = vm.QuestionId,
-                                OptionText = option.OptionText,
-                                IsCorrect = option.IsCorrect,
-                            };
-                            
-                            if (option.Image != null)
-                            {
-                                if (option.Image != null)
-                                {
-                                    var CheckImg = _uploadFile.CheckImage(option.Image);
-                                    if (!CheckImg.IsSuccess)
-                                    {
-                                        result.Message = CheckImg.Message;
-                                        return Ok(result);
-                                    }
-                                }
-                                var uploadImage = _uploadFile.GetUploadFile(option.Image);
-                                if (!uploadImage.IsSuccess)
-                                {
-                                    result.Message = uploadImage.Message;
-                                    return Ok(result);
-                                }
-                                questionOption.Imagepath = uploadImage.Data;
-                            }
-                            var addQueOpt = await _questionOptionRepo.Add(questionOption);
-                            if (addQueOpt.OptionId == 0)
-                            {
-                                result.Message = "something went wrong.";
-                                return Ok(result);
-                            }
-                            option.OptionId = addQueOpt.OptionId;
-                            questionOption.Imagepath = (string.IsNullOrEmpty(questionOption.Imagepath) ? "" : Path.Combine(_baseUrl, questionOption.Imagepath));
                         }
                         result.IsSuccess = true;
                         result.Message = "Question added successfully.";
@@ -514,8 +478,6 @@ namespace QuickCampusAPI.Controllers
                     }
                     if (vm.QuestionId > 0)
                     {
-
-
                         var questionData = (await _questionrepo.GetAll(x => x.QuestionId == vm.QuestionId)).FirstOrDefault();
                         if (questionData == null)
                         {
@@ -540,37 +502,7 @@ namespace QuickCampusAPI.Controllers
                         }
                         foreach (var option in vm.QuestionssoptionVm)
                         {
-                            TblQuestionOption questionOption = new TblQuestionOption
-                            {
-                                QuestionId = vm.QuestionId,
-                                OptionText = option.OptionText,
-                                IsCorrect = option.IsCorrect,
-                            };
-                            if (option.Image != null)
-                            {
-                              var CheckImg=  _uploadFile.CheckImage(option.Image);
-                                if (!CheckImg.IsSuccess)
-                                {
-                                    result.Message = CheckImg.Message;
-                                    return Ok(result);
-                                }
-                               var uploadImage = _uploadFile.GetUploadFile(option.Image);
-                                if (!uploadImage.IsSuccess)
-                                {
-                                    result.Message = uploadImage.Message;
-                                    return Ok(result);
-                                }
-                                questionOption.Imagepath = uploadImage.Data;
-                            }
-                            var addQueOpt = await _questionOptionRepo.Add(questionOption);
-                            if (addQueOpt.OptionId == 0)
-                            {
-                                result.Message = "something went wrong.";
-                                return Ok(result);
-                            }
-                            option.OptionId = addQueOpt.OptionId;
-                            questionOption.Imagepath = (string.IsNullOrEmpty(questionOption.Imagepath) ? "" : Path.Combine(_baseUrl, questionOption.Imagepath));
-                        }
+                            
                             if (!string.IsNullOrEmpty(option.OptionText) || option.Image != null)
                             {
                                 TblQuestionOption questionOption = new TblQuestionOption
@@ -581,11 +513,10 @@ namespace QuickCampusAPI.Controllers
                                 };
                                 if (option.Image != null)
                                 {
-                                    string[] ImageExList = { "jpeg", "jpg", "png" };
-                                    string ImageEx = option.Image.FileName.Split(".")[1];
-                                    if (!ImageExList.Any(x => x == ImageEx))
+                                    var CheckImg = _uploadFile.CheckImage(option.Image);
+                                    if (!CheckImg.IsSuccess)
                                     {
-                                        result.Message = "Image should be in jpeg, png or jpg format.";
+                                        result.Message = CheckImg.Message;
                                         return Ok(result);
                                     }
                                 }

@@ -32,6 +32,7 @@ builder.Services.AddCors(options =>
         );
 });
 //Add services to the container.
+
 builder.Services.AddDbContext<BtprojecQuickcampustestContext>(
     x => x.UseSqlServer(
         builder.Configuration.GetConnectionString("ConnectionString"))
