@@ -11,6 +11,8 @@ using QuickCampus_Core.Services;
 using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
 using QuickCampusAPI.Utility;
+using System.Net.Mail;
+using System.Net;
 using System.Reflection;
 using System.Text;
 using static QuickCampus_Core.ViewModel.ApplicantViewModel;
@@ -37,6 +39,7 @@ builder.Services.AddDbContext<BtprojecQuickcampustestContext>(
         builder.Configuration.GetConnectionString("ConnectionString"))
     );
 builder.Services.AddControllers();
+
 builder.Services.AddScoped<IValidator<AdminLogin>, AdminLoginValidator>();
 builder.Services.AddScoped<IValidator<UserVm>, UserValidator>();
 //builder.Services.AddScoped<IValidator<ClientUpdateRequest>, ClientValidatorRequest>();

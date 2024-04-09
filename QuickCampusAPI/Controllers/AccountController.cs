@@ -57,5 +57,15 @@ namespace QuickCampusAPI.Controllers
         //    }
         //    return null;
         //}
+
+        //public async Task<IActionResult> forgetpassword(ForgetPasswordVm vm)
+        //{
+        //    var user = _account.GetEmail(vm.EmailId);
+        //    if (user != null)
+        //    {
+        //        return Ok();
+        //    }
+        //    return Ok();
+        //}
     }
 }

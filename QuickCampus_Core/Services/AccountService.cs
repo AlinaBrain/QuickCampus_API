@@ -178,5 +178,11 @@ namespace QuickCampus_Core.Services
                 throw new Exception("Error in base64Encode" + ex.Message);
             }
         }
+
+        public async Task<TblUser> GetEmail(string emailId)
+        {
+            var result = _context.TblUsers.Where(s => s.Email == emailId && s.IsActive == true && s.IsDelete == false).FirstOrDefault();
+            return result;
+        }
     }
 }
