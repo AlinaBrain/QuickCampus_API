@@ -15,6 +15,7 @@ namespace QuickCampus_Core.ViewModel
             {
                 Id = item.Id,
                 Name = item.Name,
+                CompanyName = item.CompanyName,
                 IsActive = item.IsActive,
                 Address = item.Address,
                 Email = item.Email,
@@ -27,6 +28,8 @@ namespace QuickCampus_Core.ViewModel
         public int Id { get; set; }
 
         public string? Name { get; set; }
+
+        public string? CompanyName { get; set; }
 
         public bool? IsActive { get; set; }
 

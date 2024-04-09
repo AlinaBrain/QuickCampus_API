@@ -16,7 +16,7 @@ namespace QuickCampus_Core.ViewModel
         public bool? IsCorrect { get; set; }
         
         public IFormFile? Image { get; set; }
-        public string? Imagepath { get; set; }
+        public string? ImagePath { get; set; }
         public int SortOrder { get; set; }
     }
 }

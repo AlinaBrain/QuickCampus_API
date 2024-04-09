@@ -57,7 +57,7 @@ namespace QuickCampusAPI.Controllers
 
         [HttpGet]
         [Route("GetAllCollege")]
-        public async Task<IActionResult> GetAllCollege(string? search,int? ClientId, DataTypeFilter DataType = DataTypeFilter.All, int pageStart = 1, int pageSize = 10)
+        public async Task<IActionResult> GetAllCollege(string? search, int? ClientId, DataTypeFilter DataType = DataTypeFilter.All, int pageStart = 1, int pageSize = 10)
         {
             IGeneralResult<List<CollegeCountryStateVmmm>> result = new GeneralResult<List<CollegeCountryStateVmmm>>();
             try
@@ -177,50 +177,58 @@ namespace QuickCampusAPI.Controllers
             IGeneralResult<CollegeVM> result = new GeneralResult<CollegeVM>();
             try
             {
-                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
-                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
+                if (ModelState.IsValid)
                 {
-                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
-                }
-                bool isCityExits = _cityRepo.Any(x => x.CityId == vm.CityId && x.IsActive == true && x.IsDeleted == false && x.StateId==vm.StateId);
-                if (!isCityExits)
-                {
-                    result.Message = " City does not exists";
-                    return Ok(result);
-                }
-                bool isStateExits = _stateRepo.Any(x => x.StateId == vm.StateId && x.IsActive == true && x.IsDeleted == false && x.CountryId==vm.CountryId);
-                if (!isStateExits)
-                {
-                    result.Message = " State does not exists";
-                    return Ok(result);
-                }
-                bool isCountryExits = _countryRepo.Any(x => x.CountryId == vm.CountryId && x.IsActive == true && x.IsDeleted == false);
-                if (!isCountryExits)
-                {
-                    result.Message = " Country does not exists";
-                    return Ok(result);
-                }
-                bool isNameExits = _collegeRepo.Any(x => x.CollegeName == vm.CollegeName && x.IsDeleted == false);
-                if (isNameExits)
-                {
-                    result.Message = " TblCollege Name is already exists";
-                    return Ok(result);
-                }
-                bool isCodeExist = _collegeRepo.Any(x => x.CollegeCode == vm.CollegeCode && x.IsDeleted == false);
-                if (isCodeExist)
-                {
-                    result.Message = "TblCollege Code is already exist";
-                    return Ok(result);
-                }
-                bool isContactEmailExist = _collegeRepo.Any(x => x.ContectEmail == vm.ContactEmail && x.IsDeleted == false);
-                if (isContactEmailExist)
-                {
-                    result.Message = "Contact Email is Already Exist";
-                    return Ok(result);
-                }
+                    var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                    var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                    var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                    if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
+                    {
+                        var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                        LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
+                    }
+                    bool isCityExits = _cityRepo.Any(x => x.CityId == vm.CityId && x.IsActive == true && x.IsDeleted == false && x.StateId == vm.StateId);
+                    if (!isCityExits)
+                    {
+                        result.Message = " City does not exists";
+                        return Ok(result);
+                    }
+                    bool isStateExits = _stateRepo.Any(x => x.StateId == vm.StateId && x.IsActive == true && x.IsDeleted == false && x.CountryId == vm.CountryId);
+                    if (!isStateExits)
+                    {
+                        result.Message = " State does not exists";
+                        return Ok(result);
+                    }
+                    bool isCountryExits = _countryRepo.Any(x => x.CountryId == vm.CountryId && x.IsActive == true && x.IsDeleted == false);
+                    if (!isCountryExits)
+                    {
+                        result.Message = " Country does not exists";
+                        return Ok(result);
+                    }
+                    bool isNameExits = _collegeRepo.Any(x => x.CollegeName == vm.CollegeName && x.IsDeleted == false && (LoggedInUserRole.RoleId == (int)AppRole.Admin ? x.ClientId == vm.ClientId : x.ClientId == Convert.ToInt32(LoggedInUserClientId)));
+                    if (isNameExits)
+                    {
+                        result.Message = "College Name is already exists";
+                        return Ok(result);
+                    }
+                    bool isCodeExist = _collegeRepo.Any(x => x.CollegeCode == vm.CollegeCode && x.IsDeleted == false && (LoggedInUserRole.RoleId == (int)AppRole.Admin ? x.ClientId == vm.ClientId : x.ClientId == Convert.ToInt32(LoggedInUserClientId)));
+                    if (isCodeExist)
+                    {
+                        result.Message = "College Code is already exist";
+                        return Ok(result);
+                    }
+                    bool isContactEmailExist = _collegeRepo.Any(x => x.ContectEmail == vm.ContactEmail && x.IsDeleted == false && (LoggedInUserRole.RoleId == (int)AppRole.Admin ? x.ClientId == vm.ClientId : x.ClientId == Convert.ToInt32(LoggedInUserClientId)));
+                    if (isContactEmailExist)
+                    {
+                        result.Message = "Contact Email is Already Exist";
+                        return Ok(result);
+                    }
+                    bool isContactPhoneExist = _collegeRepo.Any(x => x.ContectPhone == vm.ContactPhone && x.IsDeleted == false && (LoggedInUserRole.RoleId == (int)AppRole.Admin ? x.ClientId == vm.ClientId : x.ClientId == Convert.ToInt32(LoggedInUserClientId)));
+                    if (isContactPhoneExist)
+                    {
+                        result.Message = "Contact Phone is Already Exist";
+                        return Ok(result);
+                    }
                 if (vm.ImagePath != null)
                 {
                     var ChecKImg = _uploadFile.CheckImage(vm.ImagePath);
@@ -230,8 +238,7 @@ namespace QuickCampusAPI.Controllers
                         return Ok(result);
                     }
                 }
-                if (ModelState.IsValid)
-                {
+                
                     CollegeVM college = new CollegeVM
                     {
                         CollegeName = vm.CollegeName?.Trim(),
@@ -242,10 +249,10 @@ namespace QuickCampusAPI.Controllers
                         StateId = vm.StateId,
                         CountryId = vm.CountryId,
                         CollegeCode = vm.CollegeCode,
-                        ContectPerson = vm.ContactPerson?.Trim(),
+                        ContectPerson = vm.ContactPersonName?.Trim(),
                         ContectEmail = vm.ContactEmail?.Trim(),
                         ContectPhone = vm.ContactPhone?.Trim(),
-                        ClientId = Convert.ToInt32(LoggedInUserClientId)
+                        ClientId = (LoggedInUserRole.RoleId == (int)AppRole.Admin ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId))
                     };
                     var UploadLogo = _uploadFile.GetUploadFile(vm.ImagePath);
                     if (UploadLogo.IsSuccess)
@@ -255,9 +262,9 @@ namespace QuickCampusAPI.Controllers
                         if (addCollege.CollegeId > 0)
                         {
                             result.IsSuccess = true;
-                            result.Message = "TblCollege added successfully";
+                            result.Message = "College added successfully";
                             result.Data = (CollegeVM)addCollege;
-                            result.Data.Logo = Path.Combine(baseUrl, result.Data.Logo);
+                            result.Data.Logo = Path.Combine(baseUrl, result.Data.Logo ?? "");
                         }
                         else
                         {
@@ -289,54 +296,61 @@ namespace QuickCampusAPI.Controllers
             IGeneralResult<AddCollegeVm> result = new GeneralResult<AddCollegeVm>();
             try
             {
-                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
-                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
+                if (ModelState.IsValid)
                 {
-                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
-                }
-                if (vm.CollegeId > 0)
-                {
-                    bool isCityExits = _cityRepo.Any(x => x.CityId == vm.CityId && x.IsActive == true && x.IsDeleted == false && x.StateId==vm.StateId);
-                    if (!isCityExits)
+                    var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                    var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                    var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                    if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
                     {
-                        result.Message = " City does not exists";
-                        return Ok(result);
+                        var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                        LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
                     }
-                    bool isStateExits = _stateRepo.Any(x => x.StateId == vm.StateId && x.IsActive == true && x.IsDeleted == false && x.CountryId==vm.CountryId);
-                    if (!isStateExits)
+                    if (vm.CollegeId > 0)
                     {
-                        result.Message = " State does not exists";
-                        return Ok(result);
-                    }
-                    bool isCountryExits = _countryRepo.Any(x => x.CountryId == vm.CountryId && x.IsActive == true && x.IsDeleted == false);
-                    if (!isCountryExits)
-                    {
-                        result.Message = " Country does not exists";
-                        return Ok(result);
-                    }
-                    bool isCollegeNameExists = _collegeRepo.Any(x => x.CollegeName == vm.CollegeName && x.IsDeleted == false && x.CollegeId != vm.CollegeId);
-                    if (isCollegeNameExists)
-                    {
-                        result.Message = " CollegeName is already exists";
-                        return Ok(result);
-                    }
-                    bool isCollegeCodeExist = _collegeRepo.Any(x => x.CollegeCode == vm.CollegeCode && x.IsDeleted == false && x.CollegeId != vm.CollegeId);
-                    if (isCollegeCodeExist)
-                    {
-                        result.Message = "TblCollege Code is already exist";
-                        return Ok(result);
-                    }
-                    bool isContactEmailExists = _collegeRepo.Any(x => x.ContectEmail == vm.ContactEmail && x.IsDeleted == false && x.CollegeId != vm.CollegeId);
-                    if (isContactEmailExists)
-                    {
-                        result.Message = "Contact Email is Already Exist";
-                        return Ok(result);
-                    }
-                    if (ModelState.IsValid)
-                    {
+                        bool isCityExits = _cityRepo.Any(x => x.CityId == vm.CityId && x.IsActive == true && x.IsDeleted == false && x.StateId == vm.StateId);
+                        if (!isCityExits)
+                        {
+                            result.Message = " City does not exists";
+                            return Ok(result);
+                        }
+                        bool isStateExits = _stateRepo.Any(x => x.StateId == vm.StateId && x.IsActive == true && x.IsDeleted == false && x.CountryId == vm.CountryId);
+                        if (!isStateExits)
+                        {
+                            result.Message = " State does not exists";
+                            return Ok(result);
+                        }
+                        bool isCountryExits = _countryRepo.Any(x => x.CountryId == vm.CountryId && x.IsActive == true && x.IsDeleted == false);
+                        if (!isCountryExits)
+                        {
+                            result.Message = " Country does not exists";
+                            return Ok(result);
+                        }
+                        bool isCollegeNameExists = _collegeRepo.Any(x => x.CollegeName == vm.CollegeName && x.IsDeleted == false && x.CollegeId != vm.CollegeId && (LoggedInUserRole.RoleId == (int)AppRole.Admin ? x.ClientId == vm.ClientId : x.ClientId == Convert.ToInt32(LoggedInUserClientId)));
+                        if (isCollegeNameExists)
+                        {
+                            result.Message = " College Name is already exists";
+                            return Ok(result);
+                        }
+                        bool isCollegeCodeExist = _collegeRepo.Any(x => x.CollegeCode == vm.CollegeCode && x.IsDeleted == false && x.CollegeId != vm.CollegeId && (LoggedInUserRole.RoleId == (int)AppRole.Admin ? x.ClientId == vm.ClientId : x.ClientId == Convert.ToInt32(LoggedInUserClientId)));
+                        if (isCollegeCodeExist)
+                        {
+                            result.Message = "College Code is already exist";
+                            return Ok(result);
+                        }
+                        bool isContactEmailExists = _collegeRepo.Any(x => x.ContectEmail == vm.ContactEmail && x.IsDeleted == false && x.CollegeId != vm.CollegeId && (LoggedInUserRole.RoleId == (int)AppRole.Admin ? x.ClientId == vm.ClientId : x.ClientId == Convert.ToInt32(LoggedInUserClientId)));
+                        if (isContactEmailExists)
+                        {
+                            result.Message = "Contact Email is Already Exist";
+                            return Ok(result);
+                        }
+                        bool isContactPhoneExists = _collegeRepo.Any(x => x.ContectPhone == vm.ContactPhone && x.IsDeleted == false && x.CollegeId != vm.CollegeId && (LoggedInUserRole.RoleId == (int)AppRole.Admin ? x.ClientId == vm.ClientId : x.ClientId == Convert.ToInt32(LoggedInUserClientId)));
+                        if (isContactPhoneExists)
+                        {
+                            result.Message = "Contact Phone is Already Exist";
+                            return Ok(result);
+                        }
+
 
                         TblCollege college = new TblCollege();
 
@@ -350,7 +364,7 @@ namespace QuickCampusAPI.Controllers
                         }
                         if (college == null)
                         {
-                            result.Message = " TblCollege does Not Exist";
+                            result.Message = " College does Not Exist";
                             return Ok(result);
                         }
                         else
@@ -364,7 +378,7 @@ namespace QuickCampusAPI.Controllers
                             college.StateId = vm.StateId;
                             college.CountryId = vm.CountryId;
                             college.CollegeCode = vm.CollegeCode?.Trim();
-                            college.ContectPerson = vm.ContactPerson?.Trim();
+                            college.ContectPerson = vm.ContactPersonName?.Trim();
                             college.ContectEmail = vm.ContactEmail?.Trim();
                             college.ContectPhone = vm.ContactPhone?.Trim();
                             college.ModifiedDate = DateTime.Now;
@@ -383,8 +397,9 @@ namespace QuickCampusAPI.Controllers
                                 college.Logo = UploadLogo.Data;
                                 await _collegeRepo.Update(college);
                                 result.IsSuccess = true;
-                                result.Message = "TblCollege Updated successfully.";
+                                result.Message = "College Updated successfully.";
                                 result.Data = vm;
+                                return Ok(result);
                             }
                             else
                             {
@@ -395,20 +410,19 @@ namespace QuickCampusAPI.Controllers
                     }
                     else
                     {
-                        result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
-                        return Ok(result);
+                        result.Message = "Please enter a valid College UserId";
                     }
                 }
                 else
                 {
-                    result.Message = "Please enter a valid TblCollege UserId";
+                    result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
+                    return Ok(result);
                 }
             }
 
             catch (Exception ex)
             {
                 result.Message = "Server error " + ex.Message;
-                return Ok(result);
             }
             return Ok(result);
         }
@@ -448,16 +462,17 @@ namespace QuickCampusAPI.Controllers
                         college.IsActive = false;
                         college.IsDeleted = true;
                         college.ModifiedDate = DateTime.Now;
+                        college.ModifiedBy = Convert.ToInt32(LoggedInUserId);
                         await _collegeRepo.Update(college);
                         result.IsSuccess = true;
-                        result.Message = "TblCollege deleted successfully.";
+                        result.Message = "College deleted successfully.";
                         result.Data = (CollegeVM)college;
                     }
                     return Ok(result);
                 }
                 else
                 {
-                    result.Message = "Please enter a valid TblCollege UserId.";
+                    result.Message = "Please enter a valid College Id.";
                 }
             }
             catch (Exception ex)
@@ -497,22 +512,24 @@ namespace QuickCampusAPI.Controllers
                     }
                     if (college == null)
                     {
-                        result.Message = " TblCollege does Not Exist";
+                        result.Message = " College does Not Exist";
+                        return Ok(result);
                     }
                     else
                     {
                         college.IsActive = !college.IsActive;
                         college.ModifiedDate = DateTime.Now;
+                        college.ModifiedBy = Convert.ToInt32(LoggedInUserId);
                         await _collegeRepo.Update(college);
                         result.IsSuccess = true;
-                        result.Message = "TblApplicant Updated successfully.";
+                        result.Message = "College status updated successfully.";
                         result.Data = (CollegeVM)college;
                     }
                     return Ok(result);
                 }
                 else
                 {
-                    result.Message = "Please enter a valid TblCollege UserId.";
+                    result.Message = "Please enter a valid College Id.";
                 }
             }
             catch (Exception ex)
