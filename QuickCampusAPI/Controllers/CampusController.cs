@@ -72,11 +72,11 @@ namespace QuickCampusAPI.Controllers
                 List<TblWalkIn> campusData = new List<TblWalkIn>();
                 if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                 {
-                    campusData = _campusrepo.GetAllQuerable().Where(x => x.ClientId == Convert.ToInt32(LoggedInUserClientId) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
+                    campusData = _campusrepo.GetAllQuerable().Where(x => (ClientId != null && ClientId > 0 ? x.ClientId == ClientId : true) && x.IsDeleted == false && ((DataType == DataTypeFilter.All ?  true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : x.IsActive == true)))).ToList();
                 }
                 else
                 {
-                    campusData = _campusrepo.GetAllQuerable().Where(x => x.ClientId == Convert.ToInt32(LoggedInUserClientId) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
+                    campusData = _campusrepo.GetAllQuerable().Where(x => x.ClientId == Convert.ToInt32(LoggedInUserClientId) && x.IsDeleted == false && ((DataType == DataTypeFilter.All ? true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : x.IsActive == true)))).ToList();
                 }
 
                 if (!string.IsNullOrEmpty(search))
