@@ -8,6 +8,7 @@ using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.Services;
 using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
+using SendGrid.Helpers.Mail;
 using System.Linq.Expressions;
 using System.Net.Mail;
 using System.Security.Cryptography;
@@ -31,13 +32,13 @@ namespace QuickCampusAPI.Controllers
         private string _jwtSecretKey;
         private ICampusWalkinCollegeRepo _campusWalkinCollegeRepo;
 
-        public CampusController(IConfiguration configuration, ICollegeRepo collegeRepo, ICampusRepo campusrepo, ICountryRepo countryRepo, IStateRepo stateRepo, IUserAppRoleRepo userAppRoleRepo, IUserRepo userRepo, ICampusWalkinCollegeRepo campusWalkinCollegeRepo,ICityRepo cityRepo)
+        public CampusController(IConfiguration configuration, ICollegeRepo collegeRepo, ICampusRepo campusrepo, ICountryRepo countryRepo, IStateRepo stateRepo, IUserAppRoleRepo userAppRoleRepo, IUserRepo userRepo, ICampusWalkinCollegeRepo campusWalkinCollegeRepo, ICityRepo cityRepo)
         {
             _campusrepo = campusrepo;
             _country = countryRepo;
             _staterepo = stateRepo;
             _config = configuration;
-            _cityRepo=cityRepo;
+            _cityRepo = cityRepo;
             this._collegeRepo = collegeRepo;
             _userAppRoleRepo = userAppRoleRepo;
             _userRepo = userRepo;
@@ -71,7 +72,7 @@ namespace QuickCampusAPI.Controllers
                 List<TblWalkIn> campusData = new List<TblWalkIn>();
                 if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                 {
-                    campusData = _campusrepo.GetAllQuerable().Where(x =>x.ClientId == Convert.ToInt32(LoggedInUserClientId) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
+                    campusData = _campusrepo.GetAllQuerable().Where(x => x.ClientId == Convert.ToInt32(LoggedInUserClientId) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
                 }
                 else
                 {
@@ -190,17 +191,14 @@ namespace QuickCampusAPI.Controllers
                     CreatedDate = DateTime.Now,
                     Title = vm.Title,
                     PassingYear = vm.PassingYear,
-                    ClientId= (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId)
+                    ClientId = (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId)
 
-            };
-                var walkin = await _campusrepo.Add(vm.ToCampusAddDbModel());
-
-
+                };
+                var walkin = await _campusrepo.Add(sv);
                 vm.WalkInID = walkin.WalkInId;
 
                 foreach (var rec in vm.Colleges)
                 {
-
                     AddTblWalkinCollegeVm campusWalkInCollege = new AddTblWalkinCollegeVm()
                     {
                         WalkInId = sv.WalkInId,
@@ -209,7 +207,6 @@ namespace QuickCampusAPI.Controllers
                         ExamEndTime = TimeSpan.Parse(rec.ExamEndTime),
                         CampusId = rec.CampusId,
                         StartDateTime = rec.StartDateTime,
-
                     };
                     var collegeWalkin = await _campusWalkinCollegeRepo.Add(campusWalkInCollege.ToDblWalinCollege());
                     rec.CampusId = collegeWalkin.CampusId;
@@ -246,11 +243,10 @@ namespace QuickCampusAPI.Controllers
                     result.Message = "Please select a valid Client";
                     return Ok(result);
                 }
-
-                var isCountryExist = _country.GetAllQuerable().Where(w => w.IsDeleted == false).Any(a => a.CountryId == vm.CountryID );
+                var isCountryExist = _country.GetAllQuerable().Where(w => w.IsDeleted == false).Any(a => a.CountryId == vm.CountryID);
                 var allCollages = _collegeRepo.GetAllQuerable().Where(s => s.IsDeleted == false).Select(s => s.CollegeId).ToList();
-                var allStates = _staterepo.GetAllQuerable().Where(w => w.IsDeleted == false && w.StateId==vm.StateID && w.CountryId==vm.CountryID).ToList();
-                var isStateExist = allStates.Any(a => a.StateId==vm.StateID);
+                var allStates = _staterepo.GetAllQuerable().Where(w => w.IsDeleted == false && w.StateId == vm.StateID && w.CountryId == vm.CountryID).ToList();
+                var isStateExist = allStates.Any(a => a.StateId == vm.StateID);
                 var allCity = await _cityRepo.GetAllQuerable().Where(m => m.IsDeleted == false).Select(c => c.CityId).ToListAsync();
                 var isCityExist = allCity.Any(x => x == vm.City);
 
@@ -280,41 +276,57 @@ namespace QuickCampusAPI.Controllers
                     result.Message = "City is Not exist ";
                     return Ok(result);
                 }
-                var sv = new TblWalkIn()
+                if (vm.WalkInID > 0)
                 {
-                    WalkInDate = vm.WalkInDate,
-                    JobDescription = vm.JobDescription,
-                    Address1 = vm.Address1,
-                    Address2 = vm.Address2,
-                    City = vm.City,
-                    StateId = vm.StateID,
-                    CountryId = vm.CountryID,
-                    IsActive = true,
-                    IsDeleted = false,
-                    CreatedDate = DateTime.Now,
-                    Title = vm.Title,
-                    PassingYear = vm.PassingYear,
-                    ClientId= (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId)
-                };
-                var walkin = await _campusrepo.Add(vm.ToCampusUpdateDbModel());
-                vm.WalkInID = walkin.WalkInId;
-                foreach (var rec in vm.Colleges)
-                {
-                    AddTblWalkinCollegeVm campusWalkInCollege = new AddTblWalkinCollegeVm()
+                    var campus = _campusrepo.GetAllQuerable().Where(x => x.WalkInId == vm.WalkInID && x.IsDeleted == false).FirstOrDefault();
+                    if (campus != null)
                     {
-                        WalkInId = sv.WalkInId,
-                        CollegeId = rec.CollegeId,
-                        ExamStartTime = TimeSpan.Parse(rec.ExamStartTime),
-                        ExamEndTime = TimeSpan.Parse(rec.ExamEndTime),
-                        CampusId = rec.CampusId,
-                        StartDateTime = rec.StartDateTime,
-                    };
-                    var collegeWalkin =await _campusWalkinCollegeRepo.Add(campusWalkInCollege.ToUpdateWalinCollege());
-                    rec.CampusId = collegeWalkin.CampusId;
+                        campus.WalkInDate = vm.WalkInDate;
+                        campus.JobDescription = vm.JobDescription;
+                        campus.Address1 = vm.Address1;
+                        campus.Address2 = vm.Address2;
+                        campus.City = vm.City;
+                        campus.StateId = vm.StateID;
+                        campus.CountryId = vm.CountryID;
+                        campus.Title = vm.Title;
+                        campus.CreatedDate = DateTime.Now;
+                        campus.PassingYear = vm.PassingYear;
+                        await _campusrepo.Update(campus);
+                        var walkincollege = _campusWalkinCollegeRepo.GetAllQuerable().Where(x => x.WalkInId == campus.WalkInId).ToList();
+                        vm.WalkInID = campus.WalkInId;
+                        if (walkincollege != null)
+                        {
+                            foreach (var rec in walkincollege)
+                            {
+                                await _campusWalkinCollegeRepo.Delete(rec);
+                            }
+                        }
+                        foreach (var rec in vm.Colleges)
+                        {
+                            if (rec.IsIncludeInWalkIn)
+                            {
+                                TblWalkInCollege campusWalkInCollege = new TblWalkInCollege()
+                                {
+                                    WalkInId = campus.WalkInId,
+                                    CollegeId = rec.CollegeId,
+                                    ExamStartTime = TimeSpan.Parse(rec.ExamStartTime),
+                                    ExamEndTime = TimeSpan.Parse(rec.ExamEndTime),
+                                    StartDateTime = rec.StartDateTime,
+                                };
+                                var updatecampus = await _campusWalkinCollegeRepo.Update(campusWalkInCollege);
+                                rec.CampusId = updatecampus.CampusId;
+                                result.IsSuccess = true;
+                                result.Message = "Record Update Successfully";
+                                result.Data = vm;
+                            }
+                        }
+                    }
                 }
-                result.IsSuccess = true;
-                result.Message = "Record Saved Successfully";
-                result.Data = vm;
+                else
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Something went wrong.";
+                }
             }
             catch (Exception ex)
             {
@@ -322,7 +334,7 @@ namespace QuickCampusAPI.Controllers
                 result.Message = "Something went wrong";
             }
             return Ok(result);
-    }
+        }
         [HttpGet]
         [Route("getCampusByCampusId")]
         public async Task<IActionResult> getcampusbyid(int campusId)
@@ -338,7 +350,7 @@ namespace QuickCampusAPI.Controllers
                     LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
                 }
                 var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
-                var campusData =_campusrepo.GetAllQuerable().Where(x => x.IsDeleted == false && x.WalkInId == campusId).Include(x => x.TblWalkInColleges).Include(x => x.State).Include(x => x.Country).OrderByDescending(x => x.WalkInDate).Select(x => new CampusGridViewModel()
+                var campusData = _campusrepo.GetAllQuerable().Where(x => x.IsDeleted == false && x.WalkInId == campusId).Include(x => x.TblWalkInColleges).Include(x => x.State).Include(x => x.Country).OrderByDescending(x => x.WalkInDate).Select(x => new CampusGridViewModel()
                 {
                     WalkInID = x.WalkInId,
                     Address1 = x.Address1,
@@ -350,7 +362,7 @@ namespace QuickCampusAPI.Controllers
                     WalkInDate = x.WalkInDate.Value,
                     IsActive = x.IsActive ?? false,
                     Title = x.Title,
-                    ClientId=x.ClientId,
+                    ClientId = x.ClientId,
                     Colleges = x.TblWalkInColleges.Where(z => z.WalkInId == x.WalkInId).Select(y => new CampusWalkInModel()
                     {
                         CampusId = y.CampusId,
@@ -378,7 +390,7 @@ namespace QuickCampusAPI.Controllers
                         JobDescription = campusData.JobDescription,
                         Title = campusData?.Title,
                         WalkInDate = campusData.WalkInDate,
-                        ClientId=campusData.ClientId
+                        ClientId = campusData.ClientId
                     };
                     result.Data = vmm;
                     result.IsSuccess = true;
@@ -396,7 +408,7 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-       
+
         [HttpGet]
         [Route("CampusActiveInActive")]
         public async Task<IActionResult> ActiveInActive(int campusId, bool status)

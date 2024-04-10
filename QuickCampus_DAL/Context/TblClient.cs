@@ -43,6 +43,8 @@ public partial class TblClient
 
     public virtual ICollection<TblQuestion> TblQuestions { get; set; } = new List<TblQuestion>();
 
+    public virtual ICollection<TblTemplate> TblTemplates { get; set; } = new List<TblTemplate>();
+
     public virtual ICollection<TblUser> TblUsers { get; set; } = new List<TblUser>();
 
     public virtual ICollection<TblWalkIn> TblWalkIns { get; set; } = new List<TblWalkIn>();
