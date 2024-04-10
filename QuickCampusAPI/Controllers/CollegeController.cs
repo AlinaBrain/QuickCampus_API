@@ -152,7 +152,7 @@ namespace QuickCampusAPI.Controllers
                     else
                     {
                         result.IsSuccess = true;
-                        result.Message = "TblCollege fetched successfully.";
+                        result.Message = "College fetched successfully.";
                         result.Data = (CollegeCountryStateVmmm)college;
                         result.Data.Logo = Path.Combine(baseUrl, result.Data.Logo);
                     }
@@ -160,7 +160,7 @@ namespace QuickCampusAPI.Controllers
                 }
                 else
                 {
-                    result.Message = "Please enter a valid TblCollege UserId.";
+                    result.Message = "Please enter a valid College UserId.";
                 }
             }
             catch (Exception ex)
