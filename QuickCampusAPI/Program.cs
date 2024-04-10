@@ -11,6 +11,8 @@ using QuickCampus_Core.Services;
 using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
 using QuickCampusAPI.Utility;
+using System.Net.Mail;
+using System.Net;
 using System.Reflection;
 using System.Text;
 using static QuickCampus_Core.ViewModel.ApplicantViewModel;
@@ -38,6 +40,7 @@ builder.Services.AddDbContext<BtprojecQuickcampustestContext>(
         builder.Configuration.GetConnectionString("ConnectionString"))
     );
 builder.Services.AddControllers();
+
 builder.Services.AddScoped<IValidator<AdminLogin>, AdminLoginValidator>();
 builder.Services.AddScoped<IValidator<UserVm>, UserValidator>();
 //builder.Services.AddScoped<IValidator<ClientUpdateRequest>, ClientValidatorRequest>();
@@ -99,6 +102,7 @@ builder.Services.AddAuthentication(auth =>
         ValidateIssuer = true,
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidateAudience = true,
+        ValidateLifetime=true,
         ValidAudience = builder.Configuration["Jwt:Audience"],
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
@@ -131,6 +135,7 @@ builder.Services.AddTransient<ValidationFilterAttribute>();
 builder.Services.Configure<ApiBehaviorOptions>(options
     => options.SuppressModelStateInvalidFilter = true);
 builder.Services.AddScoped<QuickCampus_Core.Common.Helper.ProcessUploadFile>();
+builder.Services.AddScoped<QuickCampus_Core.Common.Helper.SendEmail>();
 var app = builder.Build();
 //if (app.Environment.IsDevelopment())
 //{

@@ -318,6 +318,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
             entity.ToTable("tblClient");
 
             entity.Property(e => e.Address).UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            entity.Property(e => e.CompanyName).HasMaxLength(100);
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
             entity.Property(e => e.Email).UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.Latitude).HasColumnType("decimal(20, 2)");

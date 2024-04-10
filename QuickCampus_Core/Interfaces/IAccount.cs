@@ -1,5 +1,6 @@
 ﻿using QuickCampus_Core.Common;
 using QuickCampus_Core.ViewModel;
+using QuickCampus_DAL.Context;
 
 namespace QuickCampus_Core.Interfaces
 {
@@ -9,5 +10,10 @@ namespace QuickCampus_Core.Interfaces
         Task<IGeneralResult<List<PermissionVM>>> ListPermission();
         Task<IGeneralResult<List<RoleMappingVM>>> ListRoles(int ClientId, int UserId);
         public List<RolePermissions> GetUserPermission(int RoleId);
+
+        Task<TblUser> GetEmail(string emailId);
+      
+        Task<TblUser> CheckToken(string token,string userid);
+        string GenerateTokenForgotPassword(string EmailId, int userId);
     }
 }

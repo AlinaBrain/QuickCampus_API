@@ -30,7 +30,7 @@ namespace QuickCampus_Core.Services
             LoginResponseVM data = new LoginResponseVM();
             response.Data = data;
 
-            adminLogin.Password = EncodePasswordToBase64(adminLogin.Password);
+            adminLogin.Password = CommonMethods.EncodePasswordToBase64(adminLogin.Password);
 
             var findUser = _context.TblUsers.Include(i => i.TblUserRoles).Where(w => w.Email == adminLogin.UserName && w.Password == adminLogin.Password.ToLower() && w.IsDelete == false && w.IsActive == true).FirstOrDefault();
 
@@ -95,7 +95,7 @@ namespace QuickCampus_Core.Services
             };
 
             var token = new JwtSecurityToken(_config["Jwt:Issuer"], _config["Jwt:Audience"], claims,
-               expires: DateTime.Now.AddHours(24), signingCredentials: credentials);
+               expires: DateTime.Now.AddHours(5), signingCredentials: credentials);
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
@@ -164,19 +164,33 @@ namespace QuickCampus_Core.Services
             return response;
         }
 
-        private string EncodePasswordToBase64(string password)
+        
+
+        public async Task<TblUser> GetEmail(string emailId)
         {
-            try
-            {
-                byte[] encData_byte = new byte[password.Length];
-                encData_byte = System.Text.Encoding.UTF8.GetBytes(password);
-                string encodedData = Convert.ToBase64String(encData_byte);
-                return encodedData;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error in base64Encode" + ex.Message);
-            }
+            var result = _context.TblUsers.Where(s => s.Email == emailId && s.IsActive == true && s.IsDelete == false).FirstOrDefault();
+            return result;
+        }
+        public string GenerateTokenForgotPassword(string EmailId ,int userId)
+        {
+            var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var credentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
+            int passwordExpiredTime = Convert.ToInt32((_config["Jwt:PasswordExpired"]));
+            var claims = new List<Claim>
+         {
+                new Claim("UserId",userId.ToString()),
+                new Claim("EmailId",EmailId.ToString()),
+                new Claim("ExpiredOn",DateTime.Now.AddMinutes(passwordExpiredTime).ToString())
+            };
+
+            var token = new JwtSecurityToken(_config["Jwt:Issuer"], _config["Jwt:Audience"], claims,
+               expires: DateTime.Now.AddMinutes(passwordExpiredTime), signingCredentials: credentials);
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+        public async Task<TblUser> CheckToken(string token,string userid)
+        {
+            var result = _context.TblUsers.Where(s=>s.ForgotPassword ==token && s.IsActive==true && s.IsDelete == false && s.Id.ToString()==userid).FirstOrDefault();
+            return result;
         }
     }
 }
