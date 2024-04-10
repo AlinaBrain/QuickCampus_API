@@ -675,7 +675,5 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-
-
     }
 }

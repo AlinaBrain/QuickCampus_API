@@ -71,7 +71,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=DESKTOP-VO4848B\\SQLEXPRESS;Database=btprojec_quickcampustest;TrustServerCertificate=true;Integrated Security=true;");
+        => optionsBuilder.UseSqlServer("Server=SYS69\\SQLEXPRESS;Database=btprojec_quickcampustest;TrustServerCertificate=true;Integrated Security=true;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -318,6 +318,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
             entity.ToTable("tblClient");
 
             entity.Property(e => e.Address).UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            entity.Property(e => e.CompanyName).HasMaxLength(100);
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
             entity.Property(e => e.Email).UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.Latitude).HasColumnType("decimal(20, 2)");

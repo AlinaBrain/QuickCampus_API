@@ -102,6 +102,7 @@ builder.Services.AddAuthentication(auth =>
         ValidateIssuer = true,
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidateAudience = true,
+        ValidateLifetime=true,
         ValidAudience = builder.Configuration["Jwt:Audience"],
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
@@ -134,6 +135,7 @@ builder.Services.AddTransient<ValidationFilterAttribute>();
 builder.Services.Configure<ApiBehaviorOptions>(options
     => options.SuppressModelStateInvalidFilter = true);
 builder.Services.AddScoped<QuickCampus_Core.Common.Helper.ProcessUploadFile>();
+builder.Services.AddScoped<QuickCampus_Core.Common.Helper.SendEmail>();
 var app = builder.Build();
 //if (app.Environment.IsDevelopment())
 //{

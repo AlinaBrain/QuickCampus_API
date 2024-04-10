@@ -12,5 +12,8 @@ namespace QuickCampus_Core.Interfaces
         public List<RolePermissions> GetUserPermission(int RoleId);
 
         Task<TblUser> GetEmail(string emailId);
+      
+        Task<TblUser> CheckToken(string token,string userid);
+        string GenerateTokenForgotPassword(string EmailId, int userId);
     }
 }
