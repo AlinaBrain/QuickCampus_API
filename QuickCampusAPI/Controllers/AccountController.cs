@@ -90,7 +90,7 @@ namespace QuickCampusAPI.Controllers
                 };
                 string body = "<h5>Hi #UserName#</h5><br/><p> Please #Link# to reset your password </p>";
                 body = body.Replace("#UserName#", user.Name);
-                var call = (Request.IsHttps ? "https://" : "http://") + Request.Host + "/Account/Reset?passwordToken=" + token;
+                var call = (Request.IsHttps ? "https://" : "http://") + _config["UIForgetPasswordUrl"] + "/#/Reset?passwordToken=" + token;
                 var linkUrl = "<a href = '" + call + "'>click here</a>";
                 body = body.Replace("#Link#", linkUrl);
                 vm.Body = body;
