@@ -28,6 +28,8 @@ namespace QuickCampusAPI.Controllers
             _userAppRoleRepo = userAppRoleRepo;
             _userRepo = userRepo;
         }
+        [HttpGet]
+        [Route("GetAllTemplate")]
         public async Task<IActionResult> GetAllTemplate(string? search, int? ClientId, DataTypeFilter DataType, int pageStart = 1, int pageSize = 10)
         {
             IGeneralResult<List<TemplateVm>> result = new GeneralResult<List<TemplateVm>>();
@@ -63,7 +65,7 @@ namespace QuickCampusAPI.Controllers
                 {
                     search = search.Trim();
                 }
-                templatelist = templatedata.Where(x => ( x.Subject.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.Body.Contains(search ?? "", StringComparison.OrdinalIgnoreCase))).ToList();
+                templatelist = templatedata.Where(x => (x.Subject.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.Body.Contains(search ?? "", StringComparison.OrdinalIgnoreCase))).ToList();
                 TemplateListcount = templatelist.Count;
                 templatelist = templatelist.Skip(newPageStart).Take(pageSize).ToList();
 
@@ -88,6 +90,8 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
+        [HttpGet]
+        [Route("GetTemplateById")]
         public async Task<IActionResult> GetTemplateById(int templateId)
         {
             IGeneralResult<TemplateVm> result = new GeneralResult<TemplateVm>();
@@ -133,6 +137,57 @@ namespace QuickCampusAPI.Controllers
             catch (Exception ex)
             {
                 result.Message = "Server error! " + ex.Message;
+            }
+            return Ok(result);
+        }
+        [HttpPost]
+        [Route("AddTemplate")]
+        public async Task<IActionResult> AddTemplate(TemplateVm vm)
+        {
+            IGeneralResult<TemplateVm> result = new GeneralResult<TemplateVm>();
+            try
+            {
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
+                {
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
+                }
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin && (vm.ClientId == null || vm.ClientId.ToString() == "" || vm.ClientId == 0))
+                {
+                    result.Message = "Please select a valid Client";
+                    return Ok(result);
+                }
+                if (ModelState.IsValid)
+                {
+                    vm.Body = vm.Body?.Trim();
+                    vm.Subject = vm.Subject?.Trim();
+                    vm.CreatedBy = Convert.ToInt32(LoggedInUserId);
+                    vm.ClientId = (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId);
+                    var SaveApplicant = await _templateRepo.Add(vm.ToTemplateDbModel());
+                    if (SaveApplicant.Id > 0)
+                    {
+                        result.IsSuccess = true;
+                        result.Message = "Applicant added successfully.";
+                        result.Data = (TemplateVm)SaveApplicant;
+                       
+                    }
+                    else
+                    {
+                        result.Message = "Template not saved. Please try again.";
+                    }
+
+                }
+                else
+                {
+                    result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Message = "Server error " + ex.Message;
             }
             return Ok(result);
         }

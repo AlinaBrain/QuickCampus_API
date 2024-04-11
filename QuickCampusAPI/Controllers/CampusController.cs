@@ -72,11 +72,11 @@ namespace QuickCampusAPI.Controllers
                 List<TblWalkIn> campusData = new List<TblWalkIn>();
                 if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                 {
-                    campusData = _campusrepo.GetAllQuerable().Where(x => x.ClientId == Convert.ToInt32(LoggedInUserClientId) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
+                    campusData = _campusrepo.GetAllQuerable().Where(x => (ClientId != null && ClientId > 0 ? x.ClientId == ClientId : true) && x.IsDeleted == false && ((DataType == DataTypeFilter.All ? true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : x.IsActive == true)))).ToList();
                 }
                 else
                 {
-                    campusData = _campusrepo.GetAllQuerable().Where(x => x.ClientId == Convert.ToInt32(LoggedInUserClientId) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
+                    campusData = _campusrepo.GetAllQuerable().Where(x => x.ClientId == Convert.ToInt32(LoggedInUserClientId) && x.IsDeleted == false && ((DataType == DataTypeFilter.All ? true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : x.IsActive == true)))).ToList();
                 }
 
                 if (!string.IsNullOrEmpty(search))
@@ -154,7 +154,7 @@ namespace QuickCampusAPI.Controllers
                     if (!checkclg)
                     {
 
-                        result.Message = "TblCollege id " + clg.CollegeId + " does not exist";
+                        result.Message = "College id " + clg.CollegeId + " does not exist";
                         return Ok(result);
                     }
 
@@ -189,6 +189,7 @@ namespace QuickCampusAPI.Controllers
                     IsActive = true,
                     IsDeleted = false,
                     CreatedDate = DateTime.Now,
+                    CreatedBy = Convert.ToInt32(LoggedInUserId),
                     Title = vm.Title,
                     PassingYear = vm.PassingYear,
                     ClientId = (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId)
@@ -289,7 +290,6 @@ namespace QuickCampusAPI.Controllers
                         campus.StateId = vm.StateID;
                         campus.CountryId = vm.CountryID;
                         campus.Title = vm.Title;
-                        campus.CreatedDate = DateTime.Now;
                         campus.PassingYear = vm.PassingYear;
                         await _campusrepo.Update(campus);
                         var walkincollege = _campusWalkinCollegeRepo.GetAllQuerable().Where(x => x.WalkInId == campus.WalkInId).ToList();
@@ -313,25 +313,26 @@ namespace QuickCampusAPI.Controllers
                                     ExamEndTime = TimeSpan.Parse(rec.ExamEndTime),
                                     StartDateTime = rec.StartDateTime,
                                 };
-                                var updatecampus = await _campusWalkinCollegeRepo.Update(campusWalkInCollege);
+                                var updatecampus = await _campusWalkinCollegeRepo.Add(campusWalkInCollege);
                                 rec.CampusId = updatecampus.CampusId;
-                                result.IsSuccess = true;
-                                result.Message = "Record Update Successfully";
-                                result.Data = vm;
+
                             }
                         }
+                        result.IsSuccess = true;
+                        result.Message = "Record Update Successfully";
+                        result.Data = vm;
+                        return Ok(result);
                     }
                 }
                 else
                 {
-                    result.IsSuccess = false;
                     result.Message = "Something went wrong.";
+                    return Ok(result);
                 }
             }
             catch (Exception ex)
             {
-                result.IsSuccess = false;
-                result.Message = "Something went wrong";
+                result.Message = "server error. " + ex.Message;
             }
             return Ok(result);
         }

@@ -28,28 +28,25 @@ namespace QuickCampus_Core.ViewModel
                 CollegeId = x.CollegeId,
                 IsActive = x.IsActive,
                 HighestQualification=x.HighestQualification,
-                
-                //IsDeleted = x.IsDeleted,
             };
         }
         public int ApplicantID { get; set; }
-        [Required(ErrorMessage = "You must provide an FirstName.")]
-        [RegularExpression(@"/^[A-Za-z]*$/", ErrorMessage = "Only FirstName allowed.")]
-        [MaxLength(20, ErrorMessage = "can't exceed more than 20 characters.")]
+        [Required(ErrorMessage = "FirstName is required"), MaxLength(20)]
+        [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "Only characters allowed in FirstName.")]
+       
         public string? FirstName { get; set; }
-        [Required(ErrorMessage = "You must provide an LastName .")]
-        [RegularExpression(@"/^[A-Za-z]*$/", ErrorMessage = "Only LastName allowed.")]
-        [MaxLength(20, ErrorMessage = "can't exceed more than 20 characters.")]
+        [Required(ErrorMessage = "FirstName is required"), MaxLength(20)]
+        [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "Only characters allowed in LastName.")]
         public string? LastName { get; set; }
         [Required(ErrorMessage = "You must provide an email address.")]
-        [RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$", ErrorMessage = "Only Email allowed.")]
+        [RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$", ErrorMessage = "Incorrect Email")]
         [MaxLength(100, ErrorMessage = "can't exceed more than 100 characters.")]
         [EmailAddress(ErrorMessage = "Not a valid email address.")]
         public string? EmailAddress { get; set; }
         [MaxLength(25, ErrorMessage = "can't exceed more than 25 characters.")]
         [Required(ErrorMessage = "You must provide a Contact Number")]
         [Display(Name = "Contact Number")]
-        [RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Not a valid Contact number.")]
+        [RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Invalid Contact Number ")]
         public string? PhoneNumber { get; set; }
         [Required(ErrorMessage = "You must provide a HighestQualification")]
         public int? HighestQualification { get; set; }
@@ -72,11 +69,8 @@ namespace QuickCampus_Core.ViewModel
         public string? Comment { get; set; } = "";
         //public DateTime? CreatedDate { get; set; }
         public DateTime? RegisteredDate { get; set; }
-       
         public string ? CollegeName { get; set; }
         public int? ClientId { get; set; }
-        
-        
         //public bool? IsDeleted { get; set; }
         [Required(ErrorMessage = "You must provide a AssignedToCompany")]
         public int? AssignedToCompany { get; set; }

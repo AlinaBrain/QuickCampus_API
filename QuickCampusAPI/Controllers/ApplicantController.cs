@@ -168,8 +168,6 @@ namespace QuickCampusAPI.Controllers
                     result.Message = "Qualification does not Exist";
                     return Ok(result);
                 }
-
-
                 if (ModelState.IsValid)
                 {
                     string pattern = @"^[a-zA-Z][a-zA-Z\s]*$";
