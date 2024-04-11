@@ -1,24 +1,24 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using QuickCampus_Core.Common;
-using QuickCampus_Core.Interfaces;
-using QuickCampus_Core.Services;
-using QuickCampus_Core.ViewModel;
-using QuickCampus_DAL.Context;
-using System.Text.RegularExpressions;
-using static QuickCampus_Core.Common.common;
+﻿//using Microsoft.AspNetCore.Http;
+//using Microsoft.AspNetCore.Mvc;
+//using QuickCampus_Core.Common;
+//using QuickCampus_Core.Interfaces;
+//using QuickCampus_Core.Services;
+//using QuickCampus_Core.ViewModel;
+//using QuickCampus_DAL.Context;
+//using System.Text.RegularExpressions;
+//using static QuickCampus_Core.Common.common;
 
-namespace QuickCampusAPI.Controllers
-{
-    [Route("api/[controller]")]
-    [ApiController]
-    public class TemplateController : ControllerBase
-    {
-        private readonly ITemplateRepo _templateRepo;
-        private readonly IConfiguration _config;
-        private readonly string _jwtSecretKey;
-        private readonly IUserAppRoleRepo _userAppRoleRepo;
-        private readonly IUserRepo _userRepo;
+//namespace QuickCampusAPI.Controllers
+//{
+//    [Route("api/[controller]")]
+//    [ApiController]
+//    public class TemplateController : ControllerBase
+//    {
+//        private readonly ITemplateRepo _templateRepo;
+//        private readonly IConfiguration _config;
+//        private readonly string _jwtSecretKey;
+//        private readonly IUserAppRoleRepo _userAppRoleRepo;
+//        private readonly IUserRepo _userRepo;
 
         public TemplateController(ITemplateRepo templateRepo, IConfiguration configuration, IUserAppRoleRepo userAppRoleRepo, IUserRepo userRepo)
         {
@@ -69,19 +69,19 @@ namespace QuickCampusAPI.Controllers
                 TemplateListcount = templatelist.Count;
                 templatelist = templatelist.Skip(newPageStart).Take(pageSize).ToList();
 
-                var response = templatelist.Select(x => (TemplateVm)x).ToList();
+//                var response = templatelist.Select(x => (TemplateVm)x).ToList();
 
-                if (templatelist.Count > 0)
-                {
-                    result.IsSuccess = true;
-                    result.Message = "Data fetched successfully.";
-                    result.Data = response;
-                    result.TotalRecordCount = TemplateListcount;
-                }
-                else
-                {
-                    result.Message = "Template list not found!";
-                }
+//                if (templatelist.Count > 0)
+//                {
+//                    result.IsSuccess = true;
+//                    result.Message = "Data fetched successfully.";
+//                    result.Data = response;
+//                    result.TotalRecordCount = TemplateListcount;
+//                }
+//                else
+//                {
+//                    result.Message = "Template list not found!";
+//                }
 
             }
             catch (Exception ex)
