@@ -315,7 +315,7 @@ namespace QuickCampusAPI.Controllers
                                 };
                                 var updatecampus = await _campusWalkinCollegeRepo.Add(campusWalkInCollege);
                                 rec.CampusId = updatecampus.CampusId;
-
+                                
                             }
                         }
                         result.IsSuccess = true;

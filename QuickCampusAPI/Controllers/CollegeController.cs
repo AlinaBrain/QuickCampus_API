@@ -24,7 +24,7 @@ namespace QuickCampusAPI.Controllers
     {
         private readonly ICollegeRepo _collegeRepo;
         private IConfiguration _config;
-        private readonly ProcessUploadFile _uploadFile;
+        private readonly ProcessUploadFile _uploadFile;     
         private readonly IUserAppRoleRepo _userAppRoleRepo;
         private readonly Microsoft.AspNetCore.Hosting.IHostingEnvironment _hostingEnvironment;
         private readonly string basePath;
@@ -38,7 +38,8 @@ namespace QuickCampusAPI.Controllers
 
 
         public CollegeController(ICollegeRepo collegeRepo, IConfiguration config, ProcessUploadFile uploadFile,
-            IUserAppRoleRepo userAppRoleRepo, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, ICountryRepo countryRepo, IStateRepo stateRepo, ICityRepo cityRepo, BtprojecQuickcampustestContext BtprojecQuickcampustestContext, IUserRepo userRepo)
+            IUserAppRoleRepo userAppRoleRepo, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment,
+            ICountryRepo countryRepo, IStateRepo stateRepo, ICityRepo cityRepo, BtprojecQuickcampustestContext BtprojecQuickcampustestContext, IUserRepo userRepo)
         {
             _collegeRepo = collegeRepo;
             _config = config;
@@ -147,7 +148,7 @@ namespace QuickCampusAPI.Controllers
                     }
                     if (college == null)
                     {
-                        result.Message = " TblCollege does Not Exist";
+                        result.Message = "College does Not Exist";
                     }
                     else
                     {
