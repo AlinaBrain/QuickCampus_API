@@ -65,9 +65,9 @@ namespace QuickCampusAPI.Controllers
                             result.Message = "Phone Number Already Register";
                             return Ok(result);
                         }
-                        else if(_clientTypeRepo.Any(x=>x.Id==vm.ClientTypeId && x.IsDeleted == false))
+                        else if(!_clientTypeRepo.Any(x=>x.Id==vm.ClientTypeId && x.IsDeleted == false))
                         {
-                            result.Message = "ClientTypeId Already Exist!";
+                            result.Message = "Client Type does not Exist!";
                             return Ok(result);
                         }
                         else
@@ -191,12 +191,10 @@ namespace QuickCampusAPI.Controllers
                         {
                             result.Message = "Phone Number already exists";
                         }
-                        else if(_clientTypeRepo.Any(z=>z.Id==vm.ClientTypeId && z.IsActive== true))
+                        else if (!_clientTypeRepo.Any(z => z.Id == vm.ClientTypeId && z.IsDeleted == false))
                         {
-                            result.Message = "ClientTypeId  does  not Exist!";
+                            result.Message = "Client Type does not Exist!";
                         }
-                        
-                    
                         else
                         {
                             var res = (await _clientRepo.GetAll(x => x.Id == vm.Id && x.IsDeleted == false)).FirstOrDefault();
