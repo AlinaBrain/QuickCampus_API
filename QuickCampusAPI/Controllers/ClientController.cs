@@ -81,9 +81,7 @@ namespace QuickCampusAPI.Controllers
                                 UserName = vm.Email?.Trim(),
                                 Password = vm.Password.Trim(),
                             };
-
                             var clientData = await _clientRepo.Add(clientVM.ToClientDbModel());
-
                             UserVm userVm = new UserVm()
                             {
                                 Name = clientData.Name,

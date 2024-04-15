@@ -72,8 +72,7 @@ namespace QuickCampus_Core.ViewModel
         public string ? CollegeName { get; set; }
         public int? ClientId { get; set; }
         //public bool? IsDeleted { get; set; }
-        [Required(ErrorMessage = "You must provide a AssignedToCompany")]
-        public int? AssignedToCompany { get; set; }
+       
         [Display(Name ="ActiveStatus")]
         public bool? IsActive { get; set; }
         //public DateTime? ModifiedDate { get; set; }

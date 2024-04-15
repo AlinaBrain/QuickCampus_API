@@ -39,7 +39,6 @@ namespace QuickCampus_Core.ViewModel
                 CreatedDate=DateTime.UtcNow,
                 ModifiedDate=SkillId >0?DateTime.UtcNow: null
 
-
             };
         }
         
