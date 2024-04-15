@@ -168,8 +168,6 @@ namespace QuickCampusAPI.Controllers
                     result.Message = "Qualification does not Exist";
                     return Ok(result);
                 }
-
-
                 if (ModelState.IsValid)
                 {
                     string pattern = @"^[a-zA-Z][a-zA-Z\s]*$";
@@ -185,6 +183,7 @@ namespace QuickCampusAPI.Controllers
                     vm.EmailAddress = vm.EmailAddress?.Trim();
                     vm.PhoneNumber = vm.PhoneNumber?.Trim();
                     vm.Comment = vm.Comment?.Trim();
+                    
 
                     vm.ClientId = (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId);
                     var SaveApplicant = await _applicantRepo.Add(vm.ToApplicantDbModel());
@@ -195,7 +194,8 @@ namespace QuickCampusAPI.Controllers
                         {
 
                             ApplicantSkillId = item.ApplicantSkillId,
-                            SkillId = item.SkillId,
+                            //SkillId = item.SkillId,
+                            ClientId = vm.ClientId,
                             ApplicantId = SaveApplicant.ApplicantId,
                         };
                         var SaveSkills = await _skillsRepo.Add(skillVm.ToSkillDbModel());
@@ -324,7 +324,8 @@ namespace QuickCampusAPI.Controllers
                             {
 
                                 ApplicantSkillId = item.ApplicantSkillId,
-                                SkillId = item.SkillId,
+                               // SkillId = item.SkillId,
+                               ClientId=vm.ClientId,
                                 ApplicantId = applicant.ApplicantId,
                             };
                             var SaveSkills = await _skillsRepo.Add(skillVm.ToSkillDbModel());

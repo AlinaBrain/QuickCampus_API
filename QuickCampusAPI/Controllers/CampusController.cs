@@ -72,7 +72,7 @@ namespace QuickCampusAPI.Controllers
                 List<TblWalkIn> campusData = new List<TblWalkIn>();
                 if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                 {
-                    campusData = _campusrepo.GetAllQuerable().Where(x => (ClientId != null && ClientId > 0 ? x.ClientId == ClientId : true) && x.IsDeleted == false && ((DataType == DataTypeFilter.All ?  true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : x.IsActive == true)))).ToList();
+                    campusData = _campusrepo.GetAllQuerable().Where(x => (ClientId != null && ClientId > 0 ? x.ClientId == ClientId : true) && x.IsDeleted == false && ((DataType == DataTypeFilter.All ? true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : x.IsActive == true)))).ToList();
                 }
                 else
                 {
@@ -351,7 +351,7 @@ namespace QuickCampusAPI.Controllers
                     LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
                 }
                 var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
-                var campusData = _campusrepo.GetAllQuerable().Where(x => x.IsDeleted == false && x.WalkInId == campusId).Include(x => x.TblWalkInColleges).Include(x => x.State).Include(x => x.Country).OrderByDescending(x => x.WalkInDate).Select(x => new CampusGridViewModel()
+                var campusData = _campusrepo.GetAllQuerable().Where(x => x.IsDeleted == false && x.WalkInId == campusId).Include(x => x.State).Include(x => x.Country).OrderByDescending(x => x.WalkInDate).Select(x => new CampusGridViewModel()
                 {
                     WalkInID = x.WalkInId,
                     Address1 = x.Address1,
@@ -364,7 +364,13 @@ namespace QuickCampusAPI.Controllers
                     IsActive = x.IsActive ?? false,
                     Title = x.Title,
                     ClientId = x.ClientId,
-                    Colleges = x.TblWalkInColleges.Where(z => z.WalkInId == x.WalkInId).Select(y => new CampusWalkInModel()
+                    PassingYear=x.PassingYear
+
+                }).FirstOrDefault();
+              var campuswalkindata = _campusWalkinCollegeRepo.GetAllQuerable().Where(z => z.WalkInId == z.WalkInId).ToList();
+                if (campuswalkindata.Count > 0)
+                {
+                    campusData.Colleges = campuswalkindata.Select(y => new CampusWalkInModel()
                     {
                         CampusId = y.CampusId,
                         CollegeId = y.CollegeId ?? 0,
@@ -374,8 +380,8 @@ namespace QuickCampusAPI.Controllers
                         StartDateTime = y.StartDateTime.Value,
                         CollegeName = _collegeRepo.GetAllQuerable().Where(z => z.CollegeId == y.CollegeId).First().CollegeName,
                         CollegeCode = _collegeRepo.GetAllQuerable().Where(z => z.CollegeId == y.CollegeId).First().CollegeCode,
-                    }).ToList(),
-                }).FirstOrDefault();
+                    }).ToList();
+                  }
                 if (campusData != null)
                 {
                     GetCampusViewModel vmm = new GetCampusViewModel
@@ -391,7 +397,8 @@ namespace QuickCampusAPI.Controllers
                         JobDescription = campusData.JobDescription,
                         Title = campusData?.Title,
                         WalkInDate = campusData.WalkInDate,
-                        ClientId = campusData.ClientId
+                        ClientId = campusData.ClientId,
+                        PassingYear=campusData.PassingYear
                     };
                     result.Data = vmm;
                     result.IsSuccess = true;

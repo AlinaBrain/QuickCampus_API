@@ -27,7 +27,7 @@ namespace QuickCampus_Core.Common.Helper
         public IGeneralResult<string> SendGridEmail(SendMailViewModel model)
         {
             IGeneralResult<string> result = new GeneralResult<string>();
-            
+
             var fromEmail = _config["MailSettings:fromEmail"];
             var fromUserName = _config["MailSettings:fromUserName"];
             _mailSettings.SendGridApiKey = _config["MailSettings:sendGridApiKey"];

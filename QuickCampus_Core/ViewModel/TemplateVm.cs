@@ -35,5 +35,20 @@ namespace QuickCampus_Core.ViewModel
         public int? ClientId { get; set; }
         public bool? IsActive { get; set; }
         public bool? IsDeleted { get; set; }
+        public TblTemplate ToTemplateDbModel()
+        {
+            return new TblTemplate
+            {
+                Subject = Subject,
+                Body = Body,
+                CreatedBy = CreatedBy,
+                ModifiedAt = Id > 0 ? DateTime.UtcNow : null,
+                IsActive = true,
+                IsDeleted = false,
+                ClientId= ClientId,
+                CreatedAt=DateTime.Now,
+                ModifiedBy = ModifiedBy
+            };
+        }
     }
 }

@@ -426,8 +426,4 @@ namespace QuickCampusAPI.Controllers
         //}
 
     }
-
-
-
-
 }

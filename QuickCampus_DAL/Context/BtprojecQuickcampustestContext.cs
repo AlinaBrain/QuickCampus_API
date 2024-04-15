@@ -59,8 +59,6 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
     public virtual DbSet<TblRolePermission> TblRolePermissions { get; set; }
 
-    public virtual DbSet<TblTemplate> TblTemplates { get; set; }
-
     public virtual DbSet<TblUser> TblUsers { get; set; }
 
     public virtual DbSet<TblUserAppRole> TblUserAppRoles { get; set; }
@@ -460,20 +458,6 @@ public partial class BtprojecQuickcampustestContext : DbContext
             entity.HasOne(d => d.Role).WithMany(p => p.TblRolePermissions)
                 .HasForeignKey(d => d.RoleId)
                 .HasConstraintName("FK__tbl_RoleP__RoleI__151B244E");
-        });
-
-        modelBuilder.Entity<TblTemplate>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__tblTempl__3214EC0769945682");
-
-            entity.ToTable("tblTemplates");
-
-            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
-            entity.Property(e => e.ModifiedAt).HasColumnType("datetime");
-
-            entity.HasOne(d => d.Client).WithMany(p => p.TblTemplates)
-                .HasForeignKey(d => d.ClientId)
-                .HasConstraintName("FK__tblTempla__Clien__41B8C09B");
         });
 
         modelBuilder.Entity<TblUser>(entity =>
