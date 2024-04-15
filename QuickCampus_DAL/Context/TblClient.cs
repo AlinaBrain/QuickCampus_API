@@ -39,11 +39,25 @@ public partial class TblClient
 
     public string? CompanyName { get; set; }
 
+    public int? ClientTypeId { get; set; }
+
+    public virtual MstClientType? ClientType { get; set; }
+
     public virtual ICollection<TblApplicant> TblApplicants { get; set; } = new List<TblApplicant>();
+
+    public virtual ICollection<TblDepartment> TblDepartments { get; set; } = new List<TblDepartment>();
 
     public virtual ICollection<TblQuestion> TblQuestions { get; set; } = new List<TblQuestion>();
 
+    public virtual ICollection<TblSubTopic> TblSubTopics { get; set; } = new List<TblSubTopic>();
+
+    public virtual ICollection<TblSubject> TblSubjects { get; set; } = new List<TblSubject>();
+
+    public virtual ICollection<TblTag> TblTags { get; set; } = new List<TblTag>();
+
     public virtual ICollection<TblTemplate> TblTemplates { get; set; } = new List<TblTemplate>();
+
+    public virtual ICollection<TblTopic> TblTopics { get; set; } = new List<TblTopic>();
 
     public virtual ICollection<TblUser> TblUsers { get; set; } = new List<TblUser>();
 

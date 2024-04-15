@@ -26,10 +26,11 @@ namespace QuickCampusAPI.Controllers
         private readonly IUserRepo _userRepo;
         private IConfiguration _config;
         private readonly IUserRoleRepo _UserRoleRepo;
+        private readonly IClientTypeRepo _clientTypeRepo;
 
         public ClientController(IUserAppRoleRepo userAppRoleRepo, IRoleRepo roleRepo,
             IClientRepo clientRepo, IConfiguration config, IUserRepo userRepo,
-            IUserRoleRepo userRoleRepo)
+            IUserRoleRepo userRoleRepo, IClientTypeRepo clientTypeRepo)
         {
             _userAppRoleRepo = userAppRoleRepo;
             _roleRepo = roleRepo;
@@ -37,6 +38,7 @@ namespace QuickCampusAPI.Controllers
             _config = config;
             _userRepo = userRepo;
             _UserRoleRepo = userRoleRepo;
+            _clientTypeRepo = clientTypeRepo;
         }
 
         [HttpPost]
@@ -63,6 +65,11 @@ namespace QuickCampusAPI.Controllers
                             result.Message = "Phone Number Already Register";
                             return Ok(result);
                         }
+                        else if(_clientTypeRepo.Any(x=>x.Id==vm.ClientTypeId && x.IsDeleted == false))
+                        {
+                            result.Message = "ClientTypeId Already Exist!";
+                            return Ok(result);
+                        }
                         else
                         {
                             vm.Password = EncodePasswordToBase64(vm.Password);
@@ -80,6 +87,7 @@ namespace QuickCampusAPI.Controllers
                                 Longitude = vm.Longitude,
                                 UserName = vm.Email?.Trim(),
                                 Password = vm.Password.Trim(),
+                                ClientTypeId=vm.ClientTypeId
                             };
                             var clientData = await _clientRepo.Add(clientVM.ToClientDbModel());
                             UserVm userVm = new UserVm()
@@ -125,7 +133,8 @@ namespace QuickCampusAPI.Controllers
                                                 Longitude = clientData.Longitude,
                                                 RoleName = _roleRepo.GetAllQuerable().Where(x => x.Id == ClientRoleCheck.Id).Select(x => x.Name).First(),
                                                 AppRoleName = ((common.AppRole)userAppRole.RoleId).ToString(),
-                                                IsActive = clientData.IsActive
+                                                IsActive = clientData.IsActive,
+                                                ClientTypeId=clientData.ClientTypeId,   
                                             };
                                             result.Data = clientResponse;
                                             result.Message = "Client added successfully";
@@ -182,6 +191,12 @@ namespace QuickCampusAPI.Controllers
                         {
                             result.Message = "Phone Number already exists";
                         }
+                        else if(_clientTypeRepo.Any(z=>z.Id==vm.ClientTypeId && z.IsActive== true))
+                        {
+                            result.Message = "ClientTypeId  does  not Exist!";
+                        }
+                        
+                    
                         else
                         {
                             var res = (await _clientRepo.GetAll(x => x.Id == vm.Id && x.IsDeleted == false)).FirstOrDefault();
@@ -200,6 +215,7 @@ namespace QuickCampusAPI.Controllers
                             res.Latitude = vm.Latitude;
                             res.ModifiedBy = Convert.ToInt32(LoggedInUserId);
                             res.ModofiedDate = DateTime.Now;
+                            res.ClientTypeId = vm.ClientTypeId;
                             await _clientRepo.Update(res);
                             result.Message = "Client updated successfully";
                             result.IsSuccess = true;
@@ -259,7 +275,8 @@ namespace QuickCampusAPI.Controllers
                             Longitude = x.Longitude,
                             IsActive = x.IsActive,
                             RoleName = _clientRepo.GetClientRoleName((int)x.Id),
-                            AppRoleName = _clientRepo.GetClientAppRoleName(x.Id)
+                            AppRoleName = _clientRepo.GetClientAppRoleName(x.Id),
+                            ClientTypeId=x.ClientTypeId,
                         }).ToList().Where(x => (x.Name.Contains(search ?? "") || x.Email.Contains(search ?? "") || x.Address.Contains(search ?? "") || x.Phone.Contains(search ?? ""))).OrderByDescending(x => x.Id).ToList());
                         result.Data = data.Skip(newPageStart).Take(pageSize).ToList();
                         result.IsSuccess = true;

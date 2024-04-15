@@ -25,6 +25,8 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
     public virtual DbSet<MstCityStateCountry> MstCityStateCountries { get; set; }
 
+    public virtual DbSet<MstClientType> MstClientTypes { get; set; }
+
     public virtual DbSet<MstGroupdl> MstGroupdls { get; set; }
 
     public virtual DbSet<MstMenuItem> MstMenuItems { get; set; }
@@ -49,6 +51,8 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
     public virtual DbSet<TblCollege> TblColleges { get; set; }
 
+    public virtual DbSet<TblDepartment> TblDepartments { get; set; }
+
     public virtual DbSet<TblMenuItemUserPermission> TblMenuItemUserPermissions { get; set; }
 
     public virtual DbSet<TblQuestion> TblQuestions { get; set; }
@@ -58,6 +62,16 @@ public partial class BtprojecQuickcampustestContext : DbContext
     public virtual DbSet<TblRole> TblRoles { get; set; }
 
     public virtual DbSet<TblRolePermission> TblRolePermissions { get; set; }
+
+    public virtual DbSet<TblSubTopic> TblSubTopics { get; set; }
+
+    public virtual DbSet<TblSubject> TblSubjects { get; set; }
+
+    public virtual DbSet<TblTag> TblTags { get; set; }
+
+    public virtual DbSet<TblTemplate> TblTemplates { get; set; }
+
+    public virtual DbSet<TblTopic> TblTopics { get; set; }
 
     public virtual DbSet<TblUser> TblUsers { get; set; }
 
@@ -71,7 +85,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=SYS69\\SQLEXPRESS;Database=btprojec_QuickCampusTest;TrustServerCertificate=true;Integrated Security=true");
+        => optionsBuilder.UseSqlServer("Server=SYS69\\SQLEXPRESS;Database=btprojec_quickcampustest;TrustServerCertificate=true;Integrated Security=true;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -148,6 +162,17 @@ public partial class BtprojecQuickcampustestContext : DbContext
             entity.Property(e => e.CountryName)
                 .HasMaxLength(50)
                 .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+        });
+
+        modelBuilder.Entity<MstClientType>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__MstClien__3214EC07535AA148");
+
+            entity.ToTable("MstClientType");
+
+            entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+            entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.TypeName).HasMaxLength(200);
         });
 
         modelBuilder.Entity<MstGroupdl>(entity =>
@@ -335,6 +360,10 @@ public partial class BtprojecQuickcampustestContext : DbContext
             entity.Property(e => e.UserName)
                 .HasMaxLength(100)
                 .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+
+            entity.HasOne(d => d.ClientType).WithMany(p => p.TblClients)
+                .HasForeignKey(d => d.ClientTypeId)
+                .HasConstraintName("FK__tblClient__Clien__54CB950F");
         });
 
         modelBuilder.Entity<TblCollege>(entity =>
@@ -374,6 +403,27 @@ public partial class BtprojecQuickcampustestContext : DbContext
             entity.HasOne(d => d.City).WithMany(p => p.TblColleges)
                 .HasForeignKey(d => d.CityId)
                 .HasConstraintName("FK__College__CityId__7E37BEF6");
+        });
+
+        modelBuilder.Entity<TblDepartment>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__tblDepar__3214EC07A7AEFC21");
+
+            entity.ToTable("tblDepartment");
+
+            entity.Property(e => e.CreatedDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValueSql("((1))")
+                .HasColumnName("IsACtive");
+            entity.Property(e => e.IsDeleted).HasDefaultValueSql("((0))");
+            entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.Name).HasMaxLength(200);
+
+            entity.HasOne(d => d.Client).WithMany(p => p.TblDepartments)
+                .HasForeignKey(d => d.ClientId)
+                .HasConstraintName("FK__tblDepart__Clien__5A846E65");
         });
 
         modelBuilder.Entity<TblMenuItemUserPermission>(entity =>
@@ -458,6 +508,120 @@ public partial class BtprojecQuickcampustestContext : DbContext
             entity.HasOne(d => d.Role).WithMany(p => p.TblRolePermissions)
                 .HasForeignKey(d => d.RoleId)
                 .HasConstraintName("FK__tbl_RoleP__RoleI__151B244E");
+        });
+
+        modelBuilder.Entity<TblSubTopic>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__tblSubTo__3214EC078A9D4CB1");
+
+            entity.ToTable("tblSubTopics");
+
+            entity.Property(e => e.CreatedDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValueSql("((1))")
+                .HasColumnName("IsACtive");
+            entity.Property(e => e.IsDeleted).HasDefaultValueSql("((0))");
+            entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.Name).HasMaxLength(200);
+
+            entity.HasOne(d => d.Client).WithMany(p => p.TblSubTopics)
+                .HasForeignKey(d => d.ClientId)
+                .HasConstraintName("FK__tblSubTop__Clien__6F7F8B4B");
+
+            entity.HasOne(d => d.Topic).WithMany(p => p.TblSubTopics)
+                .HasForeignKey(d => d.TopicId)
+                .HasConstraintName("FK__tblSubTop__Topic__6BAEFA67");
+        });
+
+        modelBuilder.Entity<TblSubject>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__tblSubje__3214EC0737C3EA76");
+
+            entity.ToTable("tblSubjects");
+
+            entity.Property(e => e.CreatedDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValueSql("((1))")
+                .HasColumnName("IsACtive");
+            entity.Property(e => e.IsDeleted).HasDefaultValueSql("((0))");
+            entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.Name).HasMaxLength(200);
+
+            entity.HasOne(d => d.Client).WithMany(p => p.TblSubjects)
+                .HasForeignKey(d => d.ClientId)
+                .HasConstraintName("FK__tblSubjec__Clien__61316BF4");
+
+            entity.HasOne(d => d.Department).WithMany(p => p.TblSubjects)
+                .HasForeignKey(d => d.DepartmentId)
+                .HasConstraintName("FK__tblSubjec__Depar__5D60DB10");
+        });
+
+        modelBuilder.Entity<TblTag>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__tblTags__3214EC073FBE20FD");
+
+            entity.ToTable("tblTags");
+
+            entity.Property(e => e.CreatedDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValueSql("((1))")
+                .HasColumnName("IsACtive");
+            entity.Property(e => e.IsDeleted).HasDefaultValueSql("((0))");
+            entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.Name).HasMaxLength(200);
+
+            entity.HasOne(d => d.Client).WithMany(p => p.TblTags)
+                .HasForeignKey(d => d.ClientId)
+                .HasConstraintName("FK__tblTags__ClientI__753864A1");
+        });
+
+        modelBuilder.Entity<TblTemplate>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__tblTempl__3214EC0769945682");
+
+            entity.ToTable("tblTemplates");
+
+            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+            entity.Property(e => e.ModifiedAt).HasColumnType("datetime");
+
+            entity.HasOne(d => d.Client).WithMany(p => p.TblTemplates)
+                .HasForeignKey(d => d.ClientId)
+                .HasConstraintName("FK__tblTempla__Clien__41B8C09B");
+        });
+
+        modelBuilder.Entity<TblTopic>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__tblTopic__3214EC07D6176427");
+
+            entity.ToTable("tblTopics");
+
+            entity.Property(e => e.CreatedDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValueSql("((1))")
+                .HasColumnName("IsACtive");
+            entity.Property(e => e.IsDeleted).HasDefaultValueSql("((0))");
+            entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+            entity.Property(e => e.Name).HasMaxLength(200);
+
+            entity.HasOne(d => d.Client).WithMany(p => p.TblTopics)
+                .HasForeignKey(d => d.ClientId)
+                .HasConstraintName("FK__tblTopics__Clien__68D28DBC");
+
+            entity.HasOne(d => d.Department).WithMany(p => p.TblTopics)
+                .HasForeignKey(d => d.DepartmentId)
+                .HasConstraintName("FK__tblTopics__Depar__640DD89F");
+
+            entity.HasOne(d => d.Subject).WithMany(p => p.TblTopics)
+                .HasForeignKey(d => d.SubjectId)
+                .HasConstraintName("FK__tblTopics__Subje__6501FCD8");
         });
 
         modelBuilder.Entity<TblUser>(entity =>

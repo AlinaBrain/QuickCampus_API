@@ -131,6 +131,7 @@ builder.Services.AddScoped<ICampusWalkinCollegeRepo, CampusCollegeService>();
 builder.Services.AddScoped<QuestionTypeRepo, QuestionTypeService>();
 builder.Services.AddScoped<ISkillsRepo, SkillRepo>();
 builder.Services.AddScoped<IMstSkillsRepo,MstSkillRepo>();
+builder.Services.AddScoped<IClientTypeRepo, ClientTypeRepo>();
 builder.Services.AddScoped<ITemplateRepo, TemplateRepo>();
 builder.Services.AddTransient<ValidationFilterAttribute>();
 builder.Services.Configure<ApiBehaviorOptions>(options

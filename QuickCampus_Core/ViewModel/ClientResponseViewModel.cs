@@ -23,6 +23,7 @@ namespace QuickCampus_Core.ViewModel
                 SubscriptionPlan = item.SubscriptionPlan,
                 Longitude = item.Longitude,
                 Latitude = item.Latitude,
+                ClientTypeId=item.ClientTypeId,
             };
         }
         public int Id { get; set; }
@@ -46,6 +47,6 @@ namespace QuickCampus_Core.ViewModel
         public decimal? Latitude { get; set; }
         public string? RoleName { get; set; }
         public string? AppRoleName { get; set; }
-
+        public int? ClientTypeId { get; set; }
     }
 }

@@ -27,6 +27,7 @@ namespace QuickCampus_Core.ViewModel
                 IsDeleted = items.IsDeleted,
                 CreatedDate = items.CreatedDate,
                 ModifiedBy = items.ModifiedBy,
+                ClientTypeId=items.ClientTypeId,
             };
         }
         public int Id { get; set; }
@@ -56,6 +57,7 @@ namespace QuickCampus_Core.ViewModel
         public string? UserName { get; set; }
 
         public string? Password { get; set; }
+        public int? ClientTypeId { get; set; }
 
         [Required]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]

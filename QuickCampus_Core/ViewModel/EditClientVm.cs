@@ -32,6 +32,7 @@ namespace QuickCampus_Core.ViewModel
         public decimal? Longitude { get; set; }
         [RegularExpression(@"^\d+(\.\d{1,2})?$")]
         public decimal? Latitude { get; set; }
+        public int? ClientTypeId { get; set; }
         //[Required(ErrorMessage ="Please  Enter a  Valid Role UserId")]
         //public int? RoleId { get; set; }
     }
