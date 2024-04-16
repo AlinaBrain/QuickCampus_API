@@ -19,13 +19,18 @@ namespace QuickCampusAPI.Controllers
         private readonly IUserAppRoleRepo _userAppRoleRepo;
         private IConfiguration _config;
         private string _jwtSecretKey;
-        public UserController(IUserRepo userRepo, IClientRepo clientRepo, IUserAppRoleRepo userAppRoleRepo, IConfiguration config)
+        private readonly IUserRoleRepo _UserRoleRepo;
+        private readonly IRoleRepo _roleRepo;
+
+        public UserController(IUserRepo userRepo, IClientRepo clientRepo, IUserAppRoleRepo userAppRoleRepo, IConfiguration config, IUserRoleRepo userRoleRepo, IRoleRepo roleRepo)
         {
             _userRepo = userRepo;
             _clientRepo = clientRepo;
             _userAppRoleRepo = userAppRoleRepo;
             _config = config;
             _jwtSecretKey = _config["Jwt:Key"] ?? "";
+            _UserRoleRepo = userRoleRepo;
+            _roleRepo = roleRepo;
         }
 
         [HttpGet]
@@ -113,6 +118,11 @@ namespace QuickCampusAPI.Controllers
                     result.Message = "Email already Exists";
                     return Ok(result);
                 }
+                if(!_roleRepo.Any(x=>x.Id==vm.RoleId && x.IsDeleted==false && x.IsActive == true))
+                {
+                    result.Message = "Invalid Role";
+                    return Ok(result);
+                }
                 if (ModelState.IsValid)
                 {
                     TblUser userVm = new TblUser
@@ -122,24 +132,42 @@ namespace QuickCampusAPI.Controllers
                         Mobile = vm.Mobile?.Trim(),
                         Password = vm.Password.Trim(),
                         CreateDate = DateTime.Now,
-                        ClientId = (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId)
+                        ClientId = (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin) ? ((vm.ClientId == 0 || vm.ClientId == null) ? null : vm.ClientId) : Convert.ToInt32(LoggedInUserClientId)
                     };
-                    if (LoggedInUserRole != null && LoggedInUserRole.RoleId != (int)AppRole.Admin)
-                    {
-                        userVm.ClientId = Convert.ToInt32(LoggedInUserClientId);
-                    }
-                    else
-                    {
-                        userVm.ClientId = vm.ClientId;
-                    }
+                    //if (LoggedInUserRole != null && LoggedInUserRole.RoleId != (int)AppRole.Admin)
+                    //{
+                    //    userVm.ClientId = Convert.ToInt32(LoggedInUserClientId);
+                    //}
+                    //else
+                    //{
+                    //    userVm.ClientId = vm.ClientId;
+                    //}
                     var addUser = await _userRepo.Add(userVm);
-                    if(addUser.Id > 0)
+                    if (addUser.Id > 0)
                     {
-                        result.IsSuccess = true;
-                        result.Message = "User added successfully.";
-                        result.Data = (UserViewVm)addUser;
-                        return Ok(result);
+
+                        IGeneralResult<string> addRole = new GeneralResult<string>();
+                        if (LoggedInUserRole.RoleId == (int)AppRole.Admin && (vm.ClientId == 0 || vm.ClientId == null))
+                        {
+                            addRole = await AddorUpdateRole(addUser.Id, AppRole.Admin_User, vm.RoleId);
+                        }
+                        else
+                        {
+
+                            addRole = await AddorUpdateRole(addUser.Id, AppRole.Client_User, vm.RoleId);
+                        }
+                        if (addRole.IsSuccess)
+                        {
+
+                            result.IsSuccess = true;
+                            result.Message = "User added successfully.";
+                            result.Data = (UserViewVm)addUser;
+                            return Ok(result);
+                        }
+                        result.Message = addRole.Message;
                     }
+
+
                     else
                     {
                         result.Message = "Something went wrong.";
@@ -188,6 +216,11 @@ namespace QuickCampusAPI.Controllers
                         result.Message = "Mobile already Exists";
                         return Ok(result);
                     }
+                    if (!_roleRepo.Any(x => x.Id == vm.RoleId && x.IsDeleted == false && x.IsActive == true))
+                    {
+                        result.Message = "Invalid Role";
+                        return Ok(result);
+                    }
                     if (ModelState.IsValid)
                     {
                         TblUser user = new TblUser();
@@ -210,9 +243,9 @@ namespace QuickCampusAPI.Controllers
                         user.Mobile = vm.Mobile;
                         user.Email = vm.Email;
                         user.ModifiedDate = DateTime.Now;
-
                         var updateUser = await _userRepo.Update(user);
-
+                        IGeneralResult<string> addRole = new GeneralResult<string>();
+                            addRole = await AddorUpdateRole(user.Id, AppRole.None, vm.RoleId);
                         result.IsSuccess = true;
                         result.Message = "User updated successfully.";
                         result.Data = (UserViewVm)updateUser;
@@ -234,7 +267,7 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-       
+
         [HttpDelete]
         [Route("DeleteUserById")]
         public async Task<IActionResult> DeleteUser(int UserId)
@@ -276,7 +309,7 @@ namespace QuickCampusAPI.Controllers
                         result.IsSuccess = true;
                         result.Message = "User deleted successfully.";
                     }
-                   
+
                 }
                 else
                 {
@@ -345,7 +378,7 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-        
+
         [HttpGet]
         [Route("GetUserById")]
         public async Task<IActionResult> GetUserDetailsById(int UserId)
@@ -408,5 +441,51 @@ namespace QuickCampusAPI.Controllers
             }
         }
 
+        private async Task<IGeneralResult<string>> AddorUpdateRole(int userId, AppRole appRole, int roleId)
+        {
+            IGeneralResult<string> result = new GeneralResult<string>();
+
+            var checkUserAppRole = _userAppRoleRepo.GetAllQuerable().Where(x => x.UserId == userId).FirstOrDefault();
+
+            if (checkUserAppRole == null)
+            {
+                
+                TblUserAppRole userAppRole = new TblUserAppRole()
+                {
+                    UserId = userId,
+                    RoleId = (int)appRole
+                };
+                var roleAdd = await _userAppRoleRepo.Add(userAppRole);
+                if (roleAdd.Id == 0)
+                {
+                    result.Message = "Something Went Wrong";
+                    return result;
+                }
+            }
+            var checkUserRole = _UserRoleRepo.GetAllQuerable().Where(x => x.UserId == userId).FirstOrDefault();
+
+            if (checkUserRole != null)
+            {
+                await _UserRoleRepo.Update(checkUserRole);
+            }
+            else
+            {
+                TblUserRole userRole = new TblUserRole
+                {
+                    RoleId = roleId,
+                    UserId = userId
+                };
+                var userRoleData = await _UserRoleRepo.Add(userRole);
+                if (userRoleData.Id == 0)
+                {
+                    result.Message = "Something Went Wrong";
+                    return result;
+                }
+            }
+
+            result.IsSuccess = true;
+            result.Message = "Role Added Successfully";
+            return result;
+        }
     }
 }

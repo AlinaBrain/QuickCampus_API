@@ -27,7 +27,8 @@ namespace QuickCampus_Core.Common
             None = 0,
             Admin = 1,
             Client = 2,
-            Client_User = 3
+            Client_User = 3,
+            Admin_User=4
         }
         public enum DataTypeFilter
         {

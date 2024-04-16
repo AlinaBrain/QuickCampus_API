@@ -26,6 +26,8 @@ namespace QuickCampus_Core.ViewModel
         public string? Mobile { get; set; }
         public int? ClientId { get; set; }
 
+        public int RoleId { get; set; }
+
 
         //public DateTime? CreateDate { get; set; }
 
