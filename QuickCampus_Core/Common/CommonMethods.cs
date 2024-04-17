@@ -8,14 +8,12 @@ namespace QuickCampus_Core.Common
         public static string ConvertToEncrypt(string Password)
         {
             if (string.IsNullOrEmpty(Password)) return "";
-
             {
                 Password += Key;
                 var PasswordBytes = Encoding.UTF8.GetBytes(Password);
                 return Convert.ToBase64String(PasswordBytes);
             }
         }
-
         public static string ConvertToDecrypt(string base64EncodeData)
         {
             if (string.IsNullOrEmpty(base64EncodeData)) return "";

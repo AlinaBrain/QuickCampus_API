@@ -140,9 +140,9 @@ namespace QuickCampusAPI.Controllers
         }
         [HttpPost]
         [Route("AddDepartment")]
-        public async Task<IActionResult> AddDepartment(DepartmentVm vm)
+        public async Task<IActionResult> AddDepartment(AddDepartmentVm vm)
         {
-            IGeneralResult<DepartmentVm> result = new GeneralResult<DepartmentVm>();
+            IGeneralResult<AddDepartmentVm> result = new GeneralResult<AddDepartmentVm>();
             try
             {
                 var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
@@ -174,7 +174,7 @@ namespace QuickCampusAPI.Controllers
                     {
                         result.IsSuccess = true;
                         result.Message = "Department added successfully.";
-                        result.Data = (DepartmentVm)SaveDepartment;
+                        result.Data = (AddDepartmentVm)SaveDepartment;
                     }
                     else
                     {

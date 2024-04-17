@@ -11,29 +11,30 @@ namespace QuickCampusAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SubjectController : ControllerBase
+    public class SubTopicController : ControllerBase
     {
-        private readonly ISubjectRepo _subjectRepo;
-        private readonly IConfiguration _config;
-        private readonly string _jwtSecretKey;
-        private readonly IUserAppRoleRepo _userAppRoleRepo;
+        private readonly ISubTopicRepo _subTopicRepo;
         private readonly IUserRepo _userRepo;
-        private readonly IDepartmentRepo _departmentRepo;
+        private string _jwtSecretKey;
+        private readonly IUserAppRoleRepo _userAppRoleRepo;
+        private readonly IConfiguration _config;
+        private readonly ITopicRepo _topicRepo;
 
-        public SubjectController(ISubjectRepo subjectRepo, IConfiguration configuration, IUserAppRoleRepo userAppRoleRepo, IUserRepo userRepo,IDepartmentRepo departmentRepo)
+        public SubTopicController(ISubTopicRepo subTopicRepo, IConfiguration configuration, IUserAppRoleRepo userAppRoleRepo, IUserRepo userRepo,ITopicRepo topicRepo)
         {
-            _subjectRepo=subjectRepo;
+            _subTopicRepo = subTopicRepo;
+            _userRepo=userRepo;
             _config = configuration;
-            _jwtSecretKey = _config["Jwt:Key"] ?? "";
+            _topicRepo = topicRepo;
             _userAppRoleRepo = userAppRoleRepo;
-            _userRepo = userRepo;
-            _departmentRepo = departmentRepo;
+            _jwtSecretKey = _config["Jwt:Key"] ?? "";
         }
+
         [HttpGet]
-        [Route("GetAllSubject")]
-        public async Task<IActionResult> GetAllSubject(string? search, int? ClientId, DataTypeFilter DataType, int pageStart = 1, int pageSize = 10)
+        [Route("GetAllSubTopic")]
+        public async Task<IActionResult> GetAllSubTopic(string? search, int? ClientId, DataTypeFilter DataType, int pageStart = 1, int pageSize = 10)
         {
-            IGeneralResult<List<SubjectVm>> result = new GeneralResult<List<SubjectVm>>();
+            IGeneralResult<List<SubTopicVm>> result = new GeneralResult<List<SubTopicVm>>();
             try
             {
                 var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
@@ -51,39 +52,38 @@ namespace QuickCampusAPI.Controllers
                     newPageStart = (pageStart - startPage) * pageSize;
                 }
 
-                List<TblSubject> subjectlist = new List<TblSubject>();
-                List<TblSubject> subjectdata = new List<TblSubject>();
-                int SubjectListcount = 0;
+                List<TblSubTopic> SubTopiclist = new List<TblSubTopic>();
+                List<TblSubTopic> SubTopicdatadata = new List<TblSubTopic>();
+                int SubTopicListcount = 0;
                 if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                 {
-                    subjectdata = _subjectRepo.GetAllQuerable().Where(x => (ClientId != null && ClientId > 0 ? x.ClientId == ClientId : true) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
+                    SubTopicdatadata = _subTopicRepo.GetAllQuerable().Where(x => (ClientId != null && ClientId > 0 ? x.ClientId == ClientId : true) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
                 }
                 else
                 {
-                    subjectdata = _subjectRepo.GetAllQuerable().Where(x => x.ClientId == Convert.ToInt32(LoggedInUserClientId) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
+                    SubTopicdatadata = _subTopicRepo.GetAllQuerable().Where(x => x.ClientId == Convert.ToInt32(LoggedInUserClientId) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
                 }
                 if (!string.IsNullOrEmpty(search))
                 {
                     search = search.Trim();
                 }
-                subjectlist = subjectdata.Where(x => (x.Name.Contains(search ?? "", StringComparison.OrdinalIgnoreCase))).ToList();
-                SubjectListcount = subjectlist.Count;
-                subjectlist = subjectlist.Skip(newPageStart).Take(pageSize).ToList();
+                SubTopiclist = SubTopicdatadata.Where(x => (x.Name.Contains(search ?? "", StringComparison.OrdinalIgnoreCase))).ToList();
+                SubTopicListcount = SubTopiclist.Count;
+                SubTopiclist = SubTopiclist.Skip(newPageStart).Take(pageSize).ToList();
 
-                var response = subjectlist.Select(x => (SubjectVm)x).ToList();
+                var response = SubTopiclist.Select(x => (SubTopicVm)x).ToList();
 
-                if (subjectlist.Count > 0)
+                if (SubTopiclist.Count > 0)
                 {
                     result.IsSuccess = true;
                     result.Message = "Data fetched successfully.";
                     result.Data = response;
-                    result.TotalRecordCount = SubjectListcount;
+                    result.TotalRecordCount = SubTopicListcount;
                 }
                 else
                 {
-                    result.Message = "Template list not found!";
+                    result.Message = "SubTopic list not found!";
                 }
-
             }
             catch (Exception ex)
             {
@@ -91,12 +91,11 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-
         [HttpGet]
-        [Route("GetSubjectById")]
-        public async Task<IActionResult> GetSubjectById(int subjectId)
+        [Route("GetSubTopicById")]
+        public async Task<IActionResult> GetTopicById(int subTopicId)
         {
-            IGeneralResult<SubjectVm> result = new GeneralResult<SubjectVm>();
+            IGeneralResult<SubTopicVm> result = new GeneralResult<SubTopicVm>();
             try
             {
                 var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
@@ -107,33 +106,33 @@ namespace QuickCampusAPI.Controllers
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
                     LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
                 }
-                if (subjectId > 0)
+                if (subTopicId > 0)
                 {
-                    TblSubject subject = new TblSubject();
+                    TblSubTopic subTopic = new TblSubTopic();
 
                     if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                     {
-                        subject = _subjectRepo.GetAllQuerable().Where(x => x.Id == subjectId && x.IsDeleted == false).FirstOrDefault();
+                        subTopic = _subTopicRepo.GetAllQuerable().Where(x => x.Id == subTopicId && x.IsDeleted == false).FirstOrDefault();
                     }
                     else
                     {
-                        subject = _subjectRepo.GetAllQuerable().Where(x => x.Id == subjectId && x.IsDeleted == false && x.ClientId == Convert.ToInt32(LoggedInUserClientId)).FirstOrDefault();
+                        subTopic = _subTopicRepo.GetAllQuerable().Where(x => x.Id == subTopicId && x.IsDeleted == false && x.ClientId == Convert.ToInt32(LoggedInUserClientId)).FirstOrDefault();
                     }
-                    if (subject == null)
+                    if (subTopic == null)
                     {
-                        result.Message = " Subject does Not Exist";
+                        result.Message = " Topic does Not Exist";
                     }
                     else
                     {
                         result.IsSuccess = true;
-                        result.Message = "Subject fetched successfully.";
-                        result.Data = (SubjectVm)subject;
+                        result.Message = "SubTopic fetched successfully.";
+                        result.Data = (SubTopicVm)subTopic;
                     }
                     return Ok(result);
                 }
                 else
                 {
-                    result.Message = "Please enter a valid Department  Id.";
+                    result.Message = "Please enter a valid SubTopic Id.";
                 }
             }
             catch (Exception ex)
@@ -143,10 +142,10 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
         [HttpPost]
-        [Route("AddSubject")]
-        public async Task<IActionResult> AddSubject(AddSubjectVm vm)
+        [Route("AddSubTopic")]
+        public async Task<IActionResult> AddSubTopic(AddSubTopicVm vm)
         {
-            IGeneralResult<AddSubjectVm> result = new GeneralResult<AddSubjectVm>();
+            IGeneralResult<AddSubTopicVm> result = new GeneralResult<AddSubTopicVm>();
             try
             {
                 var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
@@ -162,36 +161,35 @@ namespace QuickCampusAPI.Controllers
                     result.Message = "Please select a valid Client";
                     return Ok(result);
                 }
-                var departmentExist= _departmentRepo.Any(x=>x.Id==vm.DepartmentId && x.IsDeleted==false);
-                if (!departmentExist)
+                var topic = _topicRepo.Any(x => x.Id == vm.TopicId && x.IsDeleted == false);
+                if (!topic)
                 {
-                    result.Message = "Department is not exist";
+                    result.Message = "SubTopic is not exist";
                     return Ok(result);
                 }
-                
                
                 if (ModelState.IsValid)
                 {
-                    var sv = new TblSubject()
+                    var sv = new TblSubTopic()
                     {
                         Name = vm.Name,
                         IsActive = true,
                         IsDeleted = false,
+                        TopicId=vm.TopicId,
                         CreatedBy = Convert.ToInt32(LoggedInUserId),
                         CreatedDate = DateTime.Now,
-                        DepartmentId=vm.DepartmentId,
                         ClientId = (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId)
                     };
-                    var SaveSubject = await _subjectRepo.Add(sv);
-                    if (SaveSubject.Id > 0)
+                    var saveSubTopic = await _subTopicRepo.Add(sv);
+                    if (saveSubTopic.Id > 0)
                     {
                         result.IsSuccess = true;
-                        result.Message = "Subject added successfully.";
-                        result.Data = (AddSubjectVm)SaveSubject;
+                        result.Message = "SubTopic added successfully.";
+                        result.Data = (AddSubTopicVm)saveSubTopic;
                     }
                     else
                     {
-                        result.Message = "Subject not saved. Please try again.";
+                        result.Message = "SubTopic not saved. Please try again.";
                     }
                 }
                 else
@@ -206,10 +204,10 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
         [HttpPost]
-        [Route("UpdateSubject")]
-        public async Task<IActionResult> UpdateSubject(EditSubjectVm vm)
+        [Route("UpdateSubTopic")]
+        public async Task<IActionResult> UpdateSubTopic(EditSubTopicVm vm)
         {
-            IGeneralResult<EditSubjectVm> result = new GeneralResult<EditSubjectVm>();
+            IGeneralResult<EditSubTopicVm> result = new GeneralResult<EditSubTopicVm>();
             try
             {
                 var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
@@ -225,26 +223,26 @@ namespace QuickCampusAPI.Controllers
                     result.Message = "Please select a valid Client";
                     return Ok(result);
                 }
-                var departmentExist = _departmentRepo.Any(x => x.Id == vm.DepartmentId && x.IsDeleted == false);
-                if (!departmentExist)
+                var topicExist = _topicRepo.Any(x => x.Id == vm.TopicId && x.IsDeleted == false);
+                if (!topicExist)
                 {
-                    result.Message = "Department is not exist";
+                    result.Message = "Topic is not exist";
                     return Ok(result);
                 }
+                
                 if (vm.Id > 0)
                 {
-
-                    var subj = _subjectRepo.GetAllQuerable().Where(x => x.Id == vm.Id && x.IsDeleted == false).FirstOrDefault();
-                    if (subj != null)
+                    var subTopic = _subTopicRepo.GetAllQuerable().Where(x => x.Id == vm.Id && x.IsDeleted == false).FirstOrDefault();
+                    if (subTopic != null)
                     {
-                        subj.Name = vm.Name;
-                        subj.ModifiedBy = Convert.ToInt32(LoggedInUserId);
-                        subj.ModifiedDate = DateTime.Now;
-                        subj.IsActive = true;
-                        subj.DepartmentId = vm.DepartmentId;
-                        subj.IsDeleted = false;
-                        subj.ClientId = (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId);
-                        await _subjectRepo.Update(subj);
+                        subTopic.Name = vm.Name;
+                        subTopic.ModifiedBy = Convert.ToInt32(LoggedInUserId);
+                        subTopic.ModifiedDate = DateTime.Now;
+                        subTopic.TopicId = vm.TopicId;
+                        subTopic.IsActive = true;
+                        subTopic.IsDeleted = false;
+                        subTopic.ClientId = (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId);
+                        await _subTopicRepo.Update(subTopic);
                         result.IsSuccess = true;
                         result.Message = "Record Update Successfully";
                         result.Data = vm;
@@ -264,10 +262,10 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
         [HttpDelete]
-        [Route("DeleteSubject")]
-        public async Task<IActionResult> DeleteSubject(int subjectId)
+        [Route("DeleteSubTopic")]
+        public async Task<IActionResult> DeleteSubTopic(int subTopicId)
         {
-            IGeneralResult<SubjectVm> result = new GeneralResult<SubjectVm>();
+            IGeneralResult<SubTopicVm> result = new GeneralResult<SubTopicVm>();
             try
             {
                 var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
@@ -278,37 +276,37 @@ namespace QuickCampusAPI.Controllers
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
                     LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
                 }
-                if (subjectId > 0)
+                if (subTopicId > 0)
                 {
-                    TblSubject subject = new TblSubject();
+                     TblSubTopic subTopic= new TblSubTopic();
                     if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                     {
-                        subject = _subjectRepo.GetAllQuerable().Where(x => x.Id == subjectId && x.IsDeleted == false).FirstOrDefault();
+                        subTopic = _subTopicRepo.GetAllQuerable().Where(x => x.Id == subTopicId && x.IsDeleted == false).FirstOrDefault();
                     }
                     else
                     {
-                        subject = _subjectRepo.GetAllQuerable().Where(x => x.Id == subjectId && x.IsDeleted == false && x.ClientId == Convert.ToInt32(LoggedInUserClientId)).FirstOrDefault();
+                        subTopic = _subTopicRepo.GetAllQuerable().Where(x => x.Id == subTopicId && x.IsDeleted == false && x.ClientId == Convert.ToInt32(LoggedInUserClientId)).FirstOrDefault();
                     }
-                    if (subject == null)
+                    if (subTopic == null)
                     {
-                        result.Message = " Subject does Not Exist";
+                        result.Message = "SubTopic does Not Exist";
                     }
                     else
                     {
-                        subject.IsActive = false;
-                        subject.IsDeleted = true;
-                        subject.ModifiedDate = DateTime.Now;
-                        subject.ModifiedBy = Convert.ToInt32(LoggedInUserId);
-                        await _subjectRepo.Update(subject);
+                        subTopic.IsActive = false;
+                        subTopic.IsDeleted = true;
+                        subTopic.ModifiedDate = DateTime.Now;
+                        subTopic.ModifiedBy = Convert.ToInt32(LoggedInUserId);
+                        await _subTopicRepo.Update(subTopic);
                         result.IsSuccess = true;
-                        result.Message = "Subject deleted successfully.";
-                        result.Data = (SubjectVm)subject;
+                        result.Message = " SubTopic deleted successfully.";
+                        result.Data = (SubTopicVm)subTopic;
                     }
                     return Ok(result);
                 }
                 else
                 {
-                    result.Message = "Please enter a valid Subject Id.";
+                    result.Message = "Please enter a valid Topic Id.";
                 }
             }
             catch (Exception ex)

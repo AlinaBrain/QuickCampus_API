@@ -7,22 +7,22 @@ using System.Threading.Tasks;
 
 namespace QuickCampus_Core.ViewModel
 {
-    public class AddSubjectVm
+    public class AddDepartmentVm
     {
-        public static explicit operator AddSubjectVm(TblSubject item)
+        public static explicit operator AddDepartmentVm(TblDepartment item)
         {
-            return new AddSubjectVm
+            return new AddDepartmentVm
             {
-                
-                Name= item.Name,
-                DepartmentId= item.DepartmentId,
-                CreatedDate= item.CreatedDate,
-                ClientId= item.ClientId,
+                Id = item.Id,
+                Name = item.Name,
+                IsActive= item.IsActive,
+                CreatedDate = item.CreatedDate,
+                ClientId = item.ClientId,
             };
         }
         public int Id { get; set; }
         public string? Name { get; set; }
-        public int? DepartmentId { get; set; }
+        public bool? IsActive { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? ClientId { get; set; }
     }
