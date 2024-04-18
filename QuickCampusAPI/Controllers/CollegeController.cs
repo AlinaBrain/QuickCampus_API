@@ -179,6 +179,11 @@ namespace QuickCampusAPI.Controllers
             IGeneralResult<CollegeVM> result = new GeneralResult<CollegeVM>();
             try
             {
+                if (vm == null)
+                {
+                    result.Message = "Your Model request in Invalid";
+                    return Ok(result);
+                }
                 if (ModelState.IsValid)
                 {
                     var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
@@ -299,6 +304,11 @@ namespace QuickCampusAPI.Controllers
             IGeneralResult<AddCollegeVm> result = new GeneralResult<AddCollegeVm>();
             try
             {
+                if (vm == null)
+                {
+                    result.Message = "Your Model request in Invalid";
+                    return Ok(result);
+                }
                 if (ModelState.IsValid)
                 {
                     var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);

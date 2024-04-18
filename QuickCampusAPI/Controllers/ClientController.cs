@@ -49,6 +49,11 @@ namespace QuickCampusAPI.Controllers
             IGeneralResult<ClientResponseViewModel> result = new GeneralResult<ClientResponseViewModel>();
             try
             {
+                if (vm == null)
+                {
+                    result.Message = "Your Model request in Invalid";
+                    return Ok(result);
+                }
                 var _jwtSecretKey = _config["Jwt:Key"];
                 var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                 var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
@@ -178,6 +183,11 @@ namespace QuickCampusAPI.Controllers
             IGeneralResult<ClientResponseViewModel> result = new GeneralResult<ClientResponseViewModel>();
             try
             {
+                if (vm == null)
+                {
+                    result.Message = "Your Model request in Invalid";
+                    return Ok(result);
+                }
                 var _jwtSecretKey = _config["Jwt:Key"];
                 var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                 var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();

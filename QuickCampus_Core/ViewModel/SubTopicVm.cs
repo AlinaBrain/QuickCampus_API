@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QuickCampus_DAL.Context;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,13 +7,24 @@ using System.Threading.Tasks;
 
 namespace QuickCampus_Core.ViewModel
 {
-    public class EditSubjectVm
+    public class SubTopicVm
     {
+        public static explicit operator SubTopicVm(TblSubTopic item)
+        {
+            return new SubTopicVm
+            {
+                Id= item.Id,
+                Name= item.Name,
+                TopicId= item.TopicId,
+                IsActive= item.IsActive,
+                ClientId= item.ClientId,
+            };
+        }
         public int Id { get; set; }
 
         public string? Name { get; set; }
 
-        public int? DepartmentId { get; set; }
+        public int? TopicId { get; set; }
 
         public bool? IsActive { get; set; }
 
@@ -25,6 +37,8 @@ namespace QuickCampus_Core.ViewModel
         public DateTime? CreatedDate { get; set; }
 
         public DateTime? ModifiedDate { get; set; }
+
         public int? ClientId { get; set; }
+
     }
 }

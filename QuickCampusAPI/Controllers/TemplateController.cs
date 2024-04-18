@@ -147,6 +147,11 @@ namespace QuickCampusAPI.Controllers
             IGeneralResult<TemplateVm> result = new GeneralResult<TemplateVm>();
             try
             {
+                if (vm == null)
+                {
+                    result.Message = "Your Model request in Invalid";
+                    return Ok(result);
+                }
                 var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                 var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")

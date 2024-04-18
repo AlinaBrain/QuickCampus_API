@@ -143,11 +143,16 @@ namespace QuickCampusAPI.Controllers
 
         [HttpPost]
         [Route("AddDepartment")]
-        public async Task<IActionResult> AddDepartment(DepartmentVm vm)
+        public async Task<IActionResult> AddDepartment(AddDepartmentVm vm)
         {
-            IGeneralResult<DepartmentVm> result = new GeneralResult<DepartmentVm>();
+            IGeneralResult<AddDepartmentVm> result = new GeneralResult<AddDepartmentVm>();
             try
             {
+                if (vm == null)
+                {
+                    result.Message = "Your Model request in Invalid";
+                    return Ok(result);
+                }
                 var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                 var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
@@ -177,7 +182,7 @@ namespace QuickCampusAPI.Controllers
                     {
                         result.IsSuccess = true;
                         result.Message = "Department added successfully.";
-                        result.Data = (DepartmentVm)SaveDepartment;
+                        result.Data = (AddDepartmentVm)SaveDepartment;
                     }
                     else
                     {
@@ -202,6 +207,11 @@ namespace QuickCampusAPI.Controllers
             IGeneralResult<DepartmentVm> result = new GeneralResult<DepartmentVm>();
             try
             {
+                if (vm == null)
+                {
+                    result.Message = "Your Model request in Invalid";
+                    return Ok(result);
+                }
                 var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                 var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")

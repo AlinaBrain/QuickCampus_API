@@ -7,19 +7,22 @@ using System.Threading.Tasks;
 
 namespace QuickCampus_Core.ViewModel
 {
-    public class SubjectVm
+    public class TopicVm
     {
-        public static explicit operator SubjectVm(TblSubject item)
+        public static explicit operator TopicVm(TblTopic item)
         {
-            return new SubjectVm
+            return new TopicVm
             {
-                Id= item.Id,
+                Id = item.Id,
                 Name=item.Name,
-                DepartmentId=item.DepartmentId,
-                IsActive=item.IsActive,
+                DepartmentId = item.DepartmentId,
+                SubjectId = item.SubjectId,
+                IsActive = item.IsActive,
+                IsDeleted = item.IsDeleted,
+                CreatedDate = item.CreatedDate,
                 CreatedBy=item.CreatedBy,
-                CreatedDate=item.CreatedDate,
-                ClientId=item.ClientId,
+                ModifiedBy=item.ModifiedBy,
+                ModifiedDate=item.ModifiedDate
             };
         }
         public int Id { get; set; }
@@ -27,6 +30,8 @@ namespace QuickCampus_Core.ViewModel
         public string? Name { get; set; }
 
         public int? DepartmentId { get; set; }
+
+        public int? SubjectId { get; set; }
 
         public bool? IsActive { get; set; }
 
@@ -39,6 +44,7 @@ namespace QuickCampus_Core.ViewModel
         public DateTime? CreatedDate { get; set; }
 
         public DateTime? ModifiedDate { get; set; }
+
         public int? ClientId { get; set; }
     }
 }

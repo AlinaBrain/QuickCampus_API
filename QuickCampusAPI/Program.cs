@@ -133,12 +133,11 @@ builder.Services.AddScoped<ISkillsRepo, SkillRepo>();
 builder.Services.AddScoped<IMstSkillsRepo,MstSkillRepo>();
 builder.Services.AddScoped<IClientTypeRepo, ClientTypeRepo>();
 builder.Services.AddScoped<ITemplateRepo, TemplateRepo>();
-
+builder.Services.AddScoped<IDepartmentRepo,DepartmentRepo>();
 builder.Services.AddScoped<ISubTopicRepo, SubTopicRepo>();
 builder.Services.AddScoped<ITopicRepo, TopicRepo>();
 builder.Services.AddScoped<ISubjectRepo, SubjectRepo>();
 builder.Services.AddScoped<ITagRepo, TagRepo>();
-
 builder.Services.AddTransient<ValidationFilterAttribute>();
 builder.Services.Configure<ApiBehaviorOptions>(options
     => options.SuppressModelStateInvalidFilter = true);
