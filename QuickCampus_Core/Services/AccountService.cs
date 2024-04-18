@@ -74,8 +74,8 @@ namespace QuickCampus_Core.Services
             rolePermissions = _context.TblRolePermissions.Include(i => i.Permission).Where(w => w.RoleId == RoleId).Select(s => new RolePermissions()
             {
                 Id = s.PermissionId ?? 0, 
-                PermissionName = s.Permission.PermissionName,
-                DisplayName = s.Permission.PermissionDisplay
+                PermissionName = s.Permission.SubItemName,
+                DisplayName = s.Permission.SubItemDisplayName
             }).ToList();
             return rolePermissions;
         }
@@ -86,16 +86,21 @@ namespace QuickCampus_Core.Services
             var credentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
             string roleArr = JsonSerializer.Serialize(roleVm.rolePermissions);
             var claims = new List<Claim>
-         {
+            {
                 new Claim("UserId",userId.ToString()),
                 new Claim("ClientId",clientId.ToString() ?? "0"),
                 //new Claim("RolesArray",roleArr ?? ""),
                 new Claim("UserAppRole",roleVm.UserAppRoleName ?? ""),
                 new Claim(ClaimTypes.Role,roleVm.UserAppRoleName)
             };
+            foreach (var role in roleVm.rolePermissions)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role.PermissionName));
+            }
+
 
             var token = new JwtSecurityToken(_config["Jwt:Issuer"], _config["Jwt:Audience"], claims,
-               expires: DateTime.Now.AddHours(5), signingCredentials: credentials);
+           expires: DateTime.Now.AddHours(5), signingCredentials: credentials);
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 

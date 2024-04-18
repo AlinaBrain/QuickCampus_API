@@ -41,6 +41,7 @@ namespace QuickCampusAPI.Controllers
             _clientTypeRepo = clientTypeRepo;
         }
 
+        [Authorize(Roles = "AddClient")]
         [HttpPost]
         [Route("AddClient")]
         public async Task<IActionResult> AddClient([FromBody] ClientViewModel vm)
@@ -169,6 +170,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "EditClient")]
         [HttpPost]
         [Route("EditClient")]
         public async Task<IActionResult> EditClient([FromBody] EditClientVm vm)
@@ -296,6 +298,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "DeleteClient")]
         [HttpDelete]
         [Route("DeleteClient")]
         public async Task<IActionResult> DeleteClient(int Id)
@@ -340,6 +343,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "AcInClient")]
         [HttpGet]
         [Route("ClientActiveInactive")]
         public async Task<IActionResult> ActiveAndInactive(int id)

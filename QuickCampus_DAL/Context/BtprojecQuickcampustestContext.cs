@@ -69,8 +69,6 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
     public virtual DbSet<TblTag> TblTags { get; set; }
 
-    public virtual DbSet<TblTemplate> TblTemplates { get; set; }
-
     public virtual DbSet<TblTopic> TblTopics { get; set; }
 
     public virtual DbSet<TblUser> TblUsers { get; set; }
@@ -85,7 +83,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=103.93.16.117;Database=btprojec_QuickCampusTest;TrustServerCertificate=true;user id=btprojec_admin;password=Bwy0w65ixN*bsE9wy;Integrated Security=false");
+        => optionsBuilder.UseSqlServer("Server=DESKTOP-VO4848B;Database=btprojec_quickcampustest;TrustServerCertificate=true;Integrated Security=true;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -166,7 +164,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
         modelBuilder.Entity<MstClientType>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__MstClien__3214EC07535AA148");
+            entity.HasKey(e => e.Id).HasName("PK__MstClien__3214EC07A4D5B23D");
 
             entity.ToTable("MstClientType");
 
@@ -363,7 +361,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
             entity.HasOne(d => d.ClientType).WithMany(p => p.TblClients)
                 .HasForeignKey(d => d.ClientTypeId)
-                .HasConstraintName("FK__tblClient__Clien__54CB950F");
+                .HasConstraintName("FK__tblClient__Clien__6225902D");
         });
 
         modelBuilder.Entity<TblCollege>(entity =>
@@ -407,7 +405,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
         modelBuilder.Entity<TblDepartment>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__tblDepar__3214EC07A7AEFC21");
+            entity.HasKey(e => e.Id).HasName("PK__tblDepar__3214EC074E951C75");
 
             entity.ToTable("tblDepartment");
 
@@ -423,7 +421,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
             entity.HasOne(d => d.Client).WithMany(p => p.TblDepartments)
                 .HasForeignKey(d => d.ClientId)
-                .HasConstraintName("FK__tblDepart__Clien__5A846E65");
+                .HasConstraintName("FK__tblDepart__Clien__44952D46");
         });
 
         modelBuilder.Entity<TblMenuItemUserPermission>(entity =>
@@ -503,7 +501,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
             entity.HasOne(d => d.Permission).WithMany(p => p.TblRolePermissions)
                 .HasForeignKey(d => d.PermissionId)
-                .HasConstraintName("FK__tbl_RoleP__Permi__160F4887");
+                .HasConstraintName("FK__tblRole_P__Permi__65F62111");
 
             entity.HasOne(d => d.Role).WithMany(p => p.TblRolePermissions)
                 .HasForeignKey(d => d.RoleId)
@@ -512,7 +510,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
         modelBuilder.Entity<TblSubTopic>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__tblSubTo__3214EC078A9D4CB1");
+            entity.HasKey(e => e.Id).HasName("PK__tblSubTo__3214EC07D1E05346");
 
             entity.ToTable("tblSubTopics");
 
@@ -528,16 +526,16 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
             entity.HasOne(d => d.Client).WithMany(p => p.TblSubTopics)
                 .HasForeignKey(d => d.ClientId)
-                .HasConstraintName("FK__tblSubTop__Clien__6F7F8B4B");
+                .HasConstraintName("FK__tblSubTop__Clien__59904A2C");
 
             entity.HasOne(d => d.Topic).WithMany(p => p.TblSubTopics)
                 .HasForeignKey(d => d.TopicId)
-                .HasConstraintName("FK__tblSubTop__Topic__6BAEFA67");
+                .HasConstraintName("FK__tblSubTop__Topic__55BFB948");
         });
 
         modelBuilder.Entity<TblSubject>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__tblSubje__3214EC0737C3EA76");
+            entity.HasKey(e => e.Id).HasName("PK__tblSubje__3214EC073B770977");
 
             entity.ToTable("tblSubjects");
 
@@ -553,16 +551,16 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
             entity.HasOne(d => d.Client).WithMany(p => p.TblSubjects)
                 .HasForeignKey(d => d.ClientId)
-                .HasConstraintName("FK__tblSubjec__Clien__61316BF4");
+                .HasConstraintName("FK__tblSubjec__Clien__4B422AD5");
 
             entity.HasOne(d => d.Department).WithMany(p => p.TblSubjects)
                 .HasForeignKey(d => d.DepartmentId)
-                .HasConstraintName("FK__tblSubjec__Depar__5D60DB10");
+                .HasConstraintName("FK__tblSubjec__Depar__477199F1");
         });
 
         modelBuilder.Entity<TblTag>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__tblTags__3214EC073FBE20FD");
+            entity.HasKey(e => e.Id).HasName("PK__tblTags__3214EC077A182DEA");
 
             entity.ToTable("tblTags");
 
@@ -578,26 +576,12 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
             entity.HasOne(d => d.Client).WithMany(p => p.TblTags)
                 .HasForeignKey(d => d.ClientId)
-                .HasConstraintName("FK__tblTags__ClientI__753864A1");
-        });
-
-        modelBuilder.Entity<TblTemplate>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__tblTempl__3214EC0769945682");
-
-            entity.ToTable("tblTemplates");
-
-            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
-            entity.Property(e => e.ModifiedAt).HasColumnType("datetime");
-
-            entity.HasOne(d => d.Client).WithMany(p => p.TblTemplates)
-                .HasForeignKey(d => d.ClientId)
-                .HasConstraintName("FK__tblTempla__Clien__41B8C09B");
+                .HasConstraintName("FK__tblTags__ClientI__5F492382");
         });
 
         modelBuilder.Entity<TblTopic>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__tblTopic__3214EC07D6176427");
+            entity.HasKey(e => e.Id).HasName("PK__tblTopic__3214EC07AADD047E");
 
             entity.ToTable("tblTopics");
 
@@ -613,15 +597,15 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
             entity.HasOne(d => d.Client).WithMany(p => p.TblTopics)
                 .HasForeignKey(d => d.ClientId)
-                .HasConstraintName("FK__tblTopics__Clien__68D28DBC");
+                .HasConstraintName("FK__tblTopics__Clien__52E34C9D");
 
             entity.HasOne(d => d.Department).WithMany(p => p.TblTopics)
                 .HasForeignKey(d => d.DepartmentId)
-                .HasConstraintName("FK__tblTopics__Depar__640DD89F");
+                .HasConstraintName("FK__tblTopics__Depar__4E1E9780");
 
             entity.HasOne(d => d.Subject).WithMany(p => p.TblTopics)
                 .HasForeignKey(d => d.SubjectId)
-                .HasConstraintName("FK__tblTopics__Subje__6501FCD8");
+                .HasConstraintName("FK__tblTopics__Subje__4F12BBB9");
         });
 
         modelBuilder.Entity<TblUser>(entity =>

@@ -28,4 +28,6 @@ public partial class MstMenuSubItem
     public DateTime? ModifiedAt { get; set; }
 
     public virtual MstMenuItem? Item { get; set; }
+
+    public virtual ICollection<TblRolePermission> TblRolePermissions { get; set; } = new List<TblRolePermission>();
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Extensions;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
@@ -124,10 +125,12 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "AddApplicant")]
         [HttpPost]
         [Route("AddApplicant")]
         public async Task<IActionResult> AddApplicant(ApplicantViewModel vm)
         {
+            string q = Enum.GetName<RolesList>(RolesList.AddApplicant).ToString();
             IGeneralResult<ApplicantViewModel> result = new GeneralResult<ApplicantViewModel>();
             try
             {
@@ -226,6 +229,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "EditApplicant")]
         [HttpPost]
         [Route("EditApplicant")]
         public async Task<IActionResult> EditApplicant(ApplicantViewModel vm)
@@ -427,6 +431,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "DeleteApplicant")]
         [HttpDelete]
         [Route("DeleteApplicant")]
         public async Task<IActionResult> DeleteApplicant(int applicantId)
@@ -484,6 +489,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "AcInApplicant")]
         [HttpGet]
         [Route("ApplicantActiveInactive")]
         public async Task<IActionResult> ActiveAndInactive(int applicantId)

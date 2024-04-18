@@ -55,8 +55,6 @@ public partial class TblClient
 
     public virtual ICollection<TblTag> TblTags { get; set; } = new List<TblTag>();
 
-    public virtual ICollection<TblTemplate> TblTemplates { get; set; } = new List<TblTemplate>();
-
     public virtual ICollection<TblTopic> TblTopics { get; set; } = new List<TblTopic>();
 
     public virtual ICollection<TblUser> TblUsers { get; set; } = new List<TblUser>();

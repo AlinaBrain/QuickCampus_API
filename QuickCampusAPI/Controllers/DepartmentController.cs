@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
@@ -88,6 +89,7 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
+        
         [HttpGet]
         [Route("GetDepartmentById")]
         public async Task<IActionResult> GetDepartmentById(int departmentId)
@@ -138,6 +140,7 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
+
         [HttpPost]
         [Route("AddDepartment")]
         public async Task<IActionResult> AddDepartment(DepartmentVm vm)

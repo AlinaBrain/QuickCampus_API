@@ -199,6 +199,7 @@ namespace QuickCampusAPI.Controllers
 
         }
 
+        [Authorize(Roles = "AcInQuestion")]
         [HttpGet]
         [Route("QuestionActiveInactive")]
         public async Task<ActionResult> QuestionActiveInactive(int QuestionId)
@@ -269,6 +270,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "DeleteQuestion")]
         [HttpDelete]
         [Route("DeleteQuestionById")]
         public async Task<ActionResult> DeleteQuestion(int QuestionId)
@@ -322,6 +324,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "AddQuestion")]
         [HttpPost]
         [Route("AddQuestion")]
         public async Task<ActionResult> AddQuestion([FromForm] QuestionTakeViewModel vm)
@@ -438,6 +441,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "EditQuestion")]
         [HttpPost]
         [Route("UpdateQuestion")]
         public async Task<ActionResult> UpdateQuestion([FromForm] QuestionTakeViewModel vm)

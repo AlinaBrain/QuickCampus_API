@@ -171,6 +171,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles ="AddColleges")]
         [HttpPost]
         [Route("AddCollege")]
         public async Task<IActionResult> AddCollege([FromForm] AddCollegeVm vm)
@@ -290,6 +291,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "EditColleges")]
         [HttpPost]
         [Route("EditCollege")]
         public async Task<IActionResult> EditCollege([FromForm] AddCollegeVm vm)
@@ -428,6 +430,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "DeleteColleges")]
         [HttpDelete]
         [Route("DeleteCollege")]
         public async Task<IActionResult> DeleteCollege(int CollegeId)
@@ -483,6 +486,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "AcInColleges")]
         [HttpGet]
         [Route("CollegeActiveInactive")]
         public async Task<IActionResult> ActiveAndInactive(int CollegeId)
