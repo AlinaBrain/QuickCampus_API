@@ -145,6 +145,11 @@ namespace QuickCampusAPI.Controllers
             IGeneralResult<AddDepartmentVm> result = new GeneralResult<AddDepartmentVm>();
             try
             {
+                if (vm == null)
+                {
+                    result.Message = "Your Model request in Invalid";
+                    return Ok(result);
+                }
                 var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                 var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
@@ -199,6 +204,11 @@ namespace QuickCampusAPI.Controllers
             IGeneralResult<DepartmentVm> result = new GeneralResult<DepartmentVm>();
             try
             {
+                if (vm == null)
+                {
+                    result.Message = "Your Model request in Invalid";
+                    return Ok(result);
+                }
                 var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                 var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")

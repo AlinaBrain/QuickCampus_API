@@ -148,6 +148,11 @@ namespace QuickCampusAPI.Controllers
             IGeneralResult<AddSubTopicVm> result = new GeneralResult<AddSubTopicVm>();
             try
             {
+                if (vm == null)
+                {
+                    result.Message ="Your Model request in Invalid";
+                    return Ok(result);
+                }
                 var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                 var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
@@ -210,6 +215,11 @@ namespace QuickCampusAPI.Controllers
             IGeneralResult<EditSubTopicVm> result = new GeneralResult<EditSubTopicVm>();
             try
             {
+                if (vm == null)
+                {
+                    result.Message = "Your Model request in Invalid";
+                    return Ok(result);
+                }
                 var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                 var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
