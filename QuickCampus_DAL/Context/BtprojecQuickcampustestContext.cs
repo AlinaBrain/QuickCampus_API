@@ -83,17 +83,17 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=DESKTOP-VO4848B;Database=btprojec_quickcampustest;TrustServerCertificate=true;Integrated Security=true;");
+        => optionsBuilder.UseSqlServer("Server=103.93.16.117;Database=btprojec_quickcampustest;user id=btprojec_admin;password=Bwy0w65ixN*bsE9wy;Integrated Security=false;TrustServerCertificate=true;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.UseCollation("Latin1_General_CI_AI");
+        modelBuilder.HasDefaultSchema("btprojec_admin");
 
         modelBuilder.Entity<MstAppRole>(entity =>
         {
             entity.HasKey(e => e.AppRoleId).HasName("PK__MstAppRo__E66DD698EDF1A5D6");
 
-            entity.ToTable("MstAppRole");
+            entity.ToTable("MstAppRole", "dbo");
 
             entity.Property(e => e.AppRoleName)
                 .HasMaxLength(100)
@@ -106,7 +106,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.StatusId).HasName("PK_Status");
 
-            entity.ToTable("MstApplicantStatus");
+            entity.ToTable("MstApplicantStatus", "dbo");
 
             entity.Property(e => e.StatusId).ValueGeneratedNever();
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
@@ -120,7 +120,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.CityId).HasName("PK__City__F2D21B760C7D81FB");
 
-            entity.ToTable("MstCity");
+            entity.ToTable("MstCity", "dbo");
 
             entity.Property(e => e.CityName)
                 .HasMaxLength(150)
@@ -138,7 +138,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.StateId).HasName("PK_State");
 
-            entity.ToTable("MstCity_State");
+            entity.ToTable("MstCity_State", "dbo");
 
             entity.Property(e => e.StateId).ValueGeneratedNever();
             entity.Property(e => e.StateName)
@@ -154,7 +154,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.CountryId).HasName("PK_Country");
 
-            entity.ToTable("MstCity_State_Country");
+            entity.ToTable("MstCity_State_Country", "dbo");
 
             entity.Property(e => e.CountryId).ValueGeneratedNever();
             entity.Property(e => e.CountryName)
@@ -164,9 +164,9 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
         modelBuilder.Entity<MstClientType>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__MstClien__3214EC07A4D5B23D");
+            entity.HasKey(e => e.Id).HasName("PK__MstClien__3214EC07C8B1BF56");
 
-            entity.ToTable("MstClientType");
+            entity.ToTable("MstClientType", "dbo");
 
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
             entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
@@ -177,7 +177,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.GroupId).HasName("PK_Group");
 
-            entity.ToTable("MstGroupdl");
+            entity.ToTable("MstGroupdl", "dbo");
 
             entity.Property(e => e.GroupId).ValueGeneratedNever();
             entity.Property(e => e.GroupName)
@@ -188,6 +188,8 @@ public partial class BtprojecQuickcampustestContext : DbContext
         modelBuilder.Entity<MstMenuItem>(entity =>
         {
             entity.HasKey(e => e.ItemId).HasName("PK__MstMenuI__727E838BD5B99911");
+
+            entity.ToTable("MstMenuItems", "dbo");
 
             entity.Property(e => e.CreatedAt).HasColumnType("datetime");
             entity.Property(e => e.IsActive).HasDefaultValueSql("((1))");
@@ -200,6 +202,8 @@ public partial class BtprojecQuickcampustestContext : DbContext
         modelBuilder.Entity<MstMenuSubItem>(entity =>
         {
             entity.HasKey(e => e.SubItemId).HasName("PK__MstMenuS__8A6B7585D74A99CF");
+
+            entity.ToTable("MstMenuSubItems", "dbo");
 
             entity.Property(e => e.CreatedAt).HasColumnType("datetime");
             entity.Property(e => e.IsActive).HasDefaultValueSql("((1))");
@@ -217,6 +221,8 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Tbl_perm__3214EC07F1375A94");
 
+            entity.ToTable("MstPermissions", "dbo");
+
             entity.Property(e => e.PermissionDisplay)
                 .HasMaxLength(100)
                 .UseCollation("SQL_Latin1_General_CP1_CI_AS");
@@ -229,7 +235,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.QualId).HasName("PK__MstQuali__B8C9022335534D56");
 
-            entity.ToTable("MstQualification");
+            entity.ToTable("MstQualification", "dbo");
 
             entity.Property(e => e.CreateAt).HasColumnType("datetime");
             entity.Property(e => e.IsActive).HasDefaultValueSql("((1))");
@@ -242,7 +248,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.QuestionTypeId).HasName("PK_QuestionType");
 
-            entity.ToTable("MstQuestionType");
+            entity.ToTable("MstQuestionType", "dbo");
 
             entity.Property(e => e.QuestionTypeId).ValueGeneratedNever();
             entity.Property(e => e.QuestionType)
@@ -254,7 +260,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.SectionId).HasName("PK_ExaminationSection");
 
-            entity.ToTable("MstSection");
+            entity.ToTable("MstSection", "dbo");
 
             entity.Property(e => e.SectionId).ValueGeneratedNever();
             entity.Property(e => e.Section)
@@ -265,6 +271,8 @@ public partial class BtprojecQuickcampustestContext : DbContext
         modelBuilder.Entity<MstSkill>(entity =>
         {
             entity.HasKey(e => e.SkillId).HasName("PK__mst_Skil__DFA0918741539A92");
+
+            entity.ToTable("MstSkills", "dbo");
 
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
             entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
@@ -277,7 +285,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.ApplicantId).HasName("PK_Applicant");
 
-            entity.ToTable("tblApplicant");
+            entity.ToTable("tblApplicant", "dbo");
 
             entity.Property(e => e.CollegeName)
                 .HasMaxLength(255)
@@ -319,7 +327,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.SkillId).HasName("PK__Skill__DFA091873B15CBFE");
 
-            entity.ToTable("tblApplicant_Skills");
+            entity.ToTable("tblApplicant_Skills", "dbo");
 
             entity.Property(e => e.ApplicantId).HasColumnName("Applicant_Id");
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
@@ -338,7 +346,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__tbl_Clie__3214EC0728D8A50C");
 
-            entity.ToTable("tblClient");
+            entity.ToTable("tblClient", "dbo");
 
             entity.Property(e => e.Address).UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.CompanyName).HasMaxLength(100);
@@ -361,14 +369,14 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
             entity.HasOne(d => d.ClientType).WithMany(p => p.TblClients)
                 .HasForeignKey(d => d.ClientTypeId)
-                .HasConstraintName("FK__tblClient__Clien__6225902D");
+                .HasConstraintName("FK__tblClient__Clien__0C1BC9F9");
         });
 
         modelBuilder.Entity<TblCollege>(entity =>
         {
             entity.HasKey(e => e.CollegeId).HasName("PK_College");
 
-            entity.ToTable("tblCollege");
+            entity.ToTable("tblCollege", "dbo");
 
             entity.Property(e => e.Address1)
                 .HasMaxLength(50)
@@ -405,9 +413,9 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
         modelBuilder.Entity<TblDepartment>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__tblDepar__3214EC074E951C75");
+            entity.HasKey(e => e.Id).HasName("PK__tblDepar__3214EC07E219A307");
 
-            entity.ToTable("tblDepartment");
+            entity.ToTable("tblDepartment", "dbo");
 
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("(getdate())")
@@ -421,14 +429,14 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
             entity.HasOne(d => d.Client).WithMany(p => p.TblDepartments)
                 .HasForeignKey(d => d.ClientId)
-                .HasConstraintName("FK__tblDepart__Clien__44952D46");
+                .HasConstraintName("FK__tblDepart__Clien__6ABAD62E");
         });
 
         modelBuilder.Entity<TblMenuItemUserPermission>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__tblMenuI__3214EC07ECB77D04");
 
-            entity.ToTable("tblMenuItemUserPermission");
+            entity.ToTable("tblMenuItemUserPermission", "dbo");
 
             entity.Property(e => e.CreatedAt).HasColumnType("datetime");
             entity.Property(e => e.IsActive).HasDefaultValueSql("((1))");
@@ -444,7 +452,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.QuestionId).HasName("PK_Question");
 
-            entity.ToTable("tblQuestion");
+            entity.ToTable("tblQuestion", "dbo");
 
             entity.Property(e => e.Text).UseCollation("SQL_Latin1_General_CP1_CI_AS");
 
@@ -469,7 +477,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.OptionId).HasName("PK_Answer");
 
-            entity.ToTable("tblQuestion_Option");
+            entity.ToTable("tblQuestion_Option", "dbo");
 
             entity.Property(e => e.Imagepath).UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.OptionText).UseCollation("SQL_Latin1_General_CP1_CI_AS");
@@ -483,7 +491,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__tbl_Role__3214EC07D22FB3FE");
 
-            entity.ToTable("tblRole");
+            entity.ToTable("tblRole", "dbo");
 
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
             entity.Property(e => e.ModifiedBy).HasColumnName("modifiedBy");
@@ -497,11 +505,11 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__tbl_Role__3214EC0723025571");
 
-            entity.ToTable("tblRole_Permission");
+            entity.ToTable("tblRole_Permission", "dbo");
 
             entity.HasOne(d => d.Permission).WithMany(p => p.TblRolePermissions)
                 .HasForeignKey(d => d.PermissionId)
-                .HasConstraintName("FK__tblRole_P__Permi__65F62111");
+                .HasConstraintName("FK__tblRole_P__Permi__13BCEBC1");
 
             entity.HasOne(d => d.Role).WithMany(p => p.TblRolePermissions)
                 .HasForeignKey(d => d.RoleId)
@@ -510,9 +518,9 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
         modelBuilder.Entity<TblSubTopic>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__tblSubTo__3214EC07D1E05346");
+            entity.HasKey(e => e.Id).HasName("PK__tblSubTo__3214EC071973BBAF");
 
-            entity.ToTable("tblSubTopics");
+            entity.ToTable("tblSubTopics", "dbo");
 
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("(getdate())")
@@ -526,18 +534,18 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
             entity.HasOne(d => d.Client).WithMany(p => p.TblSubTopics)
                 .HasForeignKey(d => d.ClientId)
-                .HasConstraintName("FK__tblSubTop__Clien__59904A2C");
+                .HasConstraintName("FK__tblSubTop__Clien__12C8C788");
 
             entity.HasOne(d => d.Topic).WithMany(p => p.TblSubTopics)
                 .HasForeignKey(d => d.TopicId)
-                .HasConstraintName("FK__tblSubTop__Topic__55BFB948");
+                .HasConstraintName("FK__tblSubTop__Topic__0EF836A4");
         });
 
         modelBuilder.Entity<TblSubject>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__tblSubje__3214EC073B770977");
+            entity.HasKey(e => e.Id).HasName("PK__tblSubje__3214EC07E02BEBD6");
 
-            entity.ToTable("tblSubjects");
+            entity.ToTable("tblSubjects", "dbo");
 
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("(getdate())")
@@ -551,18 +559,18 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
             entity.HasOne(d => d.Client).WithMany(p => p.TblSubjects)
                 .HasForeignKey(d => d.ClientId)
-                .HasConstraintName("FK__tblSubjec__Clien__4B422AD5");
+                .HasConstraintName("FK__tblSubjec__Clien__7167D3BD");
 
             entity.HasOne(d => d.Department).WithMany(p => p.TblSubjects)
                 .HasForeignKey(d => d.DepartmentId)
-                .HasConstraintName("FK__tblSubjec__Depar__477199F1");
+                .HasConstraintName("FK__tblSubjec__Depar__6D9742D9");
         });
 
         modelBuilder.Entity<TblTag>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__tblTags__3214EC077A182DEA");
+            entity.HasKey(e => e.Id).HasName("PK__tblTags__3214EC07F34CA66A");
 
-            entity.ToTable("tblTags");
+            entity.ToTable("tblTags", "dbo");
 
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("(getdate())")
@@ -576,14 +584,14 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
             entity.HasOne(d => d.Client).WithMany(p => p.TblTags)
                 .HasForeignKey(d => d.ClientId)
-                .HasConstraintName("FK__tblTags__ClientI__5F492382");
+                .HasConstraintName("FK__tblTags__ClientI__056ECC6A");
         });
 
         modelBuilder.Entity<TblTopic>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__tblTopic__3214EC07AADD047E");
+            entity.HasKey(e => e.Id).HasName("PK__tblTopic__3214EC074B891248");
 
-            entity.ToTable("tblTopics");
+            entity.ToTable("tblTopics", "dbo");
 
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("(getdate())")
@@ -597,22 +605,22 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
             entity.HasOne(d => d.Client).WithMany(p => p.TblTopics)
                 .HasForeignKey(d => d.ClientId)
-                .HasConstraintName("FK__tblTopics__Clien__52E34C9D");
+                .HasConstraintName("FK__tblTopics__Clien__7908F585");
 
             entity.HasOne(d => d.Department).WithMany(p => p.TblTopics)
                 .HasForeignKey(d => d.DepartmentId)
-                .HasConstraintName("FK__tblTopics__Depar__4E1E9780");
+                .HasConstraintName("FK__tblTopics__Depar__74444068");
 
             entity.HasOne(d => d.Subject).WithMany(p => p.TblTopics)
                 .HasForeignKey(d => d.SubjectId)
-                .HasConstraintName("FK__tblTopics__Subje__4F12BBB9");
+                .HasConstraintName("FK__tblTopics__Subje__753864A1");
         });
 
         modelBuilder.Entity<TblUser>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__tbl_User__3214EC073AFA6D64");
 
-            entity.ToTable("tblUser");
+            entity.ToTable("tblUser", "dbo");
 
             entity.Property(e => e.CreateDate).HasColumnType("datetime");
             entity.Property(e => e.Email)
@@ -640,7 +648,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__tblUserA__3214EC0734D6D21C");
 
-            entity.ToTable("tblUserAppRole");
+            entity.ToTable("tblUserAppRole", "dbo");
 
             entity.HasOne(d => d.Role).WithMany(p => p.TblUserAppRoles)
                 .HasForeignKey(d => d.RoleId)
@@ -655,7 +663,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Tbl_User__3214EC07BF879BE9");
 
-            entity.ToTable("tblUser_Role");
+            entity.ToTable("tblUser_Role", "dbo");
 
             entity.HasOne(d => d.Role).WithMany(p => p.TblUserRoles)
                 .HasForeignKey(d => d.RoleId)
@@ -670,7 +678,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.WalkInId).HasName("PK_CampusWalkIn");
 
-            entity.ToTable("tblWalkIn");
+            entity.ToTable("tblWalkIn", "dbo");
 
             entity.Property(e => e.Address1)
                 .HasMaxLength(100)
@@ -706,7 +714,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
         {
             entity.HasKey(e => e.CampusId).HasName("PK_CampusCollege");
 
-            entity.ToTable("tblWalkInCollege");
+            entity.ToTable("tblWalkInCollege", "dbo");
 
             entity.Property(e => e.CollegeCode)
                 .HasMaxLength(255)
