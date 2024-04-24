@@ -120,6 +120,8 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
+
+        [Authorize(Roles = "AddCampusWalkIn")]
         [HttpPost]
         [Route("AddCampus")]
         public async Task<IActionResult> AddCampus(CampusGridRequestVM vm)
@@ -229,6 +231,8 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
+
+        [Authorize(Roles = "EditCampusWalkIn")]
         [HttpPost]
         [Route("UpdateCampus")]
         public async Task<IActionResult> UpdateCampus(CampusGridRequestVM vm)
@@ -346,6 +350,7 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
+
         [HttpGet]
         [Route("getCampusByCampusId")]
         public async Task<IActionResult> getcampusbyid(int campusId)
@@ -427,6 +432,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "AcInCampusWalkIn")]
         [HttpGet]
         [Route("CampusActiveInActive")]
         public async Task<IActionResult> ActiveInActive(int campusId, bool status)
@@ -463,6 +469,8 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
+
+        [Authorize(Roles = "DeleteCampusWalkIn")]
         [HttpDelete]
         [Route("DeleteCampus")]
         public async Task<IActionResult> DeleteCampus(int campusId)

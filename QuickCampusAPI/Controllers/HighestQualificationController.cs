@@ -28,6 +28,7 @@ namespace QuickCampusAPI.Controllers
             _jwtSecretKey = _configuration["Jwt:Key"] ?? "";
         }
 
+        
         [HttpGet]
         [Route("GetAllQualification")]
         public async Task<ActionResult> GetAllQualifications()                                                                                     

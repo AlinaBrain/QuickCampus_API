@@ -96,6 +96,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "AddUser")]
         [HttpPost]
         [Route("AddUser")]
         public async Task<IActionResult> AddUser(UserModel vm)
@@ -191,6 +192,7 @@ namespace QuickCampusAPI.Controllers
 
         }
 
+        [Authorize(Roles = "EditUser")]
         [HttpPost]
         [Route("EditUser")]
         public async Task<IActionResult> EditUser(UserRequestVm vm)
@@ -278,6 +280,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "DeleteUser")]
         [HttpDelete]
         [Route("DeleteUserById")]
         public async Task<IActionResult> DeleteUser(int UserId)
@@ -333,6 +336,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "AcInUser")]
         [HttpGet]
         [Route("UserActiveInactive")]
         public async Task<IActionResult> ActiveAndInactive(int UserId)

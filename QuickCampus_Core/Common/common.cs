@@ -1,5 +1,7 @@
 ﻿
 using Microsoft.AspNetCore.Cors;
+using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
 
 namespace QuickCampus_Core.Common
 {
@@ -28,7 +30,7 @@ namespace QuickCampus_Core.Common
             Admin = 1,
             Client = 2,
             Client_User = 3,
-            Admin_User=4
+            Admin_User = 4
         }
         public enum DataTypeFilter
         {
@@ -37,6 +39,43 @@ namespace QuickCampus_Core.Common
             OnlyInActive = 3
         }
 
+        [Flags]
+        public enum RolesList
+        {
+            [EnumMember(Value = "dddd")]
+            AddApplicant,
+            EditApplicant,
+            DeleteApplicant,
+            AcInApplicant,  
+            AddClient,
+            EditClient,
+            DeleteClient,
+            AcInClient,
+            AddRole,
+            EditRole,
+            DeleteRole,
+            AcInRole,
+            AddUser,
+            EditUser,
+            DeleteUser,
+            AcInUser,
+            AddColleges,
+            EditColleges,
+            DeleteColleges,
+            AcInColleges,
+            AddCampusWalkIn,
+            EditCampusWalkIn,
+            DeleteCampusWalkIn,
+            AcInCampusWalkIn,
+            AddQuestion,
+            EditQuestion,
+            DeleteQuestion,
+            AcInQuestion,
+            AddReport,
+            EditReport,
+            DeleteReport,
+            AcInReport
+        }
 
     }
 }

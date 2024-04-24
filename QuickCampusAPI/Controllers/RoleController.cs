@@ -39,6 +39,7 @@ namespace QuickCampusAPI.Controllers
 
         [HttpGet]
         [Route("RoleList")]
+        [Authorize(Roles = "GetAllRole")]
         public async Task<IActionResult> RoleList(string? search, int? ClientId, DataTypeFilter DataType, int pageStart = 1, int pageSize = 10)
         {
             IGeneralResult<List<RoleViewVm>> result = new GeneralResult<List<RoleViewVm>>();
@@ -97,6 +98,7 @@ namespace QuickCampusAPI.Controllers
 
         [HttpPost]
         [Route("AddRole")]
+        [Authorize(Roles = "AddRole")]
         public async Task<IActionResult> AddRole( RoleModel vm)
         {
             IGeneralResult<RoleViewVm> result = new GeneralResult<RoleViewVm>();
@@ -182,6 +184,7 @@ namespace QuickCampusAPI.Controllers
 
         [HttpPost]
         [Route("EditRole")]
+        [Authorize(Roles = "EditRole")]
         public async Task<IActionResult> EditRole( RoleModel vm)
         {
             IGeneralResult<RoleViewVm> result = new GeneralResult<RoleViewVm>();
@@ -307,13 +310,14 @@ namespace QuickCampusAPI.Controllers
             }
             catch (Exception ex)
             {
-                result.Message = "Server error! " + ex.Message;
+                result.Message = "Server error! " + ex.Message; 
             }
             return Ok(result);
         }
 
         [HttpDelete]
         [Route("DeleteRoleByRoleId")]
+        [Authorize(Roles = "DeleteRole")]
         public async Task<IActionResult> DeleteRole(int RoleId)
         {
             IGeneralResult<string> result = new GeneralResult<string>();
@@ -371,6 +375,7 @@ namespace QuickCampusAPI.Controllers
 
         [HttpGet]
         [Route("RoleActiveInactive")]
+        [Authorize(Roles = "AcInRole")]
         public async Task<IActionResult> ActiveAndInactive(int RoleId)
         {
             IGeneralResult<RoleViewVm> result = new GeneralResult<RoleViewVm>();
