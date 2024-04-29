@@ -12,7 +12,7 @@ using static QuickCampus_Core.Common.common;
 
 namespace QuickCampusAPI.Controllers
 {
-    [Authorize(Roles = "Admin,Client,Client_User")]
+    [Authorize(Roles = "Admin,Client,Client_User,Admin_User")]
     [ApiController]
     [Route("api/[controller]")]
     public class RoleController : Controller
@@ -39,7 +39,7 @@ namespace QuickCampusAPI.Controllers
 
         [HttpGet]
         [Route("RoleList")]
-        [Authorize(Roles = "GetAllRole")]
+        
         public async Task<IActionResult> RoleList(string? search, int? ClientId, DataTypeFilter DataType, int pageStart = 1, int pageSize = 10)
         {
             IGeneralResult<List<RoleViewVm>> result = new GeneralResult<List<RoleViewVm>>();

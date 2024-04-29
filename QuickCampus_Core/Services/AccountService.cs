@@ -52,7 +52,7 @@ namespace QuickCampus_Core.Services
                 };
                 response.IsSuccess = true;
                 response.Message = "Login Successfully";
-                response.Data.Token = GenerateToken(adminLogin, response.Data.RoleMasters, findUser.ClientId == null ? 0 : findUser.ClientId, findUser.Id, response.Data.IsSuperAdmin);
+                response.Data.Token = GenerateToken(adminLogin, response.Data.RoleMasters, findUser.ClientId == null ? 0 : findUser.ClientId, findUser.Id);
                 response.Data.UserName = findUser.Email;
                 response.Data.UserId = findUser.Id;
                 response.Data.CilentId = findUser.ClientId;
@@ -73,61 +73,48 @@ namespace QuickCampus_Core.Services
 
             rolePermissions = _context.TblRolePermissions.Include(i => i.Permission).Where(w => w.RoleId == RoleId).Select(s => new RolePermissions()
             {
-                Id = s.PermissionId ?? 0, 
+                Id = s.PermissionId ?? 0,
                 PermissionName = s.Permission.SubItemName,
                 DisplayName = s.Permission.SubItemDisplayName
             }).ToList();
             return rolePermissions;
         }
 
-        private string GenerateToken(AdminLogin adminlogin, RoleMaster roleVm, int? clientId, int userId, bool isSuperAdmin)
+        public IGeneralResult<List<RolesItemVm>> ListPermission(bool IsAdmin)
         {
-            var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
-            var credentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
-            string roleArr = JsonSerializer.Serialize(roleVm.rolePermissions);
-            var claims = new List<Claim>
+            IGeneralResult<List<RolesItemVm>> rolesData = new GeneralResult<List<RolesItemVm>>();
+            var rolesList = _context.MstMenuItems.Include(x => x.MstMenuSubItems).Where(y => y.IsActive == true && (!IsAdmin ? !y.ItemName.Contains("Client") : true)).Select(z => new RolesItemVm
             {
-                new Claim("UserId",userId.ToString()),
-                new Claim("ClientId",clientId.ToString() ?? "0"),
-                //new Claim("RolesArray",roleArr ?? ""),
-                new Claim("UserAppRole",roleVm.UserAppRoleName ?? ""),
-                new Claim(ClaimTypes.Role,roleVm.UserAppRoleName)
-            };
-            foreach (var role in roleVm.rolePermissions)
+                ItmeId = z.ItemId,
+                ItmeIcon = z.ItemIcon,
+                ItmeName = z.ItemDisplayName,
+                ItemSubMenu = z.MstMenuSubItems.Select(u => new PermissionVM
+                {
+                    Id = u.SubItemId,
+                    PermissionDisplay = u.SubItemIcon,
+                    PermissionName = u.SubItemDisplayName
+                }).ToList()
+            }).ToList();
+
+            //var record = await _context.MstPermissions.Select(s => new PermissionVM()
+            //{
+            //    Id = s.Id,
+            //    PermissionDisplay = s.PermissionDisplay,
+            //    PermissionName = s.PermissionName
+            //}).ToListAsync();
+
+            if (rolesList.Count > 0)
             {
-                claims.Add(new Claim(ClaimTypes.Role, role.PermissionName));
-            }
-
-
-            var token = new JwtSecurityToken(_config["Jwt:Issuer"], _config["Jwt:Audience"], claims,
-           expires: DateTime.Now.AddHours(5), signingCredentials: credentials);
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
-        public async Task<IGeneralResult<List<PermissionVM>>> ListPermission()
-        {
-            IGeneralResult<List<PermissionVM>> lst = new GeneralResult<List<PermissionVM>>();
-            lst.Data = new List<PermissionVM>();
-
-            var record = await _context.MstPermissions.Select(s => new PermissionVM()
-            {
-                Id = s.Id,
-                PermissionDisplay = s.PermissionDisplay,
-                PermissionName = s.PermissionName
-            }).ToListAsync();
-
-            if (record.Count != 0)
-            {
-                lst.Message = "Permissions";
-                lst.IsSuccess = true;
-                lst.Data = record;
+                rolesData.Message = "Permissions fetched successfully";
+                rolesData.IsSuccess = true;
+                rolesData.Data = rolesList;
             }
             else
             {
-                lst.Message = "No Record Found";
-                lst.IsSuccess = false;
+                rolesData.Message = "No Record Found";
+                rolesData.IsSuccess = false;
             }
-            return lst;
+            return rolesData;
         }
 
         public async Task<IGeneralResult<List<RoleMappingVM>>> ListRoles(int ClientId, int UserId)
@@ -154,36 +141,14 @@ namespace QuickCampus_Core.Services
             return lst;
         }
 
-        public async Task<IGeneralResult<RoleMappingVM>> GetRolePermissionByRoleIds(int[] roleIds)
-        {
-            var a = new List<int>();
-            foreach (int id in roleIds)
-            {
-                a.Add(id);
-            }
-
-            GeneralResult<RoleMappingVM> response = new GeneralResult<RoleMappingVM>();
-
-            //var rec= _context.TblRolePermissions.Where(w=> a.Contains(w.RoleId)).
-
-            return response;
-        }
-
-        
-
-        public async Task<TblUser> GetEmail(string emailId)
-        {
-            var result = _context.TblUsers.Where(s => s.Email == emailId && s.IsActive == true && s.IsDelete == false).FirstOrDefault();
-            return result;
-        }
-        public string GenerateTokenForgotPassword(string EmailId ,int userId)
+        public string GenerateTokenForgotPassword(string EmailId, int UserId)
         {
             var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
             int passwordExpiredTime = Convert.ToInt32((_config["Jwt:PasswordExpired"]));
             var claims = new List<Claim>
          {
-                new Claim("UserId",userId.ToString()),
+                new Claim("UserId",UserId.ToString()),
                 new Claim("EmailId",EmailId.ToString()),
                 new Claim("ExpiredOn",DateTime.Now.AddMinutes(passwordExpiredTime).ToString())
             };
@@ -192,10 +157,41 @@ namespace QuickCampus_Core.Services
                expires: DateTime.Now.AddMinutes(passwordExpiredTime), signingCredentials: credentials);
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-        public async Task<TblUser> CheckToken(string token,string userid)
+
+        public TblUser CheckToken(string token, string UserId)
         {
-            var result = _context.TblUsers.Where(s=>s.ForgotPassword ==token && s.IsActive==true && s.IsDelete == false && s.Id.ToString()==userid).FirstOrDefault();
+            var result = _context.TblUsers.Where(s => s.ForgotPassword == token && s.IsActive == true && s.IsDelete == false && s.Id.ToString() == UserId).FirstOrDefault();
             return result;
         }
+        public TblUser GetEmail(string emailId)
+        {
+            var result = _context.TblUsers.Where(s => s.Email == emailId && s.IsActive == true && s.IsDelete == false).FirstOrDefault();
+            return result;
+        }
+
+        private string GenerateToken(AdminLogin AdminLogin, RoleMaster roleVm, int? clientId, int userId)
+        {
+            var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var credentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
+            string roleArr = JsonSerializer.Serialize(roleVm.rolePermissions);
+            var claims = new List<Claim>
+            {
+                new Claim("UserId",userId.ToString()),
+                new Claim("ClientId",clientId.ToString() ?? "0"),
+                //new Claim("RolesArray",roleArr ?? ""),
+                new Claim("UserAppRole",roleVm.UserAppRoleName ?? ""),
+                new Claim(ClaimTypes.Role,roleVm.UserAppRoleName)
+            };
+            foreach (var role in roleVm.rolePermissions)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role.PermissionName));
+            }
+
+
+            var token = new JwtSecurityToken(_config["Jwt:Issuer"], _config["Jwt:Audience"], claims,
+           expires: DateTime.Now.AddHours(5), signingCredentials: credentials);
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
     }
 }

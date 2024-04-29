@@ -12,8 +12,6 @@ namespace QuickCampus_Core.ViewModel
         public int? CilentId { get; set; }
         public int UserId { get; set; }
         public string UserName { get; set; }
-        public string UserAppRole { get; set; }
-        public bool IsSuperAdmin { get; set; }
         public RoleMaster RoleMasters { get; set; }
         public object Modifiedby { get; internal set; }
         public object Createdby { get; internal set; }

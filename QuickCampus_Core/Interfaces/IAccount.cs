@@ -7,13 +7,11 @@ namespace QuickCampus_Core.Interfaces
     public interface IAccount
     {
         Task<IGeneralResult<LoginResponseVM>> Login(AdminLogin adminLogin);
-        Task<IGeneralResult<List<PermissionVM>>> ListPermission();
+        IGeneralResult<List<RolesItemVm>> ListPermission(bool IsAdmin);
         Task<IGeneralResult<List<RoleMappingVM>>> ListRoles(int ClientId, int UserId);
-        public List<RolePermissions> GetUserPermission(int RoleId);
-
-        Task<TblUser> GetEmail(string emailId);
-      
-        Task<TblUser> CheckToken(string token,string userid);
+        List<RolePermissions> GetUserPermission(int RoleId);
+        TblUser CheckToken(string token,string UserId);
+        TblUser GetEmail(string emailId);
         string GenerateTokenForgotPassword(string EmailId, int userId);
     }
 }

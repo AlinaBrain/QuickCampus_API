@@ -42,7 +42,6 @@ namespace QuickCampus_Core.Common
         [Flags]
         public enum RolesList
         {
-            [EnumMember(Value = "dddd")]
             AddApplicant,
             EditApplicant,
             DeleteApplicant,
