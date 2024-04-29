@@ -52,28 +52,28 @@ namespace QuickCampusAPI.Controllers
                     newPageStart = (pageStart - startPage) * pageSize;
                 }
 
-                List<TblSubTopic> SubTopiclist = new List<TblSubTopic>();
-                List<TblSubTopic> SubTopicdatadata = new List<TblSubTopic>();
+                List<TblSubTopic> SubTopicList = new List<TblSubTopic>();
+                List<TblSubTopic> SubTopicData = new List<TblSubTopic>();
                 int SubTopicListcount = 0;
                 if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                 {
-                    SubTopicdatadata = _subTopicRepo.GetAllQuerable().Where(x => (ClientId != null && ClientId > 0 ? x.ClientId == ClientId : true) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
+                    SubTopicData = _subTopicRepo.GetAllQuerable().Where(x => (ClientId != null && ClientId > 0 ? x.ClientId == ClientId : true) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
                 }
                 else
                 {
-                    SubTopicdatadata = _subTopicRepo.GetAllQuerable().Where(x => x.ClientId == Convert.ToInt32(LoggedInUserClientId) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
+                    SubTopicData = _subTopicRepo.GetAllQuerable().Where(x => x.ClientId == Convert.ToInt32(LoggedInUserClientId) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
                 }
                 if (!string.IsNullOrEmpty(search))
                 {
                     search = search.Trim();
                 }
-                SubTopiclist = SubTopicdatadata.Where(x => (x.Name.Contains(search ?? "", StringComparison.OrdinalIgnoreCase))).ToList();
-                SubTopicListcount = SubTopiclist.Count;
-                SubTopiclist = SubTopiclist.Skip(newPageStart).Take(pageSize).ToList();
+                SubTopicList = SubTopicData.Where(x => (x.Name.Contains(search ?? "", StringComparison.OrdinalIgnoreCase))).ToList();
+                SubTopicListcount = SubTopicList.Count;
+                SubTopicList = SubTopicList.Skip(newPageStart).Take(pageSize).ToList();
 
-                var response = SubTopiclist.Select(x => (SubTopicVm)x).ToList();
+                var response = SubTopicList.Select(x => (SubTopicVm)x).ToList();
 
-                if (SubTopiclist.Count > 0)
+                if (SubTopicList.Count > 0)
                 {
                     result.IsSuccess = true;
                     result.Message = "Data fetched successfully.";

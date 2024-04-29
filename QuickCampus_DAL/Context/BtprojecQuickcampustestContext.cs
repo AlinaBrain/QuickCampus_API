@@ -27,6 +27,8 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
     public virtual DbSet<MstClientType> MstClientTypes { get; set; }
 
+    public virtual DbSet<MstContenType> MstContenTypes { get; set; }
+
     public virtual DbSet<MstGroupdl> MstGroupdls { get; set; }
 
     public virtual DbSet<MstMenuItem> MstMenuItems { get; set; }
@@ -50,6 +52,8 @@ public partial class BtprojecQuickcampustestContext : DbContext
     public virtual DbSet<TblClient> TblClients { get; set; }
 
     public virtual DbSet<TblCollege> TblColleges { get; set; }
+
+    public virtual DbSet<TblContent> TblContents { get; set; }
 
     public virtual DbSet<TblDepartment> TblDepartments { get; set; }
 
@@ -83,7 +87,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=103.93.16.117;Database=btprojec_quickcampustest;user id=btprojec_admin;password=Bwy0w65ixN*bsE9wy;Integrated Security=false;TrustServerCertificate=true;");
+        => optionsBuilder.UseSqlServer("Server=103.93.16.117;Database=btprojec_quickcampustest;TrustServerCertificate=true;user id=btprojec_admin;password=Bwy0w65ixN*bsE9wy;Integrated Security=false;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -171,6 +175,16 @@ public partial class BtprojecQuickcampustestContext : DbContext
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
             entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
             entity.Property(e => e.TypeName).HasMaxLength(200);
+        });
+
+        modelBuilder.Entity<MstContenType>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__MstConte__3214EC0700983A8C");
+
+            entity.ToTable("MstContenType", "dbo");
+
+            entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+            entity.Property(e => e.UpdatedDate).HasColumnType("datetime");
         });
 
         modelBuilder.Entity<MstGroupdl>(entity =>
@@ -409,6 +423,26 @@ public partial class BtprojecQuickcampustestContext : DbContext
             entity.HasOne(d => d.City).WithMany(p => p.TblColleges)
                 .HasForeignKey(d => d.CityId)
                 .HasConstraintName("FK__College__CityId__7E37BEF6");
+        });
+
+        modelBuilder.Entity<TblContent>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__tblConte__3214EC07EB09CA14");
+
+            entity.ToTable("tblContent", "dbo");
+
+            entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+            entity.Property(e => e.UpdatedDate)
+                .HasColumnType("datetime")
+                .HasColumnName("UpdatedDAte");
+
+            entity.HasOne(d => d.Client).WithMany(p => p.TblContents)
+                .HasForeignKey(d => d.ClientId)
+                .HasConstraintName("FK__tblConten__Clien__23F3538A");
+
+            entity.HasOne(d => d.ContentType).WithMany(p => p.TblContents)
+                .HasForeignKey(d => d.ContentTypeId)
+                .HasConstraintName("FK__tblConten__Conte__22FF2F51");
         });
 
         modelBuilder.Entity<TblDepartment>(entity =>

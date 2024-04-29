@@ -45,6 +45,8 @@ public partial class TblClient
 
     public virtual ICollection<TblApplicant> TblApplicants { get; set; } = new List<TblApplicant>();
 
+    public virtual ICollection<TblContent> TblContents { get; set; } = new List<TblContent>();
+
     public virtual ICollection<TblDepartment> TblDepartments { get; set; } = new List<TblDepartment>();
 
     public virtual ICollection<TblQuestion> TblQuestions { get; set; } = new List<TblQuestion>();

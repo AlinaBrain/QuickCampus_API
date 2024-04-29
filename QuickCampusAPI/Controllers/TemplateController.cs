@@ -142,9 +142,9 @@ namespace QuickCampusAPI.Controllers
         }
         [HttpPost]
         [Route("AddTemplate")]
-        public async Task<IActionResult> AddTemplate(TemplateVm vm)
+        public async Task<IActionResult> AddTemplate(AddTemplateVm vm)
         {
-            IGeneralResult<TemplateVm> result = new GeneralResult<TemplateVm>();
+            IGeneralResult<AddTemplateVm> result = new GeneralResult<AddTemplateVm>();
             try
             {
                 if (vm == null)
@@ -167,23 +167,28 @@ namespace QuickCampusAPI.Controllers
                 }
                 if (ModelState.IsValid)
                 {
-                    vm.Body = vm.Body?.Trim();
-                    vm.Subject = vm.Subject?.Trim();
-                    vm.CreatedBy = Convert.ToInt32(LoggedInUserId);
-                    vm.ClientId = (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId);
-                    var SaveApplicant = await _templateRepo.Add(vm.ToTemplateDbModel());
-                    if (SaveApplicant.Id > 0)
+                    var sv = new TblTemplate()
+                    {
+                        Subject=vm.Subject,
+                        Body=vm.Body,
+                        IsActive = true,
+                        IsDeleted = false,
+                        CreatedBy = Convert.ToInt32(LoggedInUserId),
+                        CreatedAt=DateTime.Now,
+                        
+                        ClientId = (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId)
+                    };
+                    var saveTemplate= await _templateRepo.Add(sv);
+                    if (saveTemplate.Id > 0)
                     {
                         result.IsSuccess = true;
-                        result.Message = "Applicant added successfully.";
-                        result.Data = (TemplateVm)SaveApplicant;
-                       
+                        result.Message = "Template added successfully.";
+                        result.Data = (AddTemplateVm)saveTemplate;
                     }
                     else
                     {
                         result.Message = "Template not saved. Please try again.";
                     }
-
                 }
                 else
                 {
@@ -193,6 +198,118 @@ namespace QuickCampusAPI.Controllers
             catch (Exception ex)
             {
                 result.Message = "Server error " + ex.Message;
+            }
+            return Ok(result);
+        }
+        [HttpPost]
+        [Route("UpdateTemplate")]
+        public async Task<IActionResult> UpdateTemplate(EditTemplateVm vm)
+        {
+            IGeneralResult<EditTemplateVm> result = new GeneralResult<EditTemplateVm>();
+            try
+            {
+                if (vm == null)
+                {
+                    result.Message = "Your Model request in Invalid";
+                    return Ok(result);
+                }
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
+                {
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
+                }
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin && (vm.ClientId == null || vm.ClientId.ToString() == "" || vm.ClientId == 0))
+                {
+                    result.Message = "Please select a valid Client";
+                    return Ok(result);
+                }
+
+
+                if (vm.Id > 0)
+                {
+                    var template = _templateRepo.GetAllQuerable().Where(x => x.Id == vm.Id && x.IsDeleted == false).FirstOrDefault();
+                    if (template != null)
+                    {
+                        template.Subject = vm.Subject;
+                        template.Body=vm.Body;
+                        template.ModifiedBy = Convert.ToInt32(LoggedInUserId);
+                        template.ModifiedAt = DateTime.Now;
+                        template.IsActive = true;
+                        template.IsDeleted = false;
+                        template.ClientId = (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId);
+                        await _templateRepo.Update(template);
+                        result.IsSuccess = true;
+                        result.Message = "Record Update Successfully";
+                        result.Data = vm;
+                        return Ok(result);
+                    }
+                }
+                else
+                {
+                    result.Message = "Something went wrong.";
+                    return Ok(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Message = "server error. " + ex.Message;
+            }
+            return Ok(result);
+        }
+        [HttpDelete]
+        [Route("DeleteTemplate")]
+        public async Task<IActionResult> DeleteTemplate(int templateId)
+        {
+            IGeneralResult<TemplateVm> result = new GeneralResult<TemplateVm>();
+            try
+            {
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
+                {
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
+                }
+                if (templateId > 0)
+                {
+                    TblTemplate tblTemplate = new TblTemplate();
+                    if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
+                    {
+                        tblTemplate = _templateRepo.GetAllQuerable().Where(x => x.Id == templateId && x.IsDeleted == false).FirstOrDefault();
+                    }
+                    else
+                    {
+                        tblTemplate = _templateRepo.GetAllQuerable().Where(x => x.Id == templateId && x.IsDeleted == false && x.ClientId == Convert.ToInt32(LoggedInUserClientId)).FirstOrDefault();
+                    }
+                    if (tblTemplate == null)
+                    {
+                        result.Message = "SubTopic does Not Exist";
+                    }
+                    else
+                    {
+                        tblTemplate.IsActive = false;
+                        tblTemplate.IsDeleted = true;
+                        tblTemplate.ModifiedAt = DateTime.Now;
+                        tblTemplate.ModifiedBy = Convert.ToInt32(LoggedInUserId);
+                        await _templateRepo.Update(tblTemplate);
+                        result.IsSuccess = true;
+                        result.Message = " Tag deleted successfully.";
+                        result.Data = (TemplateVm)tblTemplate;
+                    }
+                    return Ok(result);
+                }
+                else
+                {
+                    result.Message = "Please enter a valid Tag Id.";
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Message = "Server error! " + ex.Message;
             }
             return Ok(result);
         }

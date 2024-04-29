@@ -138,6 +138,7 @@ builder.Services.AddScoped<ISubTopicRepo, SubTopicRepo>();
 builder.Services.AddScoped<ITopicRepo, TopicRepo>();
 builder.Services.AddScoped<ISubjectRepo, SubjectRepo>();
 builder.Services.AddScoped<ITagRepo, TagRepo>();
+builder.Services.AddScoped<ISubTopicRepo, SubTopicRepo>();
 builder.Services.AddTransient<ValidationFilterAttribute>();
 builder.Services.Configure<ApiBehaviorOptions>(options
     => options.SuppressModelStateInvalidFilter = true);
