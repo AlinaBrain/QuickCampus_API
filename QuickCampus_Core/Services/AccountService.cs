@@ -129,9 +129,9 @@ namespace QuickCampus_Core.Services
             IGeneralResult<List<RolesItemVm>> rolesData = new GeneralResult<List<RolesItemVm>>();
             var rolesList = _context.MstMenuItems.Include(x => x.MstMenuSubItems).Where(y => y.IsActive == true && (!IsAdmin ? !y.ItemName.Contains("Client") : true)).Select(z => new RolesItemVm
             {
-                ItmeId = z.ItemId,
-                ItmeIcon = z.ItemIcon,
-                ItmeName = z.ItemDisplayName,
+                ItemId = z.ItemId,
+                ItemIcon = z.ItemIcon,
+                ItemName = z.ItemDisplayName,
                 ItemSubMenu = z.MstMenuSubItems.Select(u => new PermissionVM
                 {
                     Id = u.SubItemId,

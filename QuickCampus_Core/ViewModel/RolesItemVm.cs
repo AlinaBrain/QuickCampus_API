@@ -8,9 +8,9 @@ namespace QuickCampus_Core.ViewModel
 {
     public class RolesItemVm
     {
-        public int ItmeId { get; set; }
-        public string ItmeIcon { get; set; }
-        public string ItmeName { get; set; }
+        public int ItemId { get; set; }
+        public string ItemIcon { get; set; }
+        public string ItemName { get; set; }
         public List<PermissionVM> ItemSubMenu { get; set; }
     }
 }
