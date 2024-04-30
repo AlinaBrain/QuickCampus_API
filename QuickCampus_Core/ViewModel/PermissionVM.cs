@@ -12,5 +12,6 @@ namespace QuickCampus_Core.ViewModel
         public string? PermissionName { get; set; }
         public string? PermissionDisplay { get; set;}
         public string? DisplayIcon { get; set;}
+        public string? Url { get; set;}
     }
 }
