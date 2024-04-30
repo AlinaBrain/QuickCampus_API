@@ -27,8 +27,9 @@ namespace QuickCampusAPI.Controllers
         private readonly MailSettings _mailSettings;
         private readonly SendEmail _sendMail;
         private string _jwtSecretKey;
+        private readonly ProcessUploadFile _uploadFile;
 
-        public AccountController(IUserRepo userRepo, IUserAppRoleRepo userAppRoleRepo, IConfiguration config, IAccount account, IOptions<MailSettings> mailSettings, SendEmail sendEmail)
+        public AccountController(IUserRepo userRepo, IUserAppRoleRepo userAppRoleRepo, IConfiguration config, IAccount account, IOptions<MailSettings> mailSettings, SendEmail sendEmail, ProcessUploadFile uploadFile)
         {
             _config = config;
             _mailSettings = mailSettings.Value;
@@ -37,6 +38,7 @@ namespace QuickCampusAPI.Controllers
             _account = account;
             _sendMail = sendEmail;
             _jwtSecretKey = _config["Jwt:Key"] ?? "";
+            _uploadFile = uploadFile;
         }
         
         [AllowAnonymous]
@@ -142,6 +144,70 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        [HttpPost]
+        [Route("ProfileChange")]
+        public async Task<IActionResult> ProfileChange([FromForm]ProfileChangeVm vm )
+        {
+            IGeneralResult<ProfileChangeVm> result = new GeneralResult<ProfileChangeVm>();
+            try
+            {
+                if (vm == null)
+                {
+                    result.Message = "Your Model request in Invalid";
+                    return Ok(result);
+                }
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
+                {
+                    var user = await userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
+                }
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                
+                if (vm.Id > 0)
+                {
+                    var profile = _account.GetAllQuerable().Where(x => x.Id == vm.Id && x.IsDelete == false).FirstOrDefault();
+                    if (profile != null)
+                    {
+                        profile.Name = vm.Name;
+                        profile.Mobile = vm.Mobile;
+                        profile.ModifiedDate = DateTime.Now;
+                        
+                        if (vm.ImagePath != null)
+                        {
+                            var CheckImg = _uploadFile.CheckImage(vm.ImagePath);
+                            if (!CheckImg.IsSuccess)
+                            {
+                                result.Message = CheckImg.Message;
+                                return Ok(result);
+                            }
+                        }
+                        var UploadLogo = _uploadFile.GetUploadFile(vm.ImagePath);
+                        if (UploadLogo.IsSuccess)
+                        {
+                            profile.ProfilePicture = UploadLogo.Data;
+                            await _account.Update(profile);
+                            result.IsSuccess = true;
+                            result.Message = "Record Update Successfully";
+                            result.Data = vm;
+                            result.Data.ImagePath = null;
+                            return Ok(result);
+                        }
+                    }
+                    else
+                    {
+                        result.Message = "Something went wrong.";
+                        return Ok(result);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Message = "server error. " + ex.Message;
+            }
+            return Ok(result);
+        }
     }
 }
 

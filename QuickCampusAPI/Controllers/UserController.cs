@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QuickCampus_Core.Common;
+using QuickCampus_Core.Common.Helper;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.Services;
 using QuickCampus_Core.ViewModel;
@@ -21,8 +22,11 @@ namespace QuickCampusAPI.Controllers
         private string _jwtSecretKey;
         private readonly IUserRoleRepo _UserRoleRepo;
         private readonly IRoleRepo _roleRepo;
+        private readonly ProcessUploadFile _uploadFile;
+        private string baseUrl;
 
-        public UserController(IUserRepo userRepo, IClientRepo clientRepo, IUserAppRoleRepo userAppRoleRepo, IConfiguration config, IUserRoleRepo userRoleRepo, IRoleRepo roleRepo)
+
+        public UserController(IUserRepo userRepo, IClientRepo clientRepo, IUserAppRoleRepo userAppRoleRepo, IConfiguration config, IUserRoleRepo userRoleRepo, IRoleRepo roleRepo, ProcessUploadFile uploadFile)
         {
             _userRepo = userRepo;
             _clientRepo = clientRepo;
@@ -31,6 +35,8 @@ namespace QuickCampusAPI.Controllers
             _jwtSecretKey = _config["Jwt:Key"] ?? "";
             _UserRoleRepo = userRoleRepo;
             _roleRepo = roleRepo;
+            _uploadFile = uploadFile;
+            baseUrl = _config.GetSection("APISitePath").Value;
         }
 
         [HttpGet]
@@ -99,7 +105,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "AddUser")]
         [HttpPost]
         [Route("AddUser")]
-        public async Task<IActionResult> AddUser(UserModel vm)
+        public async Task<IActionResult> AddUser([FromForm] UserModel vm)
         {
             IGeneralResult<UserViewVm> result = new GeneralResult<UserViewVm>();
             try
@@ -129,6 +135,15 @@ namespace QuickCampusAPI.Controllers
                     result.Message = "Invalid Role";
                     return Ok(result);
                 }
+                if (vm.ImagePath != null)
+                {
+                    var ChecKImg = _uploadFile.CheckImage(vm.ImagePath);
+                    if (!ChecKImg.IsSuccess)
+                    {
+                        result.Message = ChecKImg.Message;
+                        return Ok(result);
+                    }
+                }
                 if (ModelState.IsValid)
                 {
                     TblUser userVm = new TblUser
@@ -140,15 +155,14 @@ namespace QuickCampusAPI.Controllers
                         CreateDate = DateTime.Now,
                         ClientId = (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin) ? ((vm.ClientId == 0 || vm.ClientId == null) ? null : vm.ClientId) : Convert.ToInt32(LoggedInUserClientId)
                     };
-                    //if (LoggedInUserRole != null && LoggedInUserRole.RoleId != (int)AppRole.Admin)
-                    //{
-                    //    userVm.ClientId = Convert.ToInt32(LoggedInUserClientId);
-                    //}
-                    //else
-                    //{
-                    //    userVm.ClientId = vm.ClientId;
-                    //}
+                    var UploadPicture = _uploadFile.GetUploadFile(vm.ImagePath);
+                    if (UploadPicture.IsSuccess)
+                    {
+                        userVm.ProfilePicture = UploadPicture.Data;
+
+                    }
                     var addUser = await _userRepo.Add(userVm);
+                    
                     if (addUser.Id > 0)
                     {
 
@@ -159,7 +173,6 @@ namespace QuickCampusAPI.Controllers
                         }
                         else
                         {
-
                             addRole = await AddorUpdateRole(addUser.Id, AppRole.Client_User, vm.RoleId);
                         }
                         if (addRole.IsSuccess)
@@ -168,6 +181,8 @@ namespace QuickCampusAPI.Controllers
                             result.IsSuccess = true;
                             result.Message = "User added successfully.";
                             result.Data = (UserViewVm)addUser;
+                            result.Data.ProfilePicture = Path.Combine(baseUrl, UploadPicture.Data ?? "");
+
                             return Ok(result);
                         }
                         result.Message = addRole.Message;

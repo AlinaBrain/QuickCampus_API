@@ -13,7 +13,7 @@ using System.Text.Json;
 
 namespace QuickCampus_Core.Services
 {
-    public class AccountService : IAccount
+    public class AccountService : BaseRepository<BtprojecQuickcampustestContext,TblUser>,IAccount
     {
 
         private readonly BtprojecQuickcampustestContext _context;

@@ -27,6 +27,8 @@ public partial class TblUser
 
     public string? ForgotPassword { get; set; }
 
+    public string? ProfilePicture { get; set; }
+
     public virtual TblClient? Client { get; set; }
 
     public virtual ICollection<TblMenuItemUserPermission> TblMenuItemUserPermissions { get; set; } = new List<TblMenuItemUserPermission>();

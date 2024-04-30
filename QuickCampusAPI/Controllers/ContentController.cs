@@ -1,311 +1,319 @@
-﻿//using Microsoft.AspNetCore.Http;
-//using Microsoft.AspNetCore.Mvc;
-//using QuickCampus_Core.Common;
-//using QuickCampus_Core.Interfaces;
-//using QuickCampus_Core.Services;
-//using QuickCampus_Core.ViewModel;
-//using QuickCampus_DAL.Context;
-//using static QuickCampus_Core.Common.common;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using QuickCampus_Core.Common;
+using QuickCampus_Core.Interfaces;
+using QuickCampus_Core.Services;
+using QuickCampus_Core.ViewModel;
+using QuickCampus_DAL.Context;
+using static QuickCampus_Core.Common.common;
 
-//namespace QuickCampusAPI.Controllers
-//{
-//    [Route("api/[controller]")]
-//    [ApiController]
-//    public class ContentController : ControllerBase
-//    {
-//        private readonly IContentRepo _contentRepo;
-//        private readonly IConfiguration _config;
-//        private readonly string _jwtSecretKey;
-//        private readonly IUserAppRoleRepo _userAppRoleRepo;
-//        private readonly IUserRepo _userRepo;
+namespace QuickCampusAPI.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class ContentController : ControllerBase
+    {
+        private readonly IContentRepo _contentRepo;
+        private readonly IConfiguration _config;
+        private readonly string _jwtSecretKey;
+        private readonly IUserAppRoleRepo _userAppRoleRepo;
+        private readonly IUserRepo _userRepo;
+        private readonly IMstContentTypeRepo _mstContentTypeRepo;
 
-//        public ContentController(/*IContentRepo*/ contentRepo , IConfiguration configuration, IUserAppRoleRepo userAppRoleRepo, IUserRepo userRepo)
-//        {
-//            _contentRepo = contentRepo;
-//            _config = configuration;
-//            _jwtSecretKey = _config["Jwt:Key"] ?? "";
-//            _userAppRoleRepo = userAppRoleRepo;
-//            _userRepo = userRepo;
-//        }
-//        [HttpGet]
-//        [Route("GetAllContent")]
-//        public async Task<IActionResult> GetAllContent(string? search, int? ClientId, DataTypeFilter DataType, int pageStart = 1, int pageSize = 10)
-//        {
-//            IGeneralResult<List<TblContentVm>> result = new GeneralResult<List<TblContentVm>>();
-//            try
-//            {
-//                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-//                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-//                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
-//                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
-//                {
-//                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-//                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
-//                }
-//                var newPageStart = 0;
-//                if (pageStart > 0)
-//                {
-//                    var startPage = 1;
-//                    newPageStart = (pageStart - startPage) * pageSize;
-//                }
+        public ContentController(IContentRepo contentRepo , IConfiguration configuration, IUserAppRoleRepo userAppRoleRepo, IUserRepo userRepo,IMstContentTypeRepo mstContentTypeRepo)
+        {
+            _contentRepo = contentRepo;
+            _config = configuration;
+            _jwtSecretKey = _config["Jwt:Key"] ?? "";
+            _userAppRoleRepo = userAppRoleRepo;
+            _userRepo = userRepo;
+            _mstContentTypeRepo = mstContentTypeRepo;
+        }
+        [HttpGet]
+        [Route("GetAllContent")]
+        public async Task<IActionResult> GetAllContent(string? search, int? ClientId, DataTypeFilter DataType, int pageStart = 1, int pageSize = 10)
+        {
+            IGeneralResult<List<TblContentVm>> result = new GeneralResult<List<TblContentVm>>();
+            try
+            {
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
+                {
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
+                }
+                var newPageStart = 0;
+                if (pageStart > 0)
+                {
+                    var startPage = 1;
+                    newPageStart = (pageStart - startPage) * pageSize;
+                }
 
-//                List<TblContent> Contentlist = new List<TblContent>();
-//                List<TblContent> Contentdata = new List<TblContent>();
-//                int ContentListcount = 0;
-//                if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
-//                {
-//                    Contentdata = _contentRepo.GetAllQuerable().Where(x => (ClientId != null && ClientId > 0 ? x.ClientId == ClientId : true) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
-//                }
-//                else
-//                {
-//                    Contentdata = _contentRepo.GetAllQuerable().Where(x => x.ClientId == Convert.ToInt32(LoggedInUserClientId) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
-//                }
-//                if (!string.IsNullOrEmpty(search))
-//                {
-//                    search = search.Trim();
-//                }
-//                Contentlist = Contentdata.Where(x => (x.Name.Contains(search ?? "", StringComparison.OrdinalIgnoreCase))).ToList();
-//                DepartmentListcount = departmentlist.Count;
-//                departmentlist = departmentlist.Skip(newPageStart).Take(pageSize).ToList();
+                List<TblContent> Contentlist = new List<TblContent>();
+                List<TblContent> Contentdata = new List<TblContent>();
+                int ContentListcount = 0;
+                if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
+                {
+                    Contentdata = _contentRepo.GetAllQuerable().Where(x => (ClientId != null && ClientId > 0 ? x.ClientId == ClientId : true) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
+                }
+                else
+                {
+                    Contentdata = _contentRepo.GetAllQuerable().Where(x => x.ClientId == Convert.ToInt32(LoggedInUserClientId) && x.IsDeleted == false && ((DataType == DataTypeFilter.OnlyActive ? x.IsActive == true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : true)))).ToList();
+                }
+                if (!string.IsNullOrEmpty(search))
+                {
+                    search = search.Trim();
+                }
+                Contentlist = Contentdata.Where(x => (x.Content.Contains(search ?? "", StringComparison.OrdinalIgnoreCase))).ToList();
+                ContentListcount = Contentlist.Count;
+                Contentlist = Contentlist.Skip(newPageStart).Take(pageSize).ToList();
 
-//                var response = departmentlist.Select(x => (DepartmentVm)x).ToList();
+                var response = Contentlist.Select(x => (TblContentVm)x).ToList();
 
-//                if (departmentlist.Count > 0)
-//                {
-//                    result.IsSuccess = true;
-//                    result.Message = "Data fetched successfully.";
-//                    result.Data = response;
-//                    result.TotalRecordCount = DepartmentListcount;
-//                }
-//                else
-//                {
-//                    result.Message = "Template list not found!";
-//                }
+                if (Contentlist.Count > 0)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Data fetched successfully.";
+                    result.Data = response;
+                    result.TotalRecordCount = ContentListcount;
+                }
+                else
+                {
+                    result.Message = "Content list not found!";
+                }
 
-//            }
-//            catch (Exception ex)
-//            {
-//                result.Message = "Server error " + ex.Message;
-//            }
-//            return Ok(result);
-//        }
+            }
+            catch (Exception ex)
+            {
+                result.Message = "Server error " + ex.Message;
+            }
+            return Ok(result);
+        }
 
-//        [HttpGet]
-//        [Route("GetDepartmentById")]
-//        public async Task<IActionResult> GetDepartmentById(int departmentId)
-//        {
-//            IGeneralResult<DepartmentVm> result = new GeneralResult<DepartmentVm>();
-//            try
-//            {
-//                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-//                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-//                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
-//                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
-//                {
-//                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-//                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
-//                }
-//                if (departmentId > 0)
-//                {
-//                    TblDepartment department = new TblDepartment();
+        [HttpGet]
+        [Route("GetContentById")]
+        public async Task<IActionResult> GetContentById(int contentId)
+        {
+            IGeneralResult<TblContentVm> result = new GeneralResult<TblContentVm>();
+            try
+            {
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
+                {
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
+                }
+                if (contentId > 0)
+                {
+                    TblContent content = new TblContent();
 
-//                    if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
-//                    {
-//                        department = _departmentRepo.GetAllQuerable().Where(x => x.Id == departmentId && x.IsDeleted == false).FirstOrDefault();
-//                    }
-//                    else
-//                    {
-//                        department = _departmentRepo.GetAllQuerable().Where(x => x.Id == departmentId && x.IsDeleted == false && x.ClientId == Convert.ToInt32(LoggedInUserClientId)).FirstOrDefault();
-//                    }
-//                    if (department == null)
-//                    {
-//                        result.Message = " Department does Not Exist";
-//                    }
-//                    else
-//                    {
-//                        result.IsSuccess = true;
-//                        result.Message = "Department fetched successfully.";
-//                        result.Data = (DepartmentVm)department;
-//                    }
-//                    return Ok(result);
-//                }
-//                else
-//                {
-//                    result.Message = "Please enter a valid Department  Id.";
-//                }
-//            }
-//            catch (Exception ex)
-//            {
-//                result.Message = "Server error! " + ex.Message;
-//            }
-//            return Ok(result);
-//        }
+                    if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
+                    {
+                        content = _contentRepo.GetAllQuerable().Where(x => x.Id == contentId && x.IsDeleted == false).FirstOrDefault();
+                    }
+                    else
+                    {
+                        content = _contentRepo.GetAllQuerable().Where(x => x.Id == contentId && x.IsDeleted == false && x.ClientId == Convert.ToInt32(LoggedInUserClientId)).FirstOrDefault();
+                    }
+                    if (content == null)
+                    {
+                        result.Message = " Content does Not Exist";
+                    }
+                    else
+                    {
+                        result.IsSuccess = true;
+                        result.Message = "Department fetched successfully.";
+                        result.Data = (TblContentVm)content;
+                    }
+                    return Ok(result);
+                }
+                else
+                {
+                    result.Message = "Please enter a valid Content Id.";
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Message = "Server error! " + ex.Message;
+            }
+            return Ok(result);
+        }
 
-//        [HttpPost]
-//        [Route("AddDepartment")]
-//        public async Task<IActionResult> AddDepartment(AddDepartmentVm vm)
-//        {
-//            IGeneralResult<AddDepartmentVm> result = new GeneralResult<AddDepartmentVm>();
-//            try
-//            {
-//                if (vm == null)
-//                {
-//                    result.Message = "Your Model request in Invalid";
-//                    return Ok(result);
-//                }
-//                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-//                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-//                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
-//                {
-//                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-//                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
-//                }
-//                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
-//                if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin && (vm.ClientId == null || vm.ClientId.ToString() == "" || vm.ClientId == 0))
-//                {
-//                    result.Message = "Please select a valid Client";
-//                    return Ok(result);
-//                }
-//                if (ModelState.IsValid)
-//                {
-//                    var sv = new TblDepartment()
-//                    {
-//                        Name = vm.Name,
-//                        IsActive = true,
-//                        IsDeleted = false,
-//                        CreatedBy = Convert.ToInt32(LoggedInUserId),
-//                        CreatedDate = DateTime.Now,
-//                        ClientId = (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId)
-//                    };
-//                    var SaveDepartment = await _departmentRepo.Add(sv);
-//                    if (SaveDepartment.Id > 0)
-//                    {
-//                        result.IsSuccess = true;
-//                        result.Message = "Department added successfully.";
-//                        result.Data = (AddDepartmentVm)SaveDepartment;
-//                    }
-//                    else
-//                    {
-//                        result.Message = "Department not saved. Please try again.";
-//                    }
-//                }
-//                else
-//                {
-//                    result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
-//                }
-//            }
-//            catch (Exception ex)
-//            {
-//                result.Message = "Server error " + ex.Message;
-//            }
-//            return Ok(result);
-//        }
-//        [HttpPost]
-//        [Route("UpdateDepartment")]
-//        public async Task<IActionResult> UpdateDepartment(DepartmentVm vm)
-//        {
-//            IGeneralResult<DepartmentVm> result = new GeneralResult<DepartmentVm>();
-//            try
-//            {
-//                if (vm == null)
-//                {
-//                    result.Message = "Your Model request in Invalid";
-//                    return Ok(result);
-//                }
-//                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-//                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-//                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
-//                {
-//                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-//                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
-//                }
-//                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
-//                if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin && (vm.ClientId == null || vm.ClientId.ToString() == "" || vm.ClientId == 0))
-//                {
-//                    result.Message = "Please select a valid Client";
-//                    return Ok(result);
-//                }
-//                if (vm.Id > 0)
-//                {
-//                    var dept = _departmentRepo.GetAllQuerable().Where(x => x.Id == vm.Id && x.IsDeleted == false).FirstOrDefault();
-//                    if (dept != null)
-//                    {
-//                        dept.Name = vm.Name;
-//                        dept.ModifiedBy = Convert.ToInt32(LoggedInUserId);
-//                        dept.ModifiedDate = DateTime.Now;
-//                        dept.ClientId = (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId);
-//                        await _departmentRepo.Update(dept);
-//                        result.IsSuccess = true;
-//                        result.Message = "Record Update Successfully";
-//                        result.Data = vm;
-//                        return Ok(result);
-//                    }
-//                }
-//                else
-//                {
-//                    result.Message = "Something went wrong.";
-//                    return Ok(result);
-//                }
-//            }
-//            catch (Exception ex)
-//            {
-//                result.Message = "server error. " + ex.Message;
-//            }
-//            return Ok(result);
-//        }
-//        [HttpDelete]
-//        [Route("DeleteDepartment")]
-//        public async Task<IActionResult> DeleteDepartment(int departmentId)
-//        {
-//            IGeneralResult<DepartmentVm> result = new GeneralResult<DepartmentVm>();
-//            try
-//            {
-//                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-//                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-//                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
-//                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
-//                {
-//                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
-//                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
-//                }
-//                if (departmentId > 0)
-//                {
-//                    TblDepartment department = new TblDepartment();
-//                    if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
-//                    {
-//                        department = _departmentRepo.GetAllQuerable().Where(x => x.Id == departmentId && x.IsDeleted == false).FirstOrDefault();
-//                    }
-//                    else
-//                    {
-//                        department = _departmentRepo.GetAllQuerable().Where(x => x.Id == departmentId && x.IsDeleted == false && x.ClientId == Convert.ToInt32(LoggedInUserClientId)).FirstOrDefault();
-//                    }
-//                    if (department == null)
-//                    {
-//                        result.Message = " TblCollege does Not Exist";
-//                    }
-//                    else
-//                    {
-//                        department.IsActive = false;
-//                        department.IsDeleted = true;
-//                        department.ModifiedDate = DateTime.Now;
-//                        department.ModifiedBy = Convert.ToInt32(LoggedInUserId);
-//                        await _departmentRepo.Update(department);
-//                        result.IsSuccess = true;
-//                        result.Message = "Department deleted successfully.";
-//                        result.Data = (DepartmentVm)department;
-//                    }
-//                    return Ok(result);
-//                }
-//                else
-//                {
-//                    result.Message = "Please enter a valid Department Id.";
-//                }
-//            }
-//            catch (Exception ex)
-//            {
-//                result.Message = "Server error! " + ex.Message;
-//            }
-//            return Ok(result);
-//        }
-//    }
-//}
+        [HttpPost]
+        [Route("AddContent")]
+        public async Task<IActionResult> AddContent(AddContentVm vm)
+        {
+            IGeneralResult<AddContentVm> result = new GeneralResult<AddContentVm>();
+            try
+            {
+                if (vm == null)
+                {
+                    result.Message = "Your Model request in Invalid";
+                    return Ok(result);
+                }
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
+                {
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
+                }
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin && (vm.ClientId == null || vm.ClientId.ToString() == "" || vm.ClientId == 0))
+                {
+                    result.Message = "Please select a valid Client";
+                    return Ok(result);
+                }
+                var MstContentExist = _mstContentTypeRepo.Any(x => x.Id == vm.ContentTypeId && x.IsDeleted == false);
+                if (!MstContentExist)
+                {
+                    result.Message = "MstContent is not exist";
+                    return Ok(result);
+                }
+                if (ModelState.IsValid)
+                {
+                    var sv = new TblContent()
+                    {
+                        Content = vm.Content,
+                        IsActive = true,
+                        IsDeleted = false,
+                        ContentTypeId = vm.ContentTypeId,
+                        CreatedDate = DateTime.Now,
+                        ClientId = (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId)
+                    };
+                    var SaveContent = await _contentRepo.Add(sv);
+                    if (SaveContent.Id > 0)
+                    {
+                        result.IsSuccess = true;
+                        result.Message = "Content added successfully.";
+                        result.Data = (AddContentVm)SaveContent;
+                    }
+                    else
+                    {
+                        result.Message = "Content not saved. Please try again.";
+                    }
+                }
+                else
+                {
+                    result.Message = GetErrorListFromModelState.GetErrorList(ModelState);
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Message = "Server error " + ex.Message;
+            }
+            return Ok(result);
+        }
+        [HttpPost]
+        [Route("UpdateContent")]
+        public async Task<IActionResult> UpdateContent(EditContentVm vm)
+        {
+            IGeneralResult<EditContentVm> result = new GeneralResult<EditContentVm>();
+            try
+            {
+                if (vm == null)
+                {
+                    result.Message = "Your Model request in Invalid";
+                    return Ok(result);
+                }
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
+                {
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
+                }
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin && (vm.ClientId == null || vm.ClientId.ToString() == "" || vm.ClientId == 0))
+                {
+                    result.Message = "Please select a valid Client";
+                    return Ok(result);
+                }
+                if (vm.Id > 0)
+                {
+                    var content = _contentRepo.GetAllQuerable().Where(x => x.Id == vm.Id && x.IsDeleted == false).FirstOrDefault();
+                    if (content != null)
+                    {
+                        content.Content = vm.Content;
+                        content.ContentTypeId =vm.ContentTypeId;
+                        content.UpdatedDate = DateTime.Now;
+                        content.ClientId = (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId);
+                        await _contentRepo.Update(content);
+                        result.IsSuccess = true;
+                        result.Message = "Record Update Successfully";
+                        result.Data = vm;
+                        return Ok(result);
+                    }
+                }
+                else
+                {
+                    result.Message = "Something went wrong.";
+                    return Ok(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Message = "server error. " + ex.Message;
+            }
+            return Ok(result);
+        }
+        [HttpDelete]
+        [Route("DeleteContent")]
+        public async Task<IActionResult> DeleteContent(int contentid)
+        {
+            IGeneralResult<TblContentVm> result = new GeneralResult<TblContentVm>();
+            try
+            {
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
+                {
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
+                }
+                if (contentid > 0)
+                {
+                    TblContent content = new TblContent();
+                    if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
+                    {
+                        content = _contentRepo.GetAllQuerable().Where(x => x.Id == contentid && x.IsDeleted == false).FirstOrDefault();
+                    }
+                    else
+                    {
+                        content = _contentRepo.GetAllQuerable().Where(x => x.Id == contentid && x.IsDeleted == false && x.ClientId == Convert.ToInt32(LoggedInUserClientId)).FirstOrDefault();
+                    }
+                    if (content == null)
+                    {
+                        result.Message = " content does Not Exist";
+                    }
+                    else
+                    {
+                        content.IsActive = false;
+                        content.IsDeleted = true;
+                        content.UpdatedDate = DateTime.Now;
+                      
+                        await _contentRepo.Update(content);
+                        result.IsSuccess = true;
+                        result.Message = "Content deleted successfully.";
+                        result.Data = (TblContentVm)content;
+                    }
+                    return Ok(result);
+                }
+                else
+                {
+                    result.Message = "Please enter a valid Content Id.";
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Message = "Server error! " + ex.Message;
+            }
+            return Ok(result);
+        }
+    }
+}

@@ -4,7 +4,7 @@ using QuickCampus_DAL.Context;
 
 namespace QuickCampus_Core.Interfaces
 {
-    public interface IAccount
+    public interface IAccount :IGenericRepository<TblUser>
     {
         Task<IGeneralResult<LoginResponseVM>> Login(AdminLogin adminLogin);
         IGeneralResult<List<RolesItemVm>> ListPermission(bool IsAdmin);
