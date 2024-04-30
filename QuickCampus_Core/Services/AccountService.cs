@@ -106,7 +106,8 @@ namespace QuickCampus_Core.Services
                         Id = y.ItemId,
                         PermissionName = y.ItemName,
                         PermissionDisplay = y.ItemDisplayName,
-                        DisplayIcon = y.ItemIcon
+                        DisplayIcon = y.ItemIcon,
+                        Url = y.ItemUrl
                     }).FirstOrDefault();
                     if (MenuItem != null)
                     {

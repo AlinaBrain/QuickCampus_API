@@ -29,5 +29,7 @@ public partial class MstMenuItem
 
     public DateTime? ModifiedAt { get; set; }
 
+    public string? ItemUrl { get; set; }
+
     public virtual ICollection<MstMenuSubItem> MstMenuSubItems { get; set; } = new List<MstMenuSubItem>();
 }
