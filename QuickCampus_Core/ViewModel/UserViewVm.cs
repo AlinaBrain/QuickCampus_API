@@ -1,4 +1,5 @@
-﻿using QuickCampus_DAL.Context;
+﻿using Microsoft.AspNetCore.Http;
+using QuickCampus_DAL.Context;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,9 @@ namespace QuickCampus_Core.ViewModel
         public int? ClientId { get; set; }
         public bool? IsActive { get; set; }
 
+        public string? ProfilePicture { get; set; }
+
+
         public static explicit operator UserViewVm(TblUser v)
         {
             return new UserViewVm
@@ -25,7 +29,8 @@ namespace QuickCampus_Core.ViewModel
                 Email = v.Email,
                 Mobile = v.Mobile,
                 ClientId = v.ClientId,
-                IsActive = v.IsActive
+                IsActive = v.IsActive,
+                
             };
         }
     }

@@ -7,20 +7,18 @@ using System.Threading.Tasks;
 
 namespace QuickCampus_Core.ViewModel
 {
-    public class TblContentVm
+    public class AddContentVm
     {
-        public static explicit operator TblContentVm(TblContent item)
+        public static explicit operator AddContentVm(TblContent item)
         {
-            return new TblContentVm
+            return new AddContentVm
             {
-                Id=item.Id,
-                ContentTypeId=item.ContentTypeId,
+                Id = item.Id,
+                Content = item.Content,
+                ContentTypeId= item.ContentTypeId,
                 ClientId=item.ClientId,
-                IsActive=item.IsActive,
-                IsDeleted=item.IsDeleted,
                 CreatedDate=item.CreatedDate,
-                UpdatedDate=item.UpdatedDate,
-                Content=item.Content,
+                IsActive=item.IsActive,
             };
         }
         public int Id { get; set; }
@@ -31,11 +29,9 @@ namespace QuickCampus_Core.ViewModel
 
         public bool? IsActive { get; set; }
 
-        public bool? IsDeleted { get; set; }
-
         public DateTime? CreatedDate { get; set; }
+
         public string? Content { get; set; }
 
-        public DateTime? UpdatedDate { get; set; }
     }
 }

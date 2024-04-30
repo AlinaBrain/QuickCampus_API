@@ -35,7 +35,7 @@ namespace QuickCampus_Core.ViewModel
         [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "Only characters allowed in FirstName.")]
        
         public string? FirstName { get; set; }
-        [Required(ErrorMessage = "FirstName is required"), MaxLength(20)]
+        [Required(ErrorMessage = "LastName is required"), MaxLength(20)]
         [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]+$", ErrorMessage = "Only characters allowed in LastName.")]
         public string? LastName { get; set; }
         [Required(ErrorMessage = "You must provide an email address.")]

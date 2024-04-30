@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
 namespace QuickCampus_Core.ViewModel
@@ -27,6 +28,9 @@ namespace QuickCampus_Core.ViewModel
         public int? ClientId { get; set; }
 
         public int RoleId { get; set; }
+
+        public IFormFile? ImagePath { get; set; }
+
 
 
         //public DateTime? CreateDate { get; set; }
