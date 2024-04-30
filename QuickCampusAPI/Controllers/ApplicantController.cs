@@ -362,6 +362,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "ViewApplicant")]
         [HttpGet]
         [Route("GetApplicantById")]
         public async Task<ActionResult> GetApplicantById(int applicantId)
@@ -494,7 +495,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = "AcInApplicant")]
+        [Authorize(Roles = "EditApplicant")]
         [HttpGet]
         [Route("ApplicantActiveInactive")]
         public async Task<IActionResult> ActiveAndInactive(int applicantId)

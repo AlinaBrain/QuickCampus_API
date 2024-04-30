@@ -119,6 +119,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "ViewColleges")]
         [HttpGet]
         [Route("GetCollegeDetailsByCollegeId")]
         public async Task<IActionResult> GetCollegeDetailsById(int collegeId)
@@ -496,7 +497,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = "AcInColleges")]
+        [Authorize(Roles = "EditColleges")]
         [HttpGet]
         [Route("CollegeActiveInactive")]
         public async Task<IActionResult> ActiveAndInactive(int CollegeId)

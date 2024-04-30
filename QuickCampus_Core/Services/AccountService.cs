@@ -5,7 +5,9 @@ using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
+using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -48,11 +50,11 @@ namespace QuickCampus_Core.Services
                     Id = uRoles.Id,
                     RoleName = uRoles.Role.Name,
                     UserAppRoleName = uAppRole != null ? ((common.AppRole)uAppRole.RoleId).ToString() : "",
-                    rolePermissions = GetUserPermission(uRoles.RoleId ?? 0)
                 };
+                var userPermissions = GetUserPermission(uRoles.RoleId ?? 0);
                 response.IsSuccess = true;
                 response.Message = "Login Successfully";
-                response.Data.Token = GenerateToken(adminLogin, response.Data.RoleMasters, findUser.ClientId == null ? 0 : findUser.ClientId, findUser.Id);
+                response.Data.Token = GenerateToken(response.Data.RoleMasters, userPermissions, findUser.ClientId == null ? 0 : findUser.ClientId, findUser.Id);
                 response.Data.UserName = findUser.Email;
                 response.Data.UserId = findUser.Id;
                 response.Data.CilentId = findUser.ClientId;
@@ -70,7 +72,7 @@ namespace QuickCampus_Core.Services
             List<RolePermissions> rolePermissions = new List<RolePermissions>();
 
             //var UserPermission = _context.TblMenuItemUserPermissions.Where(x => x.UserId == UserId && x.IsActive == true && x.IsDeleted == false).FirstOrDefault();
-
+         
             rolePermissions = _context.TblRolePermissions.Include(i => i.Permission).Where(w => w.RoleId == RoleId).Select(s => new RolePermissions()
             {
                 Id = s.PermissionId ?? 0,
@@ -78,6 +80,48 @@ namespace QuickCampus_Core.Services
                 DisplayName = s.Permission.SubItemDisplayName
             }).ToList();
             return rolePermissions;
+        }
+
+        public IGeneralResult<List<PermissionVM>> GetUserMenu(int UserId)
+        {
+            IGeneralResult<List<PermissionVM>> result = new GeneralResult<List<PermissionVM>>();
+            try
+            {
+                var UserRoleId = _context.TblUserRoles.Where(x => x.UserId == UserId).Select(x=>x.RoleId).FirstOrDefault();
+                if(UserRoleId == null || UserRoleId == 0)
+                {
+                    result.Message = "No role assigned.";
+                    return result;
+                }
+                var ItemIds = _context.TblRolePermissions.Include(i => i.Permission).Where(w => w.RoleId == UserRoleId).Select(s => new
+                {
+                    s.Permission.ItemId
+                }).Distinct().ToList();
+                List<PermissionVM> MenuItems = new List<PermissionVM>();
+                var AllMenuItems = _context.MstMenuItems.Where(x => x.IsActive == true && x.IsDeleted == false).ToList();
+                foreach (var item in ItemIds)
+                {
+                    var MenuItem = AllMenuItems.Where(x => x.ItemId == item.ItemId).Select(y => new PermissionVM
+                    {
+                        Id = y.ItemId,
+                        PermissionName = y.ItemName,
+                        PermissionDisplay = y.ItemDisplayName,
+                        DisplayIcon = y.ItemIcon
+                    }).FirstOrDefault();
+                    if (MenuItem != null)
+                    {
+                        MenuItems.Add(MenuItem);
+                    }
+                }
+                result.IsSuccess = true;
+                result.Message = "Menu fetched successfully.";
+                result.Data = MenuItems;
+            }
+            catch(Exception ex)
+            {
+                result.Message = "Server error. " + ex.Message;
+            }
+            return result;
         }
 
         public IGeneralResult<List<RolesItemVm>> ListPermission(bool IsAdmin)
@@ -91,8 +135,9 @@ namespace QuickCampus_Core.Services
                 ItemSubMenu = z.MstMenuSubItems.Select(u => new PermissionVM
                 {
                     Id = u.SubItemId,
-                    PermissionDisplay = u.SubItemIcon,
-                    PermissionName = u.SubItemDisplayName
+                    DisplayIcon = u.SubItemIcon,
+                    PermissionDisplay = u.SubItemDisplayName,
+                    PermissionName = u.SubItemName
                 }).ToList()
             }).ToList();
 
@@ -169,11 +214,11 @@ namespace QuickCampus_Core.Services
             return result;
         }
 
-        private string GenerateToken(AdminLogin AdminLogin, RoleMaster roleVm, int? clientId, int userId)
+        private string GenerateToken(RoleMaster roleVm, List<RolePermissions> roles, int? clientId, int userId)
         {
             var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
-            string roleArr = JsonSerializer.Serialize(roleVm.rolePermissions);
+            string roleArr = JsonSerializer.Serialize(roles);
             var claims = new List<Claim>
             {
                 new Claim("UserId",userId.ToString()),
@@ -182,7 +227,7 @@ namespace QuickCampus_Core.Services
                 new Claim("UserAppRole",roleVm.UserAppRoleName ?? ""),
                 new Claim(ClaimTypes.Role,roleVm.UserAppRoleName)
             };
-            foreach (var role in roleVm.rolePermissions)
+            foreach (var role in roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role.PermissionName));
             }

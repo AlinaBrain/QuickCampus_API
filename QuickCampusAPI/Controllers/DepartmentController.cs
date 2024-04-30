@@ -89,7 +89,7 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-        
+
         [HttpGet]
         [Route("GetDepartmentById")]
         public async Task<IActionResult> GetDepartmentById(int departmentId)

@@ -130,6 +130,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "ViewQuestion")]
         [HttpGet]
         [Route("GetQuestionById")]
         public async Task<ActionResult> GetQuestionById(int questionId)
@@ -199,7 +200,7 @@ namespace QuickCampusAPI.Controllers
 
         }
 
-        [Authorize(Roles = "AcInQuestion")]
+        [Authorize(Roles = "EditQuestion")]
         [HttpGet]
         [Route("QuestionActiveInactive")]
         public async Task<ActionResult> QuestionActiveInactive(int QuestionId)

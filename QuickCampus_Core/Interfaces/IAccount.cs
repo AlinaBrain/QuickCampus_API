@@ -13,5 +13,6 @@ namespace QuickCampus_Core.Interfaces
         TblUser CheckToken(string token,string UserId);
         TblUser GetEmail(string emailId);
         string GenerateTokenForgotPassword(string EmailId, int userId);
+        IGeneralResult<List<PermissionVM>> GetUserMenu(int UserId);
     }
 }

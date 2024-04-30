@@ -260,6 +260,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "ViewRole")]
         [HttpGet]
         [Route("GetRoleById")]
         public async Task<IActionResult> GetRoleById(int RoleId)
@@ -375,7 +376,7 @@ namespace QuickCampusAPI.Controllers
 
         [HttpGet]
         [Route("RoleActiveInactive")]
-        [Authorize(Roles = "AcInRole")]
+        [Authorize(Roles = "EditRole")]
         public async Task<IActionResult> ActiveAndInactive(int RoleId)
         {
             IGeneralResult<RoleViewVm> result = new GeneralResult<RoleViewVm>();

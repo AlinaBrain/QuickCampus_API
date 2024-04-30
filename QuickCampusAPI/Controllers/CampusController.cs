@@ -351,9 +351,10 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "ViewCampusWalkIn")]
         [HttpGet]
-        [Route("getCampusByCampusId")]
-        public async Task<IActionResult> getcampusbyid(int campusId)
+        [Route("GetCampusByCampusId")]
+        public async Task<IActionResult> GetCampusById(int campusId)
         {
             IGeneralResult<GetCampusViewModel> result = new GeneralResult<GetCampusViewModel>();
             try
@@ -432,7 +433,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = "AcInCampusWalkIn")]
+        [Authorize(Roles = "EditCampusWalkIn")]
         [HttpGet]
         [Route("CampusActiveInActive")]
         public async Task<IActionResult> ActiveInActive(int campusId, bool status)

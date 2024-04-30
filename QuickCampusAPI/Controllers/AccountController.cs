@@ -42,7 +42,7 @@ namespace QuickCampusAPI.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("Login")]
-        public async Task<IActionResult> AdminLogin(AdminLogin AdminLogin)
+        public async Task<IActionResult> Login(AdminLogin AdminLogin)
         {
             var res = await _account.Login(AdminLogin);
             return Ok(res);
@@ -61,16 +61,15 @@ namespace QuickCampusAPI.Controllers
             return Ok(res);
         }
 
-        //[HttpGet]
-        //[Route("getallroles")]
-        //public async Task<IActionResult> GetAllRoles()
-        //{
-        //    var _jwtSecretKey = _config["Jwt:Key"];
-        //    var LoggedInUser = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
-        //    var clientId = userRepo.GetAllQuerable().Where(x => x.Id.ToString() == LoggedInUser).Select(x => x.ClientId).First();
-        //    var res = await _account.ListRoles(clientId ?? 0, Convert.ToInt32(LoggedInUser));
-        //    return Ok(res);
-        //}
+        [HttpGet]
+        [Route("GetUserMenu")]
+        public IActionResult GetUserMenu()
+        {
+            var _jwtSecretKey = _config["Jwt:Key"];
+            var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+            var result = _account.GetUserMenu(Convert.ToInt32(LoggedInUserId));
+            return Ok(result);
+        }
 
         [AllowAnonymous]
         [HttpPost]

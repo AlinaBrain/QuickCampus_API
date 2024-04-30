@@ -336,7 +336,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = "AcInUser")]
+        [Authorize(Roles = "EditUser")]
         [HttpGet]
         [Route("UserActiveInactive")]
         public async Task<IActionResult> ActiveAndInactive(int UserId)
@@ -393,6 +393,7 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "ViewUser")]
         [HttpGet]
         [Route("GetUserById")]
         public async Task<IActionResult> GetUserDetailsById(int UserId)

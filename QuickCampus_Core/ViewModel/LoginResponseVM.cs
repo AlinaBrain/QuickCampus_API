@@ -13,8 +13,8 @@ namespace QuickCampus_Core.ViewModel
         public int UserId { get; set; }
         public string UserName { get; set; }
         public RoleMaster RoleMasters { get; set; }
-        public object Modifiedby { get; internal set; }
-        public object Createdby { get; internal set; }
+        //public object Modifiedby { get; internal set; }
+        //public object Createdby { get; internal set; }
     }
 
     public class RoleMaster
@@ -22,7 +22,7 @@ namespace QuickCampus_Core.ViewModel
         public int Id { get; set; }
         public string RoleName { get; set; }
         public string? UserAppRoleName { get; set; }
-        public List<RolePermissions> rolePermissions { get; set; }
+        //public List<RolePermissions> rolePermissions { get; set; }
 
     }
     public class RolePermissions

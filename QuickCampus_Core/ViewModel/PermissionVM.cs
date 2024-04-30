@@ -11,5 +11,6 @@ namespace QuickCampus_Core.ViewModel
         public int Id { get; set; }
         public string? PermissionName { get; set; }
         public string? PermissionDisplay { get; set;}
+        public string? DisplayIcon { get; set;}
     }
 }
