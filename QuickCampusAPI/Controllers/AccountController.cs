@@ -28,7 +28,7 @@ namespace QuickCampusAPI.Controllers
         private readonly SendEmail _sendMail;
         private string _jwtSecretKey;
         private readonly ProcessUploadFile _uploadFile;
-
+       
         public AccountController(IUserRepo userRepo, IUserAppRoleRepo userAppRoleRepo, IConfiguration config, IAccount account, IOptions<MailSettings> mailSettings, SendEmail sendEmail, ProcessUploadFile uploadFile)
         {
             _config = config;
@@ -39,6 +39,7 @@ namespace QuickCampusAPI.Controllers
             _sendMail = sendEmail;
             _jwtSecretKey = _config["Jwt:Key"] ?? "";
             _uploadFile = uploadFile;
+
         }
         
         [AllowAnonymous]
@@ -113,8 +114,8 @@ namespace QuickCampusAPI.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        [Route("ResetPassword")]
-        public async Task<IActionResult> ResetPassword([FromHeader] string passwordToken, ForgotPasswordVm vm)
+        [Route("VerifyForgetPassword")]
+        public async Task<IActionResult> VerifyForgetPassword([FromHeader] string passwordToken, ForgotPasswordVm vm)
         {
             IGeneralResult<string> result = new GeneralResult<string>();
             var UserId = JwtHelper.GetIdFromToken(Request.Headers["passwordToken"], _jwtSecretKey);
@@ -204,6 +205,43 @@ namespace QuickCampusAPI.Controllers
             {
                 result.Message = "server error. " + ex.Message;
             }
+            return Ok(result);
+        }
+        [HttpPost]
+        [Route("ResetPassword")]
+        public async Task<IActionResult> ResetPassword(PasswordChangeVm vm)
+        {
+            IGeneralResult<PasswordChangeVm> result=new GeneralResult<PasswordChangeVm>();
+            try
+            {
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
+                {
+                    var user = await userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
+                }
+                var passwordCheck = (await _account.GetAll(x => x.Password == CommonMethods.EncodePasswordToBase64(vm.OldPassWord) && x.Id== Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if(passwordCheck != null)
+                {
+                    passwordCheck.Password = CommonMethods.EncodePasswordToBase64(vm.PassWord);
+                    passwordCheck.ModifiedDate= DateTime.Now;
+                    await _account.Update(passwordCheck);
+                    result.IsSuccess = true;
+                    result.Message = "Password Change Successfully";
+                }
+                else
+                {
+                    result.Message = "Incorrect Password";
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+                 return Ok(result);
+            }
+
             return Ok(result);
         }
     }
