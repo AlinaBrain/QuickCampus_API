@@ -11,16 +11,13 @@ namespace QuickCampus_Core.ViewModel
         {
             return new ProfileChangeVm
             {
-                Id=item.Id,
                 Name=item.Name,
-            
                 Mobile = item.Mobile,   
             };
         }
-        public int Id { get; set; }
+       
         public string ?Mobile { get; set; }
         public string ?Name { get; set; }
-        
         public IFormFile? ImagePath { get; set; }
     }
 }

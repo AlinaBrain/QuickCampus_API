@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
@@ -9,6 +10,7 @@ using static QuickCampus_Core.Common.common;
 
 namespace QuickCampusAPI.Controllers
 {
+    [Authorize(Roles = "Admin,Client,Client_User,Admin_User")]
     [Route("api/[controller]")]
     [ApiController]
     public class DashboardController : ControllerBase

@@ -164,9 +164,8 @@ namespace QuickCampusAPI.Controllers
                 }
                 var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
                 
-                if (vm.Id > 0)
-                {
-                    var profile = _account.GetAllQuerable().Where(x => x.Id == vm.Id && x.IsDelete == false).FirstOrDefault();
+                
+                    var profile = _account.GetAllQuerable().Where(x => x.Id ==Convert.ToInt32(LoggedInUserId) && x.IsDelete == false).FirstOrDefault();
                     if (profile != null)
                     {
                         profile.Name = vm.Name;
@@ -199,7 +198,7 @@ namespace QuickCampusAPI.Controllers
                         result.Message = "Something went wrong.";
                         return Ok(result);
                     }
-                }
+                
             }
             catch (Exception ex)
             {
