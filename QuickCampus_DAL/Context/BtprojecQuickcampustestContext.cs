@@ -73,6 +73,8 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
     public virtual DbSet<TblTag> TblTags { get; set; }
 
+    public virtual DbSet<TblTemplate> TblTemplates { get; set; }
+
     public virtual DbSet<TblTopic> TblTopics { get; set; }
 
     public virtual DbSet<TblUser> TblUsers { get; set; }
@@ -87,7 +89,7 @@ public partial class BtprojecQuickcampustestContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=103.93.16.117;Database=btprojec_QuickCampusTest;user id=btprojec_admin;password=Bwy0w65ixN*bsE9wy;Integrated Security=false;TrustServerCertificate=true;");
+        => optionsBuilder.UseSqlServer("Server=103.93.16.117;Database=btprojec_quickcampustest;TrustServerCertificate=true;user id=btprojec_admin;password=Bwy0w65ixN*bsE9wy;Integrated Security=false;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -619,6 +621,20 @@ public partial class BtprojecQuickcampustestContext : DbContext
             entity.HasOne(d => d.Client).WithMany(p => p.TblTags)
                 .HasForeignKey(d => d.ClientId)
                 .HasConstraintName("FK__tblTags__ClientI__056ECC6A");
+        });
+
+        modelBuilder.Entity<TblTemplate>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__tblTempl__3214EC0707AFE16B");
+
+            entity.ToTable("tblTemplates", "dbo");
+
+            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+            entity.Property(e => e.ModifiedAt).HasColumnType("datetime");
+
+            entity.HasOne(d => d.Client).WithMany(p => p.TblTemplates)
+                .HasForeignKey(d => d.ClientId)
+                .HasConstraintName("FK__tblTempla__Clien__3429BB53");
         });
 
         modelBuilder.Entity<TblTopic>(entity =>
