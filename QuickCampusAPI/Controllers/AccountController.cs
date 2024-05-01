@@ -21,6 +21,7 @@ namespace QuickCampusAPI.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IUserRepo userRepo;
+        private readonly ITemplateRepo templateRepo;
         private readonly IUserAppRoleRepo _userAppRoleRepo;
         private IConfiguration _config;
         private readonly IAccount _account;
@@ -29,11 +30,12 @@ namespace QuickCampusAPI.Controllers
         private string _jwtSecretKey;
         private readonly ProcessUploadFile _uploadFile;
        
-        public AccountController(IUserRepo userRepo, IUserAppRoleRepo userAppRoleRepo, IConfiguration config, IAccount account, IOptions<MailSettings> mailSettings, SendEmail sendEmail, ProcessUploadFile uploadFile)
+        public AccountController(IUserRepo userRepo, ITemplateRepo templateRepo, IUserAppRoleRepo userAppRoleRepo, IConfiguration config, IAccount account, IOptions<MailSettings> mailSettings, SendEmail sendEmail, ProcessUploadFile uploadFile)
         {
             _config = config;
             _mailSettings = mailSettings.Value;
             this.userRepo = userRepo;
+            this.templateRepo = templateRepo;
             _userAppRoleRepo = userAppRoleRepo;
             _account = account;
             _sendMail = sendEmail;
@@ -83,26 +85,34 @@ namespace QuickCampusAPI.Controllers
             var user = _account.GetEmail(EmailId);
             if (user != null)
             {
-                var token = _account.GenerateTokenForgotPassword(EmailId, user.Id);
+                int passwordExpiredTime = Convert.ToInt32((_config["Jwt:PasswordExpired"]));
+                DateTime PasswordExpiry = DateTime.Now.AddMinutes(passwordExpiredTime);
+                var token = _account.GenerateTokenForgotPassword(EmailId, user.Id, PasswordExpiry);
                 user.ForgotPassword = token.ToString();
                 await userRepo.Update(user);
+                var ForgotPasswordTemplate = templateRepo.GetAllQuerable().Where(x => x.Subject == "Forgot Password" && x.IsDeleted == false && x.IsActive == true).FirstOrDefault();
+
                 SendMailViewModel vm = new SendMailViewModel()
                 {
                     ReceiverEmailId = EmailId,
-                    Subject = "Forget Password"
+                    Subject = ForgotPasswordTemplate?.Subject ?? ""
                 };
-                string body = "<h5>Hi #UserName#</h5><br/><p> Please #Link# to reset your password </p>";
-                body = body.Replace("#UserName#", user.Name);
-                var call = (Request.IsHttps ? "https://" : "http://") + _config["UIForgetPasswordUrl"] + "/#/Reset?passwordToken=" + token;
-                var linkUrl = "<a href = '" + call + "'>click here</a>";
-                body = body.Replace("#Link#", linkUrl);
+
+                string body = ForgotPasswordTemplate?.Body ?? "";
+                var url = _config["UIForgetPasswordUrl"] + "?passwordToken=" + token;
+
+                body = body.Replace("{{name}}", user.Name);
+                body = body.Replace("{{action_url}}", url);
+                body = body.Replace("{{expiry_time}}", PasswordExpiry.ToString());
+
                 vm.Body = body;
-                var sendmail = _sendMail.SendGridEmail(vm);
-                if (sendmail.IsSuccess)
+
+                var IsMailSent = _sendMail.SendGridEmail(vm);
+                if (IsMailSent.IsSuccess)
                 {
-                    return Ok(sendmail);
+                    return Ok(IsMailSent);
                 }
-                result.Message = sendmail.Message;
+                result.Message = IsMailSent.Message;
             }
             else
             {

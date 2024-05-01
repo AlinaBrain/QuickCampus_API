@@ -187,20 +187,20 @@ namespace QuickCampus_Core.Services
             return lst;
         }
 
-        public string GenerateTokenForgotPassword(string EmailId, int UserId)
+        public string GenerateTokenForgotPassword(string EmailId, int UserId, DateTime PasswordExpiry)
         {
             var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
-            int passwordExpiredTime = Convert.ToInt32((_config["Jwt:PasswordExpired"]));
+            
             var claims = new List<Claim>
          {
                 new Claim("UserId",UserId.ToString()),
                 new Claim("EmailId",EmailId.ToString()),
-                new Claim("ExpiredOn",DateTime.Now.AddMinutes(passwordExpiredTime).ToString())
+                new Claim("ExpiredOn",PasswordExpiry.ToString())
             };
 
             var token = new JwtSecurityToken(_config["Jwt:Issuer"], _config["Jwt:Audience"], claims,
-               expires: DateTime.Now.AddMinutes(passwordExpiredTime), signingCredentials: credentials);
+               expires: PasswordExpiry, signingCredentials: credentials);
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 

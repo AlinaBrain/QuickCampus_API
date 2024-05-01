@@ -12,7 +12,7 @@ namespace QuickCampus_Core.Interfaces
         List<RolePermissions> GetUserPermission(int RoleId);
         TblUser CheckToken(string token,string UserId);
         TblUser GetEmail(string emailId);
-        string GenerateTokenForgotPassword(string EmailId, int userId);
+        string GenerateTokenForgotPassword(string EmailId, int userId, DateTime PasswordExpiry);
         IGeneralResult<List<PermissionVM>> GetUserMenu(int UserId);
     }
 }
