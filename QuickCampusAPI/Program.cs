@@ -19,6 +19,7 @@ using static QuickCampus_Core.ViewModel.ApplicantViewModel;
 using static QuickCampus_Core.ViewModel.ClientVM;
 using static QuickCampus_Core.ViewModel.CollegeVM;
 using static QuickCampus_Core.ViewModel.UserVm;
+using System.ComponentModel.Design;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
@@ -139,6 +140,7 @@ builder.Services.AddScoped<ITopicRepo, TopicRepo>();
 builder.Services.AddScoped<ISubjectRepo, SubjectRepo>();
 builder.Services.AddScoped<ITagRepo, TagRepo>();
 builder.Services.AddScoped<ISubTopicRepo, SubTopicRepo>();
+builder.Services.AddScoped<IMstMeneItemRepo,MstMenuItemRepo>();
 builder.Services.AddTransient<ValidationFilterAttribute>();
 builder.Services.Configure<ApiBehaviorOptions>(options
     => options.SuppressModelStateInvalidFilter = true);

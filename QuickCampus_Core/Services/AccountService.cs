@@ -42,9 +42,7 @@ namespace QuickCampus_Core.Services
                     .Include(w => w.Role)
                     .Where(w => w.UserId == findUser.Id)
                     .FirstOrDefaultAsync();
-
                 var uAppRole = await _context.TblUserAppRoles.Where(x => x.UserId == findUser.Id).FirstOrDefaultAsync();
-
                 response.Data.RoleMasters = new RoleMaster()
                 {
                     Id = uRoles.Id,
@@ -232,8 +230,6 @@ namespace QuickCampus_Core.Services
             {
                 claims.Add(new Claim(ClaimTypes.Role, role.PermissionName));
             }
-
-
             var token = new JwtSecurityToken(_config["Jwt:Issuer"], _config["Jwt:Audience"], claims,
            expires: DateTime.Now.AddHours(5), signingCredentials: credentials);
             return new JwtSecurityTokenHandler().WriteToken(token);

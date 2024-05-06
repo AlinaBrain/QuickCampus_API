@@ -6,6 +6,7 @@ using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.Services;
 using QuickCampus_Core.ViewModel;
 using System.Web.Http.Results;
+using System.Xml;
 using static QuickCampus_Core.Common.common;
 
 namespace QuickCampusAPI.Controllers
@@ -24,8 +25,9 @@ namespace QuickCampusAPI.Controllers
         private readonly IUserRepo _userRepo;
         private readonly IUserAppRoleRepo _userAppRoleRepo;
         private string _jwtSecretKey;
+        private readonly IMstMeneItemRepo _mstMeneItemRepo;
 
-        public DashboardController(IApplicantRepo applicantRepo, ICollegeRepo collegeRepo, IQuestion question, ICampusRepo campusRepo, IClientRepo clientRepo, IUserRepo userRepo, IUserAppRoleRepo userAppRoleRepo, IConfiguration configuration)
+        public DashboardController(IApplicantRepo applicantRepo, ICollegeRepo collegeRepo, IQuestion question, ICampusRepo campusRepo, IClientRepo clientRepo, IUserRepo userRepo, IUserAppRoleRepo userAppRoleRepo, IConfiguration configuration, IMstMeneItemRepo mstMeneItemRepo)
         {
             _applicantRepo = applicantRepo;
             _collegeRepo = collegeRepo;
@@ -36,6 +38,7 @@ namespace QuickCampusAPI.Controllers
             _userRepo = userRepo;
             _userAppRoleRepo = userAppRoleRepo;
             _jwtSecretKey = _config["Jwt:Key"] ?? "";
+            _mstMeneItemRepo = mstMeneItemRepo;
         }
         [HttpGet]
         [Route("DashBoard")]
@@ -65,81 +68,124 @@ namespace QuickCampusAPI.Controllers
             if (LoggedInUserRole.RoleId == (int)AppRole.Admin || LoggedInUserRole.RoleId == (int)AppRole.Admin_User)
             {
                 var clientData = _clientRepo.GetAllQuerable().Where(z => z.IsDeleted == false).ToList();
-                dashboard.Add(new DashboardVm
-                {
-                    Title = "Total Clients",
-                    TotalRecord = clientData.Count,
-                    Icon=""
-                });
-                dashboard.Add(new DashboardVm
-                {
-                    Title = "Total Active Clients",
-                    TotalRecord = clientData.Where(x=>x.IsActive==true).Count(),
-                    Icon = ""
-                });
-                
-            }
-            dashboard.Add(new DashboardVm
-            {
-                Title = "Total Applicant",
-                TotalRecord = applicantData.Count,
-                Icon = ""
-            });
-            dashboard.Add(new DashboardVm
-            {
-                Title = "Total Active Applicant",
-                TotalRecord = applicantData.Where(x => x.IsActive == true).Count(),
-                Icon = ""
-            });
-            dashboard.Add(new DashboardVm
-            {
-                Title = "Total Question",
-                TotalRecord = questionData.Count,
-                Icon = ""
-            });
-            dashboard.Add(new DashboardVm
-            {
-                Title = "Total Active Question",
-                TotalRecord = questionData.Where(x => x.IsActive == true).Count(),
-                Icon = ""
-            });
-            dashboard.Add(new DashboardVm
-            {
-                Title = "Total Campus",
-                TotalRecord = campusdata.Count,
-                Icon = ""
-            });
-            dashboard.Add(new DashboardVm
-            {
-                Title = "Total Active Campus",
-                TotalRecord = campusdata.Where(x => x.IsActive == true).Count(),
-                Icon = ""
-            });
-            dashboard.Add(new DashboardVm
-            {
-                Title = "Total College",
-                TotalRecord = collegesData.Count,
-                Icon = ""
-            });
-            dashboard.Add(new DashboardVm
-            {
-                Title = "Total Active College",
-                TotalRecord = collegesData.Where(x => x.IsActive == true).Count(),
-                Icon = ""
-            });
+                    
+                    List<DashVm> ClientData = new List<DashVm>();
+                    ClientData.Add(new DashVm
+                    {
+                        Title = "Total Clients",
+                        TotalRecord = clientData.Count
+                    });
+                    ClientData.Add(new DashVm
+                    {
+                        Title = "Total Active Clients",
+                        TotalRecord = clientData.Where(x => x.IsActive == true).Count()
+                    });
+                    var client = _mstMeneItemRepo.GetAllQuerable().Where(y => y.ItemName == "Client").FirstOrDefault();
+                    dashboard.Add(new DashboardVm
+                    {
+                        DashData = ClientData,
+                        Icon = client.ItemIcon,
+                        Url = client.ItemUrl
 
-            dashboard.Add(new DashboardVm
-            {
-                Title = "Total Users",
-                TotalRecord = userData.Count,
-                Icon = ""
-            });
-            dashboard.Add(new DashboardVm
-            {
-                Title = "Total Active Users",
-                TotalRecord = userData.Where(x => x.IsActive == true).Count(),
-                Icon = ""
-            });
+
+                    }); 
+
+                    List<DashVm> ApplicantData = new List<DashVm>();
+                    ApplicantData.Add(new DashVm
+                    {
+                        Title = "Total Applicant",
+                        TotalRecord = applicantData.Count
+                    });
+                  
+                    ApplicantData.Add(new DashVm
+                    {
+                        Title = "Total Active Applicant",
+                        TotalRecord = clientData.Where(x => x.IsActive == true).Count()
+                    });
+                    var applicant = _mstMeneItemRepo.GetAllQuerable().Where(y => y.ItemName == "Applicant").FirstOrDefault();
+                    dashboard.Add(new DashboardVm
+                    {
+                        DashData = ApplicantData,
+                        Icon = applicant.ItemIcon,
+                        Url=applicant.ItemUrl
+                    });
+                    List<DashVm> QuestionData = new List<DashVm>();
+                    QuestionData.Add(new DashVm
+                    {
+                        Title = "Total Question",
+                        TotalRecord = questionData.Count
+                    });
+                    QuestionData.Add(new DashVm
+                    {
+                        Title = "Total Active Question",
+                        TotalRecord = questionData.Where(x => x.IsActive == true).Count()
+                    });
+                    var question = _mstMeneItemRepo.GetAllQuerable().Where(y => y.ItemName == "Question").FirstOrDefault();
+                    dashboard.Add(new DashboardVm
+                    {
+                        DashData = QuestionData,
+                        Icon = question.ItemIcon,
+                        Url=question.ItemUrl
+                    });
+                    List<DashVm> UserData = new List<DashVm>();
+                    UserData.Add(new DashVm
+                    {
+                        Title = "Total Users",
+                        TotalRecord = userData.Count
+                    });
+                    UserData.Add(new DashVm
+                    {
+                        Title = "Total Active Users",
+                        TotalRecord = userData.Where(x => x.IsActive == true).Count()
+                    });
+                    var user = _mstMeneItemRepo.GetAllQuerable().Where(y => y.ItemName == "User").FirstOrDefault();
+                    dashboard.Add(new DashboardVm
+                    {
+                        DashData = UserData,
+                        Icon = user.ItemIcon,
+                        Url=user.ItemUrl
+                    });
+
+                    List<DashVm> CampusData = new List<DashVm>();
+                    CampusData.Add(new DashVm
+                    {
+                        Title = "Total Campus",
+                        TotalRecord = campusdata.Count
+                    });
+                    CampusData.Add(new DashVm
+                    {
+                        Title = "Total Active Campus",
+                        TotalRecord = campusdata.Where(x => x.IsActive == true).Count()
+                    });
+                    var campus = _mstMeneItemRepo.GetAllQuerable().Where(y => y.ItemName == "CampusWalkIn").FirstOrDefault();
+                    dashboard.Add(new DashboardVm
+                    {
+                        DashData = CampusData,
+                        Icon = campus.ItemIcon,
+                        Url=campus.ItemUrl
+                    });
+
+
+                    List<DashVm> CollegeData = new List<DashVm>();
+                    CollegeData.Add(new DashVm
+                    {
+                        Title = "Total College",
+                        TotalRecord = collegesData.Count
+                    });
+                    CollegeData.Add(new DashVm
+                    {
+                        Title = "Total Active College",
+                        TotalRecord = collegesData.Where(x => x.IsActive == true).Count()
+                    });
+                    var college = _mstMeneItemRepo.GetAllQuerable().Where(y => y.ItemName == "Colleges").FirstOrDefault();
+                    dashboard.Add(new DashboardVm
+                    {
+                        DashData = CollegeData,
+                        Icon = college.ItemIcon,
+                        Url=college.ItemUrl
+                    });
+                }
+        
                 result.Data = dashboard;
                 result.IsSuccess = true;
             }
