@@ -99,7 +99,7 @@ namespace QuickCampusAPI.Controllers
                 };
 
                 string body = ForgotPasswordTemplate?.Body ?? "";
-                var url = _config["UIForgetPasswordUrl"] + "?passwordToken=" + token;
+                var url = _config["UIForgetPasswordUrl"] +  token;
 
                 body = body.Replace("{{name}}", user.Name);
                 body = body.Replace("{{action_url}}", url);
@@ -139,7 +139,7 @@ namespace QuickCampusAPI.Controllers
                     VerifiedToken.ForgotPassword = "";
                     await userRepo.Update(VerifiedToken);
                     result.IsSuccess = true;
-                    result.Message = "Password Updated Successfully";
+                    result.Message = "Your password has been updated Successfully";
                 }
                 else
                 {
@@ -198,7 +198,7 @@ namespace QuickCampusAPI.Controllers
                             profile.ProfilePicture = UploadLogo.Data;
                             await _account.Update(profile);
                             result.IsSuccess = true;
-                            result.Message = "Record Update Successfully";
+                            result.Message = "Your profile is updated Successfully";
                             result.Data = vm;
                             result.Data.ImagePath = null;
                             return Ok(result);
