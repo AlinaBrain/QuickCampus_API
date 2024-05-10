@@ -29,7 +29,7 @@ public partial class TblCollege
 
     public int? CreatedBy { get; set; }
 
-    public string? ContectPerson { get; set; }
+    public string? ContactPersonName { get; set; }
 
     public string? ContectPhone { get; set; }
 

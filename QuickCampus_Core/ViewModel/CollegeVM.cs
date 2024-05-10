@@ -21,7 +21,7 @@ namespace QuickCampus_Core.ViewModel
                 StateId = items.StateId,
                 CountryId = items.CountryId,
                 CollegeCode = items.CollegeCode,
-                ContectPerson = items.ContectPerson,
+                ContectPersonName = items.ContactPersonName,
                 ContectPhone = items.ContectPhone,
                 ContectEmail = items.ContectEmail,
                 ModifiedBy = items.ModifiedBy,
@@ -54,7 +54,7 @@ namespace QuickCampus_Core.ViewModel
         [Required(ErrorMessage = "CollegeCode is required.")]
         public string? CollegeCode { get; set; }
         [EmailAddress(ErrorMessage = "Enter a valid contact person email.")]
-        public string? ContectPerson { get; set; }
+        public string? ContectPersonName { get; set; }
 
         [RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Not a valid phone number.")]
         public string? ContectPhone { get; set; }
@@ -79,7 +79,7 @@ namespace QuickCampus_Core.ViewModel
                 StateId = StateId,
                 CountryId = CountryId,
                 CollegeCode = CollegeCode,
-                ContectPerson = ContectPerson,
+                ContactPersonName = ContectPersonName,
                 ContectPhone = ContectPhone,
                 ContectEmail = ContectEmail,
                 IsActive = true,
@@ -106,7 +106,7 @@ namespace QuickCampus_Core.ViewModel
                 StateId = StateId,
                 CountryId = CountryId,
                 CollegeCode = CollegeCode,
-                ContectPerson = ContectPerson,
+                ContactPersonName = ContectPersonName,
                 ContectPhone = ContectPhone,
                 ContectEmail = ContectEmail,
                 CreatedBy = CreatedBy, 
@@ -138,7 +138,7 @@ namespace QuickCampus_Core.ViewModel
                   .NotNull().WithMessage("MstCity could not be null")
                   .NotEmpty().WithMessage("MstCity could not be empty");
 
-                RuleFor(x => x.ContectPerson)
+                RuleFor(x => x.ContectPersonName)
                   .Cascade(CascadeMode.StopOnFirstFailure)
                   .NotNull().WithMessage("Contect Person could not be null")
                   .NotEmpty().WithMessage("Contect Person could not be empty");

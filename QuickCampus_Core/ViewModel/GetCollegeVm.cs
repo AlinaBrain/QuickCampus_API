@@ -23,7 +23,7 @@ namespace QuickCampus_Core.ViewModel
                 StateId = items.StateId,
                 CountryId = items.CountryId,
                 CollegeCode = items.CollegeCode,
-                ContectPerson = items.ContectPerson,
+                ContectPersonName = items.ContactPersonName,
                 ContectPhone = items.ContectPhone,
                 ContectEmail = items.ContectEmail,
                 ModifiedBy = items.ModifiedBy,
@@ -52,7 +52,7 @@ namespace QuickCampus_Core.ViewModel
         [Required(ErrorMessage = "CollegeCode is required.")]
         public string? CollegeCode { get; set; }
         [EmailAddress(ErrorMessage = "Enter a valid contact person email.")]
-        public string? ContectPerson { get; set; }
+        public string? ContectPersonName { get; set; }
 
         [RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Not a valid phone number.")]
         public string? ContectPhone { get; set; }

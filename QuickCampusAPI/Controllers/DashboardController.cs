@@ -77,7 +77,7 @@ namespace QuickCampusAPI.Controllers
                     });
                     ClientData.Add(new DashVm
                     {
-                        Title = "Total Active Clients",
+                        Title = " Active Clients",
                         TotalRecord = clientData.Where(x => x.IsActive == true).Count()
                     });
                     var client = _mstMeneItemRepo.GetAllQuerable().Where(y => y.ItemName == "Client").FirstOrDefault();
@@ -99,8 +99,8 @@ namespace QuickCampusAPI.Controllers
                   
                     ApplicantData.Add(new DashVm
                     {
-                        Title = "Total Active Applicant",
-                        TotalRecord = clientData.Where(x => x.IsActive == true).Count()
+                        Title = " Active Applicant",
+                        TotalRecord = applicantData.Where(x => x.IsActive == true).Count()
                     });
                     var applicant = _mstMeneItemRepo.GetAllQuerable().Where(y => y.ItemName == "Applicant").FirstOrDefault();
                     dashboard.Add(new DashboardVm
@@ -117,7 +117,7 @@ namespace QuickCampusAPI.Controllers
                     });
                     QuestionData.Add(new DashVm
                     {
-                        Title = "Total Active Question",
+                        Title = " Active Question",
                         TotalRecord = questionData.Where(x => x.IsActive == true).Count()
                     });
                     var question = _mstMeneItemRepo.GetAllQuerable().Where(y => y.ItemName == "Question").FirstOrDefault();
@@ -135,7 +135,7 @@ namespace QuickCampusAPI.Controllers
                     });
                     UserData.Add(new DashVm
                     {
-                        Title = "Total Active Users",
+                        Title = " Active Users",
                         TotalRecord = userData.Where(x => x.IsActive == true).Count()
                     });
                     var user = _mstMeneItemRepo.GetAllQuerable().Where(y => y.ItemName == "User").FirstOrDefault();
@@ -154,7 +154,7 @@ namespace QuickCampusAPI.Controllers
                     });
                     CampusData.Add(new DashVm
                     {
-                        Title = "Total Active Campus",
+                        Title = " Active Campus",
                         TotalRecord = campusdata.Where(x => x.IsActive == true).Count()
                     });
                     var campus = _mstMeneItemRepo.GetAllQuerable().Where(y => y.ItemName == "CampusWalkIn").FirstOrDefault();
@@ -174,7 +174,7 @@ namespace QuickCampusAPI.Controllers
                     });
                     CollegeData.Add(new DashVm
                     {
-                        Title = "Total Active College",
+                        Title = " Active College",
                         TotalRecord = collegesData.Where(x => x.IsActive == true).Count()
                     });
                     var college = _mstMeneItemRepo.GetAllQuerable().Where(y => y.ItemName == "Colleges").FirstOrDefault();

@@ -23,9 +23,9 @@ namespace QuickCampus_Core.ViewModel
         [Required]
         public int City { get; set; } 
         [Required]
-        public int? StateID { get; set; }
+        public int? StateId { get; set; }
         [Required]
-        public int? CountryID { get; set; }
+        public int? CountryId { get; set; }
         [Required(ErrorMessage = "Title is required.")]
         public string Title { get; set; } = String.Empty;
         [Required]
@@ -45,8 +45,8 @@ namespace QuickCampus_Core.ViewModel
                 Address2=Address2,
                 City=City,
                 ClientId=ClientId,  
-                CountryId=CountryID,
-                StateId=StateID,
+                CountryId=CountryId,
+                StateId=StateId,
                 Title=Title, 
                 PassingYear=PassingYear,
             };
@@ -62,8 +62,8 @@ namespace QuickCampus_Core.ViewModel
                 Address2 = Address2,
                 City = City,
                 ClientId = ClientId,
-                CountryId = CountryID,
-                StateId = StateID,
+                CountryId = CountryId,
+                StateId = StateId,
                 Title = Title,
                 PassingYear = PassingYear,
             };

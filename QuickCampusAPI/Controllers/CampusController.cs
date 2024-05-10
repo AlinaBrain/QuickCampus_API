@@ -148,10 +148,10 @@ namespace QuickCampusAPI.Controllers
                     return Ok(result);
                 }
 
-                var isCountryExist = _country.GetAllQuerable().Where(w => w.IsDeleted == false).Any(a => a.CountryId == vm.CountryID);
+                var isCountryExist = _country.GetAllQuerable().Where(w => w.IsDeleted == false).Any(a => a.CountryId == vm.CountryId);
                 var allCollages = _collegeRepo.GetAllQuerable().Where(s => s.IsDeleted == false).Select(s => s.CollegeId).ToList();
-                var allStates = _staterepo.GetAllQuerable().Where(w => w.IsDeleted == false && w.StateId == vm.StateID && w.CountryId == vm.CountryID).ToList();
-                var isStateExist = allStates.Any(a => a.StateId == vm.StateID);
+                var allStates = _staterepo.GetAllQuerable().Where(w => w.IsDeleted == false && w.StateId == vm.StateId && w.CountryId == vm.CountryId).ToList();
+                var isStateExist = allStates.Any(a => a.StateId == vm.StateId);
                 var allCity = await _cityRepo.GetAllQuerable().Where(m => m.IsDeleted == false).Select(c => c.CityId).ToListAsync();
                 var isCityExist = allCity.Any(x => x == vm.City);
 
@@ -191,8 +191,8 @@ namespace QuickCampusAPI.Controllers
                     Address1 = vm.Address1,
                     Address2 = vm.Address2,
                     City = vm.City,
-                    StateId = vm.StateID,
-                    CountryId = vm.CountryID,
+                    StateId = vm.StateId,
+                    CountryId = vm.CountryId,
                     IsActive = true,
                     IsDeleted = false,
                     CreatedDate = DateTime.Now,
@@ -258,10 +258,10 @@ namespace QuickCampusAPI.Controllers
                     result.Message = "Please select a valid Client";
                     return Ok(result);
                 }
-                var isCountryExist = _country.GetAllQuerable().Where(w => w.IsDeleted == false).Any(a => a.CountryId == vm.CountryID);
+                var isCountryExist = _country.GetAllQuerable().Where(w => w.IsDeleted == false).Any(a => a.CountryId == vm.CountryId);
                 var allCollages = _collegeRepo.GetAllQuerable().Where(s => s.IsDeleted == false).Select(s => s.CollegeId).ToList();
-                var allStates = _staterepo.GetAllQuerable().Where(w => w.IsDeleted == false && w.StateId == vm.StateID && w.CountryId == vm.CountryID).ToList();
-                var isStateExist = allStates.Any(a => a.StateId == vm.StateID);
+                var allStates = _staterepo.GetAllQuerable().Where(w => w.IsDeleted == false && w.StateId == vm.StateId && w.CountryId == vm.CountryId).ToList();
+                var isStateExist = allStates.Any(a => a.StateId == vm.StateId);
                 var allCity = await _cityRepo.GetAllQuerable().Where(m => m.IsDeleted == false).Select(c => c.CityId).ToListAsync();
                 var isCityExist = allCity.Any(x => x == vm.City);
 
@@ -301,8 +301,8 @@ namespace QuickCampusAPI.Controllers
                         campus.Address1 = vm.Address1;
                         campus.Address2 = vm.Address2;
                         campus.City = vm.City;
-                        campus.StateId = vm.StateID;
-                        campus.CountryId = vm.CountryID;
+                        campus.StateId = vm.StateId;
+                        campus.CountryId = vm.CountryId;
                         campus.Title = vm.Title;
                         campus.PassingYear = vm.PassingYear;
                         await _campusrepo.Update(campus);

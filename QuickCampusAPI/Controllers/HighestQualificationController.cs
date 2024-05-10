@@ -44,7 +44,8 @@ namespace QuickCampusAPI.Controllers
                     result.Data = qualificationList.Select(x => new
                     {
                         x.QualId,
-                        x.QualName
+                        x.QualName,
+                        x.IsActive
                     });
                     result.TotalRecordCount = qualificationList.Count;
                 }
@@ -163,9 +164,62 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
 
+        //[HttpPost]
+        //[Route("DeleteQualification")]
+        //public async Task<ActionResult> DeleteQualification(int QualificationId)
+        //{
+        //    IGeneralResult<dynamic> result = new GeneralResult<dynamic>();
+        //    try
+        //    {
+        //        var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+        //        var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+        //        var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+
+        //        if (QualificationId > 0)
+        //        {
+        //            MstQualification qualification = new MstQualification();
+
+        //            if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
+        //            {
+        //                qualification = _qualificationRepo.GetAllQuerable().Where(x => x.QualId == QualificationId && x.IsDeleted == false).FirstOrDefault();
+        //            }
+        //            else
+        //            {
+        //                result.Message = "Access denied";
+        //                return Ok(result);
+        //            }
+        //            if (qualification == null)
+        //            {
+        //                result.Message = " Qualification does not exist.";
+        //                return Ok(result);
+        //            }
+        //            else
+        //            {
+        //                qualification.IsActive = false;
+        //                qualification.IsDeleted = true;
+        //                qualification.ModifiedAt = DateTime.Now;
+        //                qualification.ModifiedBy = Convert.ToInt32(LoggedInUserId);
+        //                await _qualificationRepo.Update(qualification);
+
+        //                result.IsSuccess = true;
+        //                result.Message = "Qualification deleted successfully.";
+        //            }
+        //            return Ok(result);
+        //        }
+        //        else
+        //        {
+        //            result.Message = "Please enter a valid qualification Id.";
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        result.Message = "server error! " + ex.Message;
+        //    }
+        //    return Ok(result);
+        //}
         [HttpPost]
-        [Route("DeleteQualification")]
-        public async Task<ActionResult> DeleteQualification(int QualificationId)
+        [Route("EditQualification")]
+        public async Task<ActionResult> EditQualification(int QualificationId)
         {
             IGeneralResult<dynamic> result = new GeneralResult<dynamic>();
             try
@@ -194,14 +248,15 @@ namespace QuickCampusAPI.Controllers
                     }
                     else
                     {
-                        qualification.IsActive = false;
-                        qualification.IsDeleted = true;
+                        qualification.QualName = qualification.QualName;
+                        qualification.IsActive = qualification.IsActive;
                         qualification.ModifiedAt = DateTime.Now;
                         qualification.ModifiedBy = Convert.ToInt32(LoggedInUserId);
                         await _qualificationRepo.Update(qualification);
 
                         result.IsSuccess = true;
-                        result.Message = "Qualification deleted successfully.";
+                        result.Message = "Qualification  updated successfully.";
+                        result.Data = new { qualification.QualId, qualification.QualName, qualification.IsActive };
                     }
                     return Ok(result);
                 }
@@ -216,6 +271,5 @@ namespace QuickCampusAPI.Controllers
             }
             return Ok(result);
         }
-
     }
 }

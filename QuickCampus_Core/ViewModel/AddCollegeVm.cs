@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -8,31 +9,32 @@ using System.Threading.Tasks;
 
 namespace QuickCampus_Core.ViewModel
 {
+    
     public class AddCollegeVm
     {
-        public int? CollegeId { get; set; }
+        public int? collegeId { get; set; }
         [Required(ErrorMessage = "College Name is required.")]
-        public string? CollegeName { get; set; }
+        public string? collegeName { get; set; }
         
-        public IFormFile? ImagePath { get; set; }
+        public IFormFile? imagePath { get; set; }
         [Required(ErrorMessage = "Address1 is required.")]
-        public string? Address1 { get; set; }
-        public string? Address2 { get; set; }
+        public string? address1 { get; set; }
+        public string? address2 { get; set; }
         [Required(ErrorMessage = "City is required.")]
-        public int? CityId { get; set; }
+        public int? cityId { get; set; }
         [Required(ErrorMessage = "State is required.")]
-        public int? StateId { get; set; }
+        public int? stateId { get; set; }
         [Required(ErrorMessage = "Country is required.")]
-        public int? CountryId { get; set; }
+        public int? countryId { get; set; }
         [Required(ErrorMessage = "TblCollege Code is required.")]
-        public string? CollegeCode { get; set; }
+        public string? collegeCode { get; set; }
         [Required(ErrorMessage ="Contact Person Name is required ")]
-        public string? ContactPersonName { get; set; }
+        public string? contactPersonName { get; set; }
         [RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Not a valid phone number.")]
-        public string? ContactPhone { get; set; }
+        public string? contectPhone { get; set; }
         [EmailAddress(ErrorMessage = "Enter a valid email.")]
-        public string? ContactEmail { get; set; }
-        public int? ClientId { get; set; }
+        public string? contectEmail { get; set; }
+        public int? clientId { get; set; }
 
     }
 }

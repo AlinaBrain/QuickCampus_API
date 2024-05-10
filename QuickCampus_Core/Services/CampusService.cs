@@ -23,10 +23,10 @@ namespace QuickCampus_Core.Services
         {
             IGeneralResult<CampusGridRequestVM> result = new GeneralResult<CampusGridRequestVM>();
 
-            var isCountryExist = _context.MstCityStateCountries.Where(w => w.IsDeleted == false).Any(a => a.CountryId == vm.CountryID);
+            var isCountryExist = _context.MstCityStateCountries.Where(w => w.IsDeleted == false).Any(a => a.CountryId == vm.CountryId);
             var allCollages = _context.TblColleges.Where(s => s.IsDeleted == false).Select(s => s.CollegeId).ToList();
             var allStates = _context.MstCityStates.Where(w => w.IsDeleted == false).Select(s => s.StateId).ToList();
-            var isStateExist = allStates.Any(a => a == vm.StateID);
+            var isStateExist = allStates.Any(a => a == vm.StateId);
             var allCity = await _context.MstCities.Where(m => m.IsDeleted == false).Select(c => c.CityId).ToListAsync();
             var isCityExist = allCity.Any(x => x == vm.City);
 
@@ -70,8 +70,8 @@ namespace QuickCampus_Core.Services
                         campus.Address1 = vm.Address1;
                         campus.Address2 = vm.Address2;
                         campus.City = vm.City;
-                        campus.StateId = vm.StateID;
-                        campus.CountryId = vm.CountryID;
+                        campus.StateId = vm.StateId;
+                        campus.CountryId = vm.CountryId;
                         campus.Title = vm.Title;
                         campus.CreatedDate = DateTime.Now;
                         campus.PassingYear = vm.PassingYear;
@@ -122,8 +122,8 @@ namespace QuickCampus_Core.Services
                     Address1 = vm.Address1,
                     Address2 = vm.Address2,
                     City = vm.City,
-                    StateId = vm.StateID,
-                    CountryId = vm.CountryID,
+                    StateId = vm.StateId,
+                    CountryId = vm.CountryId,
                     IsActive = true,
                     IsDeleted = false,
                     CreatedDate = DateTime.Now,
@@ -318,10 +318,10 @@ namespace QuickCampus_Core.Services
         {
             IGeneralResult<string> result = new GeneralResult<string>();
 
-            var isCountryExist = _context.MstCityStateCountries.Where(w => w.IsDeleted == false).Any(a => a.CountryId == vm.CountryID);
+            var isCountryExist = _context.MstCityStateCountries.Where(w => w.IsDeleted == false).Any(a => a.CountryId == vm.CountryId);
             var allCollages = _context.TblColleges.Where(s => s.IsDeleted == false).Select(s => s.CollegeId).ToList();
             var allStates = _context.MstCityStates.Where(w => w.IsDeleted == false).Select(s => s.StateId).ToList();
-            var isStateExist = allStates.Any(a => a == vm.StateID);
+            var isStateExist = allStates.Any(a => a == vm.StateId);
             bool isExits = _context.TblWalkIns.Any(x => x.IsDeleted == false);
 
 
@@ -363,8 +363,8 @@ namespace QuickCampus_Core.Services
                         campus.Address1 = vm.Address1;
                         campus.Address2 = vm.Address2;
                         campus.City = vm.City;
-                        campus.StateId = vm.StateID;
-                        campus.CountryId = vm.CountryID;
+                        campus.StateId = vm.StateId;
+                        campus.CountryId = vm.CountryId;
                         campus.Title = vm.Title;
                         campus.CreatedDate = DateTime.Now;
                         _context.Update(campus);
@@ -414,8 +414,8 @@ namespace QuickCampus_Core.Services
                     Address1 = vm.Address1,
                     Address2 = vm.Address2,
                     City = vm.City,
-                    StateId = vm.StateID,
-                    CountryId = vm.CountryID,
+                    StateId = vm.StateId,
+                    CountryId = vm.CountryId,
                     IsActive = true,
                     IsDeleted = false,
                     CreatedBy = userId,

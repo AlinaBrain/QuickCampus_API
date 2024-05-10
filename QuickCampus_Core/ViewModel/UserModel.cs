@@ -6,30 +6,30 @@ namespace QuickCampus_Core.ViewModel
 {
     public class UserModel
     {
-        public int UserId { get; set; }
+        public int userId { get; set; }
         [Required(ErrorMessage = "Name is required.")]
         [MaxLength(20, ErrorMessage = "Name must be at most 20 characters long.")]
         [RegularExpression(@"^[a-zA-Z][a-zA-Z\s]*$", ErrorMessage = "Only alphabetic characters are allowed in the name.")]
-        public string? Name { get; set; }
+        public string? name { get; set; }
 
         [Required(ErrorMessage = "Password is required")]
         [StringLength(20, MinimumLength = 4, ErrorMessage = "Password must be between 4 and 20 characters.")]
-        public string? Password { get; set; }
+        public string? password { get; set; }
         [Required]
-        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
-        public string? ConfirmPassword { get; set; }
+        [Compare("password", ErrorMessage = "The password and confirmation password do not match.")]
+        public string? confirmPassword { get; set; }
         [Required, MaxLength(100)]
         [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage = "Invalid email address.")]
         [EmailAddress(ErrorMessage = "Invalid email address")]
-        public string? Email { get; set; }
+        public string? email { get; set; }
         [Required]
         [RegularExpression(@"^[1-9][0-9]{9}$", ErrorMessage = "Please enter a valid 10-digit mobile number that does not start with 0.")]
-        public string? Mobile { get; set; }
-        public int? ClientId { get; set; }
+        public string? mobile { get; set; }
+        public int? clientId { get; set; }
 
-        public int RoleId { get; set; }
-
-        public IFormFile? ImagePath { get; set; }
+        public int roleId { get; set; }
+     
+        public IFormFile? imagePath { get; set; }
 
 
 

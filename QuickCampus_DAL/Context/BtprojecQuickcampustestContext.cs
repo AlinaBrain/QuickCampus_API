@@ -406,10 +406,10 @@ public partial class BtprojecQuickcampustestContext : DbContext
             entity.Property(e => e.CollegeName)
                 .HasMaxLength(250)
                 .UseCollation("SQL_Latin1_General_CP1_CI_AS");
-            entity.Property(e => e.ContectEmail)
+            entity.Property(e => e.ContactPersonName)
                 .HasMaxLength(100)
                 .UseCollation("SQL_Latin1_General_CP1_CI_AS");
-            entity.Property(e => e.ContectPerson)
+            entity.Property(e => e.ContectEmail)
                 .HasMaxLength(100)
                 .UseCollation("SQL_Latin1_General_CP1_CI_AS");
             entity.Property(e => e.ContectPhone)

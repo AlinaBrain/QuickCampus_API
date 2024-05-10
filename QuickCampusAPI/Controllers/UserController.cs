@@ -123,21 +123,21 @@ namespace QuickCampusAPI.Controllers
                     var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
                     LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
                 }
-                vm.Password = EncodePasswordToBase64(vm.Password ?? "");
+                vm.password = EncodePasswordToBase64(vm.password ?? "");
 
-                if (_userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.IsDelete == false))
+                if (_userRepo.Any(x => x.Email == vm.email && x.IsActive == true && x.IsDelete == false))
                 {
                     result.Message = "Email already Exists";
                     return Ok(result);
                 }
-                if(!_roleRepo.Any(x=>x.Id==vm.RoleId && x.IsDeleted==false && x.IsActive == true))
+                if(!_roleRepo.Any(x=>x.Id==vm.roleId && x.IsDeleted==false && x.IsActive == true))
                 {
                     result.Message = "Invalid Role";
                     return Ok(result);
                 }
-                if (vm.ImagePath != null)
+                if (vm.imagePath != null)
                 {
-                    var ChecKImg = _uploadFile.CheckImage(vm.ImagePath);
+                    var ChecKImg = _uploadFile.CheckImage(vm.imagePath);
                     if (!ChecKImg.IsSuccess)
                     {
                         result.Message = ChecKImg.Message;
@@ -148,14 +148,14 @@ namespace QuickCampusAPI.Controllers
                 {
                     TblUser userVm = new TblUser
                     {
-                        Name = vm.Name?.Trim(),
-                        Email = vm.Email?.Trim(),
-                        Mobile = vm.Mobile?.Trim(),
-                        Password = vm.Password.Trim(),
+                        Name = vm.name?.Trim(),
+                        Email = vm.email?.Trim(),
+                        Mobile = vm.mobile?.Trim(),
+                        Password = vm.password.Trim(),
                         CreateDate = DateTime.Now,
-                        ClientId = (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin) ? ((vm.ClientId == 0 || vm.ClientId == null) ? null : vm.ClientId) : Convert.ToInt32(LoggedInUserClientId)
+                        ClientId = (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin) ? ((vm.clientId == 0 || vm.clientId == null) ? null : vm.clientId) : Convert.ToInt32(LoggedInUserClientId)
                     };
-                    var UploadPicture = _uploadFile.GetUploadFile(vm.ImagePath);
+                    var UploadPicture = _uploadFile.GetUploadFile(vm.imagePath);
                     if (UploadPicture.IsSuccess)
                     {
                         userVm.ProfilePicture = UploadPicture.Data;
@@ -167,13 +167,13 @@ namespace QuickCampusAPI.Controllers
                     {
 
                         IGeneralResult<string> addRole = new GeneralResult<string>();
-                        if (LoggedInUserRole.RoleId == (int)AppRole.Admin && (vm.ClientId == 0 || vm.ClientId == null))
+                        if (LoggedInUserRole.RoleId == (int)AppRole.Admin && (vm.clientId == 0 || vm.clientId == null))
                         {
-                            addRole = await AddorUpdateRole(addUser.Id, AppRole.Admin_User, vm.RoleId);
+                            addRole = await AddorUpdateRole(addUser.Id, AppRole.Admin_User, vm.roleId);
                         }
                         else
                         {
-                            addRole = await AddorUpdateRole(addUser.Id, AppRole.Client_User, vm.RoleId);
+                            addRole = await AddorUpdateRole(addUser.Id, AppRole.Client_User, vm.roleId);
                         }
                         if (addRole.IsSuccess)
                         {
@@ -210,7 +210,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "EditUser")]
         [HttpPost]
         [Route("EditUser")]
-        public async Task<IActionResult> EditUser(UserRequestVm vm)
+        public async Task<IActionResult> EditUser([FromForm]UserModel vm)
         {
 
             IGeneralResult<UserViewVm> result = new GeneralResult<UserViewVm>();
@@ -231,19 +231,19 @@ namespace QuickCampusAPI.Controllers
                 }
                 //vm.Password = EncodePasswordToBase64(vm.Password ?? "");
 
-                if (vm.UserId != null && vm.UserId > 0)
+                if (vm.userId != null && vm.userId > 0)
                 {
-                    if (_userRepo.Any(x => x.Email == vm.Email && x.IsActive == true && x.IsDelete == false && x.Id != vm.UserId))
+                    if (_userRepo.Any(x => x.Email == vm.email && x.IsActive == true && x.IsDelete == false && x.Id != vm.userId))
                     {
                         result.Message = "Email already Exists";
                         return Ok(result);
                     }
-                    if (_userRepo.Any(x => x.Mobile == vm.Mobile && x.IsActive == true && x.IsDelete == false && x.Id != vm.UserId))
+                    if (_userRepo.Any(x => x.Mobile == vm.mobile && x.IsActive == true && x.IsDelete == false && x.Id != vm.userId))
                     {
                         result.Message = "Mobile already Exists";
                         return Ok(result);
                     }
-                    if (!_roleRepo.Any(x => x.Id == vm.RoleId && x.IsDeleted == false && x.IsActive == true))
+                    if (!_roleRepo.Any(x => x.Id == vm.roleId && x.IsDeleted == false && x.IsActive == true))
                     {
                         result.Message = "Invalid Role";
                         return Ok(result);
@@ -254,11 +254,11 @@ namespace QuickCampusAPI.Controllers
 
                         if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
                         {
-                            user = _userRepo.GetAllQuerable().Where(x => x.Id == vm.UserId && x.IsDelete == false).FirstOrDefault();
+                            user = _userRepo.GetAllQuerable().Where(x => x.Id == vm.userId && x.IsDelete == false).FirstOrDefault();
                         }
                         else
                         {
-                            user = _userRepo.GetAllQuerable().Where(x => x.Id == vm.UserId && x.IsDelete == false && x.ClientId == Convert.ToInt32(LoggedInUserClientId)).FirstOrDefault();
+                            user = _userRepo.GetAllQuerable().Where(x => x.Id == vm.userId && x.IsDelete == false && x.ClientId == Convert.ToInt32(LoggedInUserClientId)).FirstOrDefault();
                         }
                         if (user == null)
                         {
@@ -266,17 +266,35 @@ namespace QuickCampusAPI.Controllers
                             return Ok(result);
                         }
 
-                        user.Name = vm.Name;
-                        user.Mobile = vm.Mobile;
-                        user.Email = vm.Email;
+                        user.Name = vm.name;
+                        user.Mobile = vm.mobile;
+                        user.Email = vm.email;
                         user.ModifiedDate = DateTime.Now;
-                        var updateUser = await _userRepo.Update(user);
-                        IGeneralResult<string> addRole = new GeneralResult<string>();
-                            addRole = await AddorUpdateRole(user.Id, AppRole.None, vm.RoleId);
-                        result.IsSuccess = true;
-                        result.Message = "User updated successfully.";
-                        result.Data = (UserViewVm)updateUser;
-                        return Ok(result);
+                        if (vm.imagePath != null)
+                        {
+                            var CheckImg = _uploadFile.CheckImage(vm.imagePath);
+                            if (!CheckImg.IsSuccess)
+                            {
+                                result.Message = CheckImg.Message;
+                                return Ok(result);
+                            }
+                        }
+                        var UploadUserProfilePicture = _uploadFile.GetUploadFile(vm.imagePath);
+                        if (UploadUserProfilePicture.IsSuccess)
+                        {
+                            var updateUser = await _userRepo.Update(user);
+                            IGeneralResult<string> addRole = new GeneralResult<string>();
+                            addRole = await AddorUpdateRole(user.Id, AppRole.None, vm.roleId);
+                            result.IsSuccess = true;
+                            result.Message = "User updated successfully.";
+                            result.Data = (UserViewVm)updateUser;
+                            return Ok(result);
+                        }
+                        else
+                        {
+                            result.Message = UploadUserProfilePicture.Message;
+                            return Ok(result);
+                        }
                     }
                     else
                     {
