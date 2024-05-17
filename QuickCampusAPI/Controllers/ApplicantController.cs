@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Extensions;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
+using QuickCampus_Core.Services;
 using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
 using System.Text.RegularExpressions;
@@ -27,9 +28,10 @@ namespace QuickCampusAPI.Controllers
         private readonly IUserRepo _userRepo;
         private string _jwtSecretKey;
         private readonly ISkillsRepo _skillsRepo;
+        private readonly IClientRepo _clientRepo;
 
         public ApplicantController(IConfiguration configuration, IMstQualificationRepo qualificationRepo, ICollegeRepo collegeRepo, IApplicantRepo applicantRepo
-            , IUserAppRoleRepo userAppRoleRepo, IUserRepo userRepo, ISkillsRepo skillsRepo)
+            , IUserAppRoleRepo userAppRoleRepo, IUserRepo userRepo, ISkillsRepo skillsRepo,IClientRepo clientRepo)
         {
             _applicantRepo = applicantRepo;
             _userAppRoleRepo = userAppRoleRepo;
@@ -39,6 +41,7 @@ namespace QuickCampusAPI.Controllers
             _userRepo = userRepo;
             _jwtSecretKey = _config["Jwt:Key"] ?? "";
             _skillsRepo = skillsRepo;
+            _clientRepo = clientRepo;
         }
 
         [HttpGet]
@@ -111,6 +114,11 @@ namespace QuickCampusAPI.Controllers
                     result.IsSuccess = true;
                     result.Message = "Applicants fetched successfully";
                     result.Data = response;
+                    foreach (var rec in result.Data)
+                    {
+                        var clientname = _clientRepo.GetById(rec.ClientId ?? 0).Result.CompanyName;
+                        rec.ClientName = clientname;
+                    }
                     result.TotalRecordCount = applicantTotalCount;
                 }
                 else

@@ -13,6 +13,7 @@ namespace QuickCampus_Core.ViewModel
         public string? RoleName { get; set; }
         public bool? IsActive { get; set; }
         public int? ClientId { get; set; }
+        public string ClientName { get; set; }
         public List<RolePermissions> Permission { get; set; }
 
         public static explicit operator RoleViewVm(TblRole v)
@@ -21,7 +22,8 @@ namespace QuickCampus_Core.ViewModel
             {
                 RoleId = v.Id,
                 RoleName = v.Name,
-                IsActive = v.IsActive
+                IsActive = v.IsActive,
+                ClientId=v.ClientId
             };
         }
     }

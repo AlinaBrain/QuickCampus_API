@@ -21,6 +21,7 @@ namespace QuickCampusAPI.Controllers
     [Route("api/[controller]")]
     public class CampusController : ControllerBase
     {
+        private readonly IClientRepo _clientRepo;
         private readonly ICampusRepo _campusrepo;
         private readonly ICountryRepo _country;
         private readonly IStateRepo _staterepo;
@@ -32,8 +33,9 @@ namespace QuickCampusAPI.Controllers
         private string _jwtSecretKey;
         private ICampusWalkinCollegeRepo _campusWalkinCollegeRepo;
 
-        public CampusController(IConfiguration configuration, ICollegeRepo collegeRepo, ICampusRepo campusrepo, ICountryRepo countryRepo, IStateRepo stateRepo, IUserAppRoleRepo userAppRoleRepo, IUserRepo userRepo, ICampusWalkinCollegeRepo campusWalkinCollegeRepo, ICityRepo cityRepo)
+        public CampusController(IConfiguration configuration, ICollegeRepo collegeRepo, ICampusRepo campusrepo, ICountryRepo countryRepo, IStateRepo stateRepo, IUserAppRoleRepo userAppRoleRepo, IUserRepo userRepo, ICampusWalkinCollegeRepo campusWalkinCollegeRepo, ICityRepo cityRepo,IClientRepo clientRepo)
         {
+            _clientRepo = clientRepo;
             _campusrepo = campusrepo;
             _country = countryRepo;
             _staterepo = stateRepo;
@@ -107,6 +109,11 @@ namespace QuickCampusAPI.Controllers
                     result.IsSuccess = true;
                     result.Message = "Campus get successfully";
                     result.Data = response;
+                    foreach (var rec in result.Data)
+                    {
+                        var clientname = _clientRepo.GetById(rec.ClientId ?? 0).Result.CompanyName;
+                        rec.ClientName = clientname;
+                    }
                     result.TotalRecordCount = campusTotalCount;
                 }
                 else
@@ -367,14 +374,14 @@ namespace QuickCampusAPI.Controllers
                     LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
                 }
                 var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
-                var campusData = _campusrepo.GetAllQuerable().Where(x => x.IsDeleted == false && x.WalkInId == campusId).Include(x => x.State).Include(x => x.Country).OrderByDescending(x => x.WalkInDate).Select(x => new CampusGridViewModel()
+                var campusData = _campusrepo.GetAllQuerable().Where(x => x.IsDeleted == false   && x.IsActive==true && x.WalkInId == campusId).Include(x => x.State).Include(x => x.Country).OrderByDescending(x => x.WalkInDate).Select(x => new CampusGridViewModel()
                 {
                     WalkInID = x.WalkInId,
                     Address1 = x.Address1,
                     Address2 = x.Address2,
                     City = x.City,
-                    StateID = x.StateId,
-                    CountryID = x.CountryId,
+                    StateId = x.StateId,
+                    CountryId = x.CountryId,
                     JobDescription = x.JobDescription,
                     WalkInDate = x.WalkInDate.Value,
                     IsActive = x.IsActive ?? false,
@@ -383,7 +390,8 @@ namespace QuickCampusAPI.Controllers
                     PassingYear=x.PassingYear
 
                 }).FirstOrDefault();
-              var campuswalkindata = _campusWalkinCollegeRepo.GetAllQuerable().Where(z => z.WalkInId == z.WalkInId).ToList();
+                
+              var campuswalkindata = _campusWalkinCollegeRepo.GetAllQuerable().Where(z => z.WalkInId == campusData.WalkInID ).ToList();
                 if (campuswalkindata.Count > 0)
                 {
                     campusData.Colleges = campuswalkindata.Select(y => new CampusWalkInModel()
@@ -406,8 +414,8 @@ namespace QuickCampusAPI.Controllers
                         Address1 = campusData.Address1,
                         Address2 = campusData.Address2,
                         City = campusData.City,
-                        StateID = campusData.StateID,
-                        CountryID = campusData.CountryID,
+                        StateId= campusData.StateId,
+                        CountryId = campusData.CountryId,
                         IsActive = campusData.IsActive,
                         Colleges = campusData?.Colleges,
                         JobDescription = campusData.JobDescription,

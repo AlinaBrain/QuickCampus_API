@@ -78,6 +78,7 @@ namespace QuickCampus_Core.ViewModel
         //public DateTime? ModifiedDate { get; set; }
         public int? CollegeId { get; set; }
         public string? PassingYear { get; set; }
+        public string ClientName { get; set; }
         public List<SkillVmm> skilltype { get; set; }
 
         public TblApplicant ToApplicantDbModel()

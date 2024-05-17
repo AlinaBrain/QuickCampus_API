@@ -42,6 +42,7 @@ namespace QuickCampus_Core.ViewModel
         public int? StateId { get; set; }
         public string? PassingYear { get; set; }
         public int? ClientId { get; set; }
+        public string ClientName { get; set; }
     }
     public class CampusGridViewModel
     {
@@ -53,9 +54,9 @@ namespace QuickCampus_Core.ViewModel
 
         public int? City { get; set; }
 
-        public int? StateID { get; set; }
+        public int? StateId { get; set; }
 
-        public int? CountryID { get; set; }
+        public int? CountryId { get; set; }
 
         [Required(ErrorMessage = "Date is required.")]
         public DateTime? WalkInDate { get; set; }

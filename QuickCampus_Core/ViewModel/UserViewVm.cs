@@ -30,6 +30,7 @@ namespace QuickCampus_Core.ViewModel
                 Mobile = v.Mobile,
                 ClientId = v.ClientId,
                 IsActive = v.IsActive,
+                ProfilePicture = v.ProfilePicture,
                 
             };
         }

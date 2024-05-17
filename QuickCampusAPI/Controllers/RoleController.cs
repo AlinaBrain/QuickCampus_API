@@ -81,7 +81,14 @@ namespace QuickCampusAPI.Controllers
                 {
                     result.IsSuccess = true;
                     result.Message = "Roles get successfully";
+
                     result.Data = roleList.Select(x=> (RoleViewVm)x).ToList();
+                    foreach(var rec in result.Data)
+                    {
+                        var clientname =  _clientRepo.GetById(rec.ClientId ?? 0).Result.CompanyName;
+                        rec.ClientName = clientname;
+                    }
+                    
                     result.TotalRecordCount = rolesTotalCount;
                 }
                 else

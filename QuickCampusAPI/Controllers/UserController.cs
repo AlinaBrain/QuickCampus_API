@@ -146,6 +146,9 @@ namespace QuickCampusAPI.Controllers
                 }
                 if (ModelState.IsValid)
                 {
+
+                    
+                    
                     TblUser userVm = new TblUser
                     {
                         Name = vm.name?.Trim(),
@@ -162,10 +165,11 @@ namespace QuickCampusAPI.Controllers
 
                     }
                     var addUser = await _userRepo.Add(userVm);
-                    
+                   
+
                     if (addUser.Id > 0)
                     {
-
+                        
                         IGeneralResult<string> addRole = new GeneralResult<string>();
                         if (LoggedInUserRole.RoleId == (int)AppRole.Admin && (vm.clientId == 0 || vm.clientId == null))
                         {
@@ -280,8 +284,12 @@ namespace QuickCampusAPI.Controllers
                             }
                         }
                         var UploadUserProfilePicture = _uploadFile.GetUploadFile(vm.imagePath);
-                        if (UploadUserProfilePicture.IsSuccess)
+                        if(!UploadUserProfilePicture.IsSuccess)
                         {
+                            result.Message = UploadUserProfilePicture.Message;
+                            return Ok(result);
+                        }
+                        user.ProfilePicture = UploadUserProfilePicture.Data;
                             var updateUser = await _userRepo.Update(user);
                             IGeneralResult<string> addRole = new GeneralResult<string>();
                             addRole = await AddorUpdateRole(user.Id, AppRole.None, vm.roleId);
@@ -289,12 +297,6 @@ namespace QuickCampusAPI.Controllers
                             result.Message = "User updated successfully.";
                             result.Data = (UserViewVm)updateUser;
                             return Ok(result);
-                        }
-                        else
-                        {
-                            result.Message = UploadUserProfilePicture.Message;
-                            return Ok(result);
-                        }
                     }
                     else
                     {

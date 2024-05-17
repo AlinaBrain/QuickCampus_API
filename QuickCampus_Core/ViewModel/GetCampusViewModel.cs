@@ -19,8 +19,8 @@ namespace QuickCampus_Core.ViewModel
                 Address1 = item.Address1,
                 Address2 = item.Address2,
                 City = item.City,
-                StateID=item.StateId,
-                CountryID=item.CountryId,
+                StateId=item.StateId,
+                CountryId=item.CountryId,
                 Title=item.Title,
                 IsActive=item.IsActive,
                 JobDescription=item.JobDescription,
@@ -35,9 +35,9 @@ namespace QuickCampus_Core.ViewModel
 
         public int? City { get; set; }
 
-        public int? StateID { get; set; }
+        public int? StateId { get; set; }
 
-        public int? CountryID { get; set; }
+        public int? CountryId { get; set; }
 
         [Required(ErrorMessage = "Date is required.")]
         public DateTime? WalkInDate { get; set; }

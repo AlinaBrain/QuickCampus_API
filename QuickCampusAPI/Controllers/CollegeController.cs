@@ -33,13 +33,14 @@ namespace QuickCampusAPI.Controllers
         private readonly ICityRepo _cityRepo;
         private string baseUrl;
         private IUserRepo _userRepo;
+        private readonly IClientRepo _clientRepo;
         private readonly BtprojecQuickcampustestContext _context;
         private string _jwtSecretKey;
 
 
         public CollegeController(ICollegeRepo collegeRepo, IConfiguration config, ProcessUploadFile uploadFile,
             IUserAppRoleRepo userAppRoleRepo, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment,
-            ICountryRepo countryRepo, IStateRepo stateRepo, ICityRepo cityRepo, BtprojecQuickcampustestContext BtprojecQuickcampustestContext, IUserRepo userRepo)
+            ICountryRepo countryRepo, IStateRepo stateRepo, ICityRepo cityRepo, BtprojecQuickcampustestContext BtprojecQuickcampustestContext, IUserRepo userRepo,IClientRepo clientRepo)
         {
             _collegeRepo = collegeRepo;
             _config = config;
@@ -53,6 +54,7 @@ namespace QuickCampusAPI.Controllers
             _jwtSecretKey = _config["Jwt:Key"] ?? "";
             baseUrl = _config.GetSection("APISitePath").Value;
             _userRepo = userRepo;
+            _clientRepo = clientRepo;
         }
 
 
@@ -104,6 +106,11 @@ namespace QuickCampusAPI.Controllers
                     result.IsSuccess = true;
                     result.Message = "Data fetched successfully.";
                     result.Data = response;
+                    foreach (var rec in result.Data)
+                    {
+                        var clientname = _clientRepo.GetById(rec.ClientId ?? 0).Result.CompanyName;
+                        rec.ClientName = clientname;
+                    }
                     result.TotalRecordCount = collegeListCount;
                 }
                 else
