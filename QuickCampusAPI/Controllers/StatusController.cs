@@ -47,9 +47,10 @@ namespace QuickCampusAPI.Controllers
                     LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
                 }
                 var res = statuslist.Select(x => ((StatusVm)x)).ToList();
+                
+                    result.IsSuccess = true;
                 if (res != null && res.Count() > 0)
                 {
-                    result.IsSuccess = true;
                     result.Message = "MstApplicantStatus fetched successfully.";
                     result.Data = res;
                     result.TotalRecordCount = res.Count();

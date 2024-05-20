@@ -31,9 +31,9 @@ namespace QuickCampus_Core.ViewModel
         [Required(ErrorMessage ="Contact Person Name is required ")]
         public string? contactPersonName { get; set; }
         [RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Not a valid phone number.")]
-        public string? contectPhone { get; set; }
+        public string? contactPhone { get; set; }
         [EmailAddress(ErrorMessage = "Enter a valid email.")]
-        public string? contectEmail { get; set; }
+        public string? contactEmail { get; set; }
         public int? clientId { get; set; }
 
     }

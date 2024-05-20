@@ -109,9 +109,10 @@ namespace QuickCampusAPI.Controllers
                     }).ToList();
                 }
 
+               
+                    result.IsSuccess = true;
                 if (applicantList.Count > 0)
                 {
-                    result.IsSuccess = true;
                     result.Message = "Applicants fetched successfully";
                     result.Data = response;
                     foreach (var rec in result.Data)

@@ -101,9 +101,10 @@ namespace QuickCampusAPI.Controllers
 
                 var response = collegeList.Select(x => (CollegeCountryStateVmmm)x).ToList();
 
+                
+                    result.IsSuccess = true;
                 if (collegeList.Count > 0)
                 {
-                    result.IsSuccess = true;
                     result.Message = "Data fetched successfully.";
                     result.Data = response;
                     foreach (var rec in result.Data)
@@ -115,7 +116,7 @@ namespace QuickCampusAPI.Controllers
                 }
                 else
                 {
-                    result.Message = "TblCollege list not found!";
+                    result.Message = " No College found!";
                 }
 
             }
@@ -232,13 +233,13 @@ namespace QuickCampusAPI.Controllers
                         result.Message = "College Code is already exist";
                         return Ok(result);
                     }
-                    bool isContactEmailExist = _collegeRepo.Any(x => x.ContectEmail == vm.contectEmail && x.IsDeleted == false && (LoggedInUserRole.RoleId == (int)AppRole.Admin ? x.ClientId == vm.clientId : x.ClientId == Convert.ToInt32(LoggedInUserClientId)));
+                    bool isContactEmailExist = _collegeRepo.Any(x => x.ContectEmail == vm.contactEmail && x.IsDeleted == false && (LoggedInUserRole.RoleId == (int)AppRole.Admin ? x.ClientId == vm.clientId : x.ClientId == Convert.ToInt32(LoggedInUserClientId)));
                     if (isContactEmailExist)
                     {
                         result.Message = "Contact Email is Already Exist";
                         return Ok(result);
                     }
-                    bool isContactPhoneExist = _collegeRepo.Any(x => x.ContectPhone == vm.contectPhone && x.IsDeleted == false && (LoggedInUserRole.RoleId == (int)AppRole.Admin ? x.ClientId == vm.clientId : x.ClientId == Convert.ToInt32(LoggedInUserClientId)));
+                    bool isContactPhoneExist = _collegeRepo.Any(x => x.ContectPhone == vm.contactPhone && x.IsDeleted == false && (LoggedInUserRole.RoleId == (int)AppRole.Admin ? x.ClientId == vm.clientId : x.ClientId == Convert.ToInt32(LoggedInUserClientId)));
                     if (isContactPhoneExist)
                     {
                         result.Message = "Contact Phone is Already Exist";
@@ -265,8 +266,8 @@ namespace QuickCampusAPI.Controllers
                         CountryId = vm.countryId,
                         CollegeCode = vm.collegeCode,
                         ContectPersonName = vm.contactPersonName?.Trim(),
-                        ContectEmail = vm.contectEmail?.Trim(),
-                        ContectPhone = vm.contectPhone?.Trim(),
+                        ContectEmail = vm.contactEmail?.Trim(),
+                        ContectPhone = vm.contactPhone?.Trim(),
                         ClientId = (LoggedInUserRole.RoleId == (int)AppRole.Admin ? vm.clientId : Convert.ToInt32(LoggedInUserClientId))
                     };
                     var UploadLogo = _uploadFile.GetUploadFile(vm.imagePath);
@@ -359,20 +360,18 @@ namespace QuickCampusAPI.Controllers
                             result.Message = "College Code is already exist";
                             return Ok(result);
                         }
-                        bool isContactEmailExists = _collegeRepo.Any(x => x.ContectEmail == vm.contectEmail && x.IsDeleted == false && x.CollegeId != vm.collegeId && (LoggedInUserRole.RoleId == (int)AppRole.Admin ? x.ClientId == vm.clientId : x.ClientId == Convert.ToInt32(LoggedInUserClientId)));
+                        bool isContactEmailExists = _collegeRepo.Any(x => x.ContectEmail == vm.contactEmail && x.IsDeleted == false && x.CollegeId != vm.collegeId && (LoggedInUserRole.RoleId == (int)AppRole.Admin ? x.ClientId == vm.clientId : x.ClientId == Convert.ToInt32(LoggedInUserClientId)));
                         if (isContactEmailExists)
                         {
                             result.Message = "Contact Email is Already Exist";
                             return Ok(result);
                         }
-                        bool isContactPhoneExists = _collegeRepo.Any(x => x.ContectPhone == vm.contectPhone && x.IsDeleted == false && x.CollegeId != vm.collegeId && (LoggedInUserRole.RoleId == (int)AppRole.Admin ? x.ClientId == vm.clientId : x.ClientId == Convert.ToInt32(LoggedInUserClientId)));
+                        bool isContactPhoneExists = _collegeRepo.Any(x => x.ContectPhone == vm.contactPhone && x.IsDeleted == false && x.CollegeId != vm.collegeId && (LoggedInUserRole.RoleId == (int)AppRole.Admin ? x.ClientId == vm.clientId : x.ClientId == Convert.ToInt32(LoggedInUserClientId)));
                         if (isContactPhoneExists)
                         {
                             result.Message = "Contact Phone is Already Exist";
                             return Ok(result);
                         }
-
-
                         TblCollege college = new TblCollege();
 
                         if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
@@ -400,8 +399,8 @@ namespace QuickCampusAPI.Controllers
                             college.CountryId = vm.countryId;
                             college.CollegeCode = vm.collegeCode?.Trim();
                             college.ContactPersonName = vm.contactPersonName?.Trim();
-                            college.ContectEmail = vm.contectEmail?.Trim();
-                            college.ContectPhone = vm.contectPhone?.Trim();
+                            college.ContectEmail = vm.contactEmail?.Trim();
+                            college.ContectPhone = vm.contactPhone?.Trim();
                             college.ModifiedDate = DateTime.Now;
                             if (vm.imagePath != null)
                             {
@@ -413,20 +412,19 @@ namespace QuickCampusAPI.Controllers
                                 }
                             }
                             var UploadLogo = _uploadFile.GetUploadFile(vm.imagePath);
-                            if (UploadLogo.IsSuccess)
-                            {
-                                college.Logo = UploadLogo.Data;
-                                await _collegeRepo.Update(college);
-                                result.IsSuccess = true;
-                                result.Message = "College Updated successfully.";
-                                result.Data = vm;
-                                return Ok(result);
-                            }
-                            else
+                            if (!UploadLogo.IsSuccess)
                             {
                                 result.Message = UploadLogo.Message;
                                 return Ok(result);
+
                             }
+                            college.Logo = UploadLogo.Data;
+                            await _collegeRepo.Update(college);
+                            result.IsSuccess = true;
+                            result.Message = "College Updated successfully.";
+                            result.Data = vm;
+                            result.Data.imagePath = null;
+                            return Ok(result);
                         }
                     }
                     else

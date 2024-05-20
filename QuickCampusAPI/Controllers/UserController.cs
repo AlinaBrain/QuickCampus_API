@@ -82,9 +82,10 @@ namespace QuickCampusAPI.Controllers
 
                 var response = userList.Select(x => (UserViewVm)x).ToList();
 
+
+                result.IsSuccess = true;
                 if (userList.Count > 0)
                 {
-                    result.IsSuccess = true;
                     result.Message = "Data fetched successfully.";
                     result.Data = response;
                     result.TotalRecordCount = userListCount;
@@ -130,7 +131,7 @@ namespace QuickCampusAPI.Controllers
                     result.Message = "Email already Exists";
                     return Ok(result);
                 }
-                if(!_roleRepo.Any(x=>x.Id==vm.roleId && x.IsDeleted==false && x.IsActive == true))
+                if (!_roleRepo.Any(x => x.Id == vm.roleId && x.IsDeleted == false && x.IsActive == true))
                 {
                     result.Message = "Invalid Role";
                     return Ok(result);
@@ -147,8 +148,8 @@ namespace QuickCampusAPI.Controllers
                 if (ModelState.IsValid)
                 {
 
-                    
-                    
+
+
                     TblUser userVm = new TblUser
                     {
                         Name = vm.name?.Trim(),
@@ -165,11 +166,11 @@ namespace QuickCampusAPI.Controllers
 
                     }
                     var addUser = await _userRepo.Add(userVm);
-                   
+
 
                     if (addUser.Id > 0)
                     {
-                        
+
                         IGeneralResult<string> addRole = new GeneralResult<string>();
                         if (LoggedInUserRole.RoleId == (int)AppRole.Admin && (vm.clientId == 0 || vm.clientId == null))
                         {
@@ -214,7 +215,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "EditUser")]
         [HttpPost]
         [Route("EditUser")]
-        public async Task<IActionResult> EditUser([FromForm]UserModel vm)
+        public async Task<IActionResult> EditUser([FromForm] UserModel vm)
         {
 
             IGeneralResult<UserViewVm> result = new GeneralResult<UserViewVm>();
@@ -284,19 +285,20 @@ namespace QuickCampusAPI.Controllers
                             }
                         }
                         var UploadUserProfilePicture = _uploadFile.GetUploadFile(vm.imagePath);
-                        if(!UploadUserProfilePicture.IsSuccess)
+                        if (!UploadUserProfilePicture.IsSuccess)
                         {
                             result.Message = UploadUserProfilePicture.Message;
                             return Ok(result);
                         }
                         user.ProfilePicture = UploadUserProfilePicture.Data;
-                            var updateUser = await _userRepo.Update(user);
-                            IGeneralResult<string> addRole = new GeneralResult<string>();
-                            addRole = await AddorUpdateRole(user.Id, AppRole.None, vm.roleId);
-                            result.IsSuccess = true;
-                            result.Message = "User updated successfully.";
-                            result.Data = (UserViewVm)updateUser;
-                            return Ok(result);
+                        var updateUser = await _userRepo.Update(user);
+                        IGeneralResult<string> addRole = new GeneralResult<string>();
+                        addRole = await AddorUpdateRole(user.Id, AppRole.None, vm.roleId);
+                        result.IsSuccess = true;
+                        result.Message = "User updated successfully.";
+                        result.Data = (UserViewVm)updateUser;
+                        result.Data.ProfilePicture = null;
+                        return Ok(result);
                     }
                     else
                     {
@@ -499,7 +501,7 @@ namespace QuickCampusAPI.Controllers
 
             if (checkUserAppRole == null)
             {
-                
+
                 TblUserAppRole userAppRole = new TblUserAppRole()
                 {
                     UserId = userId,

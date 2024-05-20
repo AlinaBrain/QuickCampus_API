@@ -90,8 +90,7 @@ namespace QuickCampusAPI.Controllers
 
                 campusTotalCount = campusList.Count;
                 campusList = campusList.Skip(newPageStart).Take(pageSize).ToList();
-                if (campusList.Count > 0)
-                {
+              
                     var response = campusList.Select(x => (CampusViewModel)x).ToList();
                     List<CampusViewModel> record = new List<CampusViewModel>();
                     foreach (var item in response)
@@ -107,6 +106,8 @@ namespace QuickCampusAPI.Controllers
                         }).ToList();
                     }
                     result.IsSuccess = true;
+                if (campusList.Count > 0)
+                {
                     result.Message = "Campus get successfully";
                     result.Data = response;
                     foreach (var rec in result.Data)

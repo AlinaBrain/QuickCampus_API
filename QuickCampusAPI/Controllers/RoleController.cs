@@ -77,9 +77,10 @@ namespace QuickCampusAPI.Controllers
                 roleList = roleData.Where(x => x.Name.Contains(search ?? "", StringComparison.OrdinalIgnoreCase)).OrderByDescending(o => o.Id).ToList();
                 rolesTotalCount = roleList.Count;
                 roleList = roleList.Skip(newPageStart).Take(pageSize).ToList();
+               
+                    result.IsSuccess = true;
                 if (roleList.Count > 0)
                 {
-                    result.IsSuccess = true;
                     result.Message = "Roles get successfully";
 
                     result.Data = roleList.Select(x=> (RoleViewVm)x).ToList();
@@ -197,11 +198,18 @@ namespace QuickCampusAPI.Controllers
             IGeneralResult<RoleViewVm> result = new GeneralResult<RoleViewVm>();
             try
             {
-                if (vm == null)
+
+                if (vm == null  )
                 {
                     result.Message = "Your Model request in Invalid";
                     return Ok(result);
                 }
+                if(vm.Id==0 || vm.Id==null)
+                {
+                    result.Message = "Invalid RoleId";
+                    return Ok(result);
+                }
+
                 var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                 var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
                 if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
@@ -212,7 +220,7 @@ namespace QuickCampusAPI.Controllers
                 var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
 
 
-                if (_roleRepo.Any(x => x.Name == vm.RoleName && x.Id != vm.Id))
+                if (_roleRepo.Any(x => x.Name == vm.RoleName && x.Id != vm.Id && (LoggedInUserRole.RoleId == (int)AppRole.Admin ? x.ClientId == vm.ClientId : x.ClientId == Convert.ToInt32(LoggedInUserClientId)))) ;
                 {
                     result.Message = "Role Already exists";
                     return Ok(result);
