@@ -410,15 +410,17 @@ namespace QuickCampusAPI.Controllers
                                     result.Message = CheckImg.Message;
                                     return Ok(result);
                                 }
-                            }
-                            var UploadLogo = _uploadFile.GetUploadFile(vm.imagePath);
-                            if (!UploadLogo.IsSuccess)
-                            {
-                                result.Message = UploadLogo.Message;
-                                return Ok(result);
+                                var UploadLogo = _uploadFile.GetUploadFile(vm.imagePath);
+                                if (!UploadLogo.IsSuccess)
+                                {
+                                    result.Message = UploadLogo.Message;
+                                    return Ok(result);
 
+                                }
+                                college.Logo = UploadLogo.Data;
                             }
-                            college.Logo = UploadLogo.Data;
+                            
+                            
                             await _collegeRepo.Update(college);
                             result.IsSuccess = true;
                             result.Message = "College Updated successfully.";

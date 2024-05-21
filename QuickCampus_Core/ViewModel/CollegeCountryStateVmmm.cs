@@ -24,8 +24,8 @@ namespace QuickCampus_Core.ViewModel
                 CountryId = items.CountryId,
                 CollegeCode = items.CollegeCode,
                 ContactPersonName = items.ContactPersonName,
-                ContectPhone = items.ContectPhone,
-                ContectEmail = items.ContectEmail,
+                ContactPhone = items.ContectPhone,
+                ContactEmail = items.ContectEmail,
                 ClientId = items.ClientId,
                 IsActive = items.IsActive,
             };
@@ -54,10 +54,10 @@ namespace QuickCampus_Core.ViewModel
         public string? ContactPersonName { get; set; }
 
         [RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Not a valid phone number.")]
-        public string? ContectPhone { get; set; }
+        public string? ContactPhone { get; set; }
 
         [EmailAddress(ErrorMessage = "Enter a valid email.")]
-        public string? ContectEmail { get; set; }
+        public string? ContactEmail { get; set; }
         public string ClientName { get; set; }
         public int? ClientId { get; set; }
         

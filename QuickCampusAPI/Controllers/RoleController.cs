@@ -86,8 +86,13 @@ namespace QuickCampusAPI.Controllers
                     result.Data = roleList.Select(x=> (RoleViewVm)x).ToList();
                     foreach(var rec in result.Data)
                     {
-                        var clientname =  _clientRepo.GetById(rec.ClientId ?? 0).Result.CompanyName;
-                        rec.ClientName = clientname;
+                        if (rec.ClientId!=null)
+                        {
+                            var clientname = _clientRepo.GetById(rec.ClientId ?? 0).Result.CompanyName;
+                            rec.ClientName = clientname;
+                        }
+
+                       
                     }
                     
                     result.TotalRecordCount = rolesTotalCount;

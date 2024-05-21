@@ -255,8 +255,8 @@ namespace QuickCampusAPI.Controllers
             return Ok(result);
         }
         [HttpDelete]
-        [Route("DeleteSubTopic")]
-        public async Task<IActionResult> DeleteSubTopic(int tagId)
+        [Route("DeleteTag")]
+        public async Task<IActionResult> DeleteTag(int tagId)
         {
             IGeneralResult<TagVm> result = new GeneralResult<TagVm>();
             try

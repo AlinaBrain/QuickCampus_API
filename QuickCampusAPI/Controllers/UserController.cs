@@ -215,7 +215,7 @@ namespace QuickCampusAPI.Controllers
         [Authorize(Roles = "EditUser")]
         [HttpPost]
         [Route("EditUser")]
-        public async Task<IActionResult> EditUser([FromForm] UserModel vm)
+        public async Task<IActionResult> EditUser([FromForm] EditUserModel vm)
         {
 
             IGeneralResult<UserViewVm> result = new GeneralResult<UserViewVm>();
@@ -281,16 +281,17 @@ namespace QuickCampusAPI.Controllers
                             if (!CheckImg.IsSuccess)
                             {
                                 result.Message = CheckImg.Message;
+
                                 return Ok(result);
                             }
+                            var UploadUserProfilePicture = _uploadFile.GetUploadFile(vm.imagePath);
+                            if (!UploadUserProfilePicture.IsSuccess)
+                            {
+                                result.Message = UploadUserProfilePicture.Message;
+                                return Ok(result);
+                            }
+                            user.ProfilePicture = UploadUserProfilePicture.Data;
                         }
-                        var UploadUserProfilePicture = _uploadFile.GetUploadFile(vm.imagePath);
-                        if (!UploadUserProfilePicture.IsSuccess)
-                        {
-                            result.Message = UploadUserProfilePicture.Message;
-                            return Ok(result);
-                        }
-                        user.ProfilePicture = UploadUserProfilePicture.Data;
                         var updateUser = await _userRepo.Update(user);
                         IGeneralResult<string> addRole = new GeneralResult<string>();
                         addRole = await AddorUpdateRole(user.Id, AppRole.None, vm.roleId);
