@@ -65,10 +65,10 @@ namespace QuickCampusAPI.Controllers
             var questionData = _question.GetAllQuerable().Where(z => z.IsDeleted == false && ((LoggedInUserRole.RoleId == (int)AppRole.Admin || LoggedInUserRole.RoleId == (int)AppRole.Admin_User) ? true : z.ClientId == Convert.ToInt32(LoggedInUserClientId))).ToList();
             var userData = _userRepo.GetAllQuerable().Where(z => z.IsDelete == false && ((LoggedInUserRole.RoleId == (int)AppRole.Admin || LoggedInUserRole.RoleId == (int)AppRole.Admin_User) ? true : z.ClientId == Convert.ToInt32(LoggedInUserClientId))).ToList();
 
-            if (LoggedInUserRole.RoleId == (int)AppRole.Admin || LoggedInUserRole.RoleId == (int)AppRole.Admin_User)
-            {
-                var clientData = _clientRepo.GetAllQuerable().Where(z => z.IsDeleted == false).ToList();
-                    
+                if (LoggedInUserRole.RoleId == (int)AppRole.Admin || LoggedInUserRole.RoleId == (int)AppRole.Admin_User)
+                {
+                    var clientData = _clientRepo.GetAllQuerable().Where(z => z.IsDeleted == false).ToList();
+
                     List<DashVm> ClientData = new List<DashVm>();
                     ClientData.Add(new DashVm
                     {
@@ -88,8 +88,8 @@ namespace QuickCampusAPI.Controllers
                         Url = client.ItemUrl
 
 
-                    }); 
-
+                    });
+                }
                     List<DashVm> ApplicantData = new List<DashVm>();
                     ApplicantData.Add(new DashVm
                     {
@@ -138,12 +138,12 @@ namespace QuickCampusAPI.Controllers
                         Title = " Active Users",
                         TotalRecord = userData.Where(x => x.IsActive == true).Count()
                     });
-                    var user = _mstMeneItemRepo.GetAllQuerable().Where(y => y.ItemName == "User").FirstOrDefault();
+                    var userres = _mstMeneItemRepo.GetAllQuerable().Where(y => y.ItemName == "User").FirstOrDefault();
                     dashboard.Add(new DashboardVm
                     {
                         DashData = UserData,
-                        Icon = user.ItemIcon,
-                        Url=user.ItemUrl
+                        Icon = userres.ItemIcon,
+                        Url= userres.ItemUrl
                     });
 
                     List<DashVm> CampusData = new List<DashVm>();
@@ -184,7 +184,7 @@ namespace QuickCampusAPI.Controllers
                         Icon = college.ItemIcon,
                         Url=college.ItemUrl
                     });
-                }
+               
         
                 result.Data = dashboard;
                 result.IsSuccess = true;

@@ -147,9 +147,6 @@ namespace QuickCampusAPI.Controllers
                 }
                 if (ModelState.IsValid)
                 {
-
-
-
                     TblUser userVm = new TblUser
                     {
                         Name = vm.name?.Trim(),
@@ -163,14 +160,10 @@ namespace QuickCampusAPI.Controllers
                     if (UploadPicture.IsSuccess)
                     {
                         userVm.ProfilePicture = UploadPicture.Data;
-
                     }
                     var addUser = await _userRepo.Add(userVm);
-
-
                     if (addUser.Id > 0)
                     {
-
                         IGeneralResult<string> addRole = new GeneralResult<string>();
                         if (LoggedInUserRole.RoleId == (int)AppRole.Admin && (vm.clientId == 0 || vm.clientId == null))
                         {
@@ -182,12 +175,10 @@ namespace QuickCampusAPI.Controllers
                         }
                         if (addRole.IsSuccess)
                         {
-
                             result.IsSuccess = true;
                             result.Message = "User added successfully.";
                             result.Data = (UserViewVm)addUser;
                             result.Data.ProfilePicture = Path.Combine(baseUrl, UploadPicture.Data ?? "");
-
                             return Ok(result);
                         }
                         result.Message = addRole.Message;
