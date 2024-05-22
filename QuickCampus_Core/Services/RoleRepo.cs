@@ -63,7 +63,7 @@ namespace QuickCampus_Core.Services
 
                 foreach (var permission in permissions)
                 {
-                    if (_context.MstPermissions.Any(x => x.Id == permission))
+                    if (_context.MstMenuSubItems.Any(x => x.SubItemId == permission))
                     {
                         TblRolePermission vm = new TblRolePermission
                         {

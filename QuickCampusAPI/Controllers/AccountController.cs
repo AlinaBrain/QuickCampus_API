@@ -52,7 +52,6 @@ namespace QuickCampusAPI.Controllers
             var res = await _account.Login(AdminLogin);
             return Ok(res);
         }
-
         [HttpGet]
         [Route("GetAllPermission")]
         public IActionResult GetAllPermission()
@@ -254,6 +253,7 @@ namespace QuickCampusAPI.Controllers
 
             return Ok(result);
         }
+
     }
 }
 

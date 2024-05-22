@@ -211,7 +211,6 @@ namespace QuickCampusAPI.Controllers
                         {
 
                             ApplicantSkillId = item.ApplicantSkillId,
-                            //SkillId = item.SkillId,
                             ClientId = vm.ClientId,
                             ApplicantId = SaveApplicant.ApplicantId,
                         };
