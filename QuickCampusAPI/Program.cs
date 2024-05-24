@@ -140,8 +140,11 @@ builder.Services.AddScoped<ITopicRepo, TopicRepo>();
 builder.Services.AddScoped<ISubjectRepo, SubjectRepo>();
 builder.Services.AddScoped<ITagRepo, TagRepo>();
 builder.Services.AddScoped<ISubTopicRepo, SubTopicRepo>();
+builder.Services.AddScoped<IContentRepo, ContentTypeRepo>();
+builder.Services.AddScoped<IMstContentTypeRepo, MstContentTypeRepo>();
 builder.Services.AddScoped<IMstMeneItemRepo,MstMenuItemRepo>();
 builder.Services.AddTransient<ValidationFilterAttribute>();
+
 builder.Services.Configure<ApiBehaviorOptions>(options
     => options.SuppressModelStateInvalidFilter = true);
 builder.Services.AddScoped<QuickCampus_Core.Common.Helper.ProcessUploadFile>();
