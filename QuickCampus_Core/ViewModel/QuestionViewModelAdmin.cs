@@ -1,0 +1,108 @@
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace QuickCampus_Core.ViewModel
+{
+    public class QuestionViewModelAdmin
+    {
+        
+
+        public int QuestionId { get; set; }
+        [Required(ErrorMessage = "TblQuestion Type is required.")]
+        [Display(Name = "Questiton Type")]
+        public int QuestionTypeId { get; set; }
+        [Required(ErrorMessage = "MstSection is required.")]
+        [Display(Name = "MstSection")]
+        public int SectionId { get; set; }
+        [Display(Name = "Group")]
+        public int GroupId { get; set; }
+        [Required(ErrorMessage = "TblQuestion is required.")]
+        [Display(Name = "TblQuestion")]
+        public string Text { get; set; }
+        public string QuestionTypeName { get; set; }
+        public string QuestionSection { get; set; }
+        public string QuestionGroup { get; set; }
+        public int? Marks { get; set; }
+        public bool IsActive { get; set; }
+        public bool IsDeleted { get; set; }
+        public List<OptionViewModelAdmin> options { get; set; } = null;
+      
+        public int ClientId { get; set; }
+
+    }
+    public class OptionViewModelAdmin
+    {
+        
+        public int OptionId { get; set; }
+        public int QuestionId { get; set; }
+        
+        public string OptionText { get; set; }
+        public string? Imagepath { get; set; } = null;
+        public IFormFile Image { get; set; }
+
+        public bool IsCorrect { get; set; }
+        public bool IsNew { get; set; }
+
+
+    }
+    public class QuestionTypeViewModelAdmin
+    {
+
+        public int QuestionTypeId { get; set; }
+        public string Questiontype { get; set; }
+
+    }
+    public class SectionViewModelAdmin
+    {
+
+        public int SectionId { get; set; }
+        public string SectionName { get; set; }
+
+    }
+    public class GroupViewModelAdmin
+    {
+
+        public int GroupId { get; set; }
+        public string GroupName { get; set; }
+
+    }
+    public class RequiredIfAttribute : RequiredAttribute
+    {
+        private String FirstPropertyName { get; set; }
+        private String SecondPropertyName { get; set; }
+
+        public RequiredIfAttribute(String firstpropertyName, string secondPropertyName)
+        {
+            FirstPropertyName = firstpropertyName;
+            SecondPropertyName = secondPropertyName;
+
+        }
+
+        //protected override ValidationResult IsValid(object value, ValidationContext context)
+        //{
+        //    Object instance = context.ObjectInstance;
+        //    Type type = instance.GetType();
+        //    Object proprtyvalue = type.GetProperty(FirstPropertyName).GetValue(instance, null);
+        //    Object proprtyvalue2 = type.GetProperty(SecondPropertyName).GetValue(instance, null);
+        //    if (proprtyvalue != null)
+        //    {
+        //        return ValidationResult.Success;
+        //    }
+        //    else
+        //    {
+        //        if ((int)proprtyvalue2 == 0)
+        //        {
+        //            ValidationResult result = base.IsValid(value, context);
+        //            return result;
+        //        }
+        //        else { return ValidationResult.Success; }
+        //    }
+        //}
+    }
+}

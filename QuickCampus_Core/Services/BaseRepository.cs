@@ -1,11 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using QuickCampus_Core.Interfaces;
 using QuickCampus_Core.ViewModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace QuickCampus_Core.Services
 {
@@ -24,6 +19,7 @@ namespace QuickCampus_Core.Services
             List<T> query = await dbContext.Set<T>().ToListAsync();
             return query;
         }
+        
         public async virtual Task<T> GetById(int Id)
         {
             return await dbContext.Set<T>().FindAsync(Id);
@@ -77,7 +73,7 @@ namespace QuickCampus_Core.Services
             return;
         }
 
-        public async virtual Task Update(T entity)
+        public async virtual Task<T> Update(T entity)
         {
             try
             {
@@ -88,7 +84,7 @@ namespace QuickCampus_Core.Services
             {
                 string msg = ex.Message;
             }
-            return;
+            return entity;
         }
 
         public async virtual Task Save()
@@ -110,14 +106,5 @@ namespace QuickCampus_Core.Services
             }
         }
 
-        Task IGenericRepository<T>.AddApplicantAsync(ApplicantViewModel model)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ApplicantViewModel.ApplicantGridViewModel UpdateApplicant(ApplicantViewModel.ApplicantGridViewModel model)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

@@ -1,200 +1,509 @@
-﻿using DocumentFormat.OpenXml.Bibliography;
-using DocumentFormat.OpenXml.InkML;
-using DocumentFormat.OpenXml.Office2010.Excel;
-using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
-using DocumentFormat.OpenXml.Wordprocessing;
-using Microsoft.AspNetCore.Http;
+﻿
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using QuickCampus_Core.Common;
 using QuickCampus_Core.Interfaces;
+using QuickCampus_Core.Services;
 using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
-using System.Collections;
-using static Azure.Core.HttpHeader;
+using SendGrid.Helpers.Mail;
+using System.Linq.Expressions;
+using System.Net.Mail;
+using System.Security.Cryptography;
+using static QuickCampus_Core.Common.common;
 
 namespace QuickCampusAPI.Controllers
 {
+    [Authorize(Roles = "Admin,Client,Client_User")]
     [ApiController]
     [Route("api/[controller]")]
     public class CampusController : ControllerBase
     {
+        private readonly IClientRepo _clientRepo;
         private readonly ICampusRepo _campusrepo;
-        private readonly ICountry _country;
+        private readonly ICountryRepo _country;
         private readonly IStateRepo _staterepo;
+        private IConfiguration _config;
+        private readonly ICityRepo _cityRepo;
+        private readonly ICollegeRepo _collegeRepo;
+        private readonly IUserAppRoleRepo _userAppRoleRepo;
+        private readonly IUserRepo _userRepo;
+        private string _jwtSecretKey;
+        private ICampusWalkinCollegeRepo _campusWalkinCollegeRepo;
 
-        public CampusController(IConfiguration configuration, ICampusRepo campusrepo, ICountry country, IStateRepo stateRepo)
+        public CampusController(IConfiguration configuration, ICollegeRepo collegeRepo, ICampusRepo campusrepo, ICountryRepo countryRepo, IStateRepo stateRepo, IUserAppRoleRepo userAppRoleRepo, IUserRepo userRepo, ICampusWalkinCollegeRepo campusWalkinCollegeRepo, ICityRepo cityRepo,IClientRepo clientRepo)
         {
+            _clientRepo = clientRepo;
             _campusrepo = campusrepo;
-            _country = country;
+            _country = countryRepo;
             _staterepo = stateRepo;
+            _config = configuration;
+            _cityRepo = cityRepo;
+            this._collegeRepo = collegeRepo;
+            _userAppRoleRepo = userAppRoleRepo;
+            _userRepo = userRepo;
+            _jwtSecretKey = _config["Jwt:Key"] ?? "";
+            _campusWalkinCollegeRepo = campusWalkinCollegeRepo;
         }
 
         [HttpGet]
-        [Route("ManageCampus")]
-        public async Task<IActionResult> ManageCampus(int WalkInId)
+        [Route("GetAllCampus")]
+        public async Task<IActionResult> GetAllCampus(string? search, int? ClientId, DataTypeFilter DataType, int pageStart = 1, int pageSize = 10)
         {
-            IGeneralResult<List<CampusGridViewModel>> result = new GeneralResult<List<CampusGridViewModel>>();
-
-            var rec = await _campusrepo.GetAllCampus();
-            var CampusList = rec.Where(x => x.WalkInID != null).ToList();
-            var res = CampusList.Select(x => ((CampusGridViewModel)x)).ToList();
-
-            if (res != null)
+            IGeneralResult<List<CampusViewModel>> result = new GeneralResult<List<CampusViewModel>>();
+            try
             {
-                result.IsSuccess = true;
-                result.Message = "List of Campus.";
-                result.Data = res;
-            }
-            else
-            {
-                result.Message = "Campus not found!";
-            }
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
+                {
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
+                }
+                var newPageStart = 0;
+                if (pageStart > 0)
+                {
+                    var startPage = 1;
+                    newPageStart = (pageStart - startPage) * pageSize;
+                }
+                var campusTotalCount = 0;
+                List<TblWalkIn> campusList = new List<TblWalkIn>();
+                List<TblWalkIn> campusData = new List<TblWalkIn>();
+                if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
+                {
+                    campusData = _campusrepo.GetAllQuerable().Where(x => (ClientId != null && ClientId > 0 ? x.ClientId == ClientId : true) && x.IsDeleted == false && ((DataType == DataTypeFilter.All ? true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : x.IsActive == true)))).ToList();
+                }
+                else
+                {
+                    campusData = _campusrepo.GetAllQuerable().Where(x => x.ClientId == Convert.ToInt32(LoggedInUserClientId) && x.IsDeleted == false && ((DataType == DataTypeFilter.All ? true : (DataType == DataTypeFilter.OnlyInActive ? x.IsActive == false : x.IsActive == true)))).ToList();
+                }
 
+                if (!string.IsNullOrEmpty(search))
+                {
+                    search = search.Trim();
+                }
+
+                campusList = campusData.Where(x => ((x.Address1 + " " + x.Address2).Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.Title.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.JobDescription.Contains(search ?? "", StringComparison.OrdinalIgnoreCase) || x.Address2.Trim().Contains(search ?? "", StringComparison.OrdinalIgnoreCase))).OrderByDescending(x => x.WalkInId).ToList();
+
+                campusTotalCount = campusList.Count;
+                campusList = campusList.Skip(newPageStart).Take(pageSize).ToList();
+              
+                    var response = campusList.Select(x => (CampusViewModel)x).ToList();
+                    List<CampusViewModel> record = new List<CampusViewModel>();
+                    foreach (var item in response)
+                    {
+                        item.CampusList = _campusWalkinCollegeRepo.GetAll(y => y.WalkInId == item.WalkInID).Result.Select(z => new CampusWalkInModel()
+                        {
+                            CampusId = z.CampusId,
+                            StartDateTime = z.StartDateTime,
+                            ExamEndTime = z.ExamEndTime.ToString(),
+                            CollegeId = z.CollegeId,
+                            CollegeName = (z.CollegeId != null ? _collegeRepo.GetAllQuerable().Where(x => x.CollegeId == z.CollegeId).First().CollegeName : ""),
+                            CollegeCode = (z.CollegeId != null ? _collegeRepo.GetAllQuerable().Where(x => x.CollegeId == z.CollegeId).First().CollegeCode : ""),
+                        }).ToList();
+                    }
+                    result.IsSuccess = true;
+                if (campusList.Count > 0)
+                {
+                    result.Message = "Campus get successfully";
+                    result.Data = response;
+                    foreach (var rec in result.Data)
+                    {
+                        var clientname = _clientRepo.GetById(rec.ClientId ?? 0).Result.CompanyName;
+                        rec.ClientName = clientname;
+                    }
+                    result.TotalRecordCount = campusTotalCount;
+                }
+                else
+                {
+                    result.Message = "No Campus found!";
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Message = "server error! " + ex.Message;
+            }
             return Ok(result);
         }
 
-        //[HttpGet]
-        //[Route("Edit")]
-
-        //public async Task<IActionResult> Edit(int id)
-        //{
-        //    var campus = await _campusrepo.GetCampusByID(id);
-        //    var model = new CampusGridViewModel()
-        //    {
-        //        WalkInID = campus.WalkinID,
-        //        JobDescription = campus.JobDescription,
-        //        WalkInDate = campus.WalkInDate,
-        //        Address1 = campus.Address1,
-        //        Address2 = campus.Address2,
-        //        City = campus.City,
-        //        StateID = campus.StateID,
-        //        CountryID = campus.CountryID,
-        //        Colleges = campus.Colleges,
-        //        Title = campus.Title
-        //    };
-
-        //    var StateList = Common.GetStateByCountryID(campus.CountryID ?? 0);
-        //    model.States = StateList.Successful ? (StateList.Value as IEnumerable).OfType<StateModel>().Select(x => new SelectListItem() { Text = x.StateName, Value = x.StateID.ToString() }) : new List<SelectListItem>();
-        //    model.Countries = (Common.GetAllCountries().Value as IEnumerable).OfType<CountryModel>().Select(x => new SelectListItem() { Text = x.CountryName, Value = x.CountryID.ToString() });
-        //    return Ok(model);
-
-        //}
-        [HttpGet]
-        [Route("Edit")]
-        public async Task<ActionResult> Edit(int Id)
-        {
-            var campus = _campusrepo.GetCampusByID(Id);
-            CampusGridViewModel model = new CampusGridViewModel()
-            {
-                WalkInID = campus.Id,
-                JobDescription = campus.JobDescription,
-                WalkInDate = campus.WalkInDate,
-                Address1 = campus.Address1,
-                Address2 = campus.Address2,
-                City = campus.City,
-                StateID = campus.StateID,
-                CountryID = campus.CountryID,
-                Colleges = campus.Colleges,
-                Title = campus.Title
-            };
-            return Ok(model);
-        }
-
-        [HttpGet]
-        [Route("AddCampus")]
-        public ActionResult AddCampus()
-        {
-            var model = new CampusGridViewModel()
-            {
-                States = new List<SelectListItem>() { },
-                Countries = new List<SelectListItem>() { },
-                Colleges = new List<CampusWalkInModel>()
-            };
-            return Ok(model);
-        }
-
-
+        [Authorize(Roles = "AddCampusWalkIn")]
         [HttpPost]
         [Route("AddCampus")]
-        public async Task<IActionResult> AddCampus(CampusGridViewModel campusGridViewModel)
+        public async Task<IActionResult> AddCampus(CampusGridRequestVM vm)
         {
-            IGeneralResult<CampusGridViewModel> result = new GeneralResult<CampusGridViewModel>();
+            IGeneralResult<CampusGridRequestVM> result = new GeneralResult<CampusGridRequestVM>();
             try
             {
-                if (ModelState.IsValid)
+                if (vm == null)
                 {
-                    var FindCountry = _country.GetAll().Result.Where(x => x.CountryId == campusGridViewModel.CountryID).ToList();
-                    var FindStates = _staterepo.GetAll().Result.Where(x => x.StateId == campusGridViewModel.StateID);
-                    if (FindCountry == null)
-                    {
-                        result.Message = "This Country is not listed for Country Table!";
-                        return Ok(result);
-                    }
-                    else if (FindStates == null)
-                    {
-                        result.Message = "State not found!";
-                        return Ok(result);
-                    }
-                    else
-                    {
-                        var campusDetails = _campusrepo.GetAll().Result.Where(x => x.CountryId == campusGridViewModel.CountryID && x.StateId == campusGridViewModel.StateID).FirstOrDefault();
-                        if (campusDetails == null)
-                        {
-                            var ad = new CampusGridViewModel()
-                            {
-                                Title = campusGridViewModel.Title,
-                                StateID = campusGridViewModel.StateID,
-                                CountryID = campusGridViewModel.CountryID,
-                                City = campusGridViewModel.City,
-                                JobDescription = campusGridViewModel.JobDescription,
-                                WalkInDate = campusGridViewModel.WalkInDate,
-                                Address1 = campusGridViewModel.Address1,
-                                Address2 = campusGridViewModel.Address2,
-                               
-
-
-                            };
-                           
-                            var campus = await _campusrepo.Add(campusDetails);
-                            if (campus != null)
-                            {
-                                result.IsSuccess = true;
-                                result.Message = "College Added Successfully.";
-                                result.Data = campusGridViewModel;
-                            }
-                            else
-                            {
-                                result.Message = " Something Went wrong!";
-                            }
-                        }
-                        else
-                        {
-                            result.Message = "College Already Exist!";
-                        }
-                    }
+                    result.Message = "Your Model request in Invalid";
+                    return Ok(result);
                 }
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
+                {
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
+                }
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin && (vm.ClientId == null || vm.ClientId.ToString() == "" || vm.ClientId == 0))
+                {
+                    result.Message = "Please select a valid Client";
+                    return Ok(result);
+                }
+
+                var isCountryExist = _country.GetAllQuerable().Where(w => w.IsDeleted == false).Any(a => a.CountryId == vm.CountryId);
+                var allCollages = _collegeRepo.GetAllQuerable().Where(s => s.IsDeleted == false).Select(s => s.CollegeId).ToList();
+                var allStates = _staterepo.GetAllQuerable().Where(w => w.IsDeleted == false && w.StateId == vm.StateId && w.CountryId == vm.CountryId).ToList();
+                var isStateExist = allStates.Any(a => a.StateId == vm.StateId);
+                var allCity = await _cityRepo.GetAllQuerable().Where(m => m.IsDeleted == false).Select(c => c.CityId).ToListAsync();
+                var isCityExist = allCity.Any(x => x == vm.City);
+
+                foreach (var clg in vm.Colleges)
+                {
+                    var checkclg = allCollages.Any(s => s == clg.CollegeId);
+                    if (!checkclg)
+                    {
+
+                        result.Message = "College id " + clg.CollegeId + " does not exist";
+                        return Ok(result);
+                    }
+
+                }
+                if (!isCountryExist)
+                {
+
+                    result.Message = "Country is not exist";
+                    return Ok(result);
+                }
+                else if (!isStateExist)
+                {
+
+                    result.Message = "State is not exist";
+                    return Ok(result);
+                }
+                else if (!isCityExist)
+                {
+                    result.Message = "City is Not exist ";
+                    return Ok(result);
+                }
+
+                var sv = new TblWalkIn()
+                {
+                    WalkInDate = vm.WalkInDate,
+                    JobDescription = vm.JobDescription,
+                    Address1 = vm.Address1,
+                    Address2 = vm.Address2,
+                    City = vm.City,
+                    StateId = vm.StateId,
+                    CountryId = vm.CountryId,
+                    IsActive = true,
+                    IsDeleted = false,
+                    CreatedDate = DateTime.Now,
+                    CreatedBy = Convert.ToInt32(LoggedInUserId),
+                    Title = vm.Title,
+                    PassingYear = vm.PassingYear,
+                    ClientId = (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin) ? vm.ClientId : Convert.ToInt32(LoggedInUserClientId)
+
+                };
+                var walkin = await _campusrepo.Add(sv);
+                vm.WalkInID = walkin.WalkInId;
+
+                foreach (var rec in vm.Colleges)
+                {
+                    AddTblWalkinCollegeVm campusWalkInCollege = new AddTblWalkinCollegeVm()
+                    {
+                        WalkInId = sv.WalkInId,
+                        CollegeId = rec.CollegeId,
+                        ExamStartTime = TimeSpan.Parse(rec.ExamStartTime),
+                        ExamEndTime = TimeSpan.Parse(rec.ExamEndTime),
+                        CampusId = rec.CampusId,
+                        StartDateTime = rec.StartDateTime,
+                    };
+                    var collegeWalkin = await _campusWalkinCollegeRepo.Add(campusWalkInCollege.ToDblWalinCollege());
+                    rec.CampusId = collegeWalkin.CampusId;
+                }
+                result.IsSuccess = true;
+                result.Message = "Record Saved Successfully";
+                result.Data = vm;
 
             }
             catch (Exception ex)
             {
-                result.Message = "Server Error!";
+                result.IsSuccess = false;
+                result.Message = "Something went wrong";
             }
             return Ok(result);
         }
 
+        [Authorize(Roles = "EditCampusWalkIn")]
+        [HttpPost]
+        [Route("UpdateCampus")]
+        public async Task<IActionResult> UpdateCampus(CampusGridRequestVM vm)
+        {
+            IGeneralResult<CampusGridRequestVM> result = new GeneralResult<CampusGridRequestVM>();
+            try
+            {
+                if (vm == null)
+                {
+                    result.Message = "Your Model request in Invalid";
+                    return Ok(result);
+                }
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
+                {
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
+                }
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin && (vm.ClientId == null || vm.ClientId.ToString() == "" || vm.ClientId == 0))
+                {
+                    result.Message = "Please select a valid Client";
+                    return Ok(result);
+                }
+                var isCountryExist = _country.GetAllQuerable().Where(w => w.IsDeleted == false).Any(a => a.CountryId == vm.CountryId);
+                var allCollages = _collegeRepo.GetAllQuerable().Where(s => s.IsDeleted == false).Select(s => s.CollegeId).ToList();
+                var allStates = _staterepo.GetAllQuerable().Where(w => w.IsDeleted == false && w.StateId == vm.StateId && w.CountryId == vm.CountryId).ToList();
+                var isStateExist = allStates.Any(a => a.StateId == vm.StateId);
+                var allCity = await _cityRepo.GetAllQuerable().Where(m => m.IsDeleted == false).Select(c => c.CityId).ToListAsync();
+                var isCityExist = allCity.Any(x => x == vm.City);
+
+                foreach (var clg in vm.Colleges)
+                {
+                    var checkclg = allCollages.Any(s => s == clg.CollegeId);
+                    if (!checkclg)
+                    {
+
+                        result.Message = "TblCollege id " + clg.CollegeId + " does not exist";
+                        return Ok(result);
+                    }
+                }
+                if (!isCountryExist)
+                {
+
+                    result.Message = "Country is not exist";
+                    return Ok(result);
+                }
+                else if (!isStateExist)
+                {
+                    result.Message = "State is not exist";
+                    return Ok(result);
+                }
+                else if (!isCityExist)
+                {
+                    result.Message = "City is Not exist ";
+                    return Ok(result);
+                }
+                if (vm.WalkInID > 0)
+                {
+                    var campus = _campusrepo.GetAllQuerable().Where(x => x.WalkInId == vm.WalkInID && x.IsDeleted == false).FirstOrDefault();
+                    if (campus != null)
+                    {
+                        campus.WalkInDate = vm.WalkInDate;
+                        campus.JobDescription = vm.JobDescription;
+                        campus.Address1 = vm.Address1;
+                        campus.Address2 = vm.Address2;
+                        campus.City = vm.City;
+                        campus.StateId = vm.StateId;
+                        campus.CountryId = vm.CountryId;
+                        campus.Title = vm.Title;
+                        campus.PassingYear = vm.PassingYear;
+                        await _campusrepo.Update(campus);
+                        var walkincollege = _campusWalkinCollegeRepo.GetAllQuerable().Where(x => x.WalkInId == campus.WalkInId).ToList();
+                        vm.WalkInID = campus.WalkInId;
+                        if (walkincollege != null)
+                        {
+                            foreach (var rec in walkincollege)
+                            {
+                                await _campusWalkinCollegeRepo.Delete(rec);
+                            }
+                        }
+                        foreach (var rec in vm.Colleges)
+                        {
+                            if (rec.IsIncludeInWalkIn)
+                            {
+                                TblWalkInCollege campusWalkInCollege = new TblWalkInCollege()
+                                {
+                                    WalkInId = campus.WalkInId,
+                                    CollegeId = rec.CollegeId,
+                                    ExamStartTime = TimeSpan.Parse(rec.ExamStartTime),
+                                    ExamEndTime = TimeSpan.Parse(rec.ExamEndTime),
+                                    StartDateTime = rec.StartDateTime,
+                                };
+                                var updatecampus = await _campusWalkinCollegeRepo.Add(campusWalkInCollege);
+                                rec.CampusId = updatecampus.CampusId;
+                                
+                            }
+                        }
+                        result.IsSuccess = true;
+                        result.Message = "Record Update Successfully";
+                        result.Data = vm;
+                        return Ok(result);
+                    }
+                }
+                else
+                {
+                    result.Message = "Something went wrong.";
+                    return Ok(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Message = "server error. " + ex.Message;
+            }
+            return Ok(result);
+        }
+
+        [Authorize(Roles = "ViewCampusWalkIn")]
+        [HttpGet]
+        [Route("GetCampusByCampusId")]
+        public async Task<IActionResult> GetCampusById(int campusId)
+        {
+            IGeneralResult<GetCampusViewModel> result = new GeneralResult<GetCampusViewModel>();
+            try
+            {
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
+                {
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
+                }
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                var campusData = _campusrepo.GetAllQuerable().Where(x => x.IsDeleted == false   && x.IsActive==true && x.WalkInId == campusId).Include(x => x.State).Include(x => x.Country).OrderByDescending(x => x.WalkInDate).Select(x => new CampusGridViewModel()
+                {
+                    WalkInID = x.WalkInId,
+                    Address1 = x.Address1,
+                    Address2 = x.Address2,
+                    City = x.City,
+                    StateId = x.StateId,
+                    CountryId = x.CountryId,
+                    JobDescription = x.JobDescription,
+                    WalkInDate = x.WalkInDate.Value,
+                    IsActive = x.IsActive ?? false,
+                    Title = x.Title,
+                    ClientId = x.ClientId,
+                    PassingYear=x.PassingYear
+
+                }).FirstOrDefault();
+                
+              var campuswalkindata = _campusWalkinCollegeRepo.GetAllQuerable().Where(z => z.WalkInId == campusData.WalkInID ).ToList();
+                if (campuswalkindata.Count > 0)
+                {
+                    campusData.Colleges = campuswalkindata.Select(y => new CampusWalkInModel()
+                    {
+                        CampusId = y.CampusId,
+                        CollegeId = y.CollegeId ?? 0,
+                        ExamEndTime = y.ExamEndTime.Value.ToString(),
+                        ExamStartTime = y.ExamStartTime.Value.ToString(),
+                        IsIncludeInWalkIn = true,
+                        StartDateTime = y.StartDateTime.Value,
+                        CollegeName = _collegeRepo.GetAllQuerable().Where(z => z.CollegeId == y.CollegeId).First().CollegeName,
+                        CollegeCode = _collegeRepo.GetAllQuerable().Where(z => z.CollegeId == y.CollegeId).First().CollegeCode,
+                    }).ToList();
+                  }
+                if (campusData != null)
+                {
+                    GetCampusViewModel vmm = new GetCampusViewModel
+                    {
+                        WalkInID = campusData.WalkInID,
+                        Address1 = campusData.Address1,
+                        Address2 = campusData.Address2,
+                        City = campusData.City,
+                        StateId= campusData.StateId,
+                        CountryId = campusData.CountryId,
+                        IsActive = campusData.IsActive,
+                        Colleges = campusData?.Colleges,
+                        JobDescription = campusData.JobDescription,
+                        Title = campusData?.Title,
+                        WalkInDate = campusData.WalkInDate,
+                        ClientId = campusData.ClientId,
+                        PassingYear=campusData.PassingYear
+                    };
+                    result.Data = vmm;
+                    result.IsSuccess = true;
+                    result.Message = "Campus fetched Successfully";
+                }
+                else
+                {
+                    result.Message = "Data Not found";
+                    return Ok(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Message = "Server error! " + ex.Message;
+            }
+            return Ok(result);
+        }
+
+        [Authorize(Roles = "EditCampusWalkIn")]
+        [HttpGet]
+        [Route("CampusActiveInActive")]
+        public async Task<IActionResult> ActiveInActive(int campusId, bool status)
+        {
+            IGeneralResult<CampusViewModel> result = new GeneralResult<CampusViewModel>();
+            try
+            {
+                var _jwtSecretKey = _config["Jwt:Key"];
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserRole = (await _userAppRoleRepo.GetAll(x => x.UserId == Convert.ToInt32(LoggedInUserId))).FirstOrDefault();
+                if (LoggedInUserRole != null && LoggedInUserRole.RoleId == (int)AppRole.Admin)
+                {
+                    var res = _campusrepo.GetAllQuerable().Where(x => x.WalkInId == campusId && x.IsDeleted == false).FirstOrDefault();
+                    int campusTotalCount = 0;
+                    campusTotalCount = _campusrepo.GetAllQuerable().Where(x => x.WalkInId == campusId && x.IsDeleted == false).Count();
+                    if (res != null)
+                    {
+                        res.IsActive = !res.IsActive;
+                        var data = await _campusrepo.Update(res);
+                        result.Data = (CampusViewModel)data;
+                        result.IsSuccess = true;
+                        result.TotalRecordCount = campusTotalCount;
+                        result.Message = "Campus status changed successfully";
+                    }
+                }
+                else
+                {
+                    result.Message = "Access Denied";
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Message = "Server Error " + ex.Message;
+            }
+            return Ok(result);
+        }
+
+        [Authorize(Roles = "DeleteCampusWalkIn")]
+        [HttpDelete]
+        [Route("DeleteCampus")]
+        public async Task<IActionResult> DeleteCampus(int campusId)
+        {
+            IGeneralResult<CampusGridViewModel> result = new GeneralResult<CampusGridViewModel>();
+            try
+            {
+                var _jwtSecretKey = _config["Jwt:Key"];
+                var LoggedInUserId = JwtHelper.GetIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                var LoggedInUserClientId = JwtHelper.GetClientIdFromToken(Request.Headers["Authorization"], _jwtSecretKey);
+                if (LoggedInUserClientId == null || LoggedInUserClientId == "0")
+                {
+                    var user = await _userRepo.GetById(Convert.ToInt32(LoggedInUserId));
+                    LoggedInUserClientId = (user.ClientId == null ? "0" : user.ClientId.ToString());
+                }
+                var res = await _campusrepo.DeleteCampus(campusId);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                result.Message = "Server Error" + ex.Message;
+            }
+            return Ok(result);
+        }
     }
-
-
 }
-
-
-
-
-
-       
-
-
-    
-

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 namespace QuickCampus_Core.Common
 {
@@ -12,14 +8,12 @@ namespace QuickCampus_Core.Common
         public static string ConvertToEncrypt(string Password)
         {
             if (string.IsNullOrEmpty(Password)) return "";
-
             {
                 Password += Key;
                 var PasswordBytes = Encoding.UTF8.GetBytes(Password);
                 return Convert.ToBase64String(PasswordBytes);
             }
         }
-
         public static string ConvertToDecrypt(string base64EncodeData)
         {
             if (string.IsNullOrEmpty(base64EncodeData)) return "";
@@ -27,6 +21,21 @@ namespace QuickCampus_Core.Common
             var result = Encoding.UTF8.GetString(base64EncodeBytes);
             result = result.Substring(0, result.Length - Key.Length);
             return result;
+        }
+
+        public static string EncodePasswordToBase64(string password)
+        {
+            try
+            {
+                byte[] encData_byte = new byte[password.Length];
+                encData_byte = System.Text.Encoding.UTF8.GetBytes(password);
+                string encodedData = Convert.ToBase64String(encData_byte);
+                return encodedData;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error in base64Encode" + ex.Message);
+            }
         }
     }
 }

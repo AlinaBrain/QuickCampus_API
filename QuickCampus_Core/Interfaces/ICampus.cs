@@ -1,19 +1,18 @@
-﻿using QuickCampus_Core.ViewModel;
+﻿using QuickCampus_Core.Common;
+using QuickCampus_Core.ViewModel;
 using QuickCampus_DAL.Context;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using static QuickCampus_Core.Common.common;
 
 namespace QuickCampus_Core.Interfaces
 {
-    public interface ICampusRepo : IGenericRepository<WalkIn>
+    public interface ICampusRepo : IGenericRepository<TblWalkIn>
     {
-        Task<IEnumerable<CampusGridViewModel>> GetAllCampus();
-        Task<IEnumerable<CampusGridViewModel>> GetCampusByID(int id);
-        Task<IEnumerable<CampusGridViewModel>> Add(CampusGridViewModel campusGridViewModel);
+       Task<IGeneralResult<List<CampusGridViewModel>>> GetAllCampus();
+        Task<IGeneralResult<CampusGridViewModel>> GetCampusByID(int id);
+        Task<IGeneralResult<CampusGridRequestVM>> AddOrUpdateCampus(CampusGridRequestVM vm);
 
-
+        Task<IGeneralResult<string>> UpdateCampus(CampusGridRequestVM vm, int clientId, int userId);
+        Task<IGeneralResult<CampusGridViewModel>> ActiveInActive(int id,bool status);
+        Task<IGeneralResult<CampusGridViewModel>> DeleteCampus(int id);
     }
 }

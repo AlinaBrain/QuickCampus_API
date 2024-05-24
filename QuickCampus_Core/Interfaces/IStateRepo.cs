@@ -1,13 +1,10 @@
-﻿using QuickCampus_DAL.Context;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using QuickCampus_DAL.Context;
 
 namespace QuickCampus_Core.Interfaces
 {
-    public interface IStateRepo : IGenericRepository<State>
-    {
+    public interface IStateRepo : IGenericRepository<MstCityState>
+    { 
+
     }
 }

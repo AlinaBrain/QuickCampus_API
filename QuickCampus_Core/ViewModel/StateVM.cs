@@ -9,20 +9,53 @@ namespace QuickCampus_Core.ViewModel
 {
     public class StateVM
     {
-        public int StateId { get; set; }
+        public static explicit operator StateVM(MstCityState items)
+        {
+            return new StateVM
+            {
+                StateId = items.StateId,
+                StateName = items.StateName,
+                //CountryId = items.CountryId,
+                //IsActive = items.IsActive,
+                //IsDeleted   = items.IsDeleted,
+                //ClientId = items.ClientId,
+            };
+        }
+        public int? StateId { get; set; }
 
         public string? StateName { get; set; }
 
-        public int? CountryId { get; set; }
+        //public int? CountryId { get; set; }
 
-        public bool? IsActive { get; set; }
+        //public bool? IsActive { get; set; }
 
-        public bool? IsDeleted { get; set; }
+        //public bool? IsDeleted { get; set; }
+        //public int? ClientId { get; set; }
 
-        public virtual ICollection<College> Colleges { get; set; } = new List<College>();
 
-        public virtual Country? Country { get; set; }
-
-        public virtual ICollection<WalkIn> WalkIns { get; set; } = new List<WalkIn>();
+        public MstCityState ToStateDbModel()
+        {
+            return new MstCityState
+            {
+                StateName = StateName,
+                //CountryId = CountryId,
+                IsDeleted = false,
+                IsActive=true,
+                //ClientId= ClientId,
+            };
+        }
+        public MstCityState ToUpdateDbModel()
+        {
+            return new MstCityState
+            {
+                StateId = (int)StateId,
+                StateName = StateName,
+                IsActive = true,
+                IsDeleted = false,
+                //CountryId = CountryId,
+                //ClientId=ClientId
+                
+            };
+        }
     }
 }
